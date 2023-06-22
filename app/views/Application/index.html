@@ -1,0 +1,30 @@
+#{extends 'templates/main.html' /}
+
+#{script 'jquery.rc4.js' /}
+<script type="text/javascript">
+	$(function() {
+		
+		$('#signin').button();
+		$('#loginForm').submit(function() {
+			encrypt();
+			return true;
+		});
+	});
+	
+	function encrypt() {
+		var id = '${session.id}';
+		for (i = 0; i < id.length; i++) {
+			if (!isNaN(id.substring(i, i+1))) {
+				var start = Number(id.substring(i, i+1));
+				if ($('#password').val() != '') {
+					$('#password').rc4({
+						key: id.substring(start, start + 8)
+					});
+				}
+				break;
+			}
+		}		
+	}
+</script>
+<div id="news">
+</div>

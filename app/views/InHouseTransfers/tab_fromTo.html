@@ -1,0 +1,182 @@
+	#{hidden id:'priceUnit', name:'transactionTemplate.securityType.priceUnit', value:transactionTemplate?.securityType?.priceUnit /}
+	#{hidden id:'discounted', name:'transactionTemplate.securityType.isDiscounted', value:transactionTemplate?.securityType?.isDiscounted /}
+	#{hidden id:'transactionType', name:'transactionTemplate.portfolioTransaction.transactionType.lookupCode', value:transactionTemplate?.portfolioTransaction?.transactionType?.lookupCode /}
+		
+	
+	<table width="100%">
+		<tr>
+			<td>
+				<div>
+					<fieldset style="width:450px;height: 400px;border-color:rgb(136,182,217);">
+						<legend style="color: black;"><b>From</b></legend>
+							<p>
+								#{textBox id:'transactionNo', name:'transactionNo', label:'Transaction No', value:'', required:true, readOnly:true, width:'85' /}
+								#{hidden id:'transactionKey', name:'transactionKey', value:'' /}
+							</p>
+							<p>
+								#{textBox id:'transactionDate', name:'transactionDate', label:'Transaction Date', value:'', required:true, class:'calendar', readOnly:true /}
+								(MM/DD/YYYY)
+							</p>
+							<p>
+								#{textBox id:'accountNo', name:'accountNo', label:'Account No', value:'', required:true, class:'capitalize', readOnly:true, width:'85px' /}
+								#{hidden id:"accountKey", name:'accountKey', value:'' /}
+								#{button id:'accountHelp', value:'?', class:'small', readOnly:true /}
+								#{textBox id:'accountName', name:'accountName', value:'', readOnly:true, width:'149px' /}
+							</p>
+							<p>
+								#{textBox id:'transactionCode', name:'transactionCode', label:'Transaction Code', value:'', required:true, readOnly:readOnly, width:'60px' /}
+								#{hidden id:'transactionTemplateKey', name:'transactionTemplateKey', value:'' /}
+								#{button id:'transactionHelp', value:'?', class:'small', readOnly:readOnly /}
+								#{textBox id:'transactionCodeDesc', name:'transactionCodeDesc', value:'', readOnly:true, width:'174px' /}
+							</p>	 	
+						 	<p>
+								#{textBox id:'securityClass', name:'securityClass', label:'Security Class', value:'', readOnly:true, width:'60px' /}
+								#{textBox id:'securityClassDesc', name:'securityClassDesc', value:'', readOnly:true, width:'198px' /}
+								#{hidden id:'securityClassId', name:'securityClassId'  /}
+							</p>
+							<p>
+								#{textBox id:'securityType', name:'securityType', label:'Security Type', value:'', readOnly:true, width:'60px' /}
+								#{textBox id:'securityTypeDesc', name:'securityTypeDesc', value:'', readOnly:true, width:'198px' /}
+							</p>
+							<p>
+								#{textBox id:'securityId', name:'securityId', label:'Security Code', value:'', required:true, class:'capitalize', readOnly:readOnly, width:'120px' /}
+								#{hidden id:'securityKey', name:'securityKey', value:'' /}
+								#{button id:'securityHelp', value:'?', class:'small', readOnly:readOnly /} 
+								<br>
+								<p style="margin-left: 15.4em">
+									#{textBox id:'securityDesc', name:'securityDesc', value:'', readOnly:true, width:'262px' /}
+								</p>
+							</p>
+								
+							
+							<p>
+								#{textBox id:'counterPartyCode', name:'counterPartyCode', label:'Counter Party', value:'', required:true, class:'capitalize', readOnly:readOnly, width:'120px' /}
+								#{hidden id:'counterPartyKey', name:'counterPartyKey', value:'' /}
+								#{button id:'counterPartyHelp', value:'?', class:'small', readOnly:readOnly /}
+								<p style="margin-left: 15.4em">
+									#{textBox id:'counterPartyName', name:'counterPartyName', value:'', readOnly:true, width:'262px' /}
+								</p>
+							</p>
+							<p>
+								#{dropDownList id:'classification', name:'classification', label:'Classification', value:'', options:classifications, required:true, readOnly:readOnly /}								
+							</p>
+							<p>	
+								#{dropDownList id:'depositoryCode', name:'security.depositoryCode.lookupId', label:'Depository Code', options:depositoryCode, value:'', required:true, readOnly:true, width:'175px' /}		
+							</p>
+							<p>
+								#{textBox id:'settlementDate', name:'settlementDate', label:'Settlement Date', value:'', required:true, class:'calendar', readOnly:true /}
+								(MM/DD/YYYY)
+								#{hidden id:'lastPaymentDate' /}
+								#{hidden id:'accrualBase' /}
+								#{hidden id:'yearBase' /}
+							</p>
+							<p>
+								<label>Portfolio <span class="req">*</span></label>
+								#{textBox id:'holdingRefs', name:'transaction.holdingRefs', value:transaction?.holdingRefs, readOnly:readOnly, width:'85px' /}
+								#{button id:'holdingHelp', value:'?', class:'small', readOnly:readOnly /}
+								#{textBox id:'holdingQuantity', name:'transaction.holdingQuantity', value:transaction?.holdingQuantity, format:'#,##0.####', readOnly:true, width:'149px' /}
+							</p>
+							#{if settlement}
+							<p>
+								#{textBox id:'settlementAccount', name:'settlementAccount', label:'Settlement Account', value:'', required:true, readOnly:settle, width:'85px' /}
+								#{hidden id:'settlementAccountKey', name:'settlementAccountKey', value:'' /}
+								#{button id:'settlementAccountHelp', value:'?', class:'small', readOnly:settle /}
+								#{textBox id:'settlementAccountName', name:'settlementAccountName', value:'settlementAccountName', readOnly:true, width:'149px' /}
+							</p>
+							#{/if}
+							<p>
+								#{button id:'fromButton',name:'fromButton', value:'process',class:'button', readOnly:readOnly   /}
+							</p>
+						</fieldset>
+				</div>
+			</td>
+			<td> 
+				<div >
+					<fieldset style="width:450px;height: 400px;border-color:rgb(136,182,217);">
+						<legend style="color: black;"><b>To</b></legend>
+							<p>
+								#{textBox id:'transactionNoTo', name:'transactionNo', label:'Transaction No', value:'', required:true, readOnly:true, width:'85' /}
+								#{hidden id:'transactionKeyTo', name:'transactionKey', value:'' /}
+							</p>
+							<p>
+								#{textBox id:'transactionDateTo', name:'transactionDate', label:'Transaction Date', value:'', required:true, class:'calendar', readOnly:true /}
+								(MM/DD/YYYY)
+							</p>
+							<p>
+								#{textBox id:'accountNoTo', name:'accountNo', label:'Account No', value:'', required:true, class:'capitalize', readOnly:true, width:'85px' /}
+								#{hidden id:"accountKeyTo", name:'accountKey', value:'' /}
+								#{button id:'accountHelpTo', value:'?', class:'small', readOnly:true /}
+								#{textBox id:'accountNameTo', name:'accountName', value:'', readOnly:true, width:'149px' /}
+							</p>
+							<p>
+								#{textBox id:'transactionCodeTo', name:'transactionCode', label:'Transaction Code', value:'', required:true, readOnly:readOnly, width:'60px' /}
+								#{hidden id:'transactionTemplateKeyTo', name:'transactionTemplateKey', value:'' /}
+								#{button id:'transactionHelpTo', value:'?', class:'small', readOnly:readOnly /}
+								#{textBox id:'transactionCodeDescTo', name:'transactionCodeDesc', value:'', readOnly:true, width:'174px' /}
+							</p>	 	
+						 	<p>
+								#{textBox id:'securityClassTo', name:'securityClass', label:'Security Class', value:'', readOnly:true, width:'60px' /}
+								#{textBox id:'securityClassDescTo', name:'securityClassDesc', value:'', readOnly:true, width:'198px' /}
+								#{hidden id:'securityClassIdTo', name:'securityClassId'  /}
+							</p>
+							<p>
+								#{textBox id:'securityTypeTo', name:'securityType', label:'Security Type', value:'', readOnly:true, width:'60px' /}
+								#{textBox id:'securityTypeDescTo', name:'securityTypeDesc', value:'', readOnly:true, width:'198px' /}
+							</p>
+							<p>
+								#{textBox id:'securityIdTo', name:'securityId', label:'Security Code', value:'', required:true, class:'capitalize', readOnly:readOnly, width:'120px' /}
+								#{hidden id:'securityKeyTo', name:'securityKey', value:'' /}
+								#{button id:'securityHelpTo', value:'?', class:'small', readOnly:readOnly /} 
+								<br>
+								<p style="margin-left: 15.4em">
+									#{textBox id:'securityDescTo', name:'securityDesc', value:'', readOnly:true, width:'262px' /}
+								</p>
+							</p>
+								
+							
+							<p>
+								#{textBox id:'counterPartyCodeTo', name:'counterPartyCode', label:'Counter Party', value:'', required:true, class:'capitalize', readOnly:readOnly, width:'120px' /}
+								#{hidden id:'counterPartyKeyTo', name:'counterPartyKey', value:'' /}
+								#{button id:'counterPartyHelpTo', value:'?', class:'small', readOnly:readOnly /}
+								<p style="margin-left: 15.4em">
+									#{textBox id:'counterPartyNameTo', name:'counterPartyName', value:'', readOnly:true, width:'262px' /}
+								</p>
+							</p>
+							<p>
+								#{dropDownList id:'classificationTo', name:'classification', label:'Classification', value:'', options:classifications, required:true, readOnly:readOnly /}								
+							</p>
+							<p>	
+								#{dropDownList id:'depositoryCodeTo', name:'security.depositoryCode.lookupId', label:'Depository Code', options:depositoryCode, value:'', required:true, readOnly:true, width:'175px' /}		
+							</p>
+							<p>
+								#{textBox id:'settlementDateTo', name:'settlementDate', label:'Settlement Date', value:'', required:true, class:'calendar', readOnly:true /}
+								(MM/DD/YYYY)
+								#{hidden id:'lastPaymentDateTo' /}
+								#{hidden id:'accrualBaseTo' /}
+								#{hidden id:'yearBaseTo' /}
+							</p>
+							<p>
+								<label>Portfolio <span class="req">*</span></label>
+								#{textBox id:'holdingRefsTo', name:'transaction.holdingRefs', value:transaction?.holdingRefs, readOnly:true, width:'85px' /}
+								#{button id:'holdingHelpTo', value:'?', class:'small', readOnly:true /}
+								#{textBox id:'holdingQuantityTo', name:'transaction.holdingQuantity', value:transaction?.holdingQuantity, format:'#,##0.####', readOnly:true, width:'149px' /}
+							</p>
+							#{if settlement}
+							<p>
+								#{textBox id:'settlementAccountTo', name:'settlementAccount', label:'Settlement Account', value:'', required:true, readOnly:settle, width:'85px' /}
+								#{hidden id:'settlementAccountKeyTo', name:'settlementAccountKey', value:'' /}
+								#{button id:'settlementAccountHelpTo', value:'?', class:'small', readOnly:settle /}
+								#{textBox id:'settlementAccountNameTo', name:'settlementAccountName', value:'settlementAccountName', readOnly:true, width:'149px' /}
+							</p>
+							#{/if}
+							<p>
+								#{button id:'toButton', name:'toButton', value:'process',class:'button', readOnly:readOnly   /} 			
+							</p>
+						</fieldset>
+					</div>
+			</td>
+		</tr>
+	</table>
+		
+
+	

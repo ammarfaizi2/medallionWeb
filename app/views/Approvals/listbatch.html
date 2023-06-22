@@ -1,0 +1,99 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Approval Information' /}
+
+<script type="text/javascript">
+	var show = function(activity, key, taskId, url, operation, maintenanceLogKey, group, refKey) {
+		key = parseFloat(key);
+		maintenanceLogKey = parseFloat(maintenanceLogKey);
+		var refKeyTrim = refKey.substring(jQuery.trim(refKey).indexOf(':') + 1);
+		refKey = parseFloat(refKeyTrim);
+		
+		window.location.replace('${ctx}' + url + '?taskId=' + taskId + '&keyId=' + key + '&operation=' + operation + '&maintenanceLogKey=' + maintenanceLogKey + '&group=' + group + '&refKey=' + refKey + '&from=listBatch');
+		return false; 
+	} 
+</script>
+
+#{if flash.error || errors}
+    <div class="error">
+    	#{if flash.error}
+	${flash.error}
+		#{/if}
+    </div>
+#{/if}
+
+<form id="approvalForm" class="form" method="POST" name="approval">
+	<p>
+		#{dropDownList id:'operator', name:'search.activity', label:'Activity', value:search?.activity, readOnly:false, required:false, options:activities /}
+	</p>
+	<p>
+		#{textBox id:'referenceno', name:'search.referenceno', label:'Ref. No', value:search?.referenceno, readOnly:false, class:'capitalize', required:false, maxLength:100/}
+	</p>
+	<p>
+		#{textBox id:'batchno', name:'search.batchno', label:'Batch. No', value:search?.batchno, readOnly:false, class:'capitalize', required:false, maxLength:100/}
+	</p>
+	<p class="buttons">
+		<input id="search" type="button" value="Search"/>
+		<input id="reset" type="button" value="Reset"/>
+	</p>
+	
+	<p>&nbsp;</p>
+
+	<table id="grid" class="display">
+		<thead>
+			<tr>
+				<th width="20px" class="no_sort"><input type="checkbox" id="checkAll"/></th>
+				<th width="70px">Task ID</th>
+				<th width="75px">CreateDate</th>
+				<th width="150px">Activity</th>
+				<th width="50px">Batch.No</th>
+				<th width="100px">Ref.No</th>
+				<th width="400px">Description</th>
+			</tr>
+		</thead>
+		
+		<tbody>
+		#{if approvals}
+			#{list items:approvals, as:'approval'}
+				<tr class="${approval_parity} selectable">
+					<td>
+						#{checkBox id:'checkList', name:checkList /}
+						#{hidden id:'urlList', name:'url', value:approval.taskId +'|'+approval.maintenanceLogKey + '|'+ approval.operation + '|' + approval.processDefinition + '|' + approval.refKey+'|'+approval.activity+'|'+approval.key /}
+					</td>
+					<td onclick="show('${approval.activity}','${approval.key}','${approval.taskId}','${approval.url}','${approval.operation}','${approval.maintenanceLogKey}','${approval.group}','${approval.refKey}')">
+						${approval.taskId} 
+					</td>
+					<td onclick="show('${approval.activity}','${approval.key}','${approval.taskId}','${approval.url}','${approval.operation}','${approval.maintenanceLogKey}','${approval.group}','${approval.refKey}')">
+						${approval.createdDate} 
+					</td>
+					<td onclick="show('${approval.activity}','${approval.key}','${approval.taskId}','${approval.url}','${approval.operation}','${approval.maintenanceLogKey}','${approval.group}','${approval.refKey}')">
+						${approval.activity} 
+					</td>					
+					<td onclick="show('${approval.activity}','${approval.key}','${approval.taskId}','${approval.url}','${approval.operation}','${approval.maintenanceLogKey}','${approval.group}','${approval.refKey}')">
+						${approval.batchNo}
+					</td>
+					<td onclick="show('${approval.activity}','${approval.key}','${approval.taskId}','${approval.url}','${approval.operation}','${approval.maintenanceLogKey}','${approval.group}','${approval.refKey}')">
+						${approval.refKey}
+					</td>
+					<td onclick="show('${approval.activity}','${approval.key}','${approval.taskId}','${approval.url}','${approval.operation}','${approval.maintenanceLogKey}','${approval.group}','${approval.refKey}')">
+						${approval.description}
+					</td>
+				</tr>
+			#{/list}
+		#{/if}
+		</tbody>
+	</table>
+	
+	<div class="buttons">
+		<input id="approve" type="button" value="Approve"/>
+		<input id="reject" type="button" value="Reject"/>
+	</div>
+</form>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'Approvals/ApprovalBatch.js' /}
+	$(document).ready(function() {
+		$('.buttons input:button').button();
+		ApprovalBatch($("#main"));
+	});
+</script>

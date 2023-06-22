@@ -1,0 +1,372 @@
+# You can specialize this file for each language.
+# For example, for French create a messages.fr file
+#
+secure.title=Please login
+
+
+validation.duplicate=<li>%2$s already exist</li>
+
+invalid.operation=Invalid Operation
+error.invalid.operation=Invalid Operation
+data.duplicate=Already exist
+data.noChange=Data no change !
+data.notfound=Data not found !
+data.hasBeenExist=has been exist
+data.hasBeenProcessed=Data has been Processed
+data.noEdited=Data Can not be Edited !
+data.noZero=Amount must be greater than 0 !
+data.greaterApplicationDate=Date can't greater than application date !
+canceldate.greaterApplicationDate=Cancel Date can't greater than application date !
+canceldate.lessEntitlementDate=Cancel Date can't less than entitlement date !
+canceldate.required=Cancel Date is required
+canceldate.lessthan.placementdate=Cancel Date can't less than placement date !
+canceldate.greaterthan.maturityDate=Cancel Date can't greater than maturity date !
+canceldate.lessthan.depositbreakdate=Cancel Date can't be less than Deposit Break Date
+
+thirdParty.thirdPartyCode=Code
+thirdParty.thirdPartyName=Name
+
+account.blocked=Account No "%s" is blocked
+
+announcement.confirmed.successful=Your Announcement No is #%d
+announcement.confirmed.successful.edit=Announcement No #%d is Updated
+announcement.approved=Announcement No #%d is Approved
+announcement.rejected=Announcement No #%d is Rejected
+announcement.entitled.update=This Announcement can't be processed because entitlement pending approval
+announcement.cancelled.successful=Announcement No #%d Success cancelled
+announcement.distributionDate=Distribution Date
+
+applicationDate.currentBusinessDate=Current Business Date
+
+batch.approved=Transaction Batch #%d is Approved
+batch.rejected=Transaction Batch #%d is Rejected
+
+cancelTrade.paymentNotYetApproved=There is an unapproved payment for this trade on payment approval work list
+cancelTrade.paymentAlreadyPaid=Cannot cancel an already paid trade
+cancelPayment.success = Payment Success cancelled
+cancelPayment.failed = Payment Failed cancelled
+
+cp.rule.rule_code_exist=Master rule with Code "%s" already exist 
+cp.affiliation.fund_code_exist=Affiliation with Fund Manager Code "%s" already exist 
+cp.portfolio.fund_code_exist=Portfolio with Fund Code "%s" already exist
+cp.ruleexception.rule_id_exist=Compliance with Rule Code "%s" already exist
+cp.ruleprofile.profile_code_exist=Compliance Profile with Code "%s" already exist 
+
+bankAccount.currency.should.same=Currency in Bank Info should be "%s"
+
+custody.eod.processdategreaterthenappdate=Process Date can't greater than application date
+custody.eod.invalidprocessdate=Invalid date format
+
+customer.currency.bankInvoice.different=Bank Account for invoicing should be in
+customer.identification1=Identification 1 must be KTP
+customer.npwp_date_greater_application_date=NPWP Registration Date can not greater than Application Date
+customer.join_date_greater_application_date=Joint Date can not greater than Application Date
+customer.expiryID1_date_less_application_date=Expiry Date Identification 1 in tab ID Info can not less than Application Date
+customer.expiryID2_date_less_application_date=Expiry Date Identification 2 in tab ID Info can not less than Application Date
+customer.expiryID3_date_less_application_date=Expiry Date Identification 3 in tab ID Info can not less than Application Date
+customer.expiryID4_date_less_application_date=Expiry Date Identification 4 in tab ID Info can not less than Application Date
+customer.expiryDoc1_date_less_application_date=Expiry Date Document 1 in tab ID Info can not less than Application Date
+customer.expiryDoc2_date_less_application_date=Expiry Date Document 2 in tab ID Info can not less than Application Date
+customer.expiryDoc3_date_less_application_date=Expiry Date Document 3 in tab ID Info can not less than Application Date
+customer.expiryDoc4_date_less_application_date=Expiry Date Document 4 in tab ID Info can not less than Application Date
+customer.siup_date_less_application_date=Exp. Date of Bussines Reg Cert No can not less than Application Date
+customer.skd_date_less_application_date=SKD Expired Date can not less than Application Date
+customer.bank_account_less_one_data=Bank Account must have at least One Data!
+
+closing.eoy.closingDateGreaterAppDate= Closing Date is greater than application date
+closing.eoy.closingYearGreaterAppDate= Closing year is equal or greater than application date
+closing.eoy.fundNotPublish= this fund not published yet
+
+dailyHoldingAsOf=Daily Holding As Of
+defaultProfile.cannotInactive=Profile Default cannont be inactive
+
+deposito.approved=Deposito No %s is Approved
+deposito.rejected=Deposito No %s is Rejected
+deposito.cancelled.approved=Deposito No %s is Cancelled
+deposito.cancelled.rejected=Cancel Deposito No %s is Rejected
+deposito.confirmed.successful=Your Deposito No is %s
+deposito.confirmed.successful.edit=Deposito No %s is Updated
+deposito.cancel.confirmed=Deposito No %s is Cancel
+
+download.unitTrust.paging = download.unitTrust.paging gnSystemParams is null
+
+entitlement.confirmed.successful=Your Entitlement No is #%d
+entitlement.approved=Entitlement No #%d is Approved
+entitlement.rejected=Entitlement No #%d is Rejected
+
+error.data.noEdited=Data Can not be Edited !
+error.invalid.data=Invalid data %s !
+error.invalidEmail=Invalid email format
+error.sentToFaInterface=Error when sent to FA Interface !
+error.transaction.invalidCategory=Invalid Category %s !
+error.transaction.invalidStatus=Status of the transaction is invalid. Status is "%s", expected is "%s"
+error.transaction.gt=%s is greater than %s !
+error.transaction.gtEq=%s is equal or greater than %s !
+error.transaction.lt=%s is less than %s !
+error.transaction.ltEq=%s is equal or less than %s !
+error.transaction.notEnoughHolding=%s is Not Enough Holding !
+error.transaction.notEnoughHolding.1=Holding Not Enough
+error.transaction.notEnoughSoldQuantity=Sold Quantity cannot be more than Available Trx Quantity
+error.transaction.notMatch=Match Status of The Transaction must be 'Match' 
+error.parameter.null=%s must not be null !
+error.transaction.ctconnect=Connection refused to CT
+error.transaction.cbconnect=Connection error to CoreBanking
+error.transaction.security.notAllowed=This security is not allowed, please check positive list in compliance setup
+error.transaction.validation=Invalid Transaction
+error.announcement.hasTaxCaLink=This Settlement should be process after Announcement no #%s settled
+error.announcement.notMatch=Announcement and Security Info Not Match!
+
+#error.settlementDate.isHoliday=Settlement Date is Holiday !
+#error.transactionDate.isHoliday=Transaction Date is Holiday !
+error.date.isHoliday=%s is Holiday !
+
+faCoaMaster.coaLevel.maximum=Can not confirm COA Level Parent must less than max level
+
+fa.eod.fromgreterthenappdate=Period fromDate can't greater than application date
+fa.eod.togreterthenappdate=Period to can't greater than application date
+fa.eod.fromyeargreterthenappdate=Period from can't less then financial year
+fa.eod.toyeargreterthenappdate=Period to can't less then financial year
+fa.eod.fromgreaterthento=Period from can't greater then period to
+fa.eod.frombackdatedallow=Period from can't less then back dated
+fa.eod.frompostingdate=Please posting from "%s"
+
+fa.posting.tolessequalfrom=Period From can't be greater than Period To
+fa.posting.backdatedgreaterthenfromdate=Max Backdated allowed is %s, can not be greater than Period From
+fa.posting.financialyearlessthenperiode=Periode Year can not be less then Fund financial year %d
+fa.posting.todategreaterthenappdate=Period to can not be greater than Business Date %s
+
+fundAction.productCode=Product Code is required
+fundAction.taxmaster=Tax is required
+fundAction.not_allowed_same_with_exceptionDate=Dividend is not allowed on this Good Fund Date
+fundAction.dividendDate.lt.effectiveDate=Dividend Date is less than Effective Date
+fundAction.dividendDate.gt.liquidDate=Dividend Date is greater than Liquidation Date
+fundAction.navDate.lt.cumDate=NAV Date is less than Cum Date
+fundAction.exDate.lt.navDate=Ex Date is less than NAV Date
+fundAction.postDate.lt.exDate=Posting Date is less than Ex Date
+fundAction.paymemtDate.lt.postDate=payment Date is less than Posting Date
+
+investment.accountNumber=Account Number is required
+investment.customer=Customer is required
+investment.rgproduct=Product Code is required
+
+investor.confirmed.successful=Your Investor No is #%d
+investor.confirmed.successful.edit=Investor No #%d successfully updated
+investor.not_allowed_in_active = Investor has active product account, can not be inactive
+
+latestDailyHolding=Latest Daily Holding
+
+lastDailyHolding=Last Daily Holding
+
+maturityDate.less_than.placementDate=Maturity Date can not less than Placement Date
+placementDate.greater_than.applicationDate=Placement Date can not greater than Current Business Date
+
+nav.productcode=Product Code is required
+nav.navdate=Nav Date is required
+
+passParam.maxLength_less_or_equal_totMinCharNumSpechar=Total of Minimum Character, Numeric, and Special must be less or equal to Maximum Length
+passParam.minChar_lt_totMinUpperLower=Total of Minimum Uppercase and Lowercase must be less than Minimum of character
+pass.invalid_oldPassword=Invalid Old Password!
+pass.list_of_restricted_password=Password must not contain Restricted Password
+
+paymentSchedule.endDate.holiday=End Date %s on grid payment schedule is holiday
+paymentSchedule.endDate.must_same.maturityDate=Last End Date on grid payment schedule must be equal Maturity Date
+paymentSchedule.must.not_null=Payment Schedule must not null  
+
+pledging.cancelled=Transaction No #%d is Cancelled
+pledging.closed=Transaction No #%d is Closed
+
+product.productCode=Product Code is required
+product.subMinAmt=Subscribe Minimum Amount is required 
+product.subMaxAmt=Subscribe Maximum Amount is required
+product.redMinAmt=Redeem Minimum Amount is required
+product.redMaxAmt=Redeem Maximum Amount is required
+product.swiMinAmt=Switching Minimum Amount is required
+product.swiMaxAmt=Switching Maximum Amount is required
+product.maxInvestor.maximum=Maximum Investor reached
+
+recurring.confirmed.successful=Your Recurring No is #%d
+recurring.approved=Recurring No #%d is Approved
+recurring.rejected=Recurring No #%d is Rejected
+
+cancelRecurring.approved=Cancel Recurring For #%d is Approved
+cancelRecurring.rejected=Cancel Recurring For #%d is Rejected
+
+redemption.fundcode=Product Code is required
+redemption.netAmount=Net Amount is required
+redemption.tradedate_greater_than_applicationDate=Trade Date greater than Application Date
+redemption.navdate_greater_than_goodFundDate=Nav Date greater than Good Fund Date
+redemption.navdate_greater_than_transactionDate=Nav Date greater than Transaction Date
+redemption.paymentdate_greater_than_maxpaydate=Payment date can not greater than maximum payment date
+redemption.postdate_less_than_goodFundDate=Post Date less than Good Fund Date
+redemption.postdate_less_than_transactionDate=Posting Date less than Transaction Date
+redemption.netAmount_less_than_redemptionMinimumAmount=Net Amount less than Minimum Amount
+redemption.netAmount_greater_than_redemptionMaximumAmount=NetAmount greater than Maximum Amount
+redemption.netAmount_greater_than_balanceAmount=Net Amount greater than Balance Amount
+redemption.unit_greater_than_balanceUnit=Unit greater than Balance Unit
+redemption.not_allowed_same_with_exceptionDate=Redemption is not allowed on this Good Fund Date
+redemption.fee_amount_greater_max_fee=Fee amount is not allowed to be greater than maximum redemption fee amount
+redemption.unit_less_than_minBalUnit=Unit less than Minimal balance unit
+redemption.fee_pct_greater_max_fee_pct=Fee can not be greater then Max Fee
+redemption.postdate_must_greater_than_eod=Posting Date can not less than or equal to Last Publish Date
+redemption.postdate_greater_than_default=Posting Date greater than Default Post Date
+redemption.feepct_lower_than_minfee=lower than min fee
+redemption.feepct_greater_than_minfee=greater than max fee
+redemption.available_unit_lower_than_min_bal_unit=Available unit is lower than Min balance unit
+redemption.unit_must_greater_than_zero=Unit must be greater than 0
+redemption.paymentdate_less_than_postdate=Payment Date can not less than Posting Date
+
+security.expired=Security code "%s" has been expired
+
+security.expired=Security code "%s" has been expired
+
+settlement.confirmed.successful=Your Settlement No is #%d
+settlement.approved=The Settlement (%d) for Transaction #%d is Approved
+settlement.rejected=The Settlement (%d) for Transaction #%d is Rejected
+settlement.success=Your settlement no is #%d, Batch No is #%d
+settlement.batch.successful=Your Settlement Batch No is #%d
+settlement.prematch.approved=Transaction #%d Prematch Status is Approved 
+settlement.prematch.rejected=Transaction #%d Prematch Status is Rejected 
+
+shareholdermeeting.confirmed.successful=Meeting No is #%d
+shareholdermeeting.approved=Meeting No #%d is Approved
+shareholdermeeting.rejected=Meeting No #%d is Rejected
+
+statement.via=Statement via at least choose one
+
+subscription.amount_less_than_topUpMinimumAmount=Net Amount less than Minimum Top Up Amount
+error.subscription.amount_less_than_topUpMinimumAmount=Net Amount less than Minimum Top Up Amount
+subscription.fundcode=Product Code is required
+subscription.netAmount=Net Amount is required
+subscription.tradedate_greater_than_applicationDate=Trade Date greater than Application Date
+subscription.navdate_greater_than_goodFundDate=NAV Date greater than Transaction Date
+subscription.postdate_less_than_goodFundDate=Posting Date less than Good Fund Date
+subscription.newAmount_less_than_subscribeMinimumAmount=Net Amount less than Minimum Initial Amount
+error.subscription.newAmount_less_than_subscribeMinimumAmount=Net Amount less than Minimum Initial Amount
+subscription.newAmount_greater_than_subscribeMaximumAmount=Net Amount greater than Maximum Amount
+subscription.not_allowed_same_with_exceptionDate=Subscription is not allowed on this Good Fund Date
+subscription.netAmount.below.subInitMinAmt=Transaction Amount Below The Minimum Initial Subscription Amount
+subscription.subscriptionFeePercent_greater_than_maxSubscriptionFeePercent=Subscription Fee in Percent greater than Maximum Subscription Fee
+subscription.currencyFundAcount_not_same_as_currencyFund=Currency for fund account should be same as currency for Fund Code
+subscription.currencyInvestorAcount_not_same_as_currencyAccountNo=Currency for investment account should be same as currency for Account No
+subscription.postdate_greater_than_default=Posting Date greater than Default Post Date
+subscription.postdate_must_greater_than_eod=Posting Date can not less than or equal to Last Publish Date
+subscription.cancelTrade_can_not_cancel_trade_more_than_one=Can't cancel trade more than one
+
+switching.investFrom=InvestmentAccount From is Required
+switching.investTo=InvestmentAccount To is Required
+switching.navdate_greater_than_goodFundDate=NAV Date greater than Good Fund Date
+switching.postdate_less_than_goodFundDate=Posting Date Less than good Fund Date
+switching.postdate_less_than_applicationDate=Posting Date less than Application Date
+switching.netAmount_less_than_switchingMinimumAmount=Net Amount less than Minimum Amount
+switching.netAmount_greater_than_switchingMaximumAmount=Net Amount greater than Maximum Amount
+switching.unit_greater_than_availableUnit=Unit greater than Available Unit
+error.switching.unit_greater_than_availableUnit=Unit greater than Available Unit
+
+switching.postdate_less_than_goodFundDate=Post Date less than Transaction Date
+switching.postdate_greater_than_eod=Post Date greater than EOD Date
+switching.tradedate_greater_than_applicationDate=Trade Date greater than Application Date
+switching.navdate_greater_than_goodFundDate=NAV Date greater than Transaction Date
+
+switching.out.unit_zero=Tab detail (Switch Out) Redeem by unit can not 0
+switching.out.unit_greate_than_zero=Tab detail (Switch Out) Redeem by unit must be greater than 0
+switching.redemption.availableUnit_empty=Tab detail (Switch Out) Have not available unit
+switching.redemption.fee_pct_greater_max_fee_pct=Switching Fee (Switch Out) can not be greater than Maximum Switching Fee
+switching.redemption.fee_amount_greater_max_fee=Switching Fee amount (Switch Out) is not allowed to be greater than maximum redemption fee amount
+switching.redemption.available_unit_lower_than_min_bal_unit=Available unit (Switch Out) is lower than Min balance unit
+
+switching.subscription.amount_less_than_topUpMinimumAmount=Amount (Switch In) less than Minimum Top Up Amount
+switching.subscription.newAmount_less_than_subscribeMinimumAmount=Net Amount (Switch In) less than Minimum Amount
+switching.subscription.newAmount_greater_than_subscribeMaximumAmount=New Amount (Switch In) greater than Maximum Amount
+switching.subscription.subscriptionFeePercent_greater_than_maxSubscriptionFeePercent=Switching Fee (Switch In) can not be greater than Maximum Switching Fee
+switching.subscription.not_allowed_same_with_exceptionDate=Subscription (Switch In) is not allowed on this Good Fund Date
+
+transaction.account=Account No
+transaction.account.custodyAccountKey=Account Key
+transaction.capitalGainTax=Capital Gain Tax
+transaction.capitalGainTaxMaster=Capital Gain Tax Master
+transaction.counterParty=Counter Party
+transaction.classification=Classification
+transaction.classification.lookupId=Classification Id
+transaction.dailyHolding=Daily Holding
+transaction.discountTaxMaster=Discount Tax Master
+transaction.discountTax=Discount Tax
+transaction.holdingRefs=Holding Refs
+transaction.lastPaymentDate=Last Payment Date
+transaction.maturityDate=Maturity Date
+transaction.notEnoughSoldQuantity=Sold Quantity cannot be more than Available Trx Quantity
+transaction.quantity=Quantity
+transaction.taxOnInterestMaster=Tax On Interest Master
+transaction.thirdParty=Third Party
+transaction.transactionCharges.chargeMaster=Charges
+transaction.transactionCharges.taxAmount=Charges Tax Amount
+transaction.transactionTemplate=Transaction Code
+transaction.transactionTemplate.portfolioTransaction.transactionType=Portfolio Transaction Type
+transaction.transactionTemplate.settlementTransaction=Settlement Transaction
+transaction.transactionTemplate.transactionCategory=Transaction Category
+transaction.transactionDate=Transaction Date
+transaction.security=Security Code
+transaction.security.notAllowed=This security is not allowed, please check positive list in compliance setup
+transaction.security.securityKey=Security Key
+transaction.security.securityType=Security Type
+transaction.settlementAccount=Settlement Account 
+transaction.settlementDate=Settlement Date
+
+transaction.confirmed.successful=Your Transaction No is #%d
+transaction.prematch.yes=Transaction No #%d Prematch Status has been saved
+transaction.prematch.reject=Please reject prematch
+transaction.prematch.cancel.reject = Please reject cancel
+transaction.approved=Transaction No #%d is Approved
+transaction.rejected=Transaction No #%d is Rejected
+transaction.ctconnect.success=Successfully sent to CBEST
+transaction.cbconnect=Successfully sent to CoreBanking
+
+trade.confirmed.successful=Your Trade ID is #%d
+trade.approved=Trade ID #%d is Approved
+trade.rejected=Trade ID #%d is Rejected
+trade.suspended=Trade ID #%d is Suspended
+trade.cancelled.successful=Trade ID #%d Success Cancelled
+
+switch.confirmed.successful=Your Switching No is #%d
+switch.approved=Switching No #%d is Approved
+switch.rejected=Switching No #%d is Rejected
+switch.cancelled.successful=Switching ID #%d Success Cancelled
+
+fundAction.confirmed.successful=Your Dividen No is #%d
+fundAction.approved=Dividen No #%d is Approved
+fundAction.rejected=Dividen No #%d is Rejected
+fundAction.cancelled.successful=Dividen ID #%d Success Cancelled
+
+billing.process.invalidmonth=Invalid month
+billing.process.invalidyear=Invalid month
+billing.process.cannotbegreaterthenappmonthyear=Month and year invoice can not be greater then application month and year
+billing.process.invduedatecannotbelesttheninvdate=Invoice Due Date can not be less or equal then Invoice Date
+billing.process.invdatecannotbelestthenendofinvoice=Invoice Date can not be less then end of month and year invoice 
+billing.process.invalidcustomertype=Invalid customer type
+
+bankaccount.customer.accountNo.unique=Customer's bank account should be unique
+auth.unregistered.user.in.app=Unregistered user, please contact Administrator.
+
+cancelInvoice.approved=Cancel For Invoice No : #%d is Approved
+cancelInvoice.rejected=Cancel For Invoice No : #%d is Rejected
+
+certificate.confirmed.successful.edit=Certificate No #%s is  Updated
+certificate.confirmed.successful=Certificate No #%s is   Successful Entry
+liquidation.payment_date_exceed_max=Payment date Exceed max payment date.
+liquidation.tradedate_greater_than_applicationDate=Trade Date greater than current date
+liquidation.navdate_greater_than_goodFundDate=Nav Date greater than Good Fund Date
+liquidation.trans_date_less_than_current_date=Transaction Date cannot greater than current date
+liquidation.confirmed.successful=Your Liquidation No is #%d
+
+adjustment.maintenance.successful=Your Adjustment Code is #%s
+adjustment.maintenance.approved=Adjustment Code #%s is approved
+adjustment.maintenance.rejected=Adjustment Code #%s is rejected
+
+templateId.confirmed.successful=Template Id : 
+templateId.approved=Template Id : #%s is Approved
+templateId.rejected=Template Id : #%s is Rejected 
+
+data.already.process=Record has been modified
+error.data.already.process=Record has been modified
+
+trade.data.duplicate=Transaction Already exist!
+error.trade.data.duplicate=Transaction Already exist!

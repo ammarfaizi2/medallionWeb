@@ -1,0 +1,5 @@
+# Application dependencies
+require:
+    - play
+    - play -> secure
+    - play -> spring 1.0.1

@@ -1,0 +1,109 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Bank Account Information' /}
+#{set fixData: true /}
+#{set mode: mode /}
+
+<script type="text/javascript">	
+	$(function() {
+		// Search section
+		$('#accordion').accordion({
+			collapsible: true
+		});
+		$('#birthDate').datepicker();
+		
+		$("#bankAccountNoOperator").attr('selectedIndex', 1);
+		$("#bankAccountNameOperator").attr('selectedIndex', 1);
+		
+		/* $('.buttons button:first').button({
+			icons: {
+				primary: 'ui-icon-search'
+			}
+		}).next().button();	
+		$('#search').click(function() {
+			search();
+		});
+		// end of Search
+		 */
+		$('#reset').click(function() {
+			location.href="@{BankAccounts.list()}?mode=${mode}";						
+		});
+		
+		$('.buttons input:button').button();
+
+		// Focus on first input:text
+		$('form input:text').first().focus();
+	});
+
+	/* var search = function() {
+		$('#result .loading').show();
+		$('#result .response').hide();
+		$('#result').show();
+		$.get('@{search()}', $('#searchForm').serialize(), function(data) {
+			checkRedirect(data);
+			$('#result .response').html(data);
+			$('#result .loading').hide();
+			$('#result .response').show();	
+			setupTable();
+		});
+	}; */
+	
+</script>
+
+<div id="accordion">
+	<h3><a href="#">Search Bank Account</a></h3>
+		<form id="searchForm" class="form">
+				#{hidden id:'query', name:'params.query', value:params?.query /}
+				<input id="param" name="params.param" type="hidden" value="${param}"/> 
+			<p>
+				#{dropDownList id:'bankAccountNoOperator', name:'params.bankAccountNoOperator', label:'Account No', options:stringOperators, removeEmpty:'true', value:params.bankAccountNoOperator /}
+				#{textBox id:'bankAccountSearchNo', name:'params.bankAccountSearchNo', value:params.bankAccountSearchNo, class:'capitalize' /}
+			</p>
+			<p>
+				#{dropDownList id:'bankAccountNameOperator', name:'params.bankAccountNameOperator', label:'Name', removeEmpty:'true', options:stringOperators, value:params.bankAccountNameOperator /}
+				#{textBox id:'bankAccountSearchName', name:'params.bankAccountSearchName', value:params.bankAccountSearchName, width:'350px', class:'capitalize' /}
+			</p>
+			<p style="display:none">
+				#{dropDownList id:'identificationNoOperator', name:'params.identificationNoOperator', label:'Identification No', removeEmpty:'true', options:stringOperators, value:params.identificationNoOperator /}
+				#{textBox id:'accountSearchIdentificationNo', name:'params.accountSearchIdentificationNo', value:params.accountSearchIdentificationNo, width:'200px', class:'capitalize' /}
+			</p>
+			<p>
+				<div class="buttons">
+					<input type="button" id="search" value="Search" />
+					<input type="button" id="reset" value="Reset" />
+				</div>
+			</p>
+	</form>
+</div>
+	
+<!-- <div id="result" style="display:none">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<div class="response"></div>
+</div> -->
+
+<div id="result" style="display:none">
+	<table id="tblBankAccount" class="display">
+		<thead>
+			<tr>
+				<th field="accountNo|string|none|left|sort" width="110px">Account No</th>
+				<th field="bankCode.thirdPartyName|string|none|left|sort">Bank Name</th>
+				<th field="name|string|none|left|sort">Beneficiary Name</th>
+				<!-- <th field="balance|number|decimal2|right|sort">Balance</th> -->
+				<th field="recordStatus|string|decode|left|sort">Status</th>
+				<th field="isActive|boolean|yesno|center|sort">Active</th>
+				
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+	
+</div>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'BankAccounts/bankAccount.js' /}
+	$(document).ready(function() {
+		Paging($("#accordion").add("#result"));
+	});
+</script>
+

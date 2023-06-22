@@ -1,0 +1,91 @@
+<script type="text/javascript">
+$(document).ready(function(){
+	// This is the hack for IE
+	if ($.browser.msie) {
+	  $('#notInList').click(function() {
+	    this.blur();
+	    this.focus();
+	  });
+	}
+
+	$('#notInList').change(function() {
+		if ($('#notInList').is(':checked')) 
+        	$('.buttons #new').show();
+		else 
+			$('.buttons #new').hide();
+	});
+	
+	$(function() {
+		$('.buttons input:button').button();
+		$('.buttons #new').hide();
+		$('.buttons #new').click(function() {
+			entry();
+		});
+	})
+
+});
+
+function doEdit(data) {
+	if ((data[4] == "New") || (data[4] == "Updated")) {
+		view(data[0]);
+		return false;
+	} else {
+		return true;
+	}
+}
+</script>
+
+
+
+<h3>Search results</h3>
+
+#{if bankAccounts}
+<table id="grid" class="display">
+	<thead>
+		<tr>
+			<th>Key</th>
+			<th width="100px">Bank Account No</th>
+			<th width="150px">Name</th>
+			<th width="100px">Balance</th>
+			<th width="100px">Status</th>
+			<th width="50px">Active</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:bankAccounts, as:'bankAccount'}
+		<tr>
+			<td>
+				${bankAccount.bankAccountKey}
+			</td>
+			<td>
+				${bankAccount.accountNo}
+			</td>
+			<td>
+				${bankAccount.name}
+			</td>
+			<td align="right">
+				#{if bankAccount.balance != null}
+					${bankAccount?.balance?.format('##,###.00')}
+				#{/if}
+			</td>
+			<td>
+				${bankAccount?.recordStatus?.decodeStatus()}
+			</td>
+			<td>
+				${(bankAccount?.isActive) ? 'Yes' : 'No'}
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>
+	#{if param == 'register-bank-acct'}
+		<div class="buttons">
+			<label><input type="checkbox" id="notInList"/> Not in the list</label>&nbsp;
+			<input type="button" id="new" value="New" />	
+		</div>	
+	#{/if}
+
+#{/if}
+#{else}
+<div>No record found</div>
+#{/else}

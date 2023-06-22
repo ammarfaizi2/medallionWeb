@@ -1,0 +1,122 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: ' ' /}
+#{set fixData: true /}
+#{set mode: mode /}
+
+<script type="text/javascript">	
+	$(function() {
+		// Search section
+		$('#accordion').accordion({
+			collapsible: true
+		});
+
+		$('#buttonNotInList').hide();
+		$('#birthDate').datepicker();
+		$('.calendar').datepicker();
+		$('.buttons button:first').button({
+			icons: {
+				primary: 'ui-icon-search'
+			}
+		}).next().button();	
+		$('#search').click(function() {
+			search();
+		});
+		// end of Search
+		$('#reset').click(function() {
+			
+				location.href="@{DepositoMaturityProcessing.list()}#{if param}&param=${param}#{/if}";
+			
+		});
+		
+		$('.buttons input:button').button();
+		$("#customerSearchIdentificationNo").attr('disabled', 'disabled');
+		$("#customerSearchIdentificationNoHelp").attr('disabled', 'disabled');
+		$("input[name='isBilyetNo']:checked").val("true");
+		$("input[name='isBilyetNo']").change(function() {
+			if ($("input[name='isBilyetNo']:checked").val() == "true"){
+				$("#customerSearchIdentificationNo").val("");
+				$("#customerSearchIdentificationNo").attr('disabled', 'disabled');
+				$("#customerSearchIdentificationNoHelp").attr('disabled', 'disabled');
+			} else {
+				$("#identificationNoOperator").val(0);
+				$("#customerSearchIdentificationNo").attr('disabled',false);
+				$("#customerSearchIdentificationNoHelp").attr('disabled',false);
+			}
+		});
+
+		//--Lookup Issuer Code
+		//$('#customerSearchIdentificationNo').lookup({
+			//list:'@{Pick.thirdParties()}?type=THIRD_PARTY-ISSUER',
+			//get:'@{Pick.thirdParty()}?type=THIRD_PARTY-ISSUER',
+			//key:$('#issuerKey'),
+			//description:$('#issuerName'),
+			//help:$('#issuerHelp')
+		//});
+				
+	
+	});
+
+	function doEdit() {
+		return false;
+	}
+
+	var search = function() {
+		$('#result .loading').show();
+		$('#result .response').hide();
+		$('#result').show();
+		$.get('@{search()}', $('#searchForm').serialize(), function(data) {
+			checkRedirect(data);
+			$('#result .response').html(data);
+			$('#result .loading').hide();
+			$('#result .response').show();
+			$('#buttonNotInList').show();	
+			setupTable();
+		});
+	};
+</script>
+
+<div id="accordion">
+	<h3><a href="#">Search Deposito</a></h3>
+		<form id="searchForm" class="form">
+
+				<input id="param" name="params.param" type="hidden" value="${param}"/> 
+			<p>
+				#{dropDownList id:'customerNoOperator', name:'params.customerNoOperator', label:'Custody Acc', options:stringOperators, value:params.customerNoOperator /}
+				#{textBox id:'customerSearchNo', name:'params.customerSearchNo', value:params.customerSearchNo, class:'capitalize' /}
+			</p>
+			<p>
+				#{dropDownList id:'customerNameOperator', name:'params.customerNameOperator', label:'Custody Name', options:stringOperators, value:params.customerNameOperator /}
+				#{textBox id:'customerSearchName', name:'params.customerSearchName', value:params.customerName, width:'350px', class:'capitalize' /}
+			</p>
+			<p>
+				<label style="width:160px">Period</label>
+				<label style="width:50px">From</label>
+				#{textBox id:'fromSearchDate', name:'params.customerSearchBirthDate', value:params.customerSearchBirthDate?.format(appProp.dateFormat), width:'85px', class:'calendar' /}&nbsp;&nbsp;
+				<label style="width:25px">To</label>
+				#{textBox id:'toSearchDate', name:'params.customerSearchBirthDate', value:params.customerSearchBirthDate?.format(appProp.dateFormat), width:'85px', class:'calendar' /} (${appProp.displayDateFormat})
+			</p>
+			<p>	
+				#{radioButton id:'isBilyetNo', name:'isBilyetNo', value:((isBilyetNo)?'false':'true'), label:'Bilyet No', options:bilyets /}&nbsp;
+				#{hidden id:'identificationNoOperator', name:'params.identificationNoOperator', label:'Bilyet No', options:stringOperators, value:params.identificationNoOperator /}
+				#{button id:'customerSearchIdentificationNoHelp', value:'?', class:'small' /}
+				#{textBox id:'customerSearchIdentificationNo', name:'params.customerSearchIdentificationNo', value:params.customerSearchIdentificationNo /}
+				
+			</p>
+			<p>
+				<div class="buttons">
+					<input type="button" id="search" value="Search" />				
+					<input type="button" id="reset" value="Reset" />					
+				</div>
+			</p>
+	</form>
+</div>	
+
+<div id="result" style="display:none">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<div class="response"></div>
+</div>
+
+
+
+	
+

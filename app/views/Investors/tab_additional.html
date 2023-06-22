@@ -1,0 +1,255 @@
+<script type="text/javascript">
+$(function() {
+	
+	if ('${fromInquiry}'=='${menuInquiry}'){
+		if ($('#customerFile').val()==''){
+			$('#idDownloadHere').html('');
+		}
+	}
+	if ($.browser.msie){
+		$("#additionalDesc[maxlength]").bind('input propertychange', function() {  
+	        var maxLength = $(this).attr('maxlength');  
+	        if ($(this).val().length > maxLength) {  
+	            $(this).val($(this).val().substring(0, maxLength));  
+	        }  
+	    });
+	}
+	$('#sof'+'${otherSourceOfFundInd}').change(function(){
+		adjustOther();
+		$('#otherSofInd').val('');
+	});
+	
+	$('#inv'+'${otherInvObjInd}').change(function(){
+		adjustOther();
+		$('#otherInvObjInd').val('');
+	});
+	
+	$('#sof'+'${otherSourceOfFundCorp}').change(function(){
+		adjustOther();
+		$('#otherSofCorp').val('');
+	});
+	
+	$('#inv'+'${otherInvObjCorp}').change(function(){
+		adjustOther();
+		$('#otherInvObjCorp').val('');
+	});
+	
+	adjustOther();
+	
+	if (!$('#flagAttachFile').is(':checked')){
+			$('#attachFile').disabled();
+			$('p[id=pAttach] label span').html('');
+	}
+	
+	$('input[name="sourceOfFunds"]').change(function(){
+		var id = this.id
+		var cekB = true;
+		if (!$('input[name="sourceOfFunds"]').is(':checked')){
+			cekB = false;
+		}
+		$('.checkboxindi').attr('checked', false);
+		if(cekB){
+			$('#'+id).attr('checked', true);
+		}
+		adjustOther();
+		$('#otherSofCorp').val('');
+		$('#otherSofInd').val('');
+	});
+	
+	$('#flagAttachFile').change(function(){
+		if (!$('#flagAttachFile').is(':checked')){
+			$('#attachFile').disabled();
+			if ($.browser.msie) {
+				$('#attachFile').replaceWith($('#attachFile').clone(true));
+			} else {
+				$('#attachFile').val('');
+			}
+			$('p[id=pAttach] label span').html('');
+		} else {
+			$('#attachFile').enabled();
+			$('p[id=pAttach] label span').html(' *');
+		}
+	});
+
+	
+});
+
+function adjustOther(){
+	if ($('#customerType').val()=='${typeIndi}'){
+		// INDIVIDUAL
+		if ($('#sof'+'${otherSourceOfFundInd}').is(':checked')){
+			if((('${mode}'=='entry')&&(!'${confirming}'))||(('${mode}'=='edit')&&(!'${confirming}'))){
+				$('#otherSofInd').enabled();
+			}
+			$('td[id=sofMandatory] label span').html(' *');
+		} 
+		
+		if (!$('#sof'+'${otherSourceOfFundInd}').is(':checked')){
+			$('#otherSofInd').disabled();
+			$('td[id=sofMandatory] label span').html('');
+		}
+		
+		if ($('#inv'+'${otherInvObjInd}').is(':checked')){
+			if((('${mode}'=='entry')&&(!'${confirming}'))||(('${mode}'=='edit')&&(!'${confirming}'))){
+				$('#otherInvObjInd').enabled();
+			}
+			$('td[id=invMandatory] label span').html(' *');
+		}
+		
+		if (!$('#inv'+'${otherInvObjInd}').is(':checked')){
+			$('#otherInvObjInd').disabled();
+			$('td[id=invMandatory] label span').html('');
+		}
+	}
+	
+	// CORPORATE
+	if ($('#customerType').val()=='${typeCorp}'){
+		if ($('#sof'+'${otherSourceOfFundCorp}').is(':checked')){
+			if((('${mode}'=='entry')&&(!'${confirming}'))||(('${mode}'=='edit')&&(!'${confirming}'))){
+				$('#otherSofCorp').enabled();
+			}
+			$('td[id=sofMandatory] label span').html(' *');
+		} 
+		
+		if (!$('#sof'+'${otherSourceOfFundCorp}').is(':checked')){
+			$('#otherSofCorp').disabled();
+			$('td[id=sofMandatory] label span').html('');
+		}
+		
+		if ($('#inv'+'${otherInvObjCorp}').is(':checked')){
+			if((('${mode}'=='entry')&&(!'${confirming}'))||(('${mode}'=='edit')&&(!'${confirming}'))){
+				$('#otherInvObjCorp').enabled();
+			}
+			$('td[id=invMandatory] label span').html(' *');
+		}
+		
+		if (!$('#inv'+'${otherInvObjCorp}').is(':checked')){
+			$('#otherInvObjCorp').disabled();
+			$('td[id=invMandatory] label span').html('');
+		}
+	}
+}
+</script>
+<style type="text/css">
+	textarea { resize:none; height: 50px;}
+</style>
+<!-- <p>
+			#{radioButton id:'isConsolidate', name:'customer.isConsolidate', value:((customer?.isConsolidate)?'true':'false'), label:'Consolidate Invoice', options:yesNo, readOnly:readOnly /}
+		</p> -->
+
+<div class="individual_only" style="width: auto;height: 250px;">
+	<div style="width: 450px">
+		<table>
+			<tr>
+				<td valign="top" atr="mandatoryDirect">
+					<label>Source of Fund</label>
+					<span class="error">#{error 'Source of Fund in tab Additional is' /}</span>
+					
+				</td>
+				<td>
+					#{list items:sourceOfFundInd, as:'item'}
+						<input id="sof${item.lookupId}" type="checkbox" name="sourceOfFunds" class="checkboxindi" value="${item.lookupId}" #{if readOnly}disabled="disabled"#{/if}/><span>${item.lookupDescription}</span><br />
+						<input id="hiddenSof${item.lookupId}" type="hidden" name="hidSourceOfFunds" value="" />
+					#{/list}
+					
+				</td>
+			</tr>
+			<tr>
+				<td id="sofMandatory" valign="top"><label>(Others)<span class="req"> *</span></label></td>
+				<td valign="top">
+					<p>
+						#{textBox id:'otherSofInd', name:'customer.sourceOfFundOthers', value:customer?.sourceOfFundOthers, class:'capitalize individual', maxLength:100, readOnly:readOnly/}
+						<span class="error">#{error 'Source of Fund (Others) in tab Additional is' /}</span>
+					</p>			
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div style="width: 450px;position: relative;left:450px;top:-230px">
+		<table>
+			<tr>
+				<td valign="top" atr="mandatoryDirect">
+					<label>Investment Objective</label>
+					<span class="error">#{error 'Investment Objectives in tab Additional is' /}</span>
+				</td>
+				<td valign="top">
+					#{list items:investObjInd, as:'item'}
+						<input id="inv${item.lookupId}" type="checkbox" name="investObjs" value="${item.lookupId}" #{if readOnly}disabled="disabled"#{/if}><span>${item.lookupDescription}</span><br />
+						<input id="hiddenInv${item.lookupId}" type="hidden" name="hidInvestObjs" value=""/>
+					#{/list}
+				</td>
+			</tr>
+			<tr>
+				<td id="invMandatory" ><label>(Others)<span class="req"> *</span></label></td>
+				<td>
+					<p>
+						#{textBox id:'otherInvObjInd', name:'customer.purposeOfInvestmentOthers', value:customer?.purposeOfInvestmentOthers, maxLength:100, class:'capitalize individual', readOnly:readOnly/}
+						<span class="error">#{error 'Investment Objectives (Others) in tab Additional is' /}</span>
+					</p>
+				</td>
+			</tr>
+		</table>
+	</div>
+	
+</div>
+<div class="corporate_only" style="width: auto;height: 180px;">
+	<div style="width: 450px">
+		<table>
+			<tr>
+				<td valign="top" atr="mandatoryDirect">
+					<label>Source of Fund</label>
+					<span class="error">#{error 'Source of Fund in tab Additional is' /}</span>
+				</td>
+				<td>
+					#{list items:sourceOfFundCorp, as:'item'}
+						<input id="sof${item.lookupId}" type="checkbox" name="sourceOfFunds" class="checkboxindi" value="${item.lookupId}" #{if readOnly}disabled="disabled"#{/if}/><span>${item.lookupDescription}</span><br />
+						<input id="hiddenSof${item.lookupId}" type="hidden" name="hidSourceOfFunds" value=""/>
+					#{/list}
+				</td>
+			</tr>
+			<tr>
+				<td id="sofMandatory"><label>(Others)<span class="req"> *</span></label></td>
+				<td>
+					<p>
+						#{textBox id:'otherSofCorp', name:'customer.sourceOfFundOthers', value:customer?.sourceOfFundOthers,  class:'capitalize corporate', maxLength:100, readOnly:readOnly/}
+						<span class="error">#{error 'Source of Fund (Others) in tab Additional is' /}</span>
+					</p>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div style="width: 450px;position: relative;left:450px;top:-130px">
+		<table>
+			<tr>
+				<td valign="top" atr="mandatoryDirect">
+					<label>Investment Objective</label>
+				<span class="error">#{error 'Investment Objectives in tab Additional is' /}</span>
+				</td>
+				<td valign="top">
+					#{list items:investObjCorp, as:'item'}
+						<input id="inv${item.lookupId}" type="checkbox" name="investObjs" value="${item.lookupId}" #{if readOnly}disabled="disabled"#{/if}><span>${item.lookupDescription}</span><br />
+						<input id="hiddenInv${item.lookupId}" type="hidden" name="hidInvestObjs" value=""/>
+					#{/list}
+				</td>
+			</tr>
+			<tr>
+				
+				<td id="invMandatory"><label>(Others)<span class="req"> *</span></label></td>
+				<td>
+					<p>
+						#{textBox id:'otherInvObjCorp', name:'customer.purposeOfInvestmentOthers', value:customer?.purposeOfInvestmentOthers,  class:'capitalize corporate', maxLength:100, readOnly:readOnly/}
+						<span class="error">#{error 'Investment Objectives (Others) in tab Additional is' /}</span>
+					</p>
+				</td>
+			</tr>
+		</table>
+	</div>
+</div>
+<br>
+<br>
+<p>
+	<label style="margin-right: 6px">Additional Description</label>
+	#{textArea id:'additionalDesc', name:'customer.remarks', value:customer?.remarks, readOnly:readOnly, class:'capitalize all',width:'255px', maxLength:225 /}
+</p>
+
+

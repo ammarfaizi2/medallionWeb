@@ -1,0 +1,61 @@
+#{extends 'templates/detail1.html' /}
+#{set pageTitle: 'Tax Maintenance' /}
+#{set id:taxMaster?.taxKey /}
+
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{script 'lookups.js' /}
+
+<script type="text/javascript">
+	$(function() {
+		$('input.percentTax').autoNumeric({vMax: '100.0000', vMin:'-99.0000'});
+		$('input.percentTax').live('blur', function() {
+			var el = $(this);
+			var id = this.id;
+			var stripped = "#" + id + "Stripped";
+			if (el.val() == '') {
+				el.siblings(stripped).val('');
+				return;
+			}
+			el.siblings(stripped).val(el.autoNumericGet());
+		});
+		
+		if ($('#rate').val()=='-0') {
+			alert('dddd');
+			$('#rate').val(0);
+		}
+		if (('${mode}'=='entry') || (('${mode}'=='edit') && (('${taxMaster?.recordStatus?.decodeStatus()}' == 'Reject')|| ($("#status").val() == 'R' )))) {
+			$('input[name=isActive]').attr("disabled", "disabled");
+		}
+		$("input[name='isActive']").change(function() {
+			$("input[name='taxMaster.isActive']").val($("input[name='isActive']:checked").val());
+		});
+	
+	})
+	
+</script>
+<style type="text/css">
+  #errmsg { color:red; }
+  .percentTax{ text-align: right;}
+</style>
+
+#{hidden id:'taxKey', name:'taxMaster.taxKey', value:taxMaster?.taxKey /}
+#{hidden id:'status', name:'status', value:status /}
+<p>
+	#{textBox id:'taxCode', name:'taxMaster.taxCode', label:'Tax Code', value:taxMaster?.taxCode , class:'capitalize', width:'150px', required:true, readOnly:((mode=='entry') ? confirming : true ), maxLength:50 /}
+	<span class="error">#{error 'Tax Code is' /}</span>
+	#{textBox id:'tasxCodeDesc', name:'taxMaster.description', value:taxMaster?.description, class:'capitalize', readOnly:readOnly, width:'300px', maxLength:100 /}	
+	<span class="error">#{error 'Tax Description is' /}</span>
+</p>
+<p>
+	#{textBox id:'rate', name:'rate', label:'Rate', value:taxMaster?.taxRate,format:'#,##0.####', required:true, class:'percentTax', readOnly:readOnly, width:'150px', maxLength:4   /} %
+	#{hidden id:'rateStripped', name:'taxMaster.taxRate', value:taxMaster?.taxRate /}
+	&nbsp;<span class="error">#{error 'Tax Rate is' /}</span>
+</p>
+<p>
+	#{textBox id:'additionalCode', name:'taxMaster.additionalCode', label:'Additional Code', value:taxMaster?.additionalCode, class:'capitalize', readOnly:readOnly, width:'150px', maxLength:50 /}
+</p>
+<p>
+	#{radioButton id:'isActive', name:'isActive', value:((taxMaster?.isActive)?'true':'false'), label:'Active', options:operators, readOnly:readOnly /}
+	#{hidden id:'isActiveHidden', name:'taxMaster.isActive', value:((taxMaster?.isActive)?'true':'false') /}
+</p>
+

@@ -1,0 +1,407 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Inquiry Portfolio Transaction' /}
+#{script 'forms.js' /}
+#{script 'date.js', characterset:'utf-8' /}
+#{script 'lookuppaging.js' /}
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+#{script 'transaction.js' /}
+#{script 'external/Util.js' /}
+
+<script type="text/javascript">
+
+	$(function(){
+		
+		/* var table = document.getElementsByTagName("table")[0];
+		var tbody = table.getElementsByTagName("tbody")[0];
+		var row = false;
+		tbody.onclick = function (e) {
+		    e = e || window.event;
+		    var data = [];
+		    var target = e.srcElement || e.target;
+		    while (target && target.nodeName !== "TR") {
+		        target = target.parentNode;
+		    }
+		    if (target) {
+		    	var cells = target.getElementsByTagName("td");
+		        if(cells.length > 1 ){
+		        	row = true;
+		        }
+		        for (var i = 0; i < cells.length; i++) {
+		            data.push(cells[i].innerHTML);
+		        }
+		    }
+		    //alert(data[0]);
+		    if(row){
+		    	location.href="@{view()}?id=" + data[0] + "&fromInquiry=fromInquiry";
+		    }
+		}; */
+		
+		$('.buttons input:button').button();
+		$('.calendar').datepicker();
+		
+		// Search section
+		$('#accordion').accordion({
+			collapsible: true
+		});
+		
+		$('.buttons button:first').button({
+			icons: {
+				primary: 'ui-icon-search'
+			}
+		}).next().button();	
+		
+//		$('#search').click(function() {
+//			search();
+//		});
+		// end of Search
+		
+		$('#reset').click(function() {
+			location.href="@{list()}";
+		});
+		
+		
+		
+		//======== START - Account Lookup
+		/* $('#accountNo').change(function(){
+			if ($('#accountNo').val() == "") {
+				$('#accountNo').val("");
+				$('#accountKey').val("");
+				$('#accountName').val("");
+				$('#h_accountName').val("");
+				
+				$('#portfolioNo').removeClass('fieldError');
+				$('#portfolioNo').val("");
+				$('#portfolioNoKey').val("");
+				$('#portfolioNoName').val("");
+				$('#h_portfolioNo').val("");
+				
+				$('#effectiveDate').removeClass('fieldError');
+				$('#effectiveDate').val("");
+				$('#h_effectiveDate').val("");
+				$('#effectiveDateHide').val("");
+			}
+		}); */
+		
+		/* $('#accountNo').lookup({
+			list:'@{Pick.accounts()}',
+			get:{
+				url:'@{Pick.account()}',
+				success: function(data){
+					$('#accountNo').removeClass('fieldError');
+					$('#accountKey').val(data.code);
+					$('#accountName').val(data.description);
+					$('#h_accountNo').val(data.code);
+					$('#h_accountName').val(data.description);	
+					
+					$('#portfolioNo').removeClass('fieldError');
+					$('#portfolioNo').val("");
+					$('#portfolioNoKey').val("");
+					$('#portfolioNoName').val("");
+					$('#h_portfolioNo').val("");
+					
+					$('#effectiveDate').removeClass('fieldError');
+					$('#effectiveDate').val("");
+					$('#h_effectiveDate').val("");
+					$('#effectiveDateHide').val("");
+				},
+				error: function(data){
+					$('#accountNo').addClass('fieldError');
+					$('#accountNo').val('');
+					$('#accountKey').val('');
+					$('#accountName').val('NOT FOUND');
+					$('#h_accountNo').val('');
+				}
+			},
+			description:$('#accountName'),
+			help:$('#accountHelp')
+		}); */
+		$('#customerCode').change(function(){
+			if ($(this).val()==''){
+				$('#customerCode').removeClass('fieldError');
+				$('#customerCode').val('');
+				$('#customerCodeId').val('');
+				$('#customerCodeName').val('');
+				$('#h_customerCodeName').val('');
+			}
+		});
+
+		$('#customerCode').dynapopup('PICK_CF_MASTER', '', 'securityType', 
+			function(data){
+				$('#customerCode').removeClass('fieldError');
+				$('#customerCodeId').val(data.code);
+				$('#customerCodeName').val(data.description);
+				$('#h_customerCodeName').val(data.description);
+			},
+			function(){
+				$('#customerCode').addClass('fieldError');
+				$('#customerCode').val('');
+				$('#customerCodeId').val('');
+				$('#customerCodeName').val('NOT FOUND');
+				$('#h_customerCodeName').val('');
+			}
+		);
+
+// 		$('#customerCode').lookup({
+// 			list : '@{Pick.customers()}',
+// 			get : {
+// 				url: '@{Pick.customer()}',
+// 				success: function(data) {
+// 					$('#customerCode').removeClass('fieldError');
+// 					$('#customerCodeId').val(data.code);
+// 					$('#customerCodeName').val(data.description);
+// 					$('#h_customerCodeName').val(data.description);
+// 				},
+// 				error: function(data) {
+// 					$('#customerCode').addClass('fieldError');
+// 					$('#customerCode').val('');
+// 					$('#customerCodeId').val('');
+// 					$('#customerCodeName').val('NOT FOUND');
+// 					$('#h_customerCodeName').val('');
+// 				}
+// 			},
+// 			description:$('#customerCodeName'),
+// 			help : $('#customerCodeHelp')
+// 		});
+		//======== END - Account Lookup
+		
+		//======== securityType start
+		$('#securityTypeCode').change(function() {
+			if ($('#securityTypeCode').val() == "") {
+				$('#securityTypeCode').val("");
+				$('#securityTypeKey').val("");
+				$('#securityTypeDesc').val("");
+				$('#h_securityTypeCode').val("");
+				
+				$('#securityId').val("");
+				$('#securityKey').val("");
+				$('#securityDesc').val("");
+				$('#h_securityDesc').val("");
+			}
+			attachSecuritiesPaging();
+		});
+		
+		$('#securityTypeCode').lookup({
+			list:'@{Pick.securityTypes()}',
+			get:{
+				url:'@{Pick.securityType()}',
+				success: function(data){
+					$('#securityTypeCode').removeClass('fieldError');
+					$('#securityTypeKey').val(data.code);
+					$('#securityTypeDesc').val(data.description);
+					$('#h_securityTypeCode').val(data.code);
+					
+					$('#securityId').val("");
+					$('#securityKey').val("");
+					$('#securityDesc').val("");
+					$('#h_securityDesc').val("");
+					$('#securityTypeCode').change();
+				},
+				error: function(data){
+					$('#securityTypeCode').addClass('fieldError');
+					$('#securityTypeCode').val('');
+					$('#securityTypeKey').val('');
+					$('#securityTypeDesc').val('NOT FOUND');
+					$('#h_securityTypeCode').val('');
+					$('#securityTypeCode').change();
+				}
+			},
+			description:$('#securityTypeCodeDesc'),
+			help:$('#securityTypeHelp')
+		});
+		//======== securityType end
+		
+		//======== securityId start
+		$('#securityId').change(function() {
+			if ($('#securityId').val() == "") {
+				$('#securityId').val("");
+				$('#securityKey').val("");
+				$('#securityDesc').val("");
+				$('#h_securityDesc').val("");
+			}
+		});
+		
+		function attachSecuritiesPaging() {
+			var securityType = $('#securityTypeCode').val();
+			var pickName = (securityType == '') ? 'PICK_SC_MASTER' : 'PICK_SC_MASTER_BY_SEC_TYPE';
+			$('#securityId').dynapopup2({key:'securityKey', help:'securityHelp', desc:'securityDesc'}, pickName, securityType, 'transactionNo', function(data){
+				$('#securityId').removeClass('fieldError');
+				$('#securityKey').val(data.code);
+				$('#securityDesc').val(data.description);
+				$('#h_securityId').val(data.code);
+			},function(data){
+				$('#securityId').addClass('fieldError');
+				$('#securityId').val('');
+				$('#securityKey').val('');
+				$('#securityDesc').val('NOT FOUND');
+				$('#h_securityId').val('');
+			});
+		}
+		attachSecuritiesPaging();
+		//======== securityId end
+		
+		$('#transactionDateFrom').change(function(){
+            var dateFrom = $(this).datepicker('getDate');
+            var dateTo = $('#transactionDateTo').datepicker('getDate');
+            var origin = 'from';
+            var id = '#transactionDate';
+            if ((($(this).val()!='') || ($(this).hasClass('fieldError'))) && ($('#transactionDateTo').val()!='')) {
+                //compareDateFromTo(dateFrom, dateTo, origin, id);
+                compareDateFromToEqual(dateFrom, dateTo, origin, id);
+            }
+        });
+
+        $('#transactionDateTo').change(function(){
+            var dateFrom = $('#transactionDateFrom').datepicker('getDate');
+            var dateTo = $(this).datepicker('getDate');
+            var origin = 'to';
+            var id = '#transactionDate';
+            if ((($(this).val()!='') || ($(this).hasClass('fieldError'))) && ($('#transactionDateFrom').val()!='')) {
+                //compareDateFromTo(dateFrom, dateTo, origin, id);
+                compareDateFromToEqual(dateFrom, dateTo, origin, id);
+            }
+        });
+	});
+
+/*	var search = function() {
+		var resultValidate = validateSearch();
+		if (!resultValidate) {
+			return;
+		}
+		
+		$('#result .loading').show();
+		$('#result .response').hide();
+		$('#result').show();
+		$.get('@{searchInquiryCancelTrade()}', $('#searchForm').serialize(), function(data) {
+			$('#result .response').html(data);
+			$('#result .loading').hide();
+			$('#result .response').show();
+			setupTable();
+		});
+	}; */
+	
+	function validateSearch() {
+		if (($('#transactionDateFrom').val() == '')||($('#transactionDateTo').val() == '') ||
+			($('#transactionDateFrom').hasClass('fieldError')) || ($('#transactionDateTo').hasClass('fieldError'))){
+			if ($('#transactionDateFrom').val() == '') {
+				$('#transactionDateFromError').html('required');	
+			} else {
+				$('#transactionDateFromError').html('');
+			}
+			
+			if ($('#transactionDateTo').val() == '') {
+				$('#transactionDateToError').html('required');	
+			} else {
+				$('#transactionDateToError').html('');
+			}
+			
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+// 	var validateDate = function(from){
+// 		var DateFrom = new Date($('#transactionDateFrom').datepicker('getDate'));
+// 		var DateTo = new Date($('#transactionDateTo').datepicker('getDate'));
+// 		if (($('#transactionDateFrom').val()!='') && ($('#transactionDateTo').val()!='')) { 
+// 			if (DateTo.getTime() < DateFrom.getTime()) {
+// 				if (from=='From'){
+// 					$('#transactionDateFrom').addClass('fieldError');
+// 					$("#transactionDateFromError").html("Date From must be less than Date To");
+// 				} else {
+// 					$('#transactionDateTo').addClass('fieldError');
+// 					$("#transactionDateToError").html("Date To must be greather than Date From");
+// 				}
+// 			} else {
+// 				//if (from!='From'){
+// 					$('#transactionDateTo').removeClass('fieldError');
+// 					$("#transactionDateToError").html("");
+// 				//} else {
+// 					$('#transactionDateFrom').removeClass('fieldError');
+// 					$("#transactionDateFromError").html("");
+// 				//}
+// 				//return true;
+// 			}
+// 		}
+// 	}
+</script>
+
+<div id="accordion">
+	<h3><a href="#">Search Transaction</a></h3>
+	<form id="searchForm" class="form">
+	#{hidden id:'query', name:'params.query', value:params?.query /}
+		<p>
+			#{textBox id:'transactionDateFrom', name:'params.transactionDateFrom', label:'Transaction Date', value:params?.transactionDateFrom?.format(appProp.dateFormat), class:'calendar', required: true , width:'100px'/}
+			(${appProp.displayDateFormat})
+			<span id="transactionDateFromError" class="error"></span> 
+			<b>To</b>
+			#{textBox id:'transactionDateTo', name:'params.transactionDateTo', value:params?.transactionDateTo?.format(appProp.dateFormat), class:'calendar', width:'100px'/}
+			(${appProp.displayDateFormat})
+			<span id="transactionDateToError" class="error"></span>
+		</p>
+		<p>
+			#{textBox id:'customerCode',width:'100px', name:'', label:'Customer Code', value:'', class:'capitalize' /}
+			#{hidden id:'customerCodeId', name:'params.customerCodeSearchId', value:params.customerCodeSearchId /}
+			#{button id:'customerCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'customerCodeName', name:'customer.customerName', value:customer?.customerName, readOnly:true, width:'300px' /}
+			<span id="errGroupCode" class="error"></span>
+		</p>
+		<p>
+			#{textBox id:'securityTypeCode', name:'params.securityType', label:'Security Type', class:'capitalize',readOnly:readOnly, width:'100px' /}
+			#{hidden id:'securityTypeKey', name:'params.transactionTemplateKey' /}
+			#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'securityTypeDesc', name:'params.securityTypeDescription', readOnly:true, width:'300px' /}
+		</p>
+		<p>
+			#{textBox id:'securityId', name:'params.securityId', label:'Security Code', value:params?.securityId, class:'capitalize', readOnly:readOnly, width:'100px' /}
+			#{hidden id:'securityKey', name:'params.securityKey' /}
+			#{button id:'securityHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'securityDesc', name:'params.securityDescription', readOnly:true, width:'300px' /}
+		</p>
+		<p>
+			#{textBox id:'transactionNo', name:'params.transactionNo', value:params?.transactionNo, label:'Transaction No', class:'capitalize', readOnly:readOnly, width:'100px', class:'numberOnly' /}
+		</p>
+		<p>
+			<div class="buttons">
+				<input type="button" id="search" value="Search" />
+				<input type="button" id="reset" value="Reset" />
+			</div>
+		</p>
+	</form>
+</div>
+<br />
+<!-- div id="result" style="display:none">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<div class="response"></div>
+</div -->
+
+<div id="result" style="display:none">
+	<table id="tableInqPortofolio" class="display">
+		<thead>
+			<tr>
+				<!-- <th field="transactionKey|string|none|center|sort">Key</th> -->
+				<th field="transactionDate|date|date|center|sort" width="110px">Transaction Date</th>
+				<th field="transactionNumber|string|none|left|sort">Txn #</th>
+				<th field="account.accountNo|string|none|left|sort">Account No</th>
+				<th field="account.name|string|none|left|sort">Account Name</th>
+				<th field="transactionTemplate.description|string|none|left|sort">Description</th>
+				<th field="security.securityId|string|none|left|sort">Security Code</th>
+				<th field="settlementAmount|number|decimal4|right|sort">Settlement Amount</th>
+				<th field="transactionStatus|string|none|center|sort">Status</th>
+				
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+	
+</div>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'InquiryPortfolioTransaction/InquiryProtofolioTransPaging.js' /}
+	$(document).ready(function() {
+		Paging($("#accordion").add("#result"));
+	});
+</script>

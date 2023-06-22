@@ -1,0 +1,53 @@
+<form id="pledgingForm" class="form">
+	#{hidden id:'rowPosition'/}
+	#{hidden id:'transactionDetailKey', name:'pledgingDetail.transactionDetailKey', value:pledgingDetail?.transactionDetailKey /}
+	#{hidden id:'accountType', name:'pledgingDetail.accountType.lookupId', value:pledgingDetail?.accountType?.lookupId /}
+		<!--
+		<p>
+			#{dropDownList id:'accountType', name:'pledgingDetail.accountType.lookupId', value:pledgingDetail?.accountType?.lookupId, label:'Account Type', options:accountTypePld, readOnly:true/}
+			#{hidden id:'accountTypeDesc', name:'pledging.accountType.lookupDescription', value:pledgingDetail?.accountType?.lookupDescription /}
+		</p>
+		-->
+		<br>
+		<p>
+			#{textBox id:'accountNo', name:'pledgingDetail.account.accountNo', label:'Account No', value:pledgingDetail?.account?.accountNo, readOnly:releaseOnly,  required:true, width:'100px' , class:'capitalize' /}
+			#{hidden id:'accountKey', name:'pledgingDetail.account.custodyAccountKey', value:pledgingDetail?.account?.custodyAccountKey /}
+			#{button id:'accountHelp', value:'?', class:'small', readOnly:true /}
+			#{textBox id:'accountDesc', name:'pledgingDetail.account.name', value:pledgingDetail?.account?.name, readOnly:true, width:'350px' /}
+		</p>
+		<p>
+			#{textBox id:'securityType', name:'pledgingDetail.security.securityType.securityType', label:'Security Type', value:pledgingDetail?.security?.securityType?.securityType, readOnly:releaseOnly, required:true, width:'100px' , class:'capitalize' /}
+			#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:true /}
+			#{textBox id:'securityTypeDesc', name:'pledgingDetail.security.securityType.description', value:pledgingDetail?.security?.securityType?.description, readOnly:true, width:'350px' /}
+		</p>
+		<p>
+			#{textBox id:'securityCode', name:'pledgingDetail.security.securityId', label:'Security Code', value:pledgingDetail?.security?.securityId, readOnly:releaseOnly, required:true, width:'100px' , class:'capitalize' /}
+			#{hidden id:'securityKey', name:'pledgingDetail.security.securityKey', value:pledgingDetail?.security?.securityKey /}
+			#{button id:'securityHelp', value:'?', class:'small', readOnly:true /}
+			#{textBox id:'securityDesc', name:'pledgingDetail.security.description', value:pledgingDetail?.securityType?.description, readOnly:true,  required:releaseOnly, width:'350px' /}
+		</p>
+		<p>
+			#{dropDownList id:'classification', name:'pledgingDetail.classification.lookupId', label:'Classification', value:pledgingDetail?.classification?.lookupId, options:classifications, required:true, readOnly:releaseOnly, width:'143px'/}
+		</p>
+		<p>
+			#{textBox id:'portfolioNo', label:'Holding Ref.', name:'pledgingDetail.holdingRefs', value:pledgingDetail?.holdingRefs, readOnly:releaseOnly,  required:true, width:'100px' , class:'capitalize' /}
+			#{hidden id:'portfolioNoKey', name:'pledgingDetail.portfolio.portfolioKey', value:pledgingDetail?.portfolio?.portfolioKey /}
+			#{button id:'portfolioNoHelp', value:'?', class:'small', readOnly:releaseOnly /}
+			#{textBox id:'portfolioQuantity', value:pledgingDetail?.portoQuantity, format:'#,##0.####', readOnly:true, width:'350px' /}
+			#{hidden id:'portfolioQuantityStripped', name:'pledgingDetail.portoQuantity', value:pledgingDetail?.portoQuantity /}
+		</p>
+		<p>
+			#{textBox id:'availableQty', label:'Available Qty', value:pledgingDetail?.availableQuantity,format:'#,##0.####', readOnly:releaseOnly, width:'108px',class:'numeric' /}
+			#{hidden id:'availableQtyStripped',  name:'pledgingDetail.availableQuantity', value:pledgingDetail?.availableQuantity /}
+		</p>
+		<p>
+			#{textBox id:'pledgingQty', label:'Qty To Block', value:pledgingDetail?.amount, format:'#,##0.####',readOnly:releaseOnly, width:'108px', required:true, class:'numeric' /}
+			#{hidden id:'pledgingQtyStripped', name:'pledgingDetail.amount', vaue:pledgingDetail?.amount /}
+		</p>
+		<!--
+		<p>
+			#{textBox id:'portoQty',  label:'Porto Qty', value:pledgingDetail?.portoQuantity, format:'#,##0.####',readOnly:true, width:'108px', class:'numeric' /}
+			#{hidden id:'portoQtyStripped', name:'pledgingDetail.portoQuantity', value:pledgingDetail?.portoQuantity /}
+		</p>
+		-->
+</form>

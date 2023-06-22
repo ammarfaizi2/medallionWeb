@@ -1,0 +1,331 @@
+#{set readOnly: ((mode != 'edit' && mode != 'entry') || confirming) /}
+#{set editOnly: ((mode == 'edit' || mode == 'entry') || confirming) /}
+#{set id:gnAdjustmentMaster?.code /}
+#{script 'date.js', characterset:'utf-8' /}
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+
+<script type="text/javascript">
+#{include 'RegistrySubscription/Util.js' /}
+$(function(){
+	Array.max = function( array ){
+		return Math.max.apply( Math, array );
+		};
+
+		// Function to get the Minimam value in Array
+		Array.min = function( array ){
+		return Math.min.apply( Math, array );
+		};
+		
+	var closeDialog = function() {
+		$("#dialog-message").dialog('close');	
+	}
+	
+	$('#listAdjustmentDetail #gridAdjustmentDetail tbody tr #deleteButton').live('click', function() {
+		var row = $(this).parents('tr');
+		var rowNumber = tableAdjustmentDetail.fnGetPosition(row[0]);
+		var deleteAdjustmentDetail = function(){
+			tableAdjustmentDetail.fnDeleteRow(rowNumber);
+			$("#dialog-message").dialog('close');
+		}
+		messageAlertYesNo("Are you sure to delete data ?", "ui-icon ui-icon-notice", "Confirmation Message", deleteAdjustmentDetail, closeDialog);
+		return false;
+	});
+	
+	$('#listAdjustmentDetail #gridAdjustmentDetail ').removeAttr('style');
+	$('#listAdjustmentDetail #gridAdjustmentDetail tbody tr td').die('click');
+	
+	$('#dummy').autoNumeric();
+	$('#tabsAdjustmentDetail').tabs();
+	$('#newAdjustmentDetail').button();
+	$('#cancelAdjustmentDetail').button();
+	$('#addAdjustmentDetail').button();
+	$('#name').attr('maxlength','50');
+	
+	var data = new Object();
+	tabAdjustment(data);
+	
+	$( "#detailForAdjustmentDetails" ).dialog({
+		autoOpen:false,
+		modal:true,
+		heigth:'600px',
+		width:'455px',
+		resizable:false
+	});
+	
+	$('.buttons #newAdjustmentDetail').click(function() {
+		selectedRow = null;
+		$("#currencyError").html('').hide();
+		$("#operatorError").html('').hide();
+		$("#valueError").html('').hide();
+		$("#detailForAdjustmentDetails").dialog('open');
+		$('.ui-widget-overlay').css('height',$('body').height());
+		$("#detailForAdjustmentDetails input:text").val(""); 
+		$("#detailForAdjustmentDetails input:hidden").val(""); 
+		$("#detailForAdjustmentDetails #operator").val("");
+		$("#detailForAdjustmentDetails #operatorSym").val("");
+		$("#detailForAdjustmentDetails #currency").val("");
+		$("#detailForAdjustmentDetails #currencyDesc").val("");
+		$("#errmsgNull").html("");
+		$("#detailForAdjustmentDetails #adjustmentDetailForm").find("span[id*='Error']").html("");
+	
+		$('#addAdjustmentDetail').removeAttr('disabled');
+		return false;
+	});
+	
+	$('#addAdjustmentDetail').live("click", function(){
+		$('#addAdjustmentDetail').attr('disabled','disabled');
+	   setTimeout(function() {
+		var table = $('#listAdjustmentDetail #gridAdjustmentDetail').dataTable();
+		var rowPosition = $("#rowPosition").val();
+		var code = $("#currency").val();
+		var operator = $("#operator").val();
+		var found = false;
+		
+		$("#gridAdjustmentDetail tbody tr").each(function(){
+			var currCode = $(this).find(".curr-code").val();
+			var operatorId = $(this).find(".operator-id").val();
+			//if(currCode==code && operatorId==operator){
+				if(currCode==code){
+				var row = $(this).find('.row-pos').val();
+				if(row!=rowPosition)
+					found=true;
+			}
+		});
+		
+		if(found){
+			//$('#detailForAdjustmentDetails').dialog('close');
+			messageAlertOk("These Currency already exist", "ui-icon1 ui-icon-circle-close", "Error Message", function() {
+				$("dialog-message").dialog('close');
+				$('#addAdjustmentDetail').removeAttr('disabled');
+			});
+		}else{
+			saveAdjustmentDetail();	
+			$('#addAdjustmentDetail').removeAttr('disabled');
+		}
+		
+		
+		function saveAdjustmentDetail(){
+			$("#currencyError").html('').hide();
+			$("#operatorError").html('').hide();
+			$("#valueError").html('').hide();
+			if (($("#currency").val() == "") || ($("#operator").val()=="") || ( $("#value").val()=="")){
+				$("#detailForAdjustmentDetails #adjustmentDetailForm").find("span[id*='Error']").html("");
+				
+				if ($("#currency").val()=="") {
+					$("#currencyError").html('Required').show();
+				} 
+				if ($("#operator").val()=="") {
+					$("#operatorError").html('Required').show();
+				}
+				if ($("#value").val()=="") {
+					$("#valueError").html('Required').show();
+				}
+			} else {
+				var dataAdjustmentDetails = table.fnGetData(parseFloat(rowPosition));
+				if (rowPosition != "") {
+					table.fnUpdate(dataAdjustmentDetails.currency.currencyCode = $("#currency").val(),parseFloat(rowPosition),0);
+					table.fnUpdate(dataAdjustmentDetails.currency.description = $("#currencyDesc").val(),parseFloat(rowPosition),0);
+					table.fnUpdate(dataAdjustmentDetails.operator.lookupId = $("#operator").val(),parseFloat(rowPosition),1);
+					table.fnUpdate(dataAdjustmentDetails.operator.lookupDescription = $("#operatorSym").val(),parseFloat(rowPosition),1);
+					table.fnUpdate(dataAdjustmentDetails.value = $("#value").autoNumericGet(),parseFloat(rowPosition),2);
+					table.fnUpdate(dataAdjustmentDetails.gnAdjustmentMaster.code = $("#code").val(),parseFloat(rowPosition),3);					
+				} else {
+					var dataAdjustmentDetail = new Object();
+					dataAdjustmentDetail.gnAdjustmentMaster = new Object();
+					dataAdjustmentDetail.currency = new Object();
+					dataAdjustmentDetail.operator = new Object();
+					dataAdjustmentDetail.gnAdjustmentMaster.code = $("#code").val();
+					dataAdjustmentDetail.currency.currencyCode = $("#currency").val();
+					dataAdjustmentDetail.currency.description = $("#currencyDesc").val();
+					dataAdjustmentDetail.operator.lookupId = $("#operator").val();
+					dataAdjustmentDetail.operator.lookupDescription = $("#operatorSym").val();
+					dataAdjustmentDetail.value = $("#value").autoNumericGet();
+					dataAdjustmentDetail.adjustmentDetailKey = $("#adjustmentDetailKey").val();
+					table.fnAddData(dataAdjustmentDetail);
+				}
+				$('#detailForAdjustmentDetails').dialog('close');
+				return false;		
+			}
+		}
+	   }, 500);
+	});
+	
+	$('#listAdjustmentDetail #gridAdjustmentDetail tbody tr td').die('click');
+	$('#listAdjustmentDetail #gridAdjustmentDetail tbody tr td').live('click',function(){
+		var txt = $(this).text();
+		if(txt == 'No data available in table')
+		{
+			return false;
+		}else{
+			var rowPos= $(this).parents('tr');
+			var rowPosNumber = tableAdjustmentDetail.fnGetPosition(rowPos[0]);
+			//var pos = tableAdjustmentDetail.fnGetPosition(this);
+			dataAdjustmentDetail = cell = tableAdjustmentDetail.fnGetData(this.parentNode);
+			console.log(dataAdjustmentDetail.currency)
+			//dataAdjustmentDetail = tableAdjustmentDetail.fnGetData(this.parentNode);
+			
+			//$('#detailForAdjustmentDetails #adjustmentDetailForm #currency').removeClass('fieldError');
+			$("#currencyError").html('').hide();
+			$("#operatorError").html('').hide();
+			$("#valueError").html('').hide();
+			$("#errmsgNull").html("");
+			$("#adjustmentDetailForm").find("span[id*='Error']").html("");
+			$("#rowPosition").val(rowPosNumber);
+			$("#adjMasterCode").val(dataAdjustmentDetail.gnAdjustmentMaster.code);
+			$("#currencyTxt").val(dataAdjustmentDetail.currency.currencyCode).change().blur();
+			$("#operator").val(dataAdjustmentDetail.operator.lookupId).change();
+			$("#value").autoNumericSet(dataAdjustmentDetail.value);
+			$("#detailForAdjustmentDetails").dialog('open');
+			$('.ui-widget-overlay').css('height',$('body').height());
+		}
+		
+	});
+});
+
+function tabAdjustment(data) {
+	var transactionDetails;
+	#{if '${transactionDetails}' != '' }
+		if(${transactionDetails.raw()} == null){
+			transactionDetails = new Array();
+		}else{
+			transactionDetails = ${transactionDetails.raw()};
+		}
+	#{/if}
+	#{if '${transactionDetails}' == '' }
+		transactionDetails = new Array();
+	#{/if}
+	
+	tableAdjustmentDetail = 
+		$('#adjustmentMasterForm #listAdjustmentDetail #gridAdjustmentDetail').dataTable({
+			aaData: transactionDetails,
+			aoColumns: [ 
+			             {
+			 				fnRender: function(obj) {
+							  	var controls;
+								controls = obj.aData.currency.currencyCode;
+								controls += '<input type="hidden" name="rowPosition" class="row-pos" value="'+obj.iDataRow+'">';
+								controls += '<input type="hidden" name="gnAdjustmentDetails[' + obj.iDataRow + '].currency.currencyCode" value="' + obj.aData.currency.currencyCode + '" class="curr-code" />';
+								controls += '<input type="hidden" name="gnAdjustmentDetails[' + obj.iDataRow + '].currency.description" value="' + obj.aData.currency.description + '" />';
+							  	return controls;
+							 }
+						  }, 
+						  {
+							  fnRender: function(obj) {
+								  	var controls;
+								  	var symbols;
+									symbols = getSymbolOperator(obj.aData.operator.lookupId);
+									controls = symbols;
+									controls += '<input type="hidden" name="gnAdjustmentDetails[' + obj.iDataRow + '].operator.lookupId" value="' + obj.aData.operator.lookupId + '" class="operator-id" />';
+									controls += '<input type="hidden" name="gnAdjustmentDetails[' + obj.iDataRow + '].operator.lookupDescription" value="' + symbols + '" />';
+								  	return controls;
+							  }
+						  },
+						  {
+							  sClass: 'numeric',
+							  fnRender: function(obj) {
+								  var controls;
+								  controls = $('#dummy').autoNumericSet( obj.aData.value, {aPad:true,mDec:2}).val();
+								  controls += '<input type="hidden" name="gnAdjustmentDetails[' + obj.iDataRow + '].value" value="' + obj.aData.value + '" />';
+								  return controls;
+							  }
+						  },
+						  
+						  {
+							fnRender: function(obj) {
+							 	var controls;
+							 	controls = '<center><input id="deleteButton" type="button" value="Delete" #{if readOnly}disabled="disabled"#{/if} /></center>';
+					 			controls += '<input type="hidden" name="gnAdjustmentDetails[' + obj.iDataRow + '].gnAdjustmentMaster.code" value="' + obj.aData.gnAdjustmentMaster.code + '" />';
+					 			controls += '<input type="hidden" name="gnAdjustmentDetails[' + obj.iDataRow + '].adjustmentDetailKey" value="' + obj.aData.adjustmentDetailKey + '" />';
+					 			return controls;
+						 	}
+						  }
+						  
+						],
+			aaSorting:[[1,'asc']],
+        	bAutoWidth: false,		
+        	bDestroy: true,
+        	bFilter: false,
+        	bInfo: false,
+        	bJQueryUI: true,
+        	bPaginate: false,
+        	bSearch: false,
+        	bLengthChange: false,
+        	isDisplayLength:10                						
+	});
+}
+
+function getSymbolOperator(operator){
+	var symbol = null;
+	
+	if(operator=="OPERATOR_FILTER-EQ")symbol="=";
+	else if(operator=="OPERATOR_FILTER-GT")symbol=">";
+	else if(operator=="OPERATOR_FILTER-GTE")symbol=">=";
+	else if(operator=="OPERATOR_FILTER-LT")symbol="<";
+	else if(operator=="OPERATOR_FILTER-LTE")symbol="<=";
+	else if(operator=="OPERATOR_FILTER-IN")symbol="<>";
+	else if(operator=="OPERATOR_FILTER-INN")symbol="IN";
+	
+	return symbol;
+}
+</script>
+
+<form id="adjustmentMasterForm" class="form" method="POST">
+	<div id="dataAdjustmentMaster">
+		#{hidden id:'mode', name:'mode', value:mode /}
+		<ul>
+			<li>
+				#{textBox id:'code', name:'gnAdjustmentMaster.code', label:'Adjustment Code', value:adjustmentMaster?.code, readOnly:'true', class:'capitalize all' /}
+			</li>
+			
+			<li>
+				#{textBox id:'name', required:'true', name:'gnAdjustmentMaster.name', label:'Name', class:'capitalize', value:adjustmentMaster?.name, readOnly:readOnly, class:'capitalize all'/}
+			</li>
+			<li>
+				#{radioButton id:'isActive', name:'gnAdjustmentMaster.isActive', value:((adjustmentMaster?.isActive)?'true':'false'), label:'Active', options:operators, readOnly:readOnly /}
+				#{hidden id:'isActiveHidden', name:'gnAdjustmentMaster.isActive', value:((adjustmentMaster?.isActive)?'true':'false') /}
+			</li>				
+		</ul>
+	</div>
+	<div class="divclear"></div>
+	<br>
+	<p> </p>
+	<div id="tabsAdjustmentDetail">
+		<ul>
+			<li><a href="#tabsAdjustmentDetail-1">Adjustment Maintenance Details</a></li>
+		</ul>
+		<div class="pane" id="tabsAdjustmentDetail-1">	
+			<div id="listAdjustmentDetail" style="overflow-y:scroll;height:220px">
+				#{include 'AdjustmentMaintenance/grid_detail.html' /}
+			</div>
+			<div class="buttons">
+				#{ifnot confirming}
+					<button id="newAdjustmentDetail" #{if readOnly}disabled="disabled"#{/if}>New Data</button>
+				#{/ifnot}
+			</div>	
+		</div>
+	</div>
+	<div id="detailForAdjustmentDetails" title="Adjustment Maintenance Details">
+		#{include 'AdjustmentMaintenance/entry_adj_detail.html' /}
+		<div class="buttons">
+			#{if (((mode == "view"))||(confirming)) }
+				<button id="cancelAdjustmentDetail">Close</button>				
+			#{/if}
+			#{else}
+				<input id="addAdjustmentDetail" type="button" value="Save">
+				<button id="cancelAdjustmentDetail">Cancel</button>
+			#{/else}
+		</div>
+	</div>
+</form>
+<input type="hidden" id="dummy" />
+
+
+
+
+
+
+
+
+
+

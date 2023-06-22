@@ -1,0 +1,77 @@
+#{script 'jquery.rc4.js' /}
+#{script 'date.format.js' /}
+#{script 'lookups.js' /}
+
+<script type="text/javascript">
+$(function(){
+	
+	// This is the hack for IE
+	if ($.browser.msie) {
+	  $('#notInList').click(function() {
+	    this.blur();
+	    this.focus();
+	  });
+	}
+	
+ });
+
+function doView(data) {
+	
+	if ((data[5] == "New") || (data[5] == "Updated")) {
+		return true;
+	} else {
+		edit(data[0]);
+		return false;
+	}
+}
+</script>
+<h3>Search results</h3>
+
+#{if balances}
+<table id="grid" class="display">
+	<thead>
+		<tr>
+			<th width="100px"></th>
+			<th width="100px">Date</th>
+			<th width="100px">Account No</th>
+			<th width="100px">Beneficiary Name</th>
+			<th width="100px">Balance Amount</th>
+			<th width="100px">Status</th>
+			<th width="100px">Active</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list balances, as:'balance'}
+		<tr>
+			<td>
+				${balance?.balanceKey}
+			</td>
+			<td>
+				${balance?.balanceDate?.format(appProp.dateFormat)}
+			</td>
+			<td>
+				${balance?.bnAccount?.accountNo}
+			</td>
+			<td>
+				${balance?.bnAccount?.name}
+			</td>
+			<td align="right">
+				#{if balance.balanceAmount != null}
+					${balance?.balanceAmount?.format('##,##0.00')}
+				#{/if}
+			</td>
+			<td>
+				${balance?.recordStatus?.decodeStatus()}
+			</td>
+			<td>
+				${(balance?.active) ? 'Yes' : 'No'}
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>
+
+#{/if}
+#{else}
+<div>No record found</div>
+#{/else}

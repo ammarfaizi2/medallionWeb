@@ -1,0 +1,28 @@
+#{hidden id:'rowNumber' /}
+<div id="listSellingAgent" style="overflow-y:scroll;max-height:400px;">               
+    <table id="sellingAgentTable" class="display">
+        <thead>
+            <tr>
+<!--                 <th>Code</th> -->
+                <th>Selling Agent Name</th>
+<!--                 <th>Payment Type</th> -->
+                <th>Method Name</th>
+                <th>Account No</th>
+                <th>Bank Name</th>
+<!--                 <th>Currency</th> -->
+                <th>Beneficiary Name</th>
+                <th>Transfer Charge</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+<div class="buttons">
+    #{hidden id:'isPayable'/}  
+    #{ifnot confirming}
+        <button id="newSellingAgentDialog" #{if readOnly}disabled="disabled"#{/if}>New Data</button>
+    #{/ifnot}
+    <span id="btnSellingAgentAddError" class="error"><span></span>#{error 'Bank Account is' /}</span>
+</div>

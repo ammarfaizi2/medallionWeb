@@ -1,0 +1,29 @@
+<table id="gridPick" class="display">
+#{hidden id:'sizePickColumn', value:pick.sizecolumn /}
+	<thead>
+		<tr>
+			#{list pick.titles, as:'title'}
+				#{if pick.widths[title_index-1]}
+					<th id="titleForGlobalPick" width="${pick.widths[title_index-1]}%">${title}</th>
+				#{/if}
+			#{/list}	
+		</tr>
+	</thead>
+	<tbody>
+	#{list pick.rows, as:'row'}
+		<tr id="${row.pk}">
+		#{list row.data, as:'data'}
+			#{if pick.types[data_index-1] == 'String'}
+				<td> ${data}</td>
+			#{/if}
+			#{if pick.types[data_index-1] == 'Date'}
+				<td> ${data?.format(appProp.dateFormat)}</td>
+			#{/if}
+			#{if pick.types[data_index-1] == 'Number'}
+				<td> ${data?.format('#,##0.######')}</td>
+			#{/if}	
+		#{/list}
+		</tr>
+	#{/list}
+	</tbody>
+</table>

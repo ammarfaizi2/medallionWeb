@@ -1,0 +1,31 @@
+<table id="gridOverwriteCharge"  class="display">
+	<thead>
+		<tr>
+			<th>chargeOverrideKey</th>
+			<th>chargeKey</th>
+			<th>Charge Code</th>
+			<th>Description</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	<tbody>
+	 	#{list account?.chargeOverrides, as:'override'}
+		<tr>
+			<td>${override?.chargeOverrideKey}</td>	
+			<td>${override?.chargeMaster?.chargeKey}</td>	
+			<td>${override?.chargeMaster?.chargeCode}</td>
+			<td>${override?.chargeMaster?.description}</td>
+			<td>
+				#{hidden id:'chargeOverrideKeyX', name:'chargeOverrides[' + (override_index-1) + '].chargeOverrideKey', value:override?.chargeOverrideKey /}
+				#{hidden id:'custodyAccountKeyX', name:'chargeOverrides[' + (override_index-1) + '].account.custodyAccountKey', value:override?.account?.custodyAccountKey /}
+				#{hidden id:'ChargeKeyX', name:'chargeOverrides[' + (override_index-1) + '].chargeMaster.chargeKey', value:override?.chargeMaster?.chargeKey /}
+				#{hidden id:'chargeCodeX', name:'chargeOverrides[' + (override_index-1) + '].chargeMaster.chargeCode', value:override?.chargeMaster?.chargeCode /}
+				#{hidden id:'descriptionX', name:'chargeOverrides[' + (override_index-1) + '].chargeMaster.description', value:override?.chargeMaster?.description /}
+				#{hidden id:'minChargeX', name:'chargeOverrides[' + (override_index-1) + '].minimumValue', value:override?.minimumValue /}
+				#{hidden id:'maxChargeX', name:'chargeOverrides[' + (override_index-1) + '].maximumValue', value:override?.maximumValue /}
+				<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} /></center>
+			</td>
+		</tr>
+		#{/list}
+	</tbody>
+</table>

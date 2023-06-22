@@ -1,0 +1,174 @@
+<form id="chargeMasterForm" class="form" method="POST">
+<table>
+<tr>
+<td>
+	<div id="profileMaster">
+	#{hidden id:'masterChargeKey', name:'master.chargeKey', value:master?.chargeKey, required:true, readOnly:readOnly /}
+	#{hidden id:'status', name:'status', value:status /}
+	<ul>
+		<li>
+			#{dropDownList id:'chargeCategory', name:'master.chargeCategory.lookupId', label:'Charges Category', value:master?.chargeCategory?.lookupId, options:chargeCategory, readOnly:readOnly, required:true , maxLength:50, width:'200px'/} 
+			<span class="error">#{error 'Charges Category is' /}</span>
+		</li>
+		<li>
+			#{textBox id:'chargeCode',  label:'Charges Code', value:master?.chargeCode, class:'capitalize clearFieldValue', required:true, maxLength:50,readOnly:readOnly , width:200 /}
+			#{hidden id:'hiddenChargeCode', name:'master.chargeCode', value:master?.chargeCode /}
+			<span class="error">#{error 'Charges Code is' /}</span>
+		</li>
+		<li>
+			#{dropDownList id:'invoiceCharge', name:'master.invoiceCharge.lookupId', label:'Charges Group', value:master?.invoiceCharge?.lookupId, class:'clearFieldValue', options:invoiceCharge, readOnly:readOnly, required:true , width:'200px'/}
+			<span class="error">#{error 'Charges Group is' /}</span>
+		</li>
+		<li>
+			#{textBox id:'masterDescription', name:'master.description', label:'Description', value:master?.description, class:'capitalize clearFieldValue', required:true, readOnly:readOnly, width:'315px', maxLength:100 /}
+			<span class="error">#{error 'Description is' /}</span>
+		</li>
+		<li class="viewOverride">
+			#{dropDownList id:'masterChargeType', name:'chargeType', label:'Charges Type', value:master?.chargeType?.lookupId, options:chargesTypes, readOnly:readOnly, required:true ,width:'125px'/} 
+			#{hidden id:'masterChargeTypeHidden', name:'master.chargeType.lookupId', value:master?.chargeType?.lookupId /}
+			<span class="error">#{error 'Charges Type is' /}</span>
+		</li>
+		<li class="viewOverride" id="mandatoryManual1">
+			#{dropDownList id:'masterValueType', name:'master.valueType.lookupId', label:'Value Type', value:master?.valueType?.lookupId, options:chargesValues,class:'disabledForChargeTypeManual clearFieldValue', readOnly:readOnly, required:true, width:'125px'/} 
+			<span class="error">#{error 'Value Type is' /}</span>
+		</li>
+		<li class="viewOverride">
+			#{dropDownList id:'masterTieringType', name:'tieringType', label:'Tiering Type', value:master?.tieringType?.lookupId, class:'disabledForChargeTypeManual clearFieldValue',options:chargesCalculation, readOnly:readOnly, required:true,width:'125px' /}
+			#{hidden id:'masterTieringTypeHidden', name:'master.tieringType.lookupId', value:master?.tieringType?.lookupId /}
+			<span class="error">#{error 'Tiering Type is' /}</span>
+		</li>
+		<li class="viewOverride">
+			#{dropDownList id:'masterChargeFrequency', name:'chargeFrequency', label:'Charges Frequency', value:master?.chargeFrequency?.lookupId, options:chargeFrequency, readOnly:readOnly, required:true,width:'125px' /} 
+			#{hidden id:'masterChargeFrequencyHidden', name:'master.chargeFrequency.lookupId', value:master?.chargeFrequency?.lookupId /}
+			<span class="error">#{error 'Charges Frequency is' /}</span>
+		</li>
+		<li class="viewOverride" id="mandatoryManual2">
+			#{dropDownList id:'masterBaseCalculationField', name:'baseCalculation', label:'Base calculation', value:master?.baseCalculationField?.lookupId, options:chargeBaseCalculation, class:'disabledForChargeTypeManual clearFieldValue', readOnly:readOnly, required:true,width:'125px' /}
+			#{hidden id:'masterBaseCalculationFieldHidden', name:'master.baseCalculationField.lookupId', value:master?.baseCalculationField?.lookupId /}
+			<span class="error">#{error 'Base calculation is' /}</span>
+		</li>
+		<li class="viewOverride" id="mandatoryManual3">
+			#{dropDownList id:'masterTierComparisonField', name:'master.tierComparisonField.lookupId', label:'Tier Comparison', value:master?.tierComparisonField?.lookupId, options:chargeBaseCalculation, readOnly:readOnly, required:true,class:'disabledForChargeTypeManual clearFieldValue',width:'125px'  /}
+			<span class="error">#{error 'Tier Comparison is' /}</span>
+		</li>
+		<li>
+			#{textBox id:'currency', name:'master.currency.currencyCode', label:'Currency', value:master?.currency?.currencyCode, required:true, readOnly:readOnly, width:'86px', class:'capitalize all' /}
+			#{button id:'currencyHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'currencyDesc', name:'master.currency.description', value:master?.currency?.description, readOnly:true, width:'200px', class:'all' /}
+			<span class="error">#{error 'Currency is' /}</span>
+		</li>
+		<li id="viewOverrideMin">
+			#{textBox id:'masterMinimumValue',label:'Minimum Value', value:master?.minimumValue, format:'#,##0.####', required:true,readOnly:readOnly,class:'disabledForChargeTypeManual numeric clearFieldValue',width:'185px'  /}
+			#{hidden id:'masterMinimumValueStripped', name:'master.minimumValue', value:master?.minimumValue /}
+			<span class="error">#{error 'Minimum Value is' /}</span>
+		</li>
+		<li id="mandatoryMax">
+			#{textBox id:'masterMaximumValue', label:'Maximum Value', value:master?.maximumValue, format:'#,##0.####', readOnly:readOnly,class:'numeric clearFieldValue', width:'185px'  /}
+			#{hidden id:'masterMaximumValueStripped',  name:'master.maximumValue', value:master?.maximumValue /}
+			#{checkBox id:'isChecked', name:'isChecked', value:master?.isChecked, readOnly:readOnly /}Max
+			#{hidden id:'isCheckedHidden', name:'master.isChecked', value:master?.isChecked /}
+			<span class="error">#{error 'Maximum Value is' /}</span>
+			<span id="errmsg"></span>
+		</li>
+		
+		<li>
+			#{textBox id:'taxCodeMaster', name:'taxCode', label:'Tax Code', value:master?.taxMaster?.taxCode, class:'capitalize', required:true, readOnly:readOnly, width:'86px' /}
+			#{hidden id:'taxCodeMasterHidden', name:'master.taxMaster.taxCode', value:master?.taxMaster?.taxCode  /}
+			#{hidden id:'taxKeyMaster', name:'master.taxMaster.taxKey', value:master?.taxMaster?.taxKey  /}
+			#{button id:'taxCodeHelpMaster', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'taxNameMaster', name:'master.taxMaster.description', value:master?.taxMaster?.description, readOnly:true, width:'200px' /}
+			<span class="error">#{error 'Tax Code is' /}</span>
+			<span style="center" id="errmsgTax"></span>
+		</li>
+		<li>
+			#{radioButton id:'isActive', name:'isActive', value:((master?.isActive)?'true':'false'), label:'Active', options:operators, readOnly:readOnly /}
+			#{hidden id:'isActiveHidden', name:'master.isActive', value:((master?.isActive)?'true':'false') /}
+		</li>
+	</ul>
+</td>
+<td>
+	#{hidden name:'master.chargeKey', value:master.chargeKey /}
+	<input type="hidden" name="param" value="master" />
+	<!--  p style="position:absolute;left:650px;top:130px;">
+	
+	
+	</p-->
+	<fieldset id="safekeepingFee" style="display:none;width:390;height:130;position:relative;right:0;top:73;">
+	<!-- fieldset id="safekeepingFee" style="display:none;width:500;height:130" -->
+		<legend>Safekeeping Fee</legend>
+		<ul>
+			<li>
+				#{dropDownList id:'methodSkfee', name:'master.methodSkfee.lookupId', label:'Method', value:master?.methodSkfee?.lookupId, options:methodSkfee, readOnly:readOnly, required:true, class:'clearFieldValueForSkfee'/}
+				<span class="error">#{error 'Method is' /}</span>
+			</li>
+			<li>
+				#{dropDownList id:'priceUsed', name:'master.priceUsed.lookupId', label:'Price Used', value:master?.priceUsed?.lookupId, options:priceUsed, readOnly:readOnly, class:'clearFieldValueForSkfee'/}
+			</li>
+			<li>
+				<label id="lblYearBase">Year Base <span class="req"></span></label>
+				#{dropDownList id:'yearBase', name:'master.yearBase.lookupId', value:master?.yearBase?.lookupId, required:true, readOnly:readOnly, options:yearBase, class:'clearFieldValueForSkfee'/}
+				<span class="error">#{error 'Year Base is' /}</span>
+			</li>
+			<div id="enablePeriod" style="display:none;">
+				<li>
+					#{textBox id:'nPeriod', label:'Number of Period', value:periods?.size, required:true, readOnly:readOnly,  name:'master.periodArray', class:'numeric clearFieldValueForSkfee' , width:'105px' /}
+					#{hidden id:'nPeriodStripped', name:'master.periodArray', value:master?.periodArray/}
+					#{button id:'nPeriodAct', value:'Act', readOnly:readOnly /}
+					<span class="error">#{error 'Period is' /}</span>
+					<span id="errmsgPeriod"></span> 
+					<span id="errmsgNull"></span>
+			</li>
+			</div>
+		</ul>
+	</fieldset>
+	</td>
+</div>
+</tr>
+</table>
+<b><span id="errmsgTierValueNull"></span></b> 
+<p></p>
+<div id="tabsTier">
+	<ul>
+		<li><a href="#tier">Charge Tiers</a></li>
+		<li><a href="#periods">Days</a></li>
+	</ul>
+	<div class="pane" id="tier">	
+		<div id="listTier" style="overflow-y:scroll;height:120px">
+			#{include 'ChargeMasters/grid_tier.html' /}
+		</div>
+		<span id="errTierValueNull" class="error"></span>
+		<br/>
+		<div class="buttons">
+				<button id="newTierData" #{if readOnly}disabled="disabled"#{/if}>New Data</button>
+		</div>	
+	</div>
+	<div class="pane" id="periods">
+		<div id="listPeriods"></div>
+		#{include 'ChargeMasters/grid_periods.html' /}
+	</div>
+	
+</div>
+<form></form>
+<div id="detailTier" title="Detail Charge Tiers">
+	#{include 'ChargeMasters/detail_tier.html' /}
+	<div class="buttons">
+		#{if (mode=='entry' || mode == 'edit')&& (!(confirming))}
+			<button id="addTier">Save</button>
+			<button id="cancelTier">Cancel</button>
+		#{/if}
+		#{else}
+			#{if confirming || mode=='view' }
+			<button id="cancelTier">Close</button>
+			#{/if}
+		#{/else}	
+	</div>
+</div>
+
+<input type="hidden" id="dummy" />
+<input type="hidden" id="maxValidation" />
+<div id="dialog-message-1" title="Message Confirmation" style="display: none;">
+	<p>
+	<span class="ui-icon ui-icon-notice" style="float:left; margin:0 7px 50px 0;"></span>
+	Are you sure to delete data ? </p>
+</div>
+</form>

@@ -1,0 +1,65 @@
+#{set id:entitlementDetail?.entitlementDetailKey /}
+#{set mode:mode /}
+
+<script type="text/javascript"> 
+
+$(function(){
+	$('.buttons button').button();
+	$('.buttons #close').click(function() {
+		$('#detailEntitlementAction').dialog('close');
+	});
+});
+
+</script>
+		
+<form id="entitlementActionForm" class="form">
+	<ul>			
+		#{hidden id:'entitlementDetailKey', name:'actionTemplateMaster.description', value:actionTemplateMaster?.description /}
+		#{hidden id:'announcementDetail', name:'actionTemplateMaster.description', value:actionTemplateMaster?.description /}
+		#{hidden id:'entitlement', name:'actionTemplateMaster.description', value:actionTemplateMaster?.description /}
+	<p>      
+		#{textBox id:'securitySource', name:'entitlementDetail.announcementDetail.securityBySecuritySource', label:'Security Source', value:entDetail?.announcementDetail?.securityBySecuritySource, class:'capitalize', width:'100px', readOnly:((mode=='entry') ? confirming :true ) /}
+	</p>
+	<p>      
+		#{textBox id:'securityTarget', name:'entitlementDetail.announcementDetail.securityBySecurityTarget', label:'Security Target', value:entDetail?.announcementDetail?.securityBySecurityTarget, class:'capitalize', width:'100px', readOnly:((mode=='entry') ? confirming :true ) /}
+	</p>
+	<p>      
+		#{textBox id:'account', name:'entitlementDetail.account', label:'Account', class:'numeric', value:actionTemplateMaster?.actionCode, width:'100px', readOnly:((mode=='entry') ? confirming :true ) /}
+	</p>
+	<p>			
+		#{textBox id:'currency', name:'entitlementDetail.currency', label:'Currency', width:'100px', value:actionTemplateMaster?.description, class:'capitalize', readOnly:((mode=='entry') ? confirming :true ) /}
+	</p>
+	<p>			
+		#{textBox id:'sourceQuantity', name:'entitlementDetail.sourceQuantity', label:'Source Quantity', class:'numeric', width:'100px',value:actionTemplateMaster?.description, readOnly:((mode=='entry') ? confirming :true ) /}
+	</p>
+	<p>			
+		#{textBox id:'targetQuantity', name:'entitlementDetail.targetQuantity', label:'Target Quantity', class:'numeric', width:'100px',value:actionTemplateMaster?.description, readOnly:((mode=='entry') ? confirming :true ) /}
+	</p>
+	<p>			
+		#{textBox id:'price', name:'entitlementDetail.price', label:'Price', class:'numeric', width:'100px', value:actionTemplateMaster?.description, readOnly:((mode=='entry') ? confirming :true ) /}
+	</p>
+	<p>			
+		#{textBox id:'amount', name:'entitlementDetail.amount', label:'Amount', class:'numeric', width:'100px',value:actionTemplateMaster?.description, readOnly:((mode=='entry') ? confirming :true ) /}
+	</p>
+	<p>			
+		#{textBox id:'taxRate', name:'entitlementDetail.taxRate', label:'Tax Rate', class:'numeric', width:'100px',value:actionTemplateMaster?.description, readOnly:((mode=='entry') ? confirming :true ) /}
+	</p>
+	<p>			
+		#{textBox id:'taxAmount', name:'entitlementDetail.taxAmount', label:'Tax Amount', class:'numeric', width:'100px',value:actionTemplateMaster?.description, readOnly:((mode=='entry') ? confirming :true ) /}
+	</p>
+	<p>			
+		#{textBox id:'netAmount', name:'entitlementDetail.netAmount', label:'Net Amount', class:'numeric', width:'100px',value:actionTemplateMaster?.description, readOnly:((mode=='entry') ? confirming :true ) /}
+	</p>
+	<p>			
+		#{textBox id:'status', name:'entitlementDetail.status', label:'Status', width:'100px',value:actionTemplateMaster?.description, class:'capitalize', readOnly:((mode=='entry') ? confirming :true ) /}
+	</p>
+	</ul>
+</form>
+
+<div class="buttons">
+		<button id="close">Close</button>
+</div>
+
+
+
+

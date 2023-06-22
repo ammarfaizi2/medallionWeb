@@ -1,0 +1,65 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Cancel Invoice' /}
+#{script 'lookups.js', characterset:'utf-8' /}
+
+<div id="root">
+    <h3><a href="#">Search Invoice</a></h3>
+    <form id="searchForm" class="form">
+        <input id="param" name="params.param" type="hidden" value="${param}"/>
+        <input id="invoiceStatus" name="params.invoiceStatus" type="hidden" value="A"/>
+        #{hidden id:'query', name:'params.query', value:params?.query /}
+        
+        <p>
+            #{textBox id:'invoiceDateFrom', name:'params.invoiceDateFrom', label:'Invoice Date', width:'85px', value:params?.invoiceDateFrom ,class:'calendar', required:'true'  /} (${appProp.displayDateFormat})
+            <span id="invoiceDateFromError" class="error"></span> <b>To</b>
+            #{textBox id:'invoiceDateTo', name:'params.invoiceDateTo', value:params?.invoiceDateTo, class:'calendar'  /} (${appProp.displayDateFormat})
+            <span id="invoiceDateToError" class="error"></span>
+        </p>
+
+         <p>
+            #{textBox id:'customerCode',width:'100px', name:'', label:'Customer Code', value:'', class:'capitalize' /}
+            #{hidden id:'customerCodeId', name:'params.customerCode', value:params.customerCode /}
+            #{button id:'customerCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+            #{textBox id:'customerDesc', name:'customer.customerName', value:customer?.customerName, readOnly:true, width:'300px' /}
+            <span id="errGroupCode" class="error"></span>
+        </p>
+       
+        <p>
+            #{dropDownList id:'invoiceNoOperator', name:'params.invoiceNoOperator', label:'Invoice No', options:stringOperators, value:params?.invoiceNoOperator /}
+            #{textBox id:'invoiceSearchNoOperator', name:'params.invoiceSearchNoOperator', value:params?.invoiceSearchNoOperator, class:'capitalize' /}
+        </p>
+
+        <p>
+            <div class="buttons">
+                <input type="button" id="search" value="Search" />              
+                <input type="button" id="reset" value="Reset" />
+            </div>
+        </p>
+    </form>
+</div>
+
+<div id="result" style="display:none">
+    <table id="tableInvoice" class="display">
+        <thead>
+            <tr>
+<!--                 <th width="20px" field="component|checkbox|none|center|nosort"><input type="checkbox"></th> -->
+                <th width="80px" field="invoiceDate|date|date|center|sort">Invoice Date</th>
+                <th width="50px" field="invoiceNo|string|none|center|sort">Invoice No</th>
+                <th width="50px" field="customerNo|string|none|left|sort">Customer Code</th>
+                <th width="150px" field="customerName|string|none|left|sort">Customer Name</th>
+                <th width="50px" field="totBillAmount|number|decimal0|right|sort">Total Amount</th>
+                <th width="80px" field="dueDate|date|date|center|sort">Due Date</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<script type="text/javascript">
+    #{include 'RegistrySubscription/Util.js' /}
+    #{include 'CancelInvoices/cancelInvoicesList.js' /}
+    $(document).ready(function() {
+    	Paging($("#root").add("#result"));
+    });
+</script>

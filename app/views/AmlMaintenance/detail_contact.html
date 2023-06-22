@@ -1,0 +1,94 @@
+#{if contact?.isCustomer == true }	
+	#{set readOnlyIsCustomer: true /}
+#{/if}
+#{else}
+	#{set readOnlyIsCustomer: readOnly || ((isInterfaceDone) && (param!='edit')) /}
+#{/else}
+
+#{set readOnlyContact: ((mode != 'entry') && (param != 'entry'))  || (isInterfaceDone) && ((param == 'entry') && (mode == 'edit')) || confirming /}
+#{script 'validation/numericOnly.js' /}
+
+<script type="text/javascript">	
+$(function() {
+	//$('#addressType').trigger('change');
+	$('#accordionContact').accordion({
+		collapsible: false,
+		autoHeight: false 
+	});
+	
+});
+
+
+</script>
+
+<form id="contactForm" class="form">
+	#{hidden id:'rowPosition' /}
+	#{hidden id:'oldContactType' /}
+	#{hidden id:'newContactType' /}
+	#{hidden id:'contactKey', name:'contact.contactKey', value:contact?.contactKey /}
+
+	<p >
+		#{dropDownList id:'contactType', name:'contact.addressType.lookupId', label:'Contact Person', value:contact?.addressType?.lookupId, options:contactType, readOnly:readOnlyContact, width:'145px', required:true /}
+		#{hidden id:'contactTypeDesc', name:'contact.addressType.lookupDescription', value:contact?.addressType?.lookupDescription /}			
+		<span id="contactTypeError" class="errorMessage"></span>
+	</p>
+	<p >
+		#{textBox id:'firstNameContact', name:'contact.firstName', label:'First Name', value:contact?.firstName, readOnly:readOnlyContact, required:true, width:'307px', maxLength:30, class:'capitalize noSpace specialField' /}
+		<span id="firstNameContactError" class="errorMessage"></span>
+	</p>
+    <p >
+		#{textBox id:'middleNameContact', name:'contact.middleName', label:'Middle Name', value:contact?.middleName, readOnly:readOnlyContact, width:'307px', maxLength:30, class:'capitalize specialField' /}
+	</p>
+    <p >
+		#{textBox id:'lastNameContact', name:'contact.lastName', label:'Last Name', value:contact?.lastName, readOnly:readOnlyContact, width:'307px', maxLength:30, class:'capitalize noSpace specialField' /}
+		<span id="lastNameContactError" class="errorMessage"></span>
+	</p>
+    <p >
+		#{textBox id:'contactNameContact', name:'contactName', label:'Contact Name', value:contact?.customerName, required:false, readOnly:true, width:'307px', maxLength:100, class:'capitalize specialField' /}
+		#{hidden id:'contactNameContactHide', name:'contact.customerName', value:contact?.customerName, class:'capitalize specialField' /}
+	</p>
+    <p align="right" style="margin-right: 50px;" >
+		<b>Identification Number</b>
+	</p>
+	<p >
+		#{dropDownList id:'identificationTypeContact', name:'contact.identificationType.lookupId', label:'Identification 1', value:contact?.identificationType?.lookupId, options:identificationTypes, required:true, readOnly:readOnlyContact, class:'capitalize' /}
+		#{textBox id:'identificationNoContact', name:'contact.identificationNo', value:contact?.identificationNo, required:true, readOnly:readOnlyContact, class:'capitalize', width:'218px', maxLength:50 /}	
+		<span id="identificationContactError" class="errorMessage"></span>
+	</p>
+    <p >
+		#{textBox id:'birthPlaceContact', name:'contact.birthPlace', label:'Place Of Birth', value:contact?.birthPlace, required:true, readOnly:readOnlyContact, width:'307px', maxLength:30, class:'capitalize'/}
+		<span id="birthPlaceContactError" class="errorMessage"></span>
+	</p>
+	<p >
+		#{textBox id:'birthDateContact', name:'contact.birthDate', label:'Date Of Birth', value:contact?.birthDate?.format(appProp.dateFormat), class:'calendar', required:true, readOnly:readOnlyContact, maxLength:10 /}(${appProp.displayDateFormat})
+		<span id="birthDateContactError" class="error">#{error 'Date Of Birth is' /}</span>
+	</p>	
+	<p>
+		#{textBox id:'address1CountryCodeContact', name:'contact.address1Country.lookupCode', label:'Country', value:contact?.address1Country?.lookupCode, dataold:contact?.address1Country?.lookupCode, class:'capitalize sameAs', readOnly:readOnlyContact, width:'80px', required:true /}
+		#{hidden id:'address1CountryContact', name:'contact.address1Country.lookupId', value:contact?.address1Country?.lookupId, class:'sameAs' /}
+		#{button id:'address1CountryHelpContact', value:'?', class:'small', readOnly:readOnlyContact /}	
+		#{textBox id:'address1CountryDescContact', name:'contact.address1Country.lookupDescription', value:contact?.address1Country?.lookupDescription, readOnly:true, width:'220px' /}
+		<span id="address1CountryContactError" class="errorMessage"></span>
+	</p>
+    <p class="individual_only primary">
+		#{textBox id:'relationContact', name:'contact.relation', label:'Relation', value:contact?.relation, readOnly:readOnlyContact, width:'307px', maxLength:30, class:'capitalize specialField' /}
+		<span id="relationContactError" class="errorMessage"></span>
+	</p>
+    <p>
+		#{dropDownList id:'sourceOfFundContact', name:'contact.sourceOfFund.lookupId', label:'Source Of Fund', value:contact?.sourceOfFund?.lookupId, options:sourceOfFundInd, readOnly:readOnlyContact, width:'168px', class:'' /}
+		<span id="sourceOfFundContactError" class="errorMessage"></span>
+	</p>
+    <p  atr="occupationMandatory">
+		#{dropDownList id:'occupationContact', name:'contact.occupation.lookupId', label:'Occupation ', value:contact?.occupation?.lookupId, options:occupation, readOnly:readOnlyContact, width:'168px', class:'', required:true /}
+		<span id="occupationContactError" class="errorMessage"></span>
+	</p>
+    <p>
+		#{textBox id:'positionContact', name:'contact.position', label:'Position', value:contact?.position, readOnly:readOnlyContact, width:'307px', maxLength:30, class:'capitalize specialField' /}
+		<span id="positionContactError" class="errorMessage"></span>
+	</p>
+    <p atr="natureBusinessMandatory">
+		#{dropDownList id:'natureBusinessContact', name:'contact.natureBusiness.lookupId', label:'Nature Business', value:contact?.natureBusiness?.lookupId, required:true, options:natureBusiness, readOnly:readOnlyContact, width:'168px', class:'' /}
+		<span id="natureBusinessContactError" class="errorMessage"></span>
+	</p>
+				
+</form>

@@ -1,0 +1,108 @@
+#{extends 'templates/main.html' /}
+
+<script type="text/javascript">
+	$(function() {
+		$('.buttons input:button').button();
+		
+		var backToWorkList = function() {
+			loading.dialog('open');
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			};
+		}
+		
+		function validateRemarkCorrection() {
+			if ($('#needCorrection').is(':checked')) {
+				if (($('#remarksCorrection').val() == '') || ($('#remarksCorrection').val() == null)) {
+					$('#remarksCorrectionError').html('Required');
+				} else {
+					$('#remarksCorrectionError').html('');
+					return true;
+				}
+				return false;
+			}
+			return true;
+		}
+		
+		$('#approve').click(function() {
+			//var action = "@{approve()}?keyId=${transaction?.transactionKey}&taskId=${taskId}";
+			var action = "@{approve()}?keyId=${transaction?.transactionKey}&taskId=${taskId}&operation=${operation}";
+			loading.dialog('open');
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					//alert(data.message);
+					messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+				} else {
+					//alert(data.error);
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+				}
+			});			
+		});
+		
+
+		// ACTION BUTTON REJECT
+		/* $('#reject').click(function() {
+			var action = "@{reject()}?keyId=${transaction?.transactionKey}&taskId=${taskId}";
+			loading.dialog('open');
+			$.post(action, function(data, status, xhr) {
+				loading.dialog('close');
+				if (data.status == 'success') {
+					messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+				} else {
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+				}
+			});
+		}); */
+		
+		$('#reject').click(function() {
+			var resultValidateCorrection = validateRemarkCorrection();
+			if (!resultValidateCorrection) {
+				return;
+			}
+			
+			var action = "@{reject()}?keyId=${transaction?.transactionKey}&taskId=${taskId}&operation=${operation}";
+			var postData = {
+				"correction": $('#remarksCorrection').val()
+			};
+			loading.dialog('open');
+			$.post(action, postData, function(data, status, xhr) {
+	    		checkRedirect(data);
+				if (data.status == 'success') {
+					//alert(data.message);
+					loading.dialog('close');
+					messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+				} else {
+					//alert(data.error);
+					loading.dialog('close');
+					messageAlertOk(data.message, "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+				}
+			});
+		});
+		$('#closeWorkflow').click(function() {
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			}
+		});
+	});
+</script>
+
+<h2>Cancel Miscellaneous Charge Approval</h2>
+<div id="detail">
+	#{include 'MiscellaneousChargeCancel/detail.html' /}
+</div>
+
+#{hidden id:'from', name:'from', value:from /}	
+
+<div id="actions" class="buttons">
+
+	<input type="button" id="approve" value="Approve" />
+	<input type="button" id="reject" value="Reject" />
+	<input type="button" id="closeWorkflow" value="Cancel" />			
+
+</div>

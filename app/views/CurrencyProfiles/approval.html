@@ -1,0 +1,87 @@
+#{extends 'templates/main.html' /}
+
+<script type="text/javascript">
+	$(function() {
+		// DECLARE CLASS BTN
+		$(".btn").button();
+		$(".btn").css("width", "100px");
+		//===============
+		
+		var backToWorkList = function() {
+			loading.dialog('open');
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			};
+		}
+		
+		// ACTION BUTTON APPROVE
+		$('#approve').click(function() {
+			var action = "@{approve()}?taskId=${taskId}&maintenanceLogKey=${maintenanceLogKey}&operation=${operation}";
+			loading.dialog('open');
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					messageAlertOk("Exchange Rate for Date '${currencyProfile?.profileDate?.format(appProp.dateFormat)}' is Approved ", "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+				} else if (data.status == 'error') {
+					messageAlertOk("Exchange Rate for Date '${currencyProfile?.profileDate?.format(appProp.dateFormat)}' can not be approved for reason "+data.message, "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+				}
+			});			
+		});
+		//===============
+		
+		// ACTION BUTTON REJECT	
+		$('#reject').click(function() {
+			var action = "@{reject()}?taskId=${taskId}&maintenanceLogKey=${maintenanceLogKey}&operation=${operation}";
+			loading.dialog('open');
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					messageAlertOk("Exchange Rate for Date '${currencyProfile?.profileDate?.format(appProp.dateFormat)}' is Rejected ", "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+				}else{
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+				}
+			});
+		});
+		//===============
+			
+		// ACTION BUTTON CLOSE
+		$('#closeWorkflow').click(function() {
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			}
+		});
+		//===============
+		
+		// HIDE PROPERTY INSIDE APPROVAL ACTIONS ID 
+		$("#approval-actions").css("display","block");
+		//===============
+			
+		$("#close").css("display","none");
+	});
+
+</script>
+
+<div id="detail">
+	<form id="form" class="form">
+		#{include 'CurrencyProfiles/detail.html' /}
+	</form>
+</div>	
+
+
+	
+<span id="approval-actions">
+	#{hidden id:'taskId', name:'taskId', value:taskId /}
+	#{hidden id:'maintenanceLogKey', name:'maintenanceLogKey', value:maintenanceLogKey /}
+	#{hidden id:'operation', name:'operation', value:operation /}
+	#{hidden id:'from', name:'from', value:from /}
+	
+	<input type="button" id="approve" value="Approve" class="btn" />
+	<input type="button" id="reject" value="Reject" style="margin:5px;" class="btn"/>	
+	<input type="button" id="closeWorkflow" value="Cancel" class="btn" />
+</span>

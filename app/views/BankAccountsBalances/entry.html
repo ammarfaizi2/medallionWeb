@@ -1,0 +1,143 @@
+#{extends 'templates/detail1.html' /}
+#{set pageTitle: 'Bank Account Balance' /}
+#{set balance?.balanceKey /}
+#{set mode: mode /}
+#{set readOnly:(((mode !='edit')&&(mode !='entry'))||(confirming)) /}
+#{set id:balance?.balanceKey /}
+#{script 'date.format.js' /}
+#{script 'lookuppaging.js' /}
+#{script 'lookups.js', characterset:'utf-8' /}
+
+
+<script type="text/javascript">
+	var reloadCal = false;
+	$(function() {
+		#{include 'RegistrySubscription/Util.js' /}
+		#{include 'BankAccountsBalances/balance.js' /}
+	});
+	
+	function popUpAccount(lookupId, filter) {
+		$('#accountNo').dynapopup(lookupId, filter, "balanceDate", function(data){
+			if (data) {
+				reloadCal = false;
+				$('#accountNo').removeClass('fieldError');
+				var codeSplit = $('#accountNo').val().split("");
+				$('#accountNo').val(codeSplit[0]);
+				$('#bankAccountKey').val(data.code);
+				$('#thirdPartyName').val(data.bankCode.thirdPartyName);
+				$('#h_thirdPartyName').val(data.bankCode.thirdPartyName);
+				$('#beneficiaryName').val(data.customer.customerName);
+				$('#h_beneficiaryName').val(data.customer.customerName);
+				$('#currencyCode').val(data.currency.currencyCode);
+				$('#currencyCodeHidden').val(data.currency.currencyCode);
+				$('#interestRate').val(data.interestRate);
+				$('#interestRateHidden').val(data.interestRate);
+				$('#interestBase').val(data.interestBase);
+				$('#interestBaseHidden').val(data.interestBase);
+				$('#yearBase').val(data.yearBase);
+				$('#yearBaseHidden').val(data.yearBase);
+			}
+		
+		}, function(data){
+			reloadCal = false;
+			$('#accountNo').addClass('fieldError');
+			$('#thirdPartyName').val('NOT FOUND');
+			$('#accountNo').val('');
+			$('#bankAccountKey').val('');
+			$('#h_thirdPartyName').val('');
+			$('#beneficiaryName').val('');
+			$('#h_beneficiaryName').val('');
+			$('#currencyCode').val('');
+			$('#h_currencyCode').val('');
+			$('#currencyCodeHidden').val('');
+			$('#interestRate').val('');
+			$('#h_interestRate').val('');
+			$('#interestRateHidden').val('');
+			$('#interestBase').val('');
+			$('#h_interestBase').val('');
+			$('#interestRateHidden').val('');
+			$('#yearBase').val('');
+			$('#h_yearBase').val('');
+			$('#yearBaseHidden').val('');
+		});
+	}
+	
+	function doSave(){
+		console.log("reloadCal = "+reloadCal);
+		if (reloadCal){
+			return true;
+		} else {
+			$('#balanceButtonError').html('Calculate button must be click');
+		}
+	}
+</script>
+
+<style type="text/css">
+	textarea { resize:none; height: 50px;}
+</style>
+
+#{hidden id:'balanceKey', name:'balance.balanceKey', value:balance?.balanceKey /}
+#{hidden id:'status', name:'status', value:status /}
+#{hidden id:'cekButton', name:'cekButton', value:cekButton /}
+	<p>
+		#{textBox id:'fundCode',width:'100px', name:'balance.fund.fundCode', label:'Fund Code', value:balance?.fund?.fundCode, required:true, class:'capitalize', readOnly:((mode=='entry') ? confirming : true ) /}
+		#{hidden id:'fundCodeKey', name:'balance.fund.fundKey', value:balance?.fund?.fundKey /}
+		#{button id:'fundCodeHelp', value:'?', class:'small', readOnly:((mode=='entry') ? confirming : true ) /}
+		#{textBox id:'fundCodeDesc', name:'balance.fund.fundDescription', value:balance?.fund?.fundDescription, readOnly:true, width:'200px' /}
+		<span id="fundCodeError" class="error">#{error 'Fund Code is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'accountNo',width:'100px', name:'balance.bnAccount.accountNo', label:'Account No', value:balance?.bnAccount?.accountNo, required:true, class:'capitalize', readOnly:((mode=='entry') ? confirming : true ) /}
+		#{hidden id:'bankAccountKey', name:'balance.bnAccount.bankAccountKey', value:balance?.bnAccount?.bankAccountKey /}
+		#{button id:'accountNoHelp', value:'?', class:'small', readOnly:((mode=='entry') ? confirming : true ) /}
+		#{textBox id:'thirdPartyName', name:'balance.bnAccount.bankCode.thirdPartyName', value:balance?.bnAccount?.bankCode?.thirdPartyName, readOnly:true, width:'200px' /}
+		<span id="accountNoError" class="error">#{error 'Account No is' /}</span>
+	</p>
+		
+	<p>
+		#{textBox id:'beneficiaryName', name:'balance.bnAccount.customer.customerName', label:'Beneficiary Name', value:balance?.bnAccount?.customer?.customerName, class:'capitalize', readOnly:true, width:'334px' /}
+		<span id="beneficiaryNameError" class="error">#{error 'Beneficiary Name is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'currencyCode', name:'currencyCode', label:'Currency', value:balance?.currency?.currencyCode, class:'capitalize', readOnly:true, width:'100px' /}
+		#{hidden id:'currencyCodeHidden', name:'balance.currency.currencyCode', value:balance?.currency?.currencyCode, class:'capitalize'/}
+		<span id="currencyCodeError" class="error">#{error 'Currency is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'interestRate',name:'interestRate', label:'Interest Rate', value:balance?.interestRate, format:'#,##0.####', class:'percent', readOnly:true, width:'100px' /}
+		#{hidden id:'interestRateHidden', name:'balance.interestRate', value:balance?.interestRate, class:'capitalize'/}
+		<span id="percentage">%</span>
+		<span id="interestRateError" class="error">#{error 'Interest Rate is' /}</span>
+	</p>
+	<p>
+		#{dropDownList id:'interestBase', label:'Accrual Type', name:'interestBase', value:balance?.interestBase?.lookupId, options:interestBase, readOnly:true, width:'104px' /}&nbsp;<b>/</b>&nbsp;
+		#{hidden id:'interestBaseHidden', name:'balance.interestBase.lookupId', value:balance?.interestBase?.lookupId, class:'capitalize'/}
+		<span class="error">#{error 'Accrual Type is' /}</span>
+		#{dropDownList id:'yearBase', name:'yearBase', value:balance?.yearBase?.lookupId, options:yearBase, readOnly:true /} (Month/Year)
+		#{hidden id:'yearBaseHidden', name:'balance.yearBase.lookupId', value:balance?.yearBase?.lookupId, class:'capitalize'/}
+		<span class="error">#{error 'Year Base is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'balanceDate', name:'balance.balanceDate', label:'Date', value:balance?.balanceDate?.format(appProp.dateFormat), required:true, class:'calendar', readOnly:((mode=='entry') ? confirming : true ) /}
+		(${appProp.displayDateFormat})
+		<span id="balanceDateError" class="error">#{error 'Date is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'balanceAmount', name:'balanceAmount', label:'Balance Amount', value:balance?.balanceAmount, format:'#,##0.####', required:true, class:'numeric', readOnly:readOnly, width:'150px' /}
+		#{hidden id:'balanceAmountStripped', name:'balance.balanceAmount', value:balance?.balanceAmount /}
+		<span id="balanceAmountError" class="error">#{error 'Balance Amount is' /}</span>
+		<button id="calcBal" #{if readOnly} disabled #{/if}>Calculate</button>
+		<span id="balanceButtonError" class="error"></span>
+	</p>
+	<p>
+		#{textBox id:'interestAmount', name:'interestAmount', label:'Interest Amount', value:balance?.interestAmount, format:'#,##0.####', class:'numeric', readOnly:true, width:'150px' /}
+		#{hidden id:'interestAmountHidden', name:'balance.interestAmount', value:balance?.interestAmount /}
+		<span id="interestAmountError" class="error">#{error 'Interest Amount is' /}</span>
+	</p>
+	<p>
+		#{textArea id:'remarks', name:'balance.remarks', value:balance?.remarks, label:'Remark', readOnly:readOnly, class:'capitalize', width:'318px', maxLength:200  /}
+	</p>
+	<p>
+		#{radioButton id:'active', name:'active', value:((balance?.active)?'true':'false'), label:'Active', options:yesNoOperators, readOnly:readOnly /}
+		#{hidden id:'activeHidden', name:'balance.active', value:((balance?.active)?'true':'false') /}
+	</p>

@@ -1,0 +1,61 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'TA - Migration' /}
+
+#{script 'lookups.js' /}
+
+<script type="text/javascript">
+	function doEdit(data) {
+		return false;
+	}
+</script>
+#{if flash.error || errors}
+    <div class="error">
+    	#{ifErrors}
+			#{errors}
+				 <li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}
+<form id="registryMigrationForm" class="form" method="POST" name="migartion">
+	<p>			
+		#{textBox id:'fundCode', name:'val.productCode', class:'capitalize', label:'Fund Code', value:val?.productCode, width:'120px', class:'capitalize'/}
+		#{hidden  id:'fundCodeKey', value:val?.productCode /}
+		#{button  id:'fundCodeHelp', value:'?', class:'small'/}
+	</p>
+	<p>			
+		#{textBox id:'fromDate', name:'val.fromDate', label:'From Date', value:val?.fromDate?.format('MM/dd/yyyy'), class:'calendar'/} (MM/DD/YYYY)
+	</p>
+	<p>			
+		#{textBox id:'toDate', name:'val.toDate', label:'To Date', value:val?.toDate?.format('MM/dd/yyyy'), class:'calendar'/} (MM/DD/YYYY)
+	</p>
+	<p>	
+		#{button  id:'btnProcess', value:'Process' /}
+	</p>
+	
+	<p>&nbsp;</p>
+	<table class="display">
+		<thead>
+		<tr>
+			<th>Messages</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list messages, as:'msg'}
+		<tr>
+			<td>${msg}</td>
+		</tr>
+	#{/list}
+	</tbody>
+	</table>
+</form>
+
+	
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'RegistryMigration/Migration.js' /}
+	$(document).ready(function() {
+		Migration($("#registryMigrationForm"));
+	});
+</script>
+

@@ -1,0 +1,160 @@
+#{extends 'templates/detail1.html' /}
+#{set pageTitle: 'Book Transfer' /}
+#{set readOnly:((mode!='entry')||(confirming)) /}
+#{set id:cBestMessage?.msgid /}
+#{script 'lookups.js' /}
+#{script 'generaldateformat.js' /}
+
+<div id="accordion">
+	#{hidden id:'msgid', name:'cBestMessage.msgid', value:cBestMessage?.msgid /}
+	<fieldset>
+		<legend><b>General Information</b></legend>
+			<p>
+				#{textBox id:'externalreference', name:'cBestMessage.data.externalreference', value:cBestMessage?.data?.externalreference, label:'External Reference', readOnly:readOnly, class:'capitalize', required:'true', maxLength:40 /}
+				<span id="error" class="error">#{error 'External Reference' /}</span>
+			</p>
+			<p>
+				#{textBox id:'instructiontype', name:'cBestMessage.data.instructiontype', value:'BTS', readOnly:'true', class:'capitalize', label:'Instruction Type' /}
+				<span id="error" class="error">#{error 'Instruction Type' /}</span>
+			</p>
+	</fieldset>
+	<br/>
+	<fieldset>
+		<legend><b>Settlement Information</b></legend>
+			<p>
+				#{textBox id:'participantcode', name:'cBestMessage.data.participantcode', label:'Participant Code', value:'8M001', readOnly:'true', required:'true', maxLength:5 /}
+				<span id="error" class="error">#{error 'Participant Code' /}</span>
+			</p>
+			<p>
+				#{textBox id:'key_orderingaccount', name:'cBestMessage.data.accountnumber', value:cBestMessage?.data?.accountnumber, label:'Ordering Account', width:'150px', readOnly:readOnly, class:'capitalize', required:'true', maxLength:100 /}
+				#{hidden id:'h_key_orderingaccount', name:'h_key_orderingaccount', value:'cBestMessage?.data?.accountnumber'/}
+				#{button id:'groupOrderingAccountHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'names_orderingaccount', name:'', value:orderingaccountname, width:'250px', readOnly:true/}
+				<span id="error" class="error">#{error 'Ordering Account' /}</span>
+			</p>
+			<p>
+				#{textBox id:'key_beneficiaryaccount', name:'cBestMessage.data.beneficiaryaccount', value:cBestMessage?.data?.beneficiaryaccount, readOnly:readOnly, required:'true', label:'Beneficiary Account', class:'capitalize', width:'150px', maxLength:14 /}
+				#{hidden id:'h_key_beneficiaryaccount', name:'h_key_beneficiaryaccount', value:'cBestMessage?.data?.beneficiaryaccount'/}
+				#{button id:'groupBeneficiaryAccountHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'names_beneficiaryaccount', name:'', value:beneficiaryaccountname, width:'250px', readOnly:true/}
+				<span id="error" class="error">#{error 'Beneficiary Account' /}</span>
+			</p>
+			<p>
+				#{textBox id:'valuedate', name:'cBestMessage.data.valuedate', label:'Value Date', class:'calendar', value:cBestMessage?.data?.valuedate, readOnly:readOnly, required:'true' /}&nbsp;&nbsp;(${appProp.displayDateFormat})
+				<span id="valuedateError" class="error">#{error 'Value Date' /}</span>
+			</p>
+			<p>
+				#{textBox id:'key_currencycode', name:'cBestMessage.data.currencycode', value:cBestMessage?.data?.currencycode, readOnly:readOnly, required:'true', label:'Currency Code', class:'capitalize', maxLength:3 /}
+				#{hidden id:'h_key_currencycode', name:'h_key_currencycode', value:'cBestMessage?.data?.currencycode'/}
+				#{button id:'groupCurrencyCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'names_currencycode', name:'', value:currencyname, width:'250px', readOnly:true/}
+				<span id="error" class="error">#{error 'Currency Code' /}</span>
+			</p>
+			<p>
+				#{textBox id:'cashamount', name:'cBestMessage.data.cashamount', label:'Cash Amount', value:cBestMessage?.data?.cashamount, class:'numeric', readOnly:readOnly, required:'true', maxLength:47 /}
+				<span id="error" class="error">#{error 'Cash Amount' /}</span>
+			</p>
+			<p>
+				#{textArea id:'description', name:'cBestMessage.data.description', label:'Description', readOnly:readOnly, value:cBestMessage?.data?.description, class:'capitalize', width:'318px', maxLength:240  /}
+			</p>
+	</fieldset>
+</div>
+<div class="buttons">
+	<button id="reset">Reset</button>
+</div>
+
+<script type="text/javascript">
+	$(function() {
+		// ordering account
+		$('#key_orderingaccount').lookup({
+			list:'@{Pick.accounts()}',
+			get:{
+				url:'@{Pick.account()}',
+				success: function(data){
+					$('#key_orderingaccount').removeClass('fieldError');
+					$('#key_orderingaccount').val(data.accountNo);
+					$('#h_key_orderingaccount').val(data.accountNo);
+					$('#names_orderingaccount').val(data.description);				
+				},
+				error : function(data){
+					$('#key_orderingaccount').addClass('fieldError');
+					$('#key_orderingaccount').val('');
+					$('#names_orderingaccount').val('NOT FOUND');
+				}
+			},
+			
+			description:$('#names_orderingaccount'),
+			help:$('#groupOrderingAccountHelp')
+			
+		});
+		
+		// beneficiary account
+		$('#key_beneficiaryaccount').lookup({
+			list:'@{Pick.accounts()}',
+			get:{
+				url:'@{Pick.account()}',
+				success: function(data){
+					$('#key_beneficiaryaccount').removeClass('fieldError');
+					$('#key_beneficiaryaccount').val(data.accountNo);
+					$('#h_key_beneficiaryaccount').val(data.accountNo);
+					$('#names_beneficiaryaccount').val(data.description);				
+				},
+				error : function(data){
+					$('#key_beneficiaryaccount').addClass('fieldError');
+					$('#key_beneficiaryaccount').val('');
+					$('#names_beneficiaryaccount').val('NOT FOUND');
+				}
+			},
+			
+			description:$('#names_beneficiaryaccount'),
+			help:$('#groupBeneficiaryAccountHelp')
+			
+		});
+		
+		// currency code
+		$('#key_currencycode').lookup({
+			list:'@{Pick.currencies()}',
+			get:{
+				url:'@{Pick.currency()}',
+				success: function(data){
+					$('#key_currencycode').removeClass('fieldError');
+					$('#key_currencycode').val(data.code);
+					$('#h_key_currencycode').val(data.code);
+					$('#names_currencycode').val(data.description);				
+				},
+				error : function(data){
+					$('#key_currencycode').addClass('fieldError');
+					$('#key_currencycode').val('');
+					$('#names_currencycode').val('NOT FOUND');
+				}
+			},
+			
+			description:$('#names_currencycode'),
+			help:$('#groupCurrencyCodeHelp')
+			
+		});
+		
+		$('#reset').insertAfter("#cancel");
+		$('.buttons #cancel').hide();
+		
+		var backButton = $('#back').attr("id");
+		if (backButton !== undefined) {
+			$('.buttons #reset').hide();
+		}
+		
+		$('#reset').click(function(){
+			// reset all field
+			$('#externalreference').val('');
+			$('#key_orderingaccount').val('');
+			$('#names_orderingaccount').val('');
+			$('#key_beneficiaryaccount').val('');
+			$('#names_beneficiaryaccount').val('');
+			$('#valuedate').val('');
+			$('#key_currencycode').val('');
+			$('#names_currencycode').val('');
+			$('#cashamount').val('');
+			$('#description').val('');
+			return false;
+		});
+	});
+</script>

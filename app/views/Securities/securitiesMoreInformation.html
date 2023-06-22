@@ -1,0 +1,127 @@
+<div id="EQ" class="EQ_only">
+    <p>         
+        #{textBox id:'issueDateEq', name:'security.issueDate', label:'Issue Date', value:security?.issueDate?.format(appProp.dateFormat), required:true, readOnly:readOnly, class:'calendar'/} (${appProp.displayDateFormat})
+        &nbsp;<span id="issueDateEqError" class="error">#{error 'Issue Date is' /}</span>
+    </p>
+
+    <p class="expiredDate">         
+        #{textBox id:'expiredDateEq', name:'security.expiredDate', label:'Expired Date', value:security?.expiredDate?.format(appProp.dateFormat), required:true, readOnly:readOnly, class:'calendar expired'/} (${appProp.displayDateFormat})
+        &nbsp;<span id="expiredDateEqError" class="error">#{error 'Expired Date is' /}</span>
+    </p>
+</div>
+
+<div id="MM" class="MM_only">
+    <p>            
+        #{textBox id:'issueDateMm', name:'security.issueDate', label:'Issue Date', value:security?.issueDate?.format(appProp.dateFormat), required:true, readOnly:readOnly, class:'calendar'/} (${appProp.displayDateFormat})
+        &nbsp;<span id="issueDateMmError" class="error">#{error 'Issue Date is' /}</span>
+    </p>
+
+ 	<p >         
+        #{textBox id:'maturityDateMm', name:'security.maturityDate', label:'Maturity Date', value:security?.maturityDate?.format(appProp.dateFormat), readOnly:readOnly, class:'calendar'/} (${appProp.displayDateFormat})
+    </p>
+    
+    <p class="expiredDate">         
+        #{textBox id:'expiredDateMm', name:'security.expiredDate', label:'Expired Date', value:security?.expiredDate?.format(appProp.dateFormat), required:true, readOnly:readOnly, class:'calendar expired'/} (${appProp.displayDateFormat})
+        &nbsp;<span id="expiredDateMmError" class="error">#{error 'Expired Date is' /}</span>
+    </p>
+
+    <!-- <p>    #{textBox id:'accrualType', name:'security.accrualType', label:'Accrual Type',  required:true, readOnly:readOnly, width:'85px' /}  </p>-->
+
+    <p> 
+        #{dropDownList id:'accrualBaseMm',label:'Accrual Type',name:'security.accrualBase.lookupId', options:accrualBase, value:security?.accrualBase?.lookupId, required:true, readOnly:readOnly, width:'100px'/}
+        <span class="error">#{error 'Accrual Type is' /}</span>
+
+        #{dropDownList id:'yearBaseMm', name:'security.yearBase.lookupId', options:yearBase, value:security?.yearBase?.lookupId, readOnly:readOnly /} (Month/Year)
+        <span class="error">#{error 'Year Base is' /}</span>
+    </p>
+
+    <p> 
+        #{dropDownList id:'frequencyMm', name:'frequency', label:'Frequency', value:security?.frequency?.lookupId, options:frequency, required:true, readOnly:readOnly, width:'100px' /}      
+        #{hidden id:'frequencyMmHidden', name:'security.frequency.lookupId', value:security?.frequency?.lookupId/}
+        &nbsp;<span id="frequencyMmError" class="error">#{error 'Frequency is' /}</span>
+    </p>
+   
+</div>
+
+<div id="FI" class="FI_only">
+    <p>         
+        #{textBox id:'issueDateFi', name:'security.issueDate', label:'Issue Date', value:security?.issueDate?.format(appProp.dateFormat), required:true, readOnly:readOnly, class:'setCoupon calendar'/} (${appProp.displayDateFormat})
+        &nbsp; <span id = "issueDateFiError" class="error">#{error 'Issue Date is' /}</span>
+    </p>
+
+    <p> 
+        #{textBox id:'maturityDate', name:'security.maturityDate', label:'Maturity Date',value:security?.maturityDate?.format(appProp.dateFormat), required:true, readOnly:readOnly,class:'setCoupon calendar' /} (${appProp.displayDateFormat})    
+        &nbsp; <span id = "maturityDateError"  class="error">#{error 'Maturity Date is' /}</span>
+    </p>
+
+    <p class="expiredDate">         
+        #{textBox id:'expiredDateFi', name:'security.expiredDate', label:'Expired Date', value:security?.expiredDate?.format(appProp.dateFormat), required:true, readOnly:readOnly, class:'setCoupon calendar expired'/} (${appProp.displayDateFormat})
+        &nbsp; <span id = "expiredDateFiError" class="error">#{error 'Expired Date is' /}</span>
+    </p>
+
+    <!-- <p>    #{textBox id:'accrualType', name:'security.accrualType', label:'Accrual Type',  required:true, readOnly:readOnly, width:'85px' /}  </p>-->
+
+    <p> 
+        #{dropDownList id:'accrualBaseFi',label:'Accrual Type',name:'security.accrualBase.lookupId', options:accrualBase,value:security?.accrualBase?.lookupId, required:true, readOnly:readOnly, width:'100px' /}
+        <span class="error">#{error 'Accrual Type is' /}</span>
+        
+        #{dropDownList id:'yearBaseFi', name:'security.yearBase.lookupId', options:yearBase,value:security?.yearBase?.lookupId, required:true, readOnly:readOnly /} (Month/Year)
+        <span class="error">#{error 'Year Base is' /}</span>
+    </p>
+
+    <p>
+        #{radioButton id:'isFraction', name:'security.isFraction', value:((security?.isFraction)?'true':'false'), label:'Fraction', options:operators, readOnly:readOnly /}
+    </p>
+
+    <p class="isFractionFi">        
+    	#{textBox id:'fractionRatioSource', name:'k', label:'Fraction Ratio', format:'#,##0.####' ,value:security?.fractionRatioSource, required:true, class:'setCoupon securityNumOnly fraction', readOnly:readOnly, width:'85px'/}
+        #{hidden id:'fractionRatioSourceStripped', name:'security.fractionRatioSource', value:security?.fractionRatioSource/}
+        <span id="fractionRatioSourceError" class="error">#{error 'Ratio Source is' /}</span>
+    </p>
+
+    <p class="isFractionFi">            
+        #{textBox id:'fractionRatioTarget', name:'fractionRatioTarget', label:'Fraction Amount', format:'#,##0.####', value:security?.fractionRatioTarget, required:true, class:'setCoupon securityNumeric fraction', readOnly:readOnly, width:'85px'/}
+        #{hidden id:'fractionRatioTargetStripped', name:'security.fractionRatioTarget', value:security?.fractionRatioTarget /}
+        <span id="fractionRatioTargetError" class="error">#{error 'Ratio Target is' /}</span>
+    </p>
+
+    <p> 
+        #{dropDownList id:'frequencyFi', name:'security.frequency.lookupId', label:'Frequency', options:frequency,value:security?.frequency?.lookupId, required:true, readOnly:readOnly, width:'100px' /}       
+        <span class="error">#{error 'Frequency is' /}</span>
+    </p>
+
+    <p> 
+        #{textBox id:'couponDate', name:'security.firstCouponDate', label:'1\'st Coupon Date',  value:security?.firstCouponDate?.format(appProp.dateFormat), required:true, readOnly:readOnly,class:'setCoupon calendar' /} (${appProp.displayDateFormat})  
+        <span id="couponDateError" class="error">#{error 'Coupon Date is' /}</span>
+    </p>
+
+    <p>         
+        #{textBox id:'interestRate', name:'interestRate', label:'Interest Rate', format:'#,##0.######', value:security?.interestRate, required:true, class:'percentIntRate', readOnly:readOnly, width:'85px' /} %
+        #{hidden id:'interestRateStripped', name:'security.interestRate', value:security?.interestRate /}
+        <span id="interestRateError" class="error">#{error 'Interest Rate is' /}</span>
+    </p>
+
+    <p>
+        #{radioButton id:'isFloatingRate', name:'security.isFloatingRate', value:((security?.isFloatingRate)?'true':'false'), label:'Floating Rate', options:operators, readOnly:readOnly /}
+    </p>
+
+    <!--
+    <p>
+    <label>Floating Rate<span class="req">*</span></label>
+        <input type="radio" value="true" name="radioFloatingRate" #{if (security?.isFloatingRate == true)} checked="checked"#{/if} id="radioFloatingRate">Yes
+        <input type="radio" value="false" name="radioFloatingRate" #{if (security?.isFloatingRate == false)} checked="checked"#{/if} id="radioFloatingRate">No
+    </p>
+     -->
+
+    <p>     
+        #{textBox id:'totalCoupon', name:'security.totalCoupon', label:'Total Coupons', value:security?.totalCoupon, required:true, class:'numeric', readOnly:readOnly, width:'85px' /} 
+        <span class="error">#{error 'Total Coupons is' /}</span>
+    </p>
+
+    <p></p>
+
+    <p>
+        #{button id:'generateButton',name:'generateButton', value:'Populate Coupon Schedule',class:'buttons', readOnly:readOnly   /}            
+        &nbsp; <span id="generateButtonError" class="error"></span>
+    </p>
+</div>

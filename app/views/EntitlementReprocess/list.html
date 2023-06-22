@@ -1,0 +1,308 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle:'Corporate Action Entitlement Reprocess' /}
+#{set fixData: true /}
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+  
+<script type="text/javascript">
+#{include 'RegistrySubscription/Util.js' /}
+	$(function() {
+		$('.buttons input:button').button();
+		
+		$('#accordion').accordion({
+			collapsible: true
+		});
+		
+		$('#actionCode').blur(function(){
+			if ($(this).val()==''){
+				$('#actionCodeKey').val('');
+				$('#actionCodeDesc').val('');
+				$('#h_actionCodeDesc').val('');
+				$('#scheduleDate').val('');
+				$(this).removeClass('fieldError');
+			}
+		});
+		
+		$('#actionCode').lookup({
+			list:'@{Pick.actionTemplates()}',
+			get:{
+				url:'@{Pick.actionTemplate()}',
+				success: function(data){
+					$('#actionCode').removeClass('fieldError');
+					$('#actionCodeKey').val(data.code);
+					$('#actionCodeDesc').val(data.description);
+					$('#h_actionCodeDesc').val(data.description);
+					$('#scheduleDate').val(data.scheduleDate);
+				},
+				error: function(data){
+					$('#actionCode').addClass('fieldError');
+					$('#actionCodeKey').val('');
+					$('#actionCode').val('');
+					$('#actionCodeDesc').val('NOT FOUND');
+					$('#h_actionCodeDesc').val('');
+					$('#scheduleDate').val('');
+				}
+			},
+			description:$('#actionCodeDesc'),
+			help:$('#actionCodeHelp')
+		});
+		
+		$('#securityType').blur(function(){
+			if ($(this).val()==''){
+				$(this).removeClass('fieldError');
+				$('#securityTypeId').val('');
+				$('#securityTypeName').val('');
+				$('#h_securityTypeName').val('');
+				
+				$('#securityCode').val('');
+				$('#securityCodeId').val('');
+				$('#securityCodeName').val('');
+				$('#h_securityCodeName').val('');
+			}
+			attachSecuritiesPaging();
+		});
+		
+		$('#securityType').lookup({
+			list:'@{Pick.securityTypes()}',
+			get:{
+				url:'@{Pick.securityType()}',
+				success: function(data){
+					$('#securityType').removeClass('fieldError');
+					$('#securityTypeId').val(data.code);
+					$('#securityTypeName').val(data.description);
+					$('#h_securityTypeName').val(data.description);
+					
+					$('#securityCode').val('');
+					$('#securityCodeId').val('');
+					$('#securityCodeName').val('');
+					$('#h_securityCodeName').val('');
+					attachSecuritiesPaging();
+					},
+				error: function(data){
+					$('#securityType').addClass('fieldError');
+					$('#securityType').val('');
+					$('#securityTypeId').val('');
+					$('#securityTypeName').val('NOT FOUND');
+					$('#h_securityTypeName').val('');
+					attachSecuritiesPaging();
+				}
+			},
+			description:$('#securityTypeName'),
+			help:$('#securityTypeHelp'),
+			nextControl:$('#securityCode')
+		});
+		
+		$('#securityCode').blur(function(){
+			if ($(this).val()==''){
+				$(this).removeClass('fieldError');
+				$('#securityCode').val('');
+				$('#securityCodeId').val('');
+				$('#securityCodeName').val('');
+				$('#h_securityCodeName').val('');
+			}
+		});
+		
+		function attachSecuritiesPaging() {
+			var securityType = $('#securityType').val();
+			var pickName = (securityType == '') ? 'PICK_SC_MASTER' : 'PICK_SC_MASTER_BY_SEC_TYPE';
+			$('#securityCode').dynapopup2({key:'securityCodeId', help:'securityCodeHelp', desc:'securityCodeName'}, pickName, securityType, 'announcementSearchNo', function(data){
+				$('#securityCode').removeClass('fieldError');
+				$('#securityCodeId').val(data.code);
+				$('#securityCodeName').val(data.description);
+				$('#h_securityCodeName').val(data.description);
+			},function(data){
+				$('#securityCode').addClass('fieldError');
+				$('#securityCode').val('');
+				$('#securityCodeId').val('');
+				$('#securityCodeName').val('NOT FOUND');
+				$('#h_securityCodeName').val('');
+			});
+		}
+		attachSecuritiesPaging();
+		
+		$('#distributionDateFrom').change(function(){
+			var dateFrom = $(this).datepicker('getDate');
+			var dateTo = $('#distributionDateTo').datepicker('getDate');
+			var origin = 'from';
+			var id = '#distributionDate';
+			if ((($(this).val()!='') || ($(this).hasClass('fieldError'))) && ($('#distributionDateTo').val()!=''))
+				//compareDateFromTo(dateFrom, dateTo, origin, id);
+			    compareDateFromToEqual(dateFrom, dateTo, origin, id);
+		});
+		
+		$('#distributionDateTo').change(function(){
+			var dateFrom = $('#distributionDateFrom').datepicker('getDate');
+			var dateTo = $(this).datepicker('getDate');
+			var origin = 'to';
+			var id = '#distributionDate';
+			if ((($(this).val()!='') || ($(this).hasClass('fieldError'))) && ($('#distributionDateFrom').val()!=''))
+				//compareDateFromTo(dateFrom, dateTo, origin, id);
+				compareDateFromToEqual(dateFrom, dateTo, origin, id);
+		});
+		
+		$('#announcementNoOperator').children().eq(0).remove();
+		
+		$('#search').click(function() {
+			search();
+		});
+		
+		$('#reset').click(function() {
+			location.href="@{list()}";		
+		});
+		
+	});
+	
+	var search = function() {
+		var resultValidate = validateSearch();
+		if (!resultValidate) {
+			return;
+		}
+		
+		$('#result .loading').show();
+		$('#result .response').hide();
+		$('.error').html('');
+		$('#result').show();
+		$.get('@{search()}?param=${param}&group=${group}', $('#searchForm').serialize(), function(data) {
+			checkRedirect(data);
+			$('#result .response').html(data);
+			$('#result .loading').hide();
+			$('#result .response').show();
+			setupTable();
+		});
+	};
+
+	function validateSearch() {
+		if (($('#actionCodeKey').val() == '')||($('#securityTypeId').val() == '') || ($('#securityCodeId').val() == '') ||
+			($('#distributionDateFrom').hasClass('fieldError')) || ($('#distributionDateTo').hasClass('fieldError')) || 
+			($('#distributionDateTo').val()=='')|| ($('#distributionDateFrom').val()=='')){
+			if ($('#actionCodeKey').val() == '') {
+				$('#actionCodeError').html('Required');	
+			} else {
+				$('#actionCodeError').html('');
+			}
+			
+			if ($('#securityTypeId').val() == '') {
+				$('#securityTypeError').html('Required');	
+			} else {
+				$('#securityTypeError').html('');
+			}
+			
+			if ($('#securityCodeId').val() == '') {
+				$('#securityCodeError').html('Required');
+			} else {
+				$('#securityCodeError').html('');
+			}
+			
+			if ($('#distributionDateFrom').val()=='') {
+				$('#distributionDateFromError').html('Required');
+			} else {
+				$('#distributionDateFromError').html('');
+			}
+			
+			if ($('#distributionDateTo').val()=='') {
+				$('#distributionDateToError').html('Required');
+			} else {
+				$('#distributionDateToError').html('');
+			}
+			
+			return false;
+		} else {
+			return true;
+		}
+	}
+</script>
+
+<div id="accordion">
+	<h3><a href="#">Search Announcement</a></h3>
+	<form id="searchForm" class="form">
+		<input id="param" name="params.param" type="hidden" value="${param}"/>
+		#{hidden id:'scheduleDate', name:'params.fieldDate', value:params?.fieldDate /}
+		<p>
+			#{textBox id:'distributionDateFrom', name:'params.dateFrom', label:'Entitlement Date', value:params?.dateFrom?.format(appProp.dateFormat), width:'100px', required:true, class:'calendar' /}
+			(${appProp.displayDateFormat}) 
+			<span id="distributionDateFromError" class="error"></span> 
+			<b>To</b>
+			#{textBox id:'distributionDateTo', name:'params.dateTo', value:params?.dateTo?.format(appProp.dateFormat), width:'100px', required:true, class:'calendar' /}
+			(${appProp.displayDateFormat})
+			<span id="distributionDateToError" class="error"></span>
+		</p>
+		<p>
+			#{textBox id:'actionCode',width:'100px', name:'', label:'Action Code', value:'', required:true, class:'capitalize' /}
+			#{hidden id:'actionCodeKey', name:'params.actionCode', value:params.actionCode /}
+			#{button id:'actionCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'actionCodeDesc', name:'', value:customer?.customerName, readOnly:true, width:'200px' /}
+			<span id="actionCodeError" class="error"></span>
+		</p>
+		<p>
+			#{textBox id:'securityType',width:'100px', name:'', label:'Security Type', value:'',required:true, class:'capitalize' /}
+			#{hidden id:'securityTypeId', name:'params.securityType', value:params?.securityType /}
+			#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'securityTypeName', name:'transaction.transactionTemplate.securityType.description', value:transaction?.transactionTemplate?.securityType?.description, readOnly:true, width:'200px' /}
+			<span id="securityTypeError" class="error"></span>
+		</p>
+		<p>
+			#{textBox id:'securityCode',width:'100px', name:'', label:'Security Code', value:'',required:true, class:'capitalize' /}
+			#{hidden id:'securityCodeId', name:'params.securityCode', value:params?.securityCode /}
+			#{button id:'securityCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'securityCodeName', name:'transaction.security.description', value:transaction?.security?.description, readOnly:true, width:'200px' /}
+			<span id="securityCodeError" class="error"></span>
+		</p>
+		
+		<p>
+			#{dropDownList id:'announcementNoOperator', name:'params.announcementNoOperator', label:'Announcement No', options:stringOperators, value:params.announcementNoOperator /}
+			#{textBox id:'announcementSearchNo', name:'params.announcementNo', value:params.announcementNo, class:'numberOnly', width:'100px' /}
+		</p>
+		<p>
+			<div class="buttons">
+				<input type="button" id="search" value="Search" />				
+				<input type="button" id="reset" value="Reset" />					
+			</div>
+		</p>
+	</form>
+</div>
+<div id="result" style="display:none">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<div class="response"></div>
+</div>
+
+<!-- <table id="grid" class="display">
+	<thead>
+		<tr>
+			<th width="100px">Key</th>
+			 <th width="100px">Announcement No</th> 
+			<th width="100px">Action Type</th>
+			<th width="100px">Security Id</th>
+			<th width="260px">Description</th>
+			<th width="40px">Announcement Date</th>
+			<th width="50px">Status</th>
+			
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:entitlements, as:'entitlement'}
+		<tr>
+			<td>
+				${entitlement?.corporateAnnouncementKey}
+			</td>
+			<td class="capitalize">
+				${entitlement?.security?.securityId}
+			</td>
+			<td class="capitalize">
+				${entitlement?.security?.description}
+			</td>
+			<td>
+				${entitlement?.announcementDate?.format("MMM/dd/yyyy")}
+			</td>
+			<td align="center" class="capitalize">
+				${entitlement?.status}
+			</td>
+			
+		</tr>
+	#{/list}
+	</tbody>
+</table> -->
+
+
+
+
+

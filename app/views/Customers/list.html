@@ -1,0 +1,137 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Customer Information' /}
+#{if param == 'register-cust-acct'}
+	#{set pageTitle: 'Register Custody Account' /}
+#{/if}
+#{if param == 'register-bank-acct'}
+	#{set pageTitle: 'Register Bank Account' /}
+#{/if}
+#{if param == 'register-invt-acct'}
+	#{set pageTitle: 'Register Investment Account' /}
+#{/if}
+#{if param == 'dedupe' }
+	#{set pageTitle: 'Customer Information' /}
+#{/if}
+
+#{set fixData: true /}
+#{set mode: mode /}
+
+<script type="text/javascript">	
+	$(function() {
+		// Search section
+		$('#accordion').accordion({
+			collapsible: true
+		});
+		
+		$('#customerNoOperator').children().eq(0).remove();
+		$('#customerNameOperator').children().eq(0).remove();
+		$('#contactNameOperator').children().eq(0).remove();
+
+		$('#buttonNotInList').hide();
+		$('#birthDate').datepicker();
+		$('.calendar').datepicker();
+		$('.buttons button:first').button({
+			icons: {
+				primary: 'ui-icon-search'
+			}
+		}).next().button();	
+		$('#search').click(function() {
+			search();
+		});
+		// end of Search
+		$('#reset').click(function() {
+			#{if dedupe}
+				location.href="@{Customers.dedupe()}";
+			#{/if}
+			#{else}
+				location.href="@{Customers.list()}?mode=${mode}#{if param}&param=${param}#{/if}";
+			#{/else}			
+		});
+		//$('#resetCust').click(function() {
+		//	alert("custody reset");
+		//	location.href="@{Customers.list()}#{if param}?param=${param}#{/if}";
+		//});
+		//$('#resetBank').click(function() {
+		//	alert("bank reset");
+		//	location.href="@{Customers.list()}?param=${param}";
+		//});
+		
+		$('#notInList').change(function() {
+		if ($('#notInList').is(':checked')) 
+        	$('.buttons #new').show();
+		else 
+			$('.buttons #new').hide();
+		});
+		
+		$('.buttons input:button').button();
+		$('.buttons input:button').button();
+		$('.buttons #new').hide();		
+					 
+		$('.buttons #new').click(function() {
+			location.href="@{Customers.entry()}";
+		});
+			
+	
+	});
+
+	var search = function() {
+		$('#result .loading').show();
+		$('#result .response').hide();
+		$('#result').show();
+		$.get('@{search()}?param=${param}', $('#searchForm').serialize(), function(data) {
+			checkRedirect(data);
+			$('#result .response').html(data);
+			$('#result .loading').hide();
+			$('#result .response').show();
+			$('#buttonNotInList').show();	
+			setupTable();
+		});
+	};
+	
+</script>
+
+<div id="accordion">
+<h3><a href="#">Search Customer</a></h3>
+
+	<form id="searchForm" class="form">
+		<input id="param" name="params.param" type="hidden" value="${param}"/> 
+		<p>
+			#{dropDownList id:'customerNoOperator', name:'params.customerNoOperator', label:'Customer Code', options:stringOperators, value:params.customerNoOperator /}
+			#{textBox id:'customerSearchNo', name:'params.customerSearchNo', value:params.customerSearchNo, class:'capitalize' /}
+		</p>
+		<p>
+			#{dropDownList id:'customerNameOperator', name:'params.customerNameOperator', label:'Customer Name', options:stringOperators, value:params.customerNameOperator /}
+			#{textBox id:'customerSearchName', name:'params.customerSearchName', value:params.customerName, width:'350px', class:'capitalize' /}
+		</p>
+		<p>
+			#{dropDownList id:'contactNameOperator', name:'params.contactNoOperator', label:'Contact Person Name', options:stringOperators, value:params.contactNoOperator /}
+			#{textBox id:'customerSearchContactName', name:'params.customerSearchContactName', value:params.customerSearchContactName, width:'350px', class:'capitalize' /}
+		</p>
+		<!-- <p>
+			#{textBox id:'customerSearchBirthDate', name:'params.customerSearchBirthDate', label:'Client Birth Date', value:params.customerSearchBirthDate, width:'85px', class:'calendar' /}(MM/DD/YYYY)
+		</p>
+		<p>
+			#{dropDownList id:'identificationNoOperator', name:'params.identificationNoOperator', label:'Identification No', options:operators, value:params.identificationNoOperator /}
+			#{textBox id:'customerSearchIdentificationNo', name:'params.customerSearchIdentificationNo', value:params.customerSearchIdentificationNo, width:'200px', class:'capitalize' /}
+		</p> -->
+		<p>
+			<div class="buttons">
+				<input type="button" id="search" value="Search" />				
+				<input type="button" id="reset" value="Reset" />					
+			</div>
+		</p>
+	</form>
+</div>	
+
+<div id="result" style="display:none">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<div class="response"></div>
+</div>
+
+#{if param == 'dedupe'}
+		<div id="buttonNotInList" class="buttons">
+					<label><input type="checkbox" id="notInList"/> Not in the list</label>&nbsp;
+					<input type="button" id="new" value="New Data" />	
+		</div>
+#{/if}	
+

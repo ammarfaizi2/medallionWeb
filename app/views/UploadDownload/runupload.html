@@ -1,0 +1,79 @@
+#{extends 'templates/main.html' /}
+#{script 'lookups.js' /}
+#{script 'jquery.form.js', characterset:'utf-8' /}
+
+<h3>Run Upload</h3>
+
+<div id="root">
+	<form id="runUploadForm" class="form" method="POST" novalidate enctype="application/x-www-form-urlencoded">
+		<p id="populateError" class="error"></p>
+		<p>
+			#{textBox id:'profile', name:'param.name', value:param?.name, required:true, label:'Profile ID', width:'150px', class:'capitalize'/}
+			#{hidden id:'profileKey', name:'profileKey', value:param?.profileKey/}
+			#{button id:'profileHelp', value:'?', class:'small'/}
+			#{textBox id:'profileDesc', name:'param.profileDesc', value:param?.profileDesc, readOnly:true, width:'250px'/}
+			<span id="profileError" class="error"></span>
+		</p>
+		<p>
+			#{fileUpload id:'file', name:'file', label:'File', required:true /}
+			<span id="fileError" class="error"></span>
+		</p>
+		<p>
+			#{button id:'populate', value:'Populate', class:'buttons' /}
+		</p>
+		</br>
+		<p id="contentPopulate">
+			#{checkBox id:'errorOnly', name:'errorOnly', label:'Show Error Only' /}
+			<span id="fileError" class="error"></span>
+			<table id="table">
+				<thead>
+					<tr></tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+		</p>
+	</form>
+	
+	<form id="processForm" class="form" method="POST" novalidate enctype="application/x-www-form-urlencoded">		
+		<p>
+			#{hidden id:'batchId', name:'id', value:'0'/}
+			#{button id:'process', value:'Process', class:'buttons', readOnly:readOnly/}
+			#{button id:'reset', value:'Reset', class:'buttons', readOnly:readOnly /}
+		</p>
+		<p>
+			<table border="1">
+				<tr>
+					<td><label>Batch No</label></td>
+					<td><input type="text" id="batchNo" value="0" class="smalldisabledtext" disabled="disabled" /></td>
+				</tr>
+				<tr>
+					<td><label>Total Rows</label></td>
+					<td><input type="text" id="totalRow" value="0" class="smalldisabledtext" disabled="disabled" /></td>
+				</tr>
+				<tr>
+					<td><label>Success</label></td>
+					<td><input type="text" id="totalSuccess" value="0" class="smalldisabledtext" disabled="disabled" /></td>
+				</tr>
+				<tr>
+					<td><label>Failed</label></td>
+					<td><input type="text" id="totalFail" value="0" class="smalldisabledtext" disabled="disabled" /></td>
+				</tr>
+			</table>
+		</p>
+		<p>
+			#{button id:'save', value:'Save To', class:'buttons', readOnly:true/}
+		</p>
+	</form>
+</div>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/json2.js' /}
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'UploadDownload/RunUpload.js' /}
+
+	$('.buttons').add($("#file")).button();
+	$(document).ready(function() {
+		RunUpload($("#root"));
+	});	
+</script>
+

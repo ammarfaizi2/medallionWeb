@@ -1,0 +1,308 @@
+#{if session.username}
+<style type="text/css">
+
+
+</style>
+<script type="text/javascript">
+	$(function() {
+		$('#menu').accordion();
+	});
+</script>
+<script type="text/javascript">
+	
+	ddaccordion.init({ //top level headers initialization
+		headerclass: "expandable", //Shared CSS class name of headers group that are expandable
+		contentclass: "categoryitems", //Shared CSS class name of contents group
+		revealtype: "click", //Reveal content when user clicks or onmouseover the header? Valid value: "click", "clickgo", or "mouseover"
+		mouseoverdelay: 200, //if revealtype="mouseover", set delay in milliseconds before header expands onMouseover
+		collapseprev: true, //Collapse previous content (so only one open at any time)? true/false 
+		defaultexpanded: [0], //index of content(s) open by default [index1, index2, etc]. [] denotes no content
+		onemustopen: false, //Specify whether at least one header should be open always (so never all headers closed)
+		animatedefault: false, //Should contents open by default be animated into view?
+		persiststate: true, //persist state of opened contents within browser session?
+		toggleclass: ["", "openheader"], //Two CSS classes to be applied to the header when it's collapsed and expanded, respectively ["class1", "class2"]
+		togglehtml: ["prefix", "", ""], //Additional HTML added to the header when it's collapsed and expanded, respectively  ["position", "html1", "html2"] (see docs)
+		animatespeed: "fast", //speed of animation: integer in milliseconds (ie: 200), or keywords "fast", "normal", or "slow"
+		oninit:function(headers, expandedindices){ //custom code to run when headers have initalized
+			//do nothing
+		},
+		onopenclose:function(header, index, state, isuseractivated){ //custom code to run whenever a header is opened or closed
+			//do nothing
+		}
+	})
+	
+	ddaccordion.init({ //2nd level headers initialization
+		headerclass: "subexpandable", //Shared CSS class name of sub headers group that are expandable
+		contentclass: "subcategoryitems", //Shared CSS class name of sub contents group
+		revealtype: "click", //Reveal content when user clicks or onmouseover the header? Valid value: "click" or "mouseover
+		mouseoverdelay: 200, //if revealtype="mouseover", set delay in milliseconds before header expands onMouseover
+		collapseprev: true, //Collapse previous content (so only one open at any time)? true/false 
+		defaultexpanded: [], //index of content(s) open by default [index1, index2, etc]. [] denotes no content
+		onemustopen: false, //Specify whether at least one header should be open always (so never all headers closed)
+		animatedefault: false, //Should contents open by default be animated into view?
+		persiststate: true, //persist state of opened contents within browser session?
+		toggleclass: ["opensubheader", "closedsubheader"], //Two CSS classes to be applied to the header when it's collapsed and expanded, respectively ["class1", "class2"]
+		togglehtml: ["none", "", ""], //Additional HTML added to the header when it's collapsed and expanded, respectively  ["position", "html1", "html2"] (see docs)
+		animatespeed: "fast", //speed of animation: integer in milliseconds (ie: 200), or keywords "fast", "normal", or "slow"
+		oninit:function(headers, expandedindices){ //custom code to run when headers have initalized
+			//do nothing
+		},
+		onopenclose:function(header, index, state, isuseractivated){ //custom code to run whenever a header is opened or closed
+			//do nothing
+		}
+	})
+</script>
+#{if menus}
+<div id="menu">	
+#{list items:menus, as:'menu'}
+	<h3>${menu.menuName}</h3>
+	<div>
+		#{if menu.subMenus}			
+		<ul>
+			#{list items:menu.subMenus, as:'subMenu'}
+			<li>
+				${subMenu.menuName}
+				#{if subMenu.subMenus}
+				<ul>
+				#{list items:subMenu.subMenus, as:'menuItem'}
+					<li>
+						${menuItem.menuName}
+					</li>
+				#{/list}
+				</ul>
+				#{/if}
+			</li>				
+			#{/list}
+		</ul>
+		#{/if}
+	</div>	
+#{/list}
+</div>
+#{/if}
+<div class="arrowlistmenu">
+	<h3 class="menuheader expandable">Transaction</h3>
+	<ul class="categoryitems">
+		<li>
+			<a href="#" class="subexpandable">Custody</a>
+			<ul class="subcategoryitems">
+				<li>
+					#{a @Transactions.entry()}Buy/Sell#{/a}
+				</li>
+				<li>
+					#{a @CorporateAnnouncements.list()}Corporate Action Announcement#{/a}
+				</li>
+				<li>
+					#{a @Entitlements.list()}Corporate Action Entitlement#{/a}
+				</li>
+				<li>
+					<a href="#">Cancellation</a>
+				</li>
+			</ul>			
+		</li>
+		<li>
+			<a href="#" class="subexpandable">Bank</a>
+			<ul class="subcategoryitems">
+				<li>
+					#{a @Transactions.entry()}Buy/Sell#{/a}
+				</li>
+				<li>
+					<a href="#"">Settlement</a>
+				</li>
+				<li>
+					<a href="#"">Corporate Action</a>
+				</li>
+				<li>
+					<a href="#">Coupon Payment</a>
+				</li>
+			</ul>			
+		</li>
+		<li>
+			<a href="#" class="subexpandable">Investment</a>
+			<ul class="subcategoryitems">
+				<li>
+					#{a @Transactions.entry()}Buy/Sell#{/a}
+				</li>
+				<li>
+					<a href="#"">Settlement</a>
+				</li>
+				<li>
+					<a href="#"">Corporate Action</a>
+				</li>
+				<li>
+					<a href="#">Coupon Payment</a>
+				</li>
+			</ul>			
+		</li>
+		<li>
+			<a href="#" class="subexpandable">Time Deposit</a>
+			<ul class="subcategoryitems">
+				<li>
+					<a href="#"">Placement</a>
+				</li>
+				<li>
+					<a href="#"">Maturity Processing</a>
+				</li>
+				<li>
+					<a href="#"">Early Maturity</a>
+				</li>
+				<li>
+					<a href="#">Cancellation</a>
+				</li>
+			</ul>			
+		</li>
+	</ul>
+	
+	<h3 class="menuheader expandable">Maintenance</h3>
+	<ul class="categoryitems">
+		<li>
+			<a href="#" class="subexpandable">Customer</a>
+			<ul class="subcategoryitems">
+				<li>
+					#{a @Customers.dedupe()}Register#{/a}
+				</li>
+				<li>
+					#{a @Customers.list('edit')}Edit#{/a}
+				</li>
+				<li>
+					#{a @Customers.list('view')}Inquiry#{/a}
+				</li>					
+			</ul>			
+		</li>
+		<li>
+			<a href="#" class="subexpandable">Custody Account</a>
+			<ul class="subcategoryitems">
+				<li>
+					#{a @Customers.list('view','register-cust-acct')}Register#{/a}
+				</li>
+				<li>
+					#{a @Accounts.list('edit','edit-cust-acct')}Edit#{/a}
+				</li>				
+				<li>
+					#{a @Accounts.list('view','list-cust-acct')}Inquiry#{/a}
+				</li>				
+			</ul>
+		</li>
+		<li>
+			<a href="#" class="subexpandable">Bank Account</a>
+			<ul class="subcategoryitems">
+				<li>
+					#{a @Customers.list('view','register-bank-acct')}Register#{/a}
+				</li>
+				<li>
+					#{a @Accounts.list('edit','edit-bank-acct')}Edit#{/a}
+				</li>					
+				<li>
+					#{a @Accounts.list('view','list-bank-acct')}Inquiry#{/a}
+				</li>					
+			</ul>
+		</li>
+	</ul>
+	
+	<h3 class="menuheader expandable">Administration</h3>
+	<ul class="categoryitems">
+		<li>
+			<a href="#" class="subexpandable">General</a>
+			<ul class="subcategoryitems">
+				<li>
+					#{a @Branches.list()}Branch#{/a}
+				</li>
+				<li>
+					#{a @Calendars.list()}Calendar#{/a}
+				</li>
+				<li>
+					#{a @Currencies.list()}Currency#{/a}
+				</li>	
+				<li>
+					#{a @Lookups.group()}Lookup#{/a}
+				</li>
+				<li>
+					#{a @ThirdParties.group()}Third Party#{/a}
+				</li>
+			</ul>
+		</li>
+		<li>
+			<a href="#" class="subexpandable">Bank Account</a>
+			<ul class="subcategoryitems">
+				<li>
+					#{a @BankTransactionMasters.list()}Bank Transaction Master#{/a}
+				</li>
+			</ul>
+		</li>
+		<li>
+			<a href="#" class="subexpandable">Custody</a>
+			<ul class="subcategoryitems">
+				<li>
+					#{a @ChargeProfiles.list()}Charges Profile#{/a}
+				</li>
+				<li>
+					#{a @ChargeMasters.list()}Charges Master#{/a}
+				</li>
+				<li>
+					#{a @TransactionMasters.list()}Transaction Master#{/a}
+				</li>
+				<li>
+					#{a @TransactionTemplates.list()}Transaction Template#{/a}
+				</li>	
+			</ul>
+		</li>
+		<li>
+			<a href="#" class="subexpandable">Fund Admin</a>
+			<ul class="subcategoryitems">
+				<li>
+					#{a @Coa.list()}COA#{/a}
+				</li>
+			</ul>
+		</li>
+		<li>
+			<a href="#" class="subexpandable">Security</a>
+			<ul class="subcategoryitems">
+				<li>
+					#{a @CorporateActionTemplates.list()}Corporate Action Template#{/a}
+				</li>
+				<li>			
+					#{a @Securities.list()}Security Information#{/a}
+				</li>
+			</ul>
+		</li>
+		<li>
+			<a href="#">STP Template</a>
+		</li>
+	</ul>
+	<h3 class="menuheader expandable">Workflow</h3>
+	<ul class="categoryitems">
+		<li>
+			#{a @Approvals.list('')}Pending Approval#{/a}
+		</li>
+		<li>
+			<a href="#">Rejection List</a>
+		</li>		
+	</ul>
+	<h3 class="menuheader expandable">Reporting</h3>
+	<ul class="categoryitems">
+		<li>
+			#{a @Reports.list()}Report List#{/a}
+		</li>
+		<li>
+			<a href="#">Setup</a>
+		</li>
+		<li>
+			<a href="#">My Reports</a>
+		</li>	
+	</ul>
+	<h3 class="menuheader expandable">Security Admin</h3>
+	<ul class="categoryitems">
+		<li>
+			<a href="#">User</a>
+		</li>
+		<li>
+			<a href="#">Group</a>
+		</li>
+		<li>
+			<a href="#">Role</a>
+		</li>
+		<li>
+			<a href="#">Access</a>
+		</li>
+	</ul>
+</div>
+#{/if}

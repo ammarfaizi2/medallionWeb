@@ -1,0 +1,218 @@
+#{extends 'templates/detail1.html' /}
+#{set pageTitle: ' ' /}
+#{set fixData: true /}
+#{script 'lookups.js' /}
+#{set id: profile?.profileKey /}
+	
+<div id="accordion">
+#{hidden id:'separatorCsv', name:'profile.separatorCsv', value:profile?.separatorCsv /}
+
+#{hidden id:'source', name:'profile.source', value:profile?.source/}
+
+	<h3>Upload Profile Entry</h3>
+		#{hidden id:'key', name:'profile.profileKey', value:profile?.profileKey/}
+		#{hidden id:'processDescription', name:'profile.processDescription', value:profile?.processDescription/}
+		#{hidden name:'profile.actionType', id:"actionType", value:'Upload'/}
+		<div class="mainEntry">
+			<div class="leftEntry">
+				<p>
+					#{textBox id:'name', name:'profile.name', value:profile?.name, label:'Profile ID', width:'150px', maxLength:50, size:50, required:'true', class:'capitalize', readOnly: ( profile?.profileKey == null ? false : true) /}
+					<span class="error">#{error 'Profile ID' /}</span>
+				</p>
+			
+				<p>
+					#{textBox id:'description', name:'profile.description', value:profile?.description, label:'Profile Name', width:'150px', maxLength:50, size:50, required:'true', class:'capitalize' /}
+					<span class="error">#{error 'Profile Name' /}</span>
+				</p>
+				<p>
+					#{textBox id:'templete',value:profileTemplate?.name, displayValue:profileTemplate?.name, required:true, label:'Profile Ref', width:'150px', class:'capitalize'/}
+					#{hidden id:'h_templete', name:'profile.templete', value:profileTemplate?.profileKey/}
+					#{button id:'groupTemplateHelp', value:'?', class:'small', readOnly:readOnly /}
+					#{textBox id:'names', name:'', value:profileTemplate?.description, width:'250px', readOnly:true/}
+					<span id="templeteError" class="error">#{error 'Profile Ref' /}</span>
+				</p>
+				
+				<p>
+					#{textBox id:'process', name:'profile.process', value:profile?.process, label:'Template', width:'150px', maxLength:50, size:50, readOnly:'true' /}
+					<span class="error">#{error 'Action Type' /}</span>
+				</p>		
+				<p>
+					#{dropDownList id:'fileType', name:'profile.fileType', label:'File Type', value:profile?.fileType, options:fileTypeOptions, required:true, readOnly:false /}
+					<span class="error">#{error 'File Type' /}</span>
+				</p>
+				
+				<p>
+					#{textBox id:'filePrefix', name:'profile.filePrefix', value:profile?.filePrefix, label:'Prefix File Name', width:'200px', maxLength:100, size:100 /}
+					<span class="error">#{error 'Prefix file name' /}</span>
+				</p>
+				<p>
+					#{dropDownList id:'separatorTxt', name:'profile.separatorTxt', label:'Separator', value:profile?.separatorTxt, options:inHead, required:true, readOnly:false /}
+					<span class="error">#{error 'Separator' /}</span>
+				</p>
+				<p>
+					
+					#{radioButton id:'include', name:'profile.includeHeader', value:((profile?.includeHeader)?'true':'false'), label:'First Row is Header', options:operators/}
+				</p>
+				<p>
+					#{radioButton id:'status', name:'profile.status', value:((profile?.status)?'true':'false'), label:'Active', options:operators/}					
+				</p>				
+			</div>
+			<div class="rightEntry">This template is applied for:
+				<div class="innerdesc">${profileTemplate?.processDescription}</div>
+			</div>
+			<div class="divclear"></div>
+		</div>
+		<input id='btnReset' class='buttons ui-button ui-widget ui-state-default ui-corner-all' type="reset" value="Reset" ></input>
+		<br/>
+		<br/>
+		<p>
+			<h2>Field List Mapping:</h2>
+			<table id="tblMapping">
+				<thead>
+					<tr>
+						<th width="50px" class="ui-state-default"><b>Action</b></th>
+						<th width="10px" class="ui-state-default"><b>No</b></th>
+						<th width="100px" class="ui-state-default"><b>Source&nbsp;Field</b></th>
+						<th width="150px" class="ui-state-default"><b>Target&nbsp;Field</b></th>
+						<th width="75px" class="ui-state-default"><b>Type&nbsp;Data</b></th>
+						<th width="100px" class="ui-state-default"><b>Format&nbsp;Data</b></th>
+						<th width="100px" class="ui-state-default"><b>Max&nbsp;Length</b></th>
+						<th width="100px" class="ui-state-default"><b>Overwrite&nbsp;Value</b></th>
+						<th width="100px" class="ui-state-default"><b>M/O</b></th>
+						<th width="50px" class="ui-state-default"><b>Order</b></th>
+					</tr>	
+				</thead>
+				<tbody>
+					#{list profile.details, as:'detail'}
+						#{if detail?.sourceType == "FILE"}
+						<tr>
+							<td>
+								<input type="hidden" class="detailIdx" id="detailKey[${detail_index-1}]" name="pdetails[${detail_index-1}].profileDetailKey" value="${detail?.profileDetailKey}"></input>
+								<input style='width:50px' type='button' name='profile.delete' class="buttons ui-button ui-widget ui-state-default ui-corner-all" tableparent="tblMapping" value='Del'></input>
+								<input style='width:50px;height:25px;display:none' class="systemField" type='checkbox' id="fieldIds[${detail_index-1}]" name='pdetails[${detail_index-1}].systemField' ${detail?.systemField ? 'checked' : ''}></input>
+							</td>
+							<td><input style='width:20px;height:25px;' class="noSeq" type="text" name="pdetails[${detail_index-1}].noSeq" value="${detail?.noSeq}" readOnly></input></td>
+							<td><input style='width:150px;height:25px' class="sourceField capitalize" type="text" name="pdetails[${detail_index-1}].sourceField" value="${detail?.sourceField}" ></input></td>
+							<td>
+								<input style='width:150px;height:25px' class='tabletarget' id="targetIds[${detail_index-1}]" type="text" name="pdetails[${detail_index-1}].targetField" value='${detail?.targetField}' readonly></input>
+							</td>
+							<td><input style='width:75px;height:25px' id="typeIds[${detail_index-1}]" class='typedatalist' type="text" name="pdetails[${detail_index-1}].dataType" value='${detail?.dataType}' readOnly></input></td>
+							<td><input style='width:100px;height:25px' id="formatIds[${detail_index-1}]" class="formatType formatdatalist" type="text" name="pdetails[${detail_index-1}].formatType" value='${detail?.formatType}' readOnly></input></td>
+							<td><input style='width:100px;height:25px' class="length numberOnly" id="defaultLengths[${detail_index-1}]" type="text" name="pdetails[${detail_index-1}].length" value="${detail?.length}"></input></td>
+							<td>
+								#{if detail?.dataType.equalsIgnoreCase("Date") }
+									#{if detail?.formatType.equalsIgnoreCase( "yyyyMMdd")}
+										#{set formatKu:  "yymmdd" /}
+									#{/if}
+									#{if detail?.formatType.equalsIgnoreCase( "dd/MM/yyyy")}
+										#{set formatKu:  "dd/mm/yy" /}
+									#{/if}
+									#{if detail?.formatType.equalsIgnoreCase( "MM/dd/yyyy")}
+										#{set formatKu:  "mm/dd/yy" /}
+									#{/if}
+								#{/if}
+								
+								<input style='width:100px;height:25px' id="defaultIds[${detail_index-1}]" #{if detail?.dataType.equalsIgnoreCase("Date") } dateformat="${formatKu}" #{/if} class="defaultValue #{if detail?.dataType.equalsIgnoreCase("Date") } calendardefault #{/if} #{if detail?.dataType.equalsIgnoreCase("NUMBER") } numberOnly #{/if}" type="text" name="pdetails[${detail_index-1}].defaultValue" value='${detail?.defaultValue}'></input>								
+							</td>
+							<td>
+								<select name="pdetails[${detail_index-1}].mandatory" id="mandatoryIds[${detail_index-1}]">
+									<option value="TRUE" #{if detail?.mandatory} selected #{/if}>MANDATORY</option>
+									<option value="FALSE" #{if !detail?.mandatory} selected #{/if}>OPTIONAL</option>
+								</select>
+								<script>
+									var myField = document.getElementById( "fieldIds[${detail_index-1}]" );
+									if ($(myField).attr("checked")) {
+										$(document.getElementById( "mandatoryIds[${detail_index-1}]" )).attr("disabled", "disabled");
+										var inputMandatory = "<input type='hidden' name='pdetails[${detail_index-1}].mandatory' value='${detail?.mandatory}'>";
+										$(myField).parent().append( inputMandatory );
+									} else {
+										if ($(document.getElementById( "mandatoryIds[${detail_index-1}]" )).attr("disabled")) {
+											$(document.getElementById( "mandatoryIds[${detail_index-1}]" )).removeAttr("disabled");
+										}
+									}
+								</script>
+							</td>
+							
+							<td><input style='width:50px' type='button' name='profile.orderup' class='buttons ui-button ui-widget ui-state-default ui-corner-all' tableparent="tblMapping" value='^'></input></td>
+							
+						</tr>
+						#{/if}
+					#{/list}
+				</tbody>
+			</table>
+		</p>
+		<br>
+		<p>
+			<input id='btnMapping' class='buttons ui-button ui-widget ui-state-default ui-corner-all' type="button" value="Add Field" ></input>
+		</p>
+		<br>
+		<p>
+			<h2>Variable List Mapping:</h2>
+			<table id="tblAdditionalMapping">
+				<thead>
+					<tr>
+						<th width="50px" class="ui-state-default"><b>Action</b></th>
+						<th width="10px" class="ui-state-default"><b>No</b></th>
+						<th width="150px" class="ui-state-default"><b>Target&nbsp;Field</b></th>
+						<th width="75px" class="ui-state-default"><b>Type&nbsp;Data</b></th>
+						<th width="100px" class="ui-state-default"><b>Format&nbsp;Data</b></th>
+						<th width="100px" class="ui-state-default"><b>Value</b></th>
+					</tr>
+				</thead>
+				<tbody>
+					#{list profile.details, as:'detail'}
+						#{if detail?.sourceType == "VARIABLE"}
+						<tr>
+						
+							<td>
+								<input type="hidden" class="additionalDetailIdx" id="detailVarKey[${detail_index-1}]" name="pdetails[${detail_index-1}].profileDetailKey" class="detailIdx" value="${detail?.profileDetailKey}"></input>
+								<input style='width:50px' type='button' name='profile.delete' class="buttons ui-button ui-widget ui-state-default ui-corner-all" tableparent="tblAdditionalMapping" value='Del'></input>
+								<input style='width:50px;height:25px;display:none' class="systemField" type='checkbox' name='pdetails[${detail_index-1}].systemField' ${detail?.systemField ? 'checked' : ''}></input>
+								<input style='width:150px;height:25px;display:none' class="sourceField capitalize" type="text" name="pdetails[${detail_index-1}].sourceField" value="${detail?.sourceField}" ></input>
+							</td>
+							<td><input style='width:20px;height:25px;' class="noSeq" type="text" name="pdetails[${detail_index-1}].noSeq" value="${detail?.noSeq}" readOnly></input></td>
+							<td>
+								<input style='width:150px;height:25px' class='additionaltarget' id="targetVarIds[${detail_index-1}]" type="text" name="pdetails[${detail_index-1}].targetField" value='${detail?.targetField}' readonly></input>
+							</td>
+							<td><input style='width:75px;height:25px' id="typeVarIds[${detail_index-1}]" class="additionalType" type="text" name="pdetails[${detail_index-1}].dataType" value='${detail?.dataType}' readOnly ></input></td>
+							<td><input style='width:100px;height:25px' id="formatVarIds[${detail_index-1}]" class="additionalFormat formatvardatalist" type="text" name="pdetails[${detail_index-1}].formatType" value='${detail?.formatType}' readOnly></input></td>
+							<td>
+								<input style='width:150px;height:25px' id="defaultVarIds[${detail_index-1}]" class="additionalDefaultValue #{if detail?.dataType.equalsIgnoreCase("NUMBER") } numberOnly #{/if} #{if detail?.targetField.equalsIgnoreCase("SECURITY_PRICE_GROUP") } defaultvalstockprice #{/if}" type="text" name="pdetails[${detail_index-1}].defaultValue" value="${detail?.defaultValue}" ></input>
+								<input type="hidden" class="additionalLength" name="pdetails[${detail_index-1}].length" value="${detail?.length}" ></input>
+								<input type="hidden" name="pdetails[${detail_index-1}].sourceType" value="${detail?.sourceType}" ></input>
+							</td>
+						</tr>
+						#{/if}
+					#{/list}
+				</tbody>				
+			</table>			
+		</p>
+		<p>
+			<input id='btnAdditionalMapping' class='buttons ui-button ui-widget ui-state-default ui-corner-all' type="button" value="Add Field" ></input>			
+		</p>		
+</div>	
+
+<div id="result" style="display:none">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<div class="response"></div>
+</div>
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'UploadDownload/Upload.js' /}
+	$(document).ready(function() {
+		Upload($("#html"));
+		$( ".calendardefault" ).each(function(idx, el){
+			var tmpFormat = $(el).attr("dateformat");
+			$(el).datepicker( {dateFormat:tmpFormat} );
+		});
+	});
+	function doCancel(){
+		location.href = '@{UploadDownload.list()}?action=Upload';
+	}
+	$("input.numberOnly").live( "keypress", function (e) {
+		if ( e.which!=8 && e.which!=0 && (e.which<48 || e.which>57)) {
+		    return false;
+		}
+	});
+	
+</script>

@@ -1,0 +1,9 @@
+<div>
+	<p id="isZero">
+		#{dropDownList id:'billingAddress', name:'account.billingAddress.contactKey', label:'Mail Address',  value:account?.billingAddress?.contactKey , options:addressType, readOnly:readOnly /}
+	</p>
+	<p>
+		#{radioButton id:'sendOption', name:'account.isSendToEmail', value:((account?.isSendToEmail)?'true':'false'),  label:'Send Option', options:sendOption, readOnly:readOnly /}
+		&nbsp;#{textBox id:'email', name:'account.customer.email', value:account?.customer?.email, width:'200px', readOnly:true /}
+	</p>
+</div>

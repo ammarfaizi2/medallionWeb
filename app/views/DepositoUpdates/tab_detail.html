@@ -1,0 +1,156 @@
+<table >
+	<tr>
+		<th>
+		</th>
+		<th align="center" >
+			Current Value
+		</th>
+		<th align="center">
+			Adjust
+		</th>
+		<th align="center">
+			Adjust Value
+		</th>
+	</tr>
+	<tr>
+		<td id="tdMaturityDate">
+			<label>Maturity Date<span class="req"> *</span></label>
+			<div style="display:none">
+			#{textBox id:'maturityDateHidden', name:'deposito.maturityDateHidden', value:deposito?.maturityDateHidden?.format(appProp.dateFormat), label:'New Maturity Date', readOnly:readOnly, class:'calendar' /}
+			</div>
+		</td>
+		<td>
+			<p>
+				#{textBox id:'oldMaturityDate', name:'oldMaturityDate', value:deposito?.maturityDate?.format(appProp.dateFormat), required:false, class:'calendar', readOnly:true /}
+				#{hidden id:'oldMaturityDateHidden', name:'deposito.maturityDate', value:deposito?.maturityDate?.format(appProp.dateFormat) /}
+			</p>
+		</td>
+		<td align="center">
+			<p>
+				#{checkBox id:'changeMaturityDate', name:'deposito.changeMaturityDate', value:deposito?.changeMaturityDate , readOnly:readOnly /}
+			</p>
+		</td>
+		<td>
+			<p>
+				#{textBox id:'newMaturityDate', name:'deposito.newMaturityDate', value:deposito?.newMaturityDate?.format(appProp.dateFormat), required:true, class:'calendar', readOnly:readOnly /}
+				<span id="newMaturityDateError" class="error">#{error 'Maturity Date is' /}</span>
+			</p>
+		</td>
+	</tr>
+	<tr>
+		<td id="tdInterestRate">
+			<label>Interest Rate (gross)<span class="req"> *</span></label>
+		</td>
+		<td>
+			<p>
+				#{textBox id:'oldInterestRate', value:deposito?.interestRate, format:'#,##0.####', class:'numeric', required:true, readOnly:true, width: '85px' /} %
+				#{hidden id:'oldInterestRateStripped', name:'deposito.interestRate', value:deposito?.interestRate /}
+			</p>
+		</td>
+		<td align="center">
+			<p>
+				#{checkBox id:'changeInterestRate', name:'deposito.changeInterestRate', value:deposito?.changeInterestRate , readOnly:readOnly /}
+			</p>
+		</td>
+		<td>
+			<p>
+				#{textBox id:'newInterestRate', value:deposito?.newInterestRate, format:'#,##0.####', class:'percent', required:true, readOnly:readOnly, width: '85px' /} %
+				#{hidden id:'newInterestRateStripped', name:'deposito.newInterestRate', value:deposito?.newInterestRate /}
+				<span id="newInterestRateError" class="error">#{error 'Interest Rate is' /}</span>
+			</p>
+		</td>
+	</tr>
+	<tr>
+		<td id="tdAccruedInterest">
+			<label>Interest (Gross)<span class="req"> *</span></label>
+		</td>
+		<td>
+				#{textBox id:'interest', value:deposito?.accruedInterest, format:'#,##0.####', class:'numeric', required:false, readOnly:true /}
+				#{hidden id:'interestStripped', name:'deposito.accruedInterest', value:deposito?.accruedInterest /}
+		</td>
+		<td align="center">
+			<p>
+				#{checkBox id:'changeAccruedInterest', name:'deposito.changeAccruedInterest', value:deposito?.changeAccruedInterest , readOnly:readOnly /}
+			</p>
+		</td>
+		<td>
+				#{textBox id:'newInterest', value:deposito?.newAccruedInterest, format:'#,##0.####', class:'numeric', required:false, readOnly:true /}
+				#{hidden id:'newInterestStripped', name:'deposito.newAccruedInterest', value:deposito?.newAccruedInterest /}
+				<span id="newInterestError" class="error">#{error 'Interest is' /}</span>
+		</td>
+	</tr>
+	<tr>
+		<td id="tdMaturityInst">
+			<label >Maturity Instruction<span class="req"> *</span></label>
+		</td>
+		<td>
+			<p >
+				#{dropDownList id:'oldMaturityIns', name:'oldMaturityIns', value:deposito?.maturityInstruction?.lookupId, options:maturityIns, width:'200px', readOnly:true/}
+				#{hidden id:'oldMaturityInsHidden', name:'deposito.maturityInstruction.lookupId', value:deposito?.maturityInstruction?.lookupId /}
+			</p>
+		</td>
+		<td align="center">
+			<p >
+				#{checkBox id:'changeMaturityIns', name:'deposito.changeMaturityIns', value:deposito?.changeMaturityIns , readOnly:readOnly /}
+			</p>
+		</td>
+		<td>
+			<p >
+				#{dropDownList id:'newMaturityIns', name:'deposito.newMaturityInstruction.lookupId', value:deposito?.newMaturityInstruction?.lookupId, options:maturityIns,width:'200px', readOnly:readOnly /}
+				<div style="display:none">
+				#{dropDownList id:'tmpMaturityIns',  options:maturityIns,width:'200px', readOnly:readOnly /}
+				</div>
+				
+				
+				<span id="newMaturityInsError" class="error">#{error 'Maturity Instruction is' /}</span>
+			</p>
+		</td>
+	</tr>
+</table>
+<br />
+
+<table>
+	<tr>
+		<td valign="top">			
+			<p>
+				#{radioButton id:'chargeAble', name:'chargeAble', label:'Apply Charge', value:((deposito?.chargeable)?'true':'false'), options:operators, readOnly:readOnly /}
+				#{hidden id:'chargeAbleHidden', name:'deposito.chargeable', value:deposito?.chargeable /}
+			</p>
+		</td>
+		<td>
+			<div >
+				<p style="margin-left: 20px" id="pNextMaturityDate">
+					#{textBox id:'nextMaturityDate', name:'deposito.nextMaturityDate', value:deposito?.nextMaturityDate?.format(appProp.dateFormat), label:'New Maturity Date',required:true,  readOnly:readOnly, class:'calendar' /}
+					<span id="nextMaturityDateError" class="error">#{error 'Next Maturity Date is' /}</span>
+				</p>
+				<p style="margin-left: 20px" id="pNextInterestRate">
+					#{textBox id:'nextInterestRate', value:deposito?.nextInterestRate, label:'New Interest Rate(%)', format:'#,##0.####', class:'percent', required:true, readOnly:readOnly, width: '85px' /} %
+					#{hidden id:'nextInterestRateStripped', name:'deposito.nextInterestRate', value:deposito?.nextInterestRate /}
+					<span id="nextInterestRateError" class="error">#{error 'Next Interest Rate is' /}</span>
+				</p>
+			</div>
+			<div class="onMonthly">
+				<fieldset>
+					<legend>Interest Payment</legend>
+					<p>
+						#{textBox id:'intPaymentFreq', name:'intPaymentFreq', value:deposito?.interestFrequency?.lookupDescription, label:'Int. Payment Freq', readOnly:true /}
+						#{hidden id:'intPaymentFreqHidden', name:'deposito.interestFrequency.lookupDescription', value:deposito?.interestFrequency?.lookupDescription, /}
+					</p>
+					<p>
+						#{textBox id:'intPaymentNo',  value:deposito?.totalPaidSchedule, label:'Int. Payment #', readOnly:true, width:'50px' /}
+						<input type="button" id="showPayments" value="&#187;" #{if readOnly}disabled="disabled"#{/if} />
+					</p>
+					<p>
+						#{textBox id:'lastPaymentDate', name:'lastPaymentDate', value:deposito?.lastPaymentDate?.format(appProp.dateFormat), label:'Last Payment',class:'calendar' ,readOnly:true /}
+						#{hidden id:'lastPaymentDateHidden', name:'deposito.lastPaymentDate', value:deposito?.lastPaymentDate?.format(appProp.dateFormat),class:'calendar' /}
+					</p>
+					<p>
+						#{textBox id:'nextPaymentDate', name:'nextPaymentDate', value:deposito?.nextPaymentDate?.format(appProp.dateFormat), label:'Next Payment',class:'calendar', readOnly:true /}
+						#{hidden id:'nextPaymentDateHidden', name:'deposito.nextPaymentDate', value:deposito?.nextPaymentDate?.format(appProp.dateFormat),class:'calendar' /}
+					</p>
+				</fieldset>
+			</div>
+		</td>
+	</tr>
+	
+</table>

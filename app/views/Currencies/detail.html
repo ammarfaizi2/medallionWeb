@@ -1,0 +1,58 @@
+#{extends 'templates/detail1.html' /}
+#{if mode == 'edit' || mode == 'entry' || mode == 'view'}
+	#{set pageTitle: 'Currency Maintenance Detail' /}
+#{/if}
+#{if taskId != null}
+	#{set pageTitle: 'Currency Maintenance Approval' /}
+#{/if}
+#{set id:currency?.currencyCode /}
+
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{script 'lookups.js' /}
+
+<script type="text/javascript">
+
+	$(function(){
+		if (('${mode}'=='entry') || (('${mode}'=='edit') && (('${currency?.recordStatus?.decodeStatus()}' == 'Reject') || ($("#status").val() == 'R' )))) {
+			$('input[name=isActive]').attr("disabled", "disabled");
+		}
+		
+		$('input[name=isActive]').change(function(){
+			$("input[name='currency.isActive']").val($("input[name='isActive']:checked").val());
+		});
+		
+	});
+	
+	function doSave() {
+		submit('@{save()}?mode=${mode}&isNewRec=${isNewRec}#{if group}&group=${group}#{/}')
+		return false;
+	}
+	
+	function doConfirm() {
+		submit('@{confirm()}/?mode=${mode}&isNewRec=${isNewRec}#{if group}&group=${group}#{/}');
+		return false;
+	};
+	
+	function doBack() {
+		location.href='@{back()}?id=${id}&mode=${mode}#{if group}&group=${group}#{/if}#{if isNewRec}&isNewRec=${isNewRec}#{/if}#{if status}&status=${status}#{/if}';
+		return false;
+	};	
+</script>
+
+<form>
+	#{hidden id:'status', name:'status', value:status /}
+	#{hidden id:'isNewRec', name:'isNewRec', value:isNewRec /}
+	<p>      
+		#{textBox id:'currencyCode', name:'currency.currencyCode', label:'Currency Code', value:currency?.currencyCode, width:'150px', class:'capitalize', required:true, readOnly:((mode=='entry') ? confirming : true ), maxLength:50 /}
+		<span class="error">#{error 'Currency Code is' /}</span>
+	</p>
+	<p>			
+		#{textBox id:'description', name:'currency.description', label:'Description', width:'300px', value:currency?.description, required:true, class:'capitalize', readOnly:readOnly, maxLength:100 /}
+		<span class="error">#{error 'Description is' /}</span>
+	</p>
+	<p>
+		#{radioButton id:'isActive', name:'isActive', value:((currency?.isActive)?'true':'false'), label:'Active', options:operators, readOnly:readOnly /}
+		#{hidden id:'isActiveHidden', name:'currency.isActive', value:((currency?.isActive)?'true':'false') /}
+	</p>
+</form>
+

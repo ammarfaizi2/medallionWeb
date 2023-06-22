@@ -1,0 +1,41 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle:'Profile Posting Rule' /}
+
+<script type="text/javascript">
+// DOEDIT FUNCTION
+/* function doEdit(data) {
+	if ((data[3] == "New") || (data[3] == "Updated")) {
+		view(data[0]);
+		return false;
+	} else {
+		return true;
+	}
+} */
+</script>
+
+<div id="result" style="display:block">
+    <table id="tablePostingProfile" class="display">
+        <thead>
+            <tr>
+                <th width="80px" field="profileCode|string|none|left|sort">Code</th>
+                <th field="profileName|string|none|left|sort">Name</th>
+                <th width="80px" field="recordStatus|string|decode|left|sort">Status</th>
+				<th width="50px" field="isActive|boolean|yesno|center|sort">Active</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<div id="btn" class="buttons">
+	<input type="button" id="newData" value="New Data" />	
+</div>
+
+<script type="text/javascript">
+#{include 'RegistrySubscription/Util.js' /}
+#{include 'PostingProfiles/postingProfilesPaging.js' /}
+$(document).ready(function() {
+	Paging($("#main"));
+});
+</script>

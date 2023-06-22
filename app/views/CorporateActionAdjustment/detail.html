@@ -1,0 +1,205 @@
+#{extends 'templates/main.html' /}
+#{set readOnly:((mode !='edit' && mode !='entry') || confirming) /}
+#{set id:entitlement?.entitlementKey /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming) || (mode=='view')) /}
+#{set fixData: true /}
+#{script 'lookups.js' /}
+#{script 'date.format.js' /}
+#{script 'validation/numericOnly.js' /}
+
+#{if flash.error || errors}
+    <div class="error">
+    	<b>Error when saving data!</b><br/><br/>
+    	#{if flash.error}
+<li>${flash.error}</li>
+		#{/if}
+		#{ifErrors}
+			#{errors}
+<li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}
+
+#{script 'external/Util.js' /}
+<script type="text/javascript">
+	$(function() {
+		#{include 'RegistrySubscription/Util.js' /}
+		#{include 'CorporateActionAdjustment/caadjustment.js' /}	
+		
+		if($("#transferMethod").val()==null||$("#transferMethod").val()==""){
+			$("#transferMethod").val('${viaInterface}');
+		}
+		
+		//corporateAnnouncement
+		
+	});
+	
+	function doView(data) {
+		return false;
+	}
+
+	function doEdit(data) {
+		return false;
+	}
+	
+</script>
+
+<style type="text/css">
+  #errmsg {color:red;}
+  textarea {resize:none; height: 50px;}
+</style>
+
+<h2>
+#{ifnot approval} 
+	#{ifnot confirming}
+		#{if (mode=='entry' || mode == 'edit')}
+			Corporate Action Adjustment Entry
+		#{/if}
+		#{else}
+			#{if mode=='view' }
+				Corporate Action Adjustment View
+			#{/if}
+		#{/else}
+	#{/ifnot}
+	#{else}
+		Corporate Action Adjustment Confirming
+	#{/else}
+#{/ifnot}
+#{else}
+		Corporate Action Adjustment Approval
+#{/else}
+</h2>
+<form id="corporateAnnouncementAdjustmentForm" class="form" method="post">
+#{hidden id:'corporateAnnouncementKey', name:'caAdjustment.corporateAnnouncement.corporateAnnouncementKey', value:caAdjustment?.corporateAnnouncement?.corporateAnnouncementKey /}
+#{hidden id:'currentDate', name:'currentDate', value:currentDate?.format(appProp.dateFormat), class:'calendar' /}
+#{hidden id:'transBatchKey', name:'caAdjustment.entitlement.transactionBatch.transactionBatchKey', value:caAdjustment?.entitlement?.transactionBatch?.transactionBatchKey /}
+#{hidden id:'taxObject', name:'caAdjustment.corporateAnnouncement.actionTemplate.taxObject.lookupId', value:caAdjustment?.corporateAnnouncement?.actionTemplate?.taxObject?.lookupId /}
+#{hidden id:'totalFee', name:'caAdjustment.transaction.totalFee', value:caAdjustment?.transaction?.totalFee /}
+
+#{hidden id:'transactionKey', name:'caAdjustment.transaction.transactionKey', value:caAdjustment?.transaction?.transactionKey /}
+#{hidden id:'adjustmentKey', name:'caAdjustment.adjustmentKey', value:caAdjustment?.adjustmentKey /}
+#{hidden id:'adjCorporateAnnouncementKey', name:'caAdjustment.corporateAnnouncement.corporateAnnouncementKey', value:caAdjustment?.corporateAnnouncement?.corporateAnnouncementKey /}
+#{hidden id:'adjEntitlementKey', name:'caAdjustment.entitlement.entitlementKey', value:caAdjustment?.entitlement?.entitlementKey /}
+#{hidden id:'adjEntitlementDetailKey', name:'caAdjustment.entitlementDetail.entitlementDetailKey', value:caAdjustment?.entitlementDetail?.entitlementDetailKey /}
+#{hidden id:'cashTransactionEmpty', name:'caAdjustment.cashTransactionEmpty', value:caAdjustment?.cashTransactionEmpty /}
+
+	<p>      
+		#{textBox id:'corporateAnnouncementCode', name:'caAdjustment.corporateAnnouncement.corporateAnnouncementCode', label:'Announcement No', value:caAdjustment?.corporateAnnouncement?.corporateAnnouncementCode, class:'capitalize master', width:'120px', readOnly:true /}
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		#{textBox id:'status', labelwidth:'40px', name:'corporateAnnouncementstatus', width:'150px',value:caAdjustment?.entitlementStatus, readOnly:true, label:'Status' /}
+		#{hidden id:'statusHidden', name:'caAdjustment.entitlementStatus', value:caAdjustment?.entitlementStatus /} 
+	</p>
+	<p>      
+		#{textBox id:'entitlementKey', name:'caAdjustment.entitlement.entitlementKey', label:'Entitlement No', value:caAdjustment?.entitlement?.entitlementKey, class:'capitalize master', width:'120px', readOnly:true /} 
+	</p>
+	<p>			
+		#{textBox id:'description', name:'caAdjustment.corporateAnnouncement.description', label:'Subject', width:'344px',value:caAdjustment?.corporateAnnouncement?.description, class:'capitalize master', readOnly:true /}
+		<span class="error">#{error 'Subject is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'securityType', name:'caAdjustment.corporateAnnouncement.securityType.securityType', label:'Security Type', dataold:caAdjustment?.corporateAnnouncement?.securityType?.securityType, class:'capitalize master', value:caAdjustment?.corporateAnnouncement?.securityType?.securityType, required:true, readOnly:true, width:'85px' /}
+		#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:true  /}
+		#{textBox id:'securityTypeDesc', name:'caAdjustment.corporateAnnouncement.securityType.description', value:caAdjustment?.corporateAnnouncement?.securityType?.description, readOnly:true, width:'234px' /}
+		<span class="error">#{error 'Security Type is' /}</span>		
+	</p>
+	<p>
+		#{textBox id:'securityCode', name:'caAdjustment.corporateAnnouncement.security.securityId', label:'Security Code', class:'capitalize master', value:caAdjustment?.corporateAnnouncement?.security?.securityId, readOnly:true, width:'85px' /}
+		#{button id:'securityCodeHelp', value:'?', class:'small', readOnly:true /}
+		#{textBox id:'securityCodeDesc', name:'caAdjustment.corporateAnnouncement.security.description', value:caAdjustment?.corporateAnnouncement?.security?.description, readOnly:true, width:'234px' /}
+		#{hidden id:'securityKey', name:'caAdjustment.corporateAnnouncement.security.securityKey', value:caAdjustment?.corporateAnnouncement?.security?.securityKey /}
+		<span class="error">#{error 'Security Code is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'actionCode', name:'caAdjustment.corporateAnnouncement.actionTemplate.actionCode', label:'Action Code', class:'capitalize master', value:caAdjustment?.corporateAnnouncement?.actionTemplate?.actionCode, required:true, readOnly:true, width:'85px' /}
+		#{button id:'actionCodeHelp', value:'?', class:'small', readOnly:true /}
+		#{textBox id:'actionCodeDesc', name:'caAdjustment.corporateAnnouncement.actionTemplate.description', value:caAdjustment?.corporateAnnouncement?.actionTemplate?.description, readOnly:true, width:'234px' /}
+		#{hidden id:'actionCodeKey', name:'caAdjustment.corporateAnnouncement.actionTemplate.actionTemplateKey', value:caAdjustment?.corporateAnnouncement?.actionTemplate?.actionTemplateKey /}
+		<span class="error">#{error 'Action Code is' /}</span>
+	</p>
+	<p>			
+		#{textBox id:'distributionDate', name:'caAdjustment.corporateAnnouncement.distributionDate', label:'Distribution Date', value:caAdjustment?.corporateAnnouncement?.distributionDate?.format(appProp.dateFormat),required:true , readOnly:true, class:'calendar master' /} (${appProp.displayDateFormat})
+		<span id="distributionDateError" class="error">#{error 'Entitlement Date is' /}</span>
+	</p>
+	<p>
+		#{dropDownList id:'transferMethod', name:'caAdjustment.entitlement.transferMethod.lookupId', label:'Fund Transfer Method', value:viaInterface, options:transferMethods, required:true, class:'dropdown' /}
+		<span id="transferMethodError" class="error">#{error 'Transfer Method is' /}</span>
+	</p>
+	<br/>
+	<fieldset id="accountDiv" style="width: 490px">
+		<p>
+			#{hidden id:'accountNoKey', name:'caAdjustment.account.custodyAccountKey', value:caAdjustment?.account?.custodyAccountKey /}
+			#{textBox id:'accountNo', labelwidth:'100px', name:'caAdjustment.account.accountNo', label:'Account No', value:caAdjustment?.account?.accountNo, class:'capitalize master', width:'120px', readOnly:true /}
+			&nbsp;
+			#{textBox id:'accountName', name:'caAdjustment.account.name', value:caAdjustment?.account?.name, class:'capitalize master', width:'234px', readOnly:true /}
+		</p>
+		<p>
+			#{textBox id:'holding', labelwidth:'100px', name:'caAdjustment.holding', label:'Holding', value:caAdjustment?.holding, format:'#,##0', class:'numeric netAmount', width:'120px', readOnly:true /}
+		</p>
+		<p>
+			#{textBox id:'entitledAmount', labelwidth:'100px', name:'caAdjustment.entitledAmount', label:'Entitled Amount', value:caAdjustment?.entitledAmount, format:'#,##0.00', class:'numeric netAmount', width:'120px', readOnly:true /}
+			#{hidden id:'entitledAmountStripped', name:'caAdjustment.entitledAmount', value:caAdjustment?.entitledAmount /}
+		</p>
+		<p>
+			#{textBox id:'taxRate', labelwidth:'100px', name:'caAdjustment.taxRate', label:'Tax Rate', value:caAdjustment?.taxRate, format:'#,##0.00', class:'percent', width:'120px', readOnly:true /}
+		</p>
+		<p>
+			#{textBox id:'taxAdjust', labelwidth:'100px', label:'Tax Amount', value:caAdjustment?.taxAdjust, format:'#,###,###,##0.00', class:'numeric netAmount', width:'120px', readOnly:readOnly /}
+			#{hidden id:'taxAdjustStripped', name:'caAdjustment.taxAdjust', value:caAdjustment?.taxAdjust /}
+			#{hidden id:'taxAdjustTmpStripped', name:'caAdjustmentTmp.taxAdjust', value:caAdjustment?.taxAdjust /}
+		</p>
+		<p>
+			#{textBox id:'settlementAmount', labelwidth:'100px', name:'caAdjustment.settlementAmount', label:'Settlement Amount', value:caAdjustment?.settlementAmount, format:'#,###,###,###,##0.00', class:'numeric netAmount', width:'120px', readOnly:true /}
+		</p>
+		<p>
+			#{textBox id:'settlementAmountAdjust', labelwidth:'100px', label:'Settlement Amount Adjust', value:caAdjustment?.settlementAmountAdjust, format:'#,###,###,###,##0.00', class:'numeric netAmount', width:'120px', readOnly:true /}
+			#{hidden id:'settlementAmountAdjustStripped', name:'caAdjustment.settlementAmountAdjust', value:caAdjustment?.settlementAmountAdjust /}
+			<span id="settlementAmountAdjustError" class="error">#{error 'Settlement Amount Adjust is' /}</span>
+		</p>
+	</fieldset>
+	<fieldset id="bankAccountDiv" style="width: 490px">
+		<legend><b>Bank Account</b></legend>
+		<div style="float:left;height:auto">
+			<p>
+				#{textBox id:'settlementAccount', name:'caAdjustment.bankAccount.accountNo', label:'Account No', value:caAdjustment?.bankAccount?.accountNo, class:'capitalize', required:true, readOnly:readOnly, width:'100px' /}
+				#{hidden id:'settlementAccountKey', name:'caAdjustment.bankAccount.bankAccountKey', value:caAdjustment?.bankAccount?.bankAccountKey /}
+				#{button id:'settlementAccountHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{hidden id:'settlementAccountName', name:'caAdjustment.bankAccount.name', value:caAdjustment?.bankAccount?.name, readOnly:true, width:'170px' /}
+				#{hidden id:'customerKey', name:'caAdjustment.bankAccount.customer.customerKey', value:caAdjustment?.bankAccount?.customer?.customerKey /}
+			</p>
+			<p>
+				#{textBox id:'settlementBankAccount', name:'caAdjustment.bankAccount.bankCode.thirdPartyCode', label:'Bank Code', value:caAdjustment?.bankAccount?.bankCode?.thirdPartyCode, width:'100px', maxLength:'25', class:'capitalize', readOnly:true /}
+				#{hidden id:'settlementBankAccountKey', name:'caAdjustment.bankAccount.bankCode.thirdPartyKey', value:caAdjustment?.bankAccount?.bankCode?.thirdPartyKey /}
+				#{button id:'settlementBankAccountHelp', value:'?', class:'small', readOnly:true /}
+				#{textBox id:'settlementBankAccountName', name:'caAdjustment.bankAccount.bankCode.thirdPartyName', value:caAdjustment?.bankAccount?.bankCode?.thirdPartyName, readOnly:true, class:'capitalize', width:'170px' /}
+			</p>
+			<p>
+				#{textBox id:'settlementAccountBeneficiary', name:'settlementAccountBeneficiary', label:'Beneficiary Name', value:caAdjustment?.bankAccount?.name, class:'capitalize', readOnly:true, width:'250px' /}
+			</p>
+			<p>
+				#{textBox id:'settlementAccountCurrency', name:'caAdjustment.bankAccount.currency.currencyCode', label:'Currency', value:caAdjustment?.bankAccount?.currency?.currencyCode, class:'capitalize', readOnly:true, width:'150px' /}
+			</p>
+		</div>
+			
+	</fieldset>
+</form>
+<div class="buttons">
+  #{ifnot approval} 
+	#{ifnot confirming}
+		#{if (mode=='entry' || mode == 'edit')}
+			<input type="button" id="save" value="Save" />
+			<input type="button" id="cancel" value="Cancel" />
+		#{/if}
+		#{else}
+			#{if mode=='view' }
+				<input type="button" id="cancel" value="Close" />
+			#{/if}
+		#{/else}
+	#{/ifnot}
+	#{else}
+		<input type="button" id="confirm" value="Confirm" />
+		<input type="button" id="back" value="Back" />
+	#{/else}
+  #{/ifnot}
+</div>
+

@@ -1,0 +1,83 @@
+#{set id:cancelPledging?.transactionKey /}
+
+#{script 'lookups.js' /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{set releaseOnly:(((mode='edit')&&(mode!='entry'))||(confirming)) /}
+
+<script type="text/javascript">
+	#{include 'CloseCancelPledgings/cancelPledging.js' /}
+	
+</script>
+
+<form id="masterCancelPledgingForm" class="form" method="post">
+#{hidden id:'currentDate', name:'currentDate', value:currentBusinessDate?.format(appProp.dateFormat), class:'calendar' /}
+#{hidden id:'transactionNo', name:'cancelPledging.transactionKey', value:cancelPledging?.transactionKey /}
+	<!-- <p>
+		#{textBox id:'transactionNo', name:'cancelPledging.transactionKey', label:'Transaction No.', value:cancelPledging?.transactionKey, required:true, readOnly:true, width:'85px' /}
+	</p> -->
+	<p>			
+		#{textBox id:'closeCancelDate', name:'cancelPledging.closeCancelDate', label:'Release Date', value:cancelPledging?.closeCancelDate?.format(appProp.dateFormat), class:'calendar', readOnly:readOnly, required:true/} (${appProp.displayDateFormat})
+		<span id="closeCancelDateError" class="error">#{error 'cancelPledging.closeCancelDate' /}</span>
+	</p>
+	<p>			
+		#{dropDownList id:'actionCloseCancel', name:'cancelPledging.closeCancelStatus.lookupId', label:'Action', value:cancelPledging?.closeCancelStatus?.lookupId, required:true, readOnly:readOnly, options:closeCancelStatus /}
+		<span class="error">#{error 'cancelPledging.closeCancelStatus.lookupId' /}</span>
+	</p>
+	<p>
+		#{textBox id:'remarks', name:'cancelPledging.closeCancelRemarks', label:'Remarks',value:cancelPledging?.closeCancelRemarks, readOnly:readOnly, width:'430px', class:'capitalize', maxLength:100 /}
+	</p>	
+	<br/>	
+<div id="tabsDetailCancelPledging">
+	<ul>
+		<li><a href="#cancelPledgingDetail">Release Pledging Transaction</a>
+	</ul>
+	<div class="pane" id="cancelPledgingDetail">
+	<p>
+		#{textBox id:'tabTransactionNo', label:'Transaction No.', value:cancelPledging?.transactionKey, readOnly:releaseOnly, width:'100px' /}
+		#{hidden id:'tabTransactionNoHidden', name:'cancelPledging.transactionKey', value:cancelPledging?.transactionKey /}
+	</p>
+	<p>
+		#{textBox id:'tabTransactionDate', label:'Transaction Date', value:cancelPledging?.transactionDate?.format(appProp.dateFormat), class:'calendar', readOnly:releaseOnly, required:true/} (${appProp.displayDateFormat})
+		#{hidden id:'tabTransactionDateHidden', name:'cancelPledging.transactionDate', value:cancelPledging?.transactionDate?.format(appProp.dateFormat) /}
+	</p>
+	<p>      
+		#{textBox id:'tabCifCode', name:'cancelPledging.customer.customerNo', label:'Customer Code', value:cancelPledging?.customer?.customerNo, readOnly:releaseOnly, required:true, class:'capitalize', width:'100px' /}
+		#{hidden id:'tabCifKey', name:'cancelPledging.customer.customerKey', value:cancelPledging?.customer?.customerKey /}
+		#{button id:'tabCifHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'tabCifDesc', name:'cancelPledging.customer.customerName', value:cancelPledging?.customer?.customerName, readOnly:true, width:'300px' /}
+		<span class="error">#{error 'cancelPledging.customer.customerNo' /}</span>
+	</p>
+	<p>
+		#{textBox id:'tabPledgingAmount', label:'Reference Amount', format:'#,##0.####',value:cancelPledging?.amount, readOnly:releaseOnly, class:'numeric',width:'250px',required:true /}
+		#{hidden id:'tabPledgingAmountStripped', name:'cancelPledging.amount', value:cancelPledging?.amount /}
+	</p>
+	<p>
+		#{checkBox id:'tabAutoRelease', label:'Auto Release Block', readOnly:releaseOnly, value:pledging?.autoRelease /}
+		#{hidden id:'tabAutoReleaseHidden', name:'pledging.autoRelease', value:pledging?.autoRelease /}
+	</p>
+	<p>
+		#{textBox id:'tabDueDate', label:'Due Date', value:cancelPledging?.dueDate?.format(appProp.dateFormat), class:'calendar', readOnly:releaseOnly /} (${appProp.displayDateFormat})
+		#{hidden id:'tabDueDateHidden', name:'cancelPledging.dueDate', value:cancelPledging?.dueDate?.format(appProp.dateFormat) /}
+	</p>
+	<p>
+		#{textBox id:'tabRemarks', label:'Remarks', value:cancelPledging?.remarks, readOnly:releaseOnly, width:'435px', class:'capitalize', maxLength:100 /}
+		#{hidden id:'tabRemarksHidden',  name:'cancelPledging.remarks', value:cancelPledging?.remarksView /}
+	</p>
+	<br />	
+		<div id="listCancelPledging" style="overflow-y:scroll;height:120px">
+			#{include 'CloseCancelPledgings/grid_cancelPledging.html' /}
+		</div>
+
+	</div>	
+</div>
+</form>
+<form></form>
+<input type="hidden" id="dummy" />
+<div id="detailCancelPledging" title="Release Pledging Transaction">
+		#{include 'CloseCancelPledgings/detail_cancelPledging.html' /}
+		<div class="buttons">
+		<button id="closeCancelPledging">Close</button>
+		</div>	
+</div>
+
+

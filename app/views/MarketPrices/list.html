@@ -1,0 +1,88 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Security Price Entry' /}
+#{set fixData: true /}
+#{script 'lookups.js', characterset:'utf-8' /}
+#{script 'lookuppaging.js' /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+
+	
+<div id="root">
+	<h3><a href="#">Search Security Market Price</a></h3>
+		<form id="searchForm" class="form">
+				<input id="param" name="params.param" type="hidden" value="${param}"/> 
+			<p>
+				#{textBox id:'marketPriceSearchFrom', name:'param.marketPriceSearchFrom', label:'Date', value:param?.marketPriceSearchFrom?.format(appProp.dateFormat), class:'calendar', required:true /}
+				To <span id="marketPriceSearchFromError" class="error"></span> 
+				#{textBox id:'marketPriceSearchTo', name:'param.marketPriceSearchTo', value:param?.marketPriceSearchTo?.format(appProp.dateFormat), class:'calendar',required:true /} 
+				<span id="marketPriceSearchToError" class="error"></span>
+			</p>
+			<p>
+				#{textBox id:'groupCode',width:'100px', name:'', label:'Price Reference', value:'', class:'capitalize',required:true /}
+				#{hidden id:'groupCodeId', name:'param.marketPriceSearchGroupCodeId', value:param?.marketPriceSearchGroupCodeId /}
+				#{button id:'groupCodeHelp', value:'?', class:'small' /}
+				#{textBox id:'groupCodeName', name:'priceGroupSetup.lookupSecurityPriceGroup.lookupDescription', value:priceGroupSetup?.lookupSecurityPriceGroup?.lookupDescription, readOnly:true, width:'200px' /}
+				<span id="errGroupCode" class="error"></span>
+			</p>
+			<p>
+				#{textBox id:'securityType', name:'marketPrice.security.securityType.securityType', label:'Security Type', value:marketPrice?.security?.securityType?.securityType, class:'capitalize', width:'120px'/}
+				#{button id:'securityTypeHelp', value:'?', class:'small' /}
+				#{textBox id:'securityTypeDescription', name:'marketPrice.security.securityType.description', value:marketPrice?.security?.securityType?.description, readOnly:true, width:'300px' /}
+				<span class="error">#{error 'Security Type is' /}</span>
+			</p>	
+			<p>
+				#{textBox id:'securityCode', name:'', label:'Security Code', value:'', class:'capitalize', width:'120px' /}
+				#{hidden id:'securityKey', name:'param.securityKey', value:param?.securityKey /}
+				#{button id:'securityCodeHelp', value:'?', class:'small' /}
+				#{textBox id:'securityCodeDesc', name:'marketPrice.security.description', value:marketPrice?.security?.description, readOnly:true, width:'300px' /}
+				<span class="error">#{error 'Security Code is' /}</span>
+			</p>
+			<!-- <p>
+				#{textBox id:'marketDate', name:'params.marketPriceSearchMarketDate', label:'Price Date', value:params?.marketPriceSearchMarketDate?.format(appProp.dateFormat), required:true,width:'100px', class:'calendar' /}(${appProp.displayDateFormat})
+				<span id="marketDateError" class="error"></span>
+			</p> -->
+				
+			
+			<p>
+				<div class="buttons">
+					<button id="search">Search</button>
+					<button id="reset">Reset</button>
+				</div>
+			</p>
+	</form>
+</div>
+
+<div id="result" style="display:block">
+    <table id="tableMarket" class="display">
+       <thead>
+            <tr>
+       		    <th width="80px" field="marketDate|date|date|center|sort">Date</th>
+                <th width="150px" field="security.securityType.securityType|string|none|left|sort">Security Type</th>
+                <th width="150px" field="security.securityId|string|none|left|sort">Security Code</th>
+                <th width="150px" field="closingPrice|number|decimal2|right|sort">Closing Price</th>
+                <th width="150px" field="highestPrice|number|decimal2|right|sort">High Price</th>
+                <th width="150px" field="lowestPrice|number|decimal2|right|sort">Low Price</th>
+                <th width="80px" field="recordStatus|string|decode|left|sort">Status</th>
+				<th width="50px" field="isActive|boolean|yesno|center|sort">Active</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+<div id="btn" class="buttons">
+	<!-- <label><input type="checkbox" id="notInList"/> Not in the list</label>&nbsp; -->
+	<input type="button" id="newData" value="New Data" />	
+</div>
+	
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'MarketPrices/MarketPrices.js' /}
+	$(document).ready(function() {
+		//InvoiceGenerationPaging($("#root").add("#result").add("#popupDetail"));
+		//MarketPrices($("#root").add("#result"));
+		MarketPrices($("#main"));
+	});
+</script>
+
+
+
+
+

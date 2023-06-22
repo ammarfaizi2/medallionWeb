@@ -1,0 +1,74 @@
+<p>
+	#{hidden id:'poolAccountKey', name:'cust.poolAccount.custodianAccountKey', value:cust?.poolAccount?.custodianAccountKey /}
+	#{hidden id:'categoryPool', name:'cust.poolAccount.accountCategory.lookupId', value:cust?.poolAccount?.accountCategory?.lookupId /}
+</p>
+
+<br />
+<fieldSet>
+	<legend><b>For Debet Purpose</b></legend>
+	<div style="overflow-y:scroll;height:130px">
+	<table id="gridBankAccountDebetPool" class="display">
+		<thead>
+			<tr>
+				<th>Account No</th>
+				<th>Bank Name</th>
+				<th>Beneficiary Name</th>
+				<th>Currency</th>
+				<th>Branch</th>
+				<th>Used By</th>
+				<th>Action</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+		</tbody>
+	</table>
+	</div>
+	<div class="buttons">
+		<button id="newDebetPool" #{if readOnly}disabled="disabled"#{/if}>Add</button>
+	</div>
+</fieldSet>
+
+<br />
+
+<fieldSet>
+	<legend><b>For Credit Purpose</b></legend>
+	<div style="overflow-y:scroll;height:130px">
+	<table id="gridBankAccountCreditPool" class="display">
+		<thead>
+			<tr>
+				<th>Account No</th>
+				<th>Bank Name</th>
+				<th>Beneficiary Name</th>
+				<th>Currency</th>
+				<th>Branch</th>
+				<th>Used By</th>
+				<th>Action</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+		</tbody>
+	</table>
+	</div>
+	<div class="buttons">
+		<button id="newCreditPool" #{if readOnly}disabled="disabled"#{/if}>Add</button>
+	</div>
+</fieldSet>
+

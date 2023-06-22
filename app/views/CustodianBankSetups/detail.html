@@ -1,0 +1,197 @@
+#{extends 'templates/detail1.html' /}
+#{set pageTitle: 'Custodian Bank Setup' /}
+#{set id:cust?.custodianCode /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{script 'lookups.js' /}
+#{script 'validation/numericOnly.js' /}
+
+<head>
+#{stylesheet 'site.css' /}
+</head>
+
+<script type="text/javascript">
+#{include 'RegistrySubscription/Util.js' /}
+#{include 'CustodianBankSetups/Custodian.js' /}
+
+function doCancel(){
+	location.href = '@{entry()}';
+	return false;
+}
+/* $(function(){
+	$('#tabs').tabs();
+		
+}) */
+
+</script>
+
+<div id="tabs">
+	<ul>
+		<li id='li1'><a href="#tabs-1">Details</a></li>
+		<li id='li2'><a href="#tabs-2">KSEI / C-BEST</a></li>
+		<li id='li3'><a href="#tabs-3">BI / BI-SSSS</a></li>
+		<li id='li4'><a href="#tabs-5">EUROCLEAR</a></li>
+		<li id='li5'><a href="#tabs-4">Invoice</a></li>
+		<li id='li6'><a href="#tabs-6">POOL ACCOUNT</a></li>
+		<li><a href="#tabs-7">COMPLIANCE</a></li>
+	</ul>
+	<div class="pane" id="tabs-1">
+		#{include 'CustodianBankSetups/tab_details.html' /}
+	</div>
+	<div class="pane" id="tabs-2">
+		#{include 'CustodianBankSetups/tab_ksei.html' /}
+	</div>
+	<div class="pane" id="tabs-3">
+		#{include 'CustodianBankSetups/tab_bi.html' /}
+	</div>
+	<div class="pane" id="tabs-5">
+		#{include 'CustodianBankSetups/tab_euro.html' /}
+	</div>
+	<div class="pane" id="tabs-4">
+		#{include 'CustodianBankSetups/tab_invoice.html' /}
+	</div>
+	<div class="pane" id="tabs-6">
+		#{include 'CustodianBankSetups/tab_pool.html' /}
+	</div>
+	<div class="pane" id="tabs-7">
+		#{include 'CustodianBankSetups/tab_compliance.html' /}
+	</div>
+</div>
+
+<div id="dialogBankAccount" title="Detail Bank Account" class="form">
+	<input type="hidden" id="dialogId" value="-1" />
+	<input type="hidden" id="dialogType" />
+	#{hidden id:'custodianBankKey', class:'clearData' /}
+	#{hidden id:'newBankAccountNo', class:'clearData' /}
+	#{hidden id:'oldBankAccountNo', class:'clearData'  /}
+	#{hidden id:'newBankCode', class:'clearData'  /}
+	#{hidden id:'oldBankCode', class:'clearData'  /}
+	#{hidden id:'oldCurrencyCode', class:'clearData'  /}
+	#{hidden id:'newCurrencyCode', class:'clearData'  /}
+	#{hidden id:'oldUsedBy', class:'clearData'  /}
+	#{hidden id:'newUsedBy', class:'clearData'  /}
+
+	<span id="btnBankAccountAddError" class="error"></span>
+	#{hidden id:'bankAccountKey', name:'ba.bankAccountKey', value:ba?.bankAccountKey, class:'clearData' /}
+	#{hidden id:'defaultBankAccount', name:'ba.setDefault', value:ba?.setDefault, class:'clearData' /}
+	#{hidden id:'oldDefaultRgProdBankAccount', class:'clearData' /}
+	#{hidden id:'rowNumber', class:'clearData' /}
+	<p id='participantAccountCashId'>	
+		#{textBox id:'participantAccount', name:'ba.participantAccount', label:'Participant Account Cash', value:ba?.participantAccount, required:true, readOnly:readOnly, width:'300px', maxLength:'30', class:'capitalize clearData' /}
+		&nbsp; <span id="participantAccountError" class="error"></span>
+	</p>
+	<p>
+		#{textBox id:'bankAccountNo', name:'ba.accountNo', label:'Account No', value:ba?.accountNo, required:true, readOnly:readOnly, width:'300px', maxLength:'50', class:'capitalize clearData' /}
+		&nbsp; <span id="bankAccountNoError" class="error"></span>
+	</p>
+	<p>	
+		#{textBox id:'bankCode', name:'ba.bankCode.thirdPartyCode', label:'Bank', value:ba?.bankCode?.thirdPartyCode, required:true, readOnly:readOnly, width:'80px', maxLength:'25', class:'capitalize clearData' /}
+		#{hidden id:'bankCodeKey', name:'ba.bankCode.thirdPartyKey', value:ba?.bankCode?.thirdPartyKey, class:'clearData' /}
+		#{button id:'bankCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'bankCodeDesc', name:'ba.bankCode.thirdPartyName', value:ba?.bankCode?.thirdPartyName, readOnly:true, width:'192px', class:'clearData'  /}
+		&nbsp; <span id="bankCodeError" class="error"></span>
+	</p>
+	<p>
+		#{textBox id:'accountHolderName', name:'ba.accountName', label:'Beneficiary Name', value:ba?.accountName, required:true, readOnly:readOnly, width:'300px', maxLength:'100', class:'capitalize clearData' /}
+		&nbsp; <span id="accountHolderNameError" class="error"></span>
+	</p>
+	<p>
+		#{textBox id:'bankCurrency', name:'ba.currency.currencyCode', label:'Currency', value:ba?.currency?.currencyCode, required:true, readOnly:readOnly, width:'80px', maxLength:'100', class:'capitalize clearData' /}
+		#{button id:'bankCurrencyHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'bankCurrencyDesc', name:'ba.currency.description', value:ba?.currency?.description, readOnly:true, width:'192px', class:'clearData'  /}
+		&nbsp; <span id="bankCurrencyError" class="error"></span>
+	</p>
+	<p>
+		#{textBox id:'bankBranch', name:'ba.branchCode', label:'Branch', value:ba?.branchCode, readOnly:readOnly, width:'300px', maxLength:'50', class:'capitalize clearData' /}
+		&nbsp; <span id="bankBranchError" class="error"></span>
+	</p>
+	<p>
+		#{dropDownList id:'usedBy', name:'ba.usedBy.lookupId', label:'Used By', options:accountUsedByOption, value:ba?.usedBy?.lookupId, readOnly:readOnly, required:true /}
+		<span id="usedByError" class="error"></span>
+	</p>	
+<!-- 			<p> -->
+		<!-- #{hidden id:'bicCode', name:'ba.bicCode', label:'BIC Code', value:ba?.bicCode, readOnly:readOnly, width:'300px', maxLength:'50', class:'capitalize clearData' /} -->
+<!-- 				&nbsp; <span id="bicCodeError" class="error"></span> -->
+<!-- 			</p> -->
+		<p>
+			#{textArea id:'bankReferences', name:'ba.description', value:ba?.description, label:'Description', class:'capitalize clearData', readOnly:readOnly, width:'300px', maxLength:'200'/}
+		</p>
+		<span class="error" id="bankGeneralMsg"></span>
+		<div class="buttons">
+			#{if (mode=='entry' || mode == 'edit')&& (!(confirming))}
+				<button id="addBankDialog">Save</button>
+				<button id="cancelBankDialog">Cancel</button>
+			#{/if}
+			#{else}
+				#{if confirming || mode=='view' }
+				<button id="cancelBankDialog">Close</button>
+				#{/if}
+			#{/else}	
+		</div>
+</div>
+	
+<div id="dialogInvoice" title="Detail Invoice" class="form">
+	#{hidden id:'rowPosition' /}
+	#{hidden id:'oldChargeGroup' /}
+	#{hidden id:'newChargeGroup' /}
+	
+	<p>
+		#{dropDownList id:'chargeGroup', name:'', label:'Charges Group', value:master?.invoiceCharge?.lookupId, options:invoiceCharge, readOnly:readOnly, required:true , width:'248px'/}
+		#{hidden id:'chargeGroupDesc', name:'', value:'' /}
+		<span id="chargeGroupError" class="error"></span>
+	</p>
+	
+	<p>
+		#{textBox id:'invoiceTaxCode', name:'', label:'Tax Code', value:'', class:'capitalize ', required:true, readOnly:readOnly, width:'60px' /}
+		#{hidden id:'invoiceTaxKey', name:'', value:'' /}
+		#{button id:'invoiceTaxHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'invoiceTaxDesc', name:'', value:'', readOnly:true, width:'160px' /}
+		<span id="invoiceTaxCodeError" class="error"></span>
+	</p>
+	<b><span class="error" id="invoiceGeneralMsg"></span></b>
+		<div class="buttons">
+			#{if (mode=='entry' || mode == 'edit')&& (!(confirming))}
+				<button id="addInvoiceDialog">Save</button>
+				<button id="cancelInvoiceDialog">Cancel</button>
+			#{/if}
+			#{else}
+				#{if confirming || mode=='view' }
+				<button id="cancelInvoiceDialog">Close</button>
+				#{/if}
+			#{/else}	
+		</div>
+</div>
+
+<div id="dialogComplience" title="Detail Price Reference" class="form">
+	#{hidden id:'rowPosition' /}
+	#{hidden id:'oldSecurityType' /}
+	#{hidden id:'newSecurityType' /}
+	
+	<p>
+		#{textBox id:'securityType', name:'', label:'Security Type', value:'', class:'capitalize', required:true, readOnly:readOnly, width:'80px', maxLength:'100' /}
+		#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'securityTypeDescription', name:'', value:'', readOnly:true, width:'200px' /}
+		<span id="securityTypeError" class="error"></span>
+	</p>
+	<b><span class="error" id="securityTypeMsg"></span></b>
+	
+	<p>
+		#{textBox id:'groupCode', name:'', label:'Group Code', value:'', class:'capitalize ', required:true, readOnly:readOnly, width:'80px', maxLength:'100' /}
+		#{hidden id:'groupKey', name:'', value:'' /}
+		#{button id:'groupHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'groupDesc', name:'', value:'', readOnly:true, width:'200px' /}
+		<span id="groupCodeError" class="error"></span>
+	</p>
+	<b><span class="error" id="complianceGeneralMsg"></span></b>
+	
+	<div class="buttons">
+		#{if (mode=='entry' || mode == 'edit') && (!(confirming))}
+			<button id="addComplienceDialog">Save</button>
+			<button id="cancelComplienceDialog">Cancel</button>
+		#{/if}
+		#{else}
+			#{if confirming || mode=='view' }
+			<button id="cancelComplienceDialog">Close</button>
+			#{/if}
+		#{/else}	
+	</div>
+</div>

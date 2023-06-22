@@ -1,0 +1,148 @@
+#{extends 'templates/list1.html' /}
+#{set fixData:true /}
+#{set pageTitle: 'RG - BOD / EOD process New' /}
+<!-- mode >>> ${mode} <br />  -->
+<!-- date >> ${val?.eodDate} -->
+#{script 'lookups.js' /}
+
+<script type="text/javascript">
+#{include 'RegistryEndOfDayNew/RegUtilEod.js' /}
+</script>
+
+<form id="registryEndOfDayForm" class="form" method="POST" name="validation" >
+	<p>			
+		#{textBox id:'date', name:'currentDate', label:'Date', value:currentDate?.format(appProp.dateFormat), class:'calendar', readOnly:true/} (${appProp.displayDateFormat})
+	</p>
+	<p>			
+		#{textBox id:'date2', name:'nextDate', label:'Next Date', value:nextDate?.format(appProp.dateFormat), class:'calendar', readOnly:true/} (${appProp.displayDateFormat})
+	</p>
+	<p class="buttons">
+		#{button  id:'buttonTest', value:'Test', readOnly:false/}
+		#{button  id:'buttonChangeDate', value:'Change Date', readOnly:false/}
+	</p>
+	<p></p>
+	<p></p>
+	<p></p>
+	<table id="tblTransaction" class="display">
+		<thead>
+			<tr>
+				<th>Id</th>
+				<th>Process</th>
+				<th>Fund Code</th>
+				<th>Fund Name</th>
+				<th>Date</th>
+				<th>Last EOD</th>
+				<th width="150px">Start</th>
+				<th width="150px">End</th>
+				<th>Message</th>
+			</tr>
+		</thead>
+		<tbody>
+			#{list dataRgProdEod, as:'listRgProdEod'}
+			<tr>
+				<td>ID</td>
+				<td align="center" class="buttons"><input id="buttonRun" name="run" productcode='${listRgProdEod?.productCode}'  type="button" value="Run"></td>
+				<td>${listRgProdEod?.productCode}</td>
+				<td>${listRgProdEod?.rgProduct?.name}</td>
+				<td align="center" >${listRgProdEod?.eodDate?.format(appProp.dateFormat)}</td>
+				<td align="center" >${listRgProdEod?.lastEod?.format(appProp.dateFormat)}</td>
+				<td>${listRgProdEod?.starts?.format("dd/MM/yyyy HH:mm:ss")}</td>
+				<td>${listRgProdEod?.ends?.format("dd/MM/yyyy HH:mm:ss")}</td>
+				<td>${listRgProdEod?.message}</td>
+			</tr>
+			#{/list}
+		</tbody>
+	</table>
+	<div class="buttons">
+		#{button  id:'buttonRunAll', value:'Run All', readOnly:false/}
+		#{button  id:'buttonRollback', value:'Rollback', readOnly:false/}
+	</div>
+</form>
+
+<div id="changeDateForm" title="Change Date">
+	<p>			
+		<h4>There's any transaction still open</h4> 
+	</p>
+		
+	<div class="buttons">
+		#{button  id:'changeDateClose', value:'Close', readOnly:false/}
+	</div>
+
+</div>
+
+<div id="rollbackDateForm" title="Rollback Date">
+	<p>			
+		<h4>Rollback date not correct</h4> 
+	</p>
+		
+	<div class="buttons">
+		#{button  id:'rollbackDateClose', value:'Close', readOnly:false/}
+	</div>
+
+</div>
+
+<div id="rollBackEOD" title="Rollback EOD" heigth="700px" width="500px">
+	<form class="form">
+		<p>			
+			#{textBox id:'fundCode', name:'sub.rgProduct.productCode', label:'Fund Code', value:sub?.rgProduct?.productCode, width:'120px', readOnly:readOnly, class:'capitalize', required:true/}
+			#{hidden  id:'fundCodeKey', value:sub?.rgProduct?.productCode /}
+			#{button  id:'fundCodeHelp', value:'?', class:'small', readOnly:readOnly/}
+		</p>	
+		<p>
+			#{textBox id:'fundCodeDesc',  label:'Fund Name', name:'sub.rgProduct.name', value:sub?.rgProduct?.name, readOnly:true, width:'240px' /}
+		</p>
+		<p>
+			#{textBox id:'transactionDate', name:'transaction.transactionDate', label:'Rollback Date', value:transactionDate?.format(appProp.dateFormat), required:true, class:'calendar', readOnly:readOnly /}
+			(${appProp.displayDateFormat})
+		</p>
+		
+		<p>
+			<label>&nbsp;</label>
+			<span style="display: inline-block;width:85px;background: MediumAquaMarine ;font-size:12;text-align:center ;height: 20px;"><b>Current</b></span>
+			<span style="display: inline-block;width:100px;background: MediumAquaMarine ;font-size:12;text-align:center ;height: 20px;"><b>After Rollback</b></span>
+		</p>
+		
+		<p>
+			#{textBox id:'fundDate', name:'fundDate', value:fundDate?.format(appProp.dateFormat), label:'Fund Date', class:'calendar', readOnly:true/}
+			#{textBox id:'fundDateNew', name:'fundDateNew', value:fundDateNew?.format(appProp.dateFormat), class:'calendar', width:'100px', readOnly:true /}
+		</p>
+		<p>
+			#{textBox id:'lastEod', name:'lastEod', value:lastEod?.format(appProp.dateFormat),label:'Last Eod', class:'calendar', readOnly:true/}
+			#{textBox id:'lastEodNew', name:'lastEodNew', value:lastEodNew?.format(appProp.dateFormat), class:'calendar', width:'100px', readOnly:true /}
+		</p>
+		
+		<!-- 	
+		<p>
+			#{textBox id:'fundDate', name:'fundDate', label:'Fund Date', class:'calendar', readOnly:true/}
+			#{textBox id:'fundDateNew', name:'fundDateNew', value:'', required:true, class:'calendar', width:'100px', readOnly:readOnly /}
+		</p>
+		<p>
+			#{textBox id:'lastEod', name:'lastEod', label:'Last Eod', class:'calendar', readOnly:true/}
+			#{textBox id:'lastEodNew', name:'lastEodNew', value:'', required:true, class:'calendar', width:'100px', readOnly:readOnly /}
+		</p>
+		-->
+		<div class="buttons">
+			#{button  id:'buttonProcessRollBackEOD', value:'Process', readOnly:false/}
+			#{button  id:'buttonCloseRollBackEOD', value:'Close', readOnly:false/}
+		</div>	
+	</form>
+</div>
+<div id="rollBackEODConfirm" title="Rollback EOD Confirm" heigth="700px" width="500px">
+	<form class="form">
+		<p>			
+			<h4>Are you sure want to rollback this fund to <span id='fundDateNewSpan'></span>, 
+				all transactions need to EOD by daily from <span id='fundDateNewSpan1'></span> till now ? 
+			</h4> 
+		</p>
+		<div class="buttons">
+			#{button  id:'buttonOkRollBackEOD', value:'Yes', readOnly:false/}
+			#{button  id:'buttonNoRollBackEOD', value:'No', readOnly:false/}
+		</div>	
+	</form>
+</div>
+
+<div id="runAllEod" title="EOD Run All">
+	<p>			
+		<h4>Transaction being process</h4> 
+	</p>
+</div>

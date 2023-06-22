@@ -1,0 +1,58 @@
+<table id="gridFeeDetail" class="display">
+	<thead>
+		<tr>
+			<th>Key</th>
+			<th>Effective date from</th>
+			<th>Effective date to</th>
+			<th>Tier Type</th>
+			<th>Amount</th>
+			<th>Tax Rate</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list faFeeMaster?.faFeeDetails, as:'faFeeDetail'}
+		<tr>
+			<td>
+				${faFeeDetail?.id?.rowNumber}
+			</td>
+			<td>
+				${faFeeDetail?.startDate}
+			</td>
+			<td>
+				${faFeeDetail?.endDate}
+			</td>
+			<td>
+				${faFeeDetail?.tieringType?.lookupDescription}
+			</td>
+			<td>
+				
+			</td>
+			<td>
+				${faFeeDetail?.taxMaster?.taxRate}
+			</td>
+			<td>
+				#{hidden id:'detailFeeKey', name:'faFeeDetails[' + (faFeeDetail_index-1) + '].id.feeKey', value:faFeeDetail?.id?.feeKey /}
+				#{hidden id:'detailFeeKeyAmount', name:'faFeeDetails[' + (faFeeDetail_index-1) + '].id.feeKey', value:faFeeDetail?.id?.feeKey /}
+				#{hidden id:'detailRowNumber', name:'faFeeDetails[' + (faFeeDetail_index-1) + '].id.rowNumber', value:faFeeDetail?.id?.rowNumber /}
+				#{hidden id:'detailRowNumberAmount', name:'faFeeDetails[' + (faFeeDetail_index-1) + '].id.rowNumber', value:faFeeDetail?.id?.rowNumber /}
+				#{hidden id:'startDateNav', name:'faFeeDetails[' + (faFeeDetail_index-1) + '].startDate', value:faFeeDetail?.startDate /}
+				#{hidden id:'startDate', name:'faFeeDetails[' + (faFeeDetail_index-1) + '].startDate', value:faFeeDetail?.startDate /}
+				#{hidden id:'endDateNav', name:'faFeeDetails[' + (faFeeDetail_index-1) + '].startDate', value:faFeeDetail?.endDate /}
+				#{hidden id:'endDate', name:'faFeeDetails[' + (faFeeDetail_index-1) + '].startDate', value:faFeeDetail?.endDate /}
+				#{hidden id:'tieringType', name:'faFeeDetails[' + (faFeeDetail_index-1) + '].tieringType.lookupId', value:faFeeDetail?.tieringType?.lookupId /}
+				#{hidden id:'tieringTypeDesc', name:'faFeeDetails[' + (faFeeDetail_index-1) + '].tieringType.lookupId', value:faFeeDetail?.tieringType?.lookupDescription /}
+				#{hidden id:'valueType', name:'faFeeDetails[' + (faFeeDetail_index-1) + '].valueType.lookupId', value:faFeeDetail?.valueType?.lookupId /}
+				#{hidden id:'taxKeyNav', name:'faFeeDetails[' + (faFeeDetail_index-1) + '].taxMaster.taxKey', value:faFeeDetail?.taxMaster?.taxKey /}
+				#{hidden id:'taxKey', name:'faFeeDetails[' + (faFeeDetail_index-1) + '].taxMaster.taxKey', value:faFeeDetail?.taxMaster?.taxKey /}
+				#{hidden id:'taxCodeNav', name:'faFeeDetails[' + (faFeeDetail_index-1) + '].taxMaster.taxCode', value:faFeeDetail?.taxMaster?.taxCode /}
+				#{hidden id:'taxCode', name:'faFeeDetails[' + (faFeeDetail_index-1) + '].taxMaster.taxCode', value:faFeeDetail?.taxMaster?.taxCode /}
+				#{hidden id:'taxNameNav', name:'faFeeDetails[' + (faFeeDetail_index-1) + '].taxMaster.description', value:faFeeDetail?.taxMaster?.description /}
+				#{hidden id:'taxName', name:'faFeeDetails[' + (faFeeDetail_index-1) + '].taxMaster.description', value:faFeeDetail?.taxMaster?.description /}
+				#{hidden id:'taxMasterRate', name:'faFeeDetails[' + (faFeeDetail_index-1) + '].taxMaster.taxRate', value:faFeeDetail?.taxMaster?.taxRate /}
+				<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled="disabled"#{/if}/></center>
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>

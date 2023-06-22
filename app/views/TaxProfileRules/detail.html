@@ -1,0 +1,73 @@
+#{extends 'templates/detail1.html' /}
+#{set id:txProfileRule?.id?.taxProfileCode /}
+#{set pageTitle: 'Tax Profile' /}
+#{set readOnly: (((mode != 'edit')&&(mode != 'entry')) || (confirming))  /}
+
+#{script 'date.js', characterset:'utf-8' /}
+#{script 'external/Util.js' /}
+#{script 'lookups.js' /}
+ 
+<script type="text/javascript">
+	#{include 'TaxProfileRules/TaxProfileRule.js' /}
+</script>
+
+<style type="text/css">
+  #errmsg { color:red; }
+  .errMsg { color:red; }
+</style>
+
+<form id="interestTaxSetupForm" class="form" method="POST">
+
+	#{hidden id:'taxProfileRuleCode', name:'txProfileRule.id.taxProfileCode', value:txProfileRule?.id?.taxProfileCode /}
+	#{hidden id:'taxProfileRuleCodeSecType', name:'txProfileRule.id.securityTypeCode', value:txProfileRule?.id?.securityTypeCode /}
+	#{hidden id:'oldSecurityType', name:'oldSecurityType', value:oldSecurityType /}
+	#{hidden id:'recordStatus', name:'txProfileRule.recordStatus', value:txProfileRule?.recordStatus /}
+	#{hidden id:'status', name:'status', value:status /}
+	#{hidden id:'isNewRec', name:'isNewRec', value:isNewRec /}
+	#{hidden id:'tieringType', name:'txProfRuleInt.tieringType.lookupId', value:tieringTypeSingle /}
+	<ul>
+		<li>
+			#{textBox id:'taxProfileCode',  name:'txProfileRule.txProfile.taxProfileCode',label:'Tax Profile Code', value:txProfileRule?.txProfile?.taxProfileCode, class:'capitalize', readOnly:true, width:'125px', maxLength:50 /}
+			#{textBox id:'taxProfileDesc', name:'txProfileRule.txProfile.description', value:txProfileRule?.txProfile?.description,  class:'capitalize',required:true, readOnly:true, width:'300px', maxLength:100 /}
+		</li>
+		<li>
+			#{textBox id:'securityType', name:'txProfileRule.securityType.securityType', label:'Security Type', value:txProfileRule?.securityType?.securityType, class:'capitalize', required:true, readOnly:readOnly, maxLength:50, width:'100px' /}
+			#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:readOnly  /}
+			#{textBox id:'securityTypeDesc', name:'txProfileRule.securityType.description', value:txProfileRule?.securityType?.description, readOnly:true, width:'300px' /}
+			<span id="errSecType" class="error">#{error 'Security Type is' /}</span>
+		</li>
+		<li>
+			<label>Active</label>
+			<input type="radio" id="activeYes" name='isActive' value='txProfileRule.active' />
+			Yes
+			<input type="radio" id="activeNo" name='isActive' value='txProfileRule.active' />
+			No
+			#{hidden id:'isActiveHidden', name:'txProfileRule.active', value:((txProfileRule?.active)?'true':'false') /}
+		</li>
+	</ul>
+<br>
+<p></p>
+<div id="tabsInterestTaxSetup">
+	<span id="errmsg" class="error">#{error 'Tax Profile Rule Detail is' /}</span>
+	<div id="listInterest">
+		#{include 'TaxProfileRules/grid_interest.html' /}
+	</div>
+	<br/>
+	<div class="buttons">
+		#{ifnot confirming}
+			<button id="newInterest">New Data</button>
+		#{/ifnot}
+	</div>
+</div>
+<br />
+</form>
+<form></form>
+<input type="hidden" id="dummy" />
+<div id="detailInterest" title="Interest">
+	#{include 'TaxProfileRules/detail_interest.html' /}
+</div>
+<!-- <div id="dialog-message1" title="Message Confirmation">
+	<p>
+	<span class="ui-icon ui-icon-notice" style="float:left; margin:0 7px 50px 0;"></span>
+	Are you sure to delete data ? </p>
+</div> -->

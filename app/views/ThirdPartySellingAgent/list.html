@@ -1,0 +1,36 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Third Party Selling Agent' /}
+#{set fixData: true /}
+#{script 'lookups.js' /}
+
+
+
+<script type="text/javascript">
+#{include 'RegistrySubscription/Util.js' /}
+#{include 'ThirdPartySellingAgent/thirdPartySellingAgentPaging.js' /}
+$(document).ready(function() {
+	Paging($("#main"));
+});
+</script>
+<div id="root">
+	<h3>Third Party Selling Agent</h3>
+</div>
+<div id="result" style="display:block">
+    <table id="tableThirdPartySellingAgent" class="display">
+        <thead>
+            <tr>
+                <th width="80px" field="thirdPartyCode|string|none|left|sort">Code</th>
+                <th width="50px" field="thirdPartyName|string|none|left|sort">Name</th>
+                <th width="80px" field="recordStatus|string|decode|left|sort">Status</th>
+				<th width="50px" field="isActive|boolean|yesno|center|sort">Active</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<div id="btn" class="buttons">
+	<!-- <label><input type="checkbox" id="notInList"/> Not in the list</label>&nbsp; -->
+	<input type="button" id="newData" value="New Data" />	
+</div>

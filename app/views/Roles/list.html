@@ -1,0 +1,45 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Role Maintenance' /}
+
+<script type="text/javascript">
+	function doEdit(data) {
+		if ((data[2] == "New") || (data[2] == "Updated")) {
+			view(data[0]);
+			return false;
+		} else {
+			return true;
+		}
+	}
+</script>
+
+<table class="display">
+	<thead>
+		<tr>
+			<th width="0">Key</th>
+			<th>Role </th>
+			<th width="120px">Status</th>
+			<th width="120px">Active</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:roles, as:'item'}
+		<tr>
+			<td>
+				${item.roleKey} 
+			</td>
+			<td>
+				${item.roleName}
+			</td>
+			<td>
+				${item?.recordStatus?.decodeStatus()}
+			</td>
+			<td>
+				${item?.isActive ? 'Yes':'No'}
+			</td>		
+		</tr>
+	#{/list}
+	</tbody>
+</table>
+	
+
+

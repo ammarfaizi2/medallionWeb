@@ -1,0 +1,366 @@
+#{set readOnly: ((mode != 'edit' && mode != 'entry') || confirming || settlement) /}
+#{set settle: ((mode != 'edit' && mode != 'entry') || confirming) /} 
+
+#{if flash.error}
+    <p style="color:#c00">
+        ${flash.error}
+    </p>
+#{/if}
+#{script 'date.js', characterset:'utf-8' /}
+<script type="text/javascript">
+
+	$(function() {
+		
+		$('#tabs').tabs();
+		if ($('#securityClass').val() == 'EQ') {
+			$('#interestRate').attr('disabled', 'disabled');
+			$('#accrualDays').attr('disabled', 'disabled');	
+			$('#accruedInterest').attr('disabled', 'disabled');	
+			$('#taxOnInterest').attr('disabled', 'disabled');
+			$('#interestRate').val('');
+			$('#interestRateStripped').val('');
+			$('#accrualDays').val('');	
+			$('#accrualDaysStripped').val('');	
+			$('#accruedInterest').val('');	
+			$('#accruedInterestStripped').val('');	
+			$('#taxOnInterest').val('');
+			$('#taxOnInterestStripped').val('');
+		} else if ($('#securityClass').val() == 'FI') {
+			$('#interestRate').removeAttr('disabled');
+			$('#accrualDays').removeAttr('disabled');	
+			$('#accruedInterest').removeAttr('disabled');	
+			$('#taxOnInterest').removeAttr('disabled');						
+		}
+		
+		$('#accountNo').lookup({
+			list:'@{Pick.accounts()}',
+			get:function() {
+				$.get('@{Pick.account()}', {'code':$('#accountNo').val()}, function(data) {
+					checkRedirect(data);
+					if (data) {
+						$('#accountNo').removeClass('fieldError');
+						$('#accountName').val(data.description);
+						$('#h_accountName').val(data.description);
+						$('#accountKey').val(data.code);
+						$('#transactionCode').focus();
+						//getCharges(true);
+					} else {
+						$('#accountNo').addClass('fieldError');
+						$('#accountName').val('NOT FOUND');
+						$('#h_accountName').val('');
+						$('#accountKey').val('');						
+					}
+				});
+			},
+			help:$('#accountHelp')
+		});
+		//$('#accountKey').change(function() {
+		//	getCharges(false);
+		//});
+		$('#transactionCode').lookup({
+			list:'@{Pick.transactionTemplates()}',
+			get: {
+				url:'@{Pick.transactionTemplate()}',
+				success: function(data) {
+					console.debug( '>>>> masuk success');
+					$('#transactionCode').removeClass('fieldError');
+					$('#transactionTemplateKey').val(data.code);
+					$('#transactionCodeDesc').val(data.description);
+					$('#h_transactionCodeDesc').val(data.description);
+					$('#securityClassId').val(data.securityClassId);
+					$('#securityClass').val(data.securityClass);
+					$('#h_securityClass').val(data.securityClass);
+					$('#securityClassDesc').val(data.securityClassDesc);
+					$('#h_securityClassDesc').val(data.securityClassDesc);
+					$('#securityType').val(data.securityType);
+					$('#h_securityType').val(data.securityType);
+					$('#securityTypeDesc').val(data.securityTypeDesc);
+					$('#h_securityTypeDesc').val(data.securityTypeDesc);
+					//$('#transactionType').val(data.transactionType);
+					//$('#transactionTypeCode').val(data.transactionTypeCode);
+					//$('#h_transactionTypeCode').val(data.transactionTypeCode);
+					//$('#transactionTypeDesc').val(data.transactionTypeDesc);
+					//$('#h_transactionTypeDesc').val(data.transactionTypeDesc);
+					//$('#securityClassId').val(data.securityClass + '-' + data.securityType);
+					console.debug( 'securityClass=' + data.securityClass);
+					// Check securityClass
+					if (data.securityClass == 'EQ') {
+						$('#interestRate').attr('disabled', 'disabled');
+						$('#accrualDays').attr('disabled', 'disabled');	
+						$('#accruedInterest').attr('disabled', 'disabled');	
+						$('#taxOnInterest').attr('disabled', 'disabled');
+						$('#interestRate').val('');
+						$('#interestRateStripped').val('');
+						$('#accrualDays').val('');	
+						$('#accrualDaysStripped').val('');	
+						$('#accruedInterest').val('');	
+						$('#accruedInterestStripped').val('');	
+						$('#taxOnInterest').val('');
+						$('#taxOnInterestStripped').val('');
+					} else if (data.securityClass == 'FI') {
+						$('#interestRate').removeAttr('disabled');
+						$('#accrualDays').removeAttr('disabled');	
+						$('#accruedInterest').removeAttr('disabled');	
+						$('#taxOnInterest').removeAttr('disabled');						
+					} else {
+						alert('Transaction is not currently supported');
+					}
+					//getCharges(true);
+				},
+				error: function() {
+					console.debug( '>>>> masuk error');
+					$('#transactionCode').addClass('fieldError');
+					$('#transactionTemplateKey').val('');
+					$('#transactionCodeDesc').val('NOT FOUND');
+					$('#h_transactionCodeDesc').val('');
+					$('#securityClass').val('');
+					$('#h_securityClass').val('');
+					$('#securityClassDesc').val('');
+					$('#h_securityClassDesc').val('');
+					$('#securityType').val('');
+					$('#h_securityType').val('');
+					$('#securityTypeDesc').val('');
+					$('#h_securityTypeDesc').val('');
+					//$('#transactionType').val('');
+					//$('#transactionTypeCode').val('');
+					//$('#h_transactionTypeCode').val('');
+					//$('#transactionTypeDesc').val('');
+					//$('#h_transactionTypeDesc').val('');
+					$('#securityClassId').val('');	
+				}
+			},
+			filter: '$timeDeposit',
+			help:$('#transactionHelp'),
+			nextControl:$('#securityId')
+		});
+		$('#securityId').lookup({
+			list:'@{Pick.securities()}',
+			get:function() {
+				getSecurity();
+			},
+			filter:$('#securityType'),
+			help:$('#securityHelp')
+		});
+		$('#taxCode').lookup({
+			list:'@{Pick.taxMasters()}',
+			get:{
+				url:'@{Pick.taxMaster()}',
+				success: function(data) {
+							$('#taxCode').removeClass('fieldError');
+							$('#taxKey').val(data.code);
+							$('input#taxCode').val(data.taxCode);
+							$('#taxName').val(data.description);
+						},
+				error: function() {
+						$('#taxCode').addClass('fieldError');
+						$('#taxKey').val('');
+						$('#taxCode').val('');
+						$('#taxName').val('NOT FOUND');
+					}
+			},
+			key:$('#taxKey'),
+			help:$('#taxCodeHelp'),
+			nextControl:$('#tierValue')
+		});
+				
+		$('#settlementDate').datepicker();
+		$('#transactionDate').datepicker();
+		$('.calendar').datepicker();
+
+		$('#next1').click(function() {
+			$('#tabs').tabs('select', 1);
+			if (tab2Visited) {
+				$('#next2').focus();
+			} else {
+				$('#chargeList input:text').first().focus();
+			}
+		});
+		$('#prev2').click(function() {
+			$('#tabs').tabs('select', 0);
+		});
+		$('#next2').click(function() {
+			$('#tabs').tabs('select', 2);
+			//$('input:text').first().focus();
+		});
+		$('#prev3').click(function() {
+			$('#tabs').tabs('select', 1);
+		});
+		
+	});
+
+	function getSecurity() {
+		if ($('#securityId').val()) {
+			$.post('@{Pick.security()}', {'code':$('#securityId').val(),'filter':$('#securityType').val(),'transactionDate':$('#transactionDate').val()}, function(data) {
+	    		checkRedirect(data);
+				if (data) {
+					$('#securityId').removeClass('fieldError');
+					$('#securityKey').val(data.securityKey);
+					$('#securityDesc').val(data.description);
+					$('#h_securityDesc').val(data.description);
+					$('#depositoryCode').val(data.depositoryCode);
+					$('#interestRate').val($.fn.autoNumeric.Format('interestRate', data.interestRate));
+					$('#interestRateStripped').val(data.interestRate);
+					$('#lastPaymentDate').val(data.lastPaymentDate);
+					$('#accrualBase').val(data.accrualBase.replace("ACCRUAL_BASE-", ""));
+					$('#yearBase').val(data.yearBase.replace("YEAR_BASE-", ""));
+					var date = $('#transactionDate').datepicker('getDate');
+					if (date) {
+						date.setDate(date.getDate() + data.settlementDays);
+						$('#settlementDate').datepicker('setDate', date);
+					}
+					//calculateAccrualDays();
+					//calculate();
+					
+					//$('#counterPartyCode').focus();
+					//getCharges(true);
+				} else {
+					$('#securityId').addClass('fieldError');
+					$('#securityDesc').val('NOT FOUND');
+					$('#securityKey').val('');
+				}
+			});		
+		} else {
+			console.debug('getSecurity() not running, #securityId is empty');
+		}
+	}
+</script>
+#{script 'lookups.js' /}
+<form id="timeDepositPlacementForm" class="form" method="POST">
+	<p>
+		#{textBox id:'transactionNo', name:'transaction.transactionNumber', label:'Transaction No', value:'', required:true, readOnly:true,width:'85px'/}
+		#{hidden id:'transactionKey', name:'transaction.transactionKey', value:'' /}
+	</p>
+	<p>
+		#{textBox id:'transactionDate', name:'transaction.transactionDate', label:'Transaction Date', value:'', required:true, class:'calendar', readOnly:readOnly /}
+		(MM/DD/YYYY)
+	</p>
+	<p>
+		#{textBox id:'accountNo', name:'transaction.account.accountNo', label:'Account No', value:'', required:true, readOnly:readOnly, width:'100px' /}
+		#{hidden id:'accountKey', name:'transaction.account.custodyAccountKey', value:'' /}
+		#{button id:'accountHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'accountName', name:'transaction.account.name', value:'', readOnly:true, width:'300px' /}
+	</p>
+	<p>
+		#{textBox id:'transactionCode', name:'transaction.transactionTemplate.transactionCode', label:'Transaction Code', value:'', required:true, readOnly:readOnly, width:'60px' /}
+		#{hidden id:'transactionTemplateKey', name:'transaction.transactionTemplate.transactionTemplateKey', value:'' /}
+		#{button id:'transactionHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'transactionCodeDesc', name:'transaction.transactionTemplate.description', value:'', readOnly:true, width:'340px' /}
+	</p>	
+	 	#{hidden id:'transactionTypeCode', value:model?.transactionTypeCode /}
+ 	<p>
+		#{textBox id:'securityClass', name:'transaction.transactionTemplate.securityType.securityClass.lookupCode', label:'Security Class', value:transaction?.transactionTemplate?.securityType?.securityClass?.lookupCode, readOnly:true, width:'60px' /}
+		#{textBox id:'securityClassDesc', name:'transaction.transactionTemplate.securityType.securityClass.lookupDescription', value:'', readOnly:true, width:'364px' /}
+		#{hidden id:'securityClassId', name:'transaction.transactionTemplate.securityType.securityClass.lookupId'  /}
+	</p>
+	<p>
+		#{textBox id:'securityType', name:'transaction.transactionTemplate.securityType.securityType', label:'Security Type', value:'', readOnly:true, width:'60px' /}
+		#{textBox id:'securityTypeDesc', name:'transaction.transactionTemplate.securityType.description', value:'', readOnly:true, width:'364px' /}
+	</p>
+	<p>
+		#{textBox id:'securityId', name:'transaction.security.securityId', label:'Security Code', value:'', required:true, class:'capitalize', readOnly:readOnly, width:'120px' /}
+		#{hidden id:'securityKey', name:'transaction.security.securityKey', value:'' /}
+		#{button id:'securityHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'securityDesc', name:'transaction.security.description', value:'', readOnly:true, width:'280px' /}
+	</p>
+	<p>
+		#{dropDownList id:'category', name:'transaction.maturityInstruction', label:'Classification', value:'', options:classification, readOnly:readOnly /}
+	</p>
+	
+	<p>
+		#{textBox id:'settlementDate', name:'transaction.settlementDate', label:'Settlement Date', value:'', required:true, class:'calendar', readOnly:settle /}
+		(MM/DD/YYYY)
+		#{hidden id:'lastPaymentDate' /}
+		#{hidden id:'accrualBase' /}
+		#{hidden id:'yearBase' /}
+	</p>
+	<p>
+		#{textBox id:'bilyetAccountNo', name:'bilyetAccountNo', label:'Bilyet Account No', value:'', readOnly:readOnly /}
+
+	</p>
+	</br>
+	<div id="tabs" style="height:300px;width:750px">
+		<ul>
+			<li><a href="#tab1">Detail</a></li>
+			<li><a href="#tab2">Charges</a></li>
+			<li><a href="#tab3">Additional</a></li>
+		</ul>
+		<div id="tab1">
+			<div style="height:220px">
+				<div style="float:left;height:90%">
+					<p>
+						#{textBox id:'amount', label:'Amount', value:'',  required:'',  class:'numeric', readOnly:readOnly /}
+						#{hidden id:'amountStripped', name:'transaction.amount', value:'' /}
+					</p>
+					<p>
+						#{textBox id:'interestRate', label:'Interest Rate', value:'', class:'numeric', required:'', readOnly:readOnly /}%
+						#{hidden id:'interestRateStripped', name:'transaction.interestRate', value:'' /}
+					</p>
+					
+					<p>
+						#{textBox id:'periodOfInterest', name:'transaction.periodOfInterest', label:'Period(month)', value:'', class:'numeric', readOnly:readOnly , width:'85px' /}
+					</p>
+					<p>
+						#{textBox id:'effectiveDate', name:'transaction.effectiveDate', label:'Effective Date', value:'', class:'calendar', readOnly:readOnly /}
+					</p>
+					<p>
+						#{textBox id:'maturityDate', name:'transaction.maturityDate', label:'Maturity Date', value:'',  class:'calendar', readOnly:true /}
+					</p>
+					<p>
+						#{textBox id:'indicativeInterest', name:'indicativeInterest', label:'Indicative Interest', value:'',  class:'calendar', readOnly:true /}
+					</p>
+					<p>			
+						#{textBox id:'taxCode', name:'tier.taxMaster.taxCode', label:'Tax Code', value:tier?.taxMaster?.taxCode, required:true, readOnly:readOnly, width:'40' /}
+						#{hidden id:'taxKey', name:'tier.taxMaster.taxKey', value:tier?.taxMaster?.taxKey  /}
+						#{button id:'taxCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+						#{textBox id:'taxName', name:'taxName', value:tier?.taxMaster?.description, readOnly:true, width:'100' /}
+					</p>
+					<p>
+						#{textBox id:'interestAfterTax', label:'Int. After Tax', value:'',  class:'numeric', required:'', readOnly:true /}
+						#{hidden id:'interestAmountStripped', name:'transaction.interestAmount', value:''/}
+					</p>
+					<p>
+						#{dropDownList id:'maturityInstruction', name:'transaction.maturityInstruction', label:'Maturity Instruction', value:'', options:maturityInstruction, readOnly:readOnly /}&nbsp;&nbsp;
+						#{checkBox id:'checkTermOfIntPayment', name:'checkTermOfIntPayment', label:'',value:'' /}
+						#{textBox id:'termOfIntPayment', label:'Term Of Int. Payment', value:'',  class:'numeric', required:'', readOnly:true, width:'100' /}
+					</p>
+					<p>
+						#{textBox id:'maturityAmount', label:'Maturity Amount', value:'',  class:'numeric', required:'', readOnly:true /}
+						#{hidden id:'interestAmountStripped', name:'transaction.interestAmount', value:''/}
+					</p>
+				</div>
+				
+				
+			</div>
+			<div class="buttons">
+				<input type="button" id="prev1" value="&lt; Previous" disabled="disabled" />
+				<input type="button" id="next1" value="Next &gt;" />
+			</div>
+		</div>
+		<div id="tab2">
+			<div style="height:220px">
+				<div id="charges" style="overflow-y:scroll;max-height:170px;">
+					#{include 'Transactions/chargeList.html' /}
+				</div>
+				<div class="buttons" style="padding-top:5px;">
+					<input type="button" value="Add" id="addCharge" />				
+					<input type="button" value="Reset" id="resetCharge" />		
+					<input type="button" value="Done" id="chargeDone" style="display:none" />
+					#{hidden id:'chargeKey', name:'chargeKey', value:''  /}
+				</div>		
+			</div>
+			<div class="buttons">
+				<input type="button" id="prev2" value="&lt; Previous" />
+				<input type="button" id="next2" value="Next &gt;" />
+			</div>
+		</div>
+		<div id="tab3">
+			<div style="height:220px">
+				
+			</div>
+			<div class="buttons">
+				<input type="button" id="prev3" value="&lt; Previous" />
+				<input type="button" id="next3" value="Next &gt;" disabled="disabled" />
+			</div>
+		</div>
+	</div>
+</form>

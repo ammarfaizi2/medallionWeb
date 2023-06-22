@@ -1,0 +1,225 @@
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{script 'lookups.js' /}
+#{script 'transaction.js' /}
+#{script 'date.js', characterset:'utf-8' /}
+
+<h2>Deposito Inquiry</h2>
+#{if flash.error || errors}
+    <div class="error">
+    	<b>Error when saving data!</b><br/><br/>
+    	#{if flash.error}
+<li>${flash.error}</li>
+		#{/if}
+		#{ifErrors}
+			#{errors}
+<li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'InquiryDeposito/InquiryDeposito.js' /}
+</script>
+
+
+<form id="inquiryDepositoForm" class="form" method="POST">
+#{hidden id:'accountBlocked', name:'deposito.account.blocked', value:deposito?.account?.blocked /}
+#{hidden id:'classification', name:'deposito.classification.lookupId', value:deposito?.classification?.lookupId /}
+#{hidden id:'depositoKey', name:'deposito.depositoKey', value:deposito?.depositoKey /}
+#{hidden id:'depositoTemplate', name:'deposito.depositoTemplate.lookupId', value:deposito?.depositoTemplate?.lookupId /}
+#{hidden id:'depositoTemplateKey', name:'deposito.depositoTemplateKey', value:deposito?.depositoTemplateKey /}
+#{hidden id:'frequency', name:'deposito.security.frequency.lookupCode', value:deposito?.security?.frequency?.lookupCode /}
+#{hidden id:'frequencyId', name:'deposito.security.frequency.lookupId', value:deposito?.security?.frequency?.lookupId /}
+#{hidden id:'minTrxQuantity', name:'deposito.security.minTrxQuantity', value:deposito?.security?.minTrxQuantity /}
+#{hidden id:'securityClass', name:'deposito.security.securityType.securityClass.lookupId', value:deposito?.security?.securityType?.securityClass?.lookupId /}
+#{hidden id:'transactionTemplateKey', name:'deposito.transactionTemplate.transactionTemplateKey', value:deposito?.transactionTemplate?.transactionTemplateKey /}
+#{hidden id:'taxKey', name:'deposito.taxMaster.taxKey', value:deposito?.taxMaster?.taxKey /}
+#{hidden id:'taxRate', name:'deposito.taxMaster.taxRate', value:deposito?.taxMaster?.taxRate /}
+
+	<p style="float:left; width:400px">
+		#{textBox id:'depositoNo', name:'deposito.depositoNo', label:'Deposito No.', value:deposito?.depositoNo, required:true, readOnly:true, width:'100px' /}
+	</p>
+	<div class="right">
+		<p> 
+			#{textBox id:'statusDep', labelWidth:'120px',label:'Status', value:rstatus, width:'200px',readOnly:true /}
+		</p>
+	</div>
+	<p>
+		#{textBox id:'accountNo', name:'deposito.account.accountNo', label:'Account No', value:deposito?.account?.accountNo, required:true, class:'capitalize', readOnly:readOnly, width:'100px' /}
+		#{hidden id:"accountKey", name:'deposito.account.custodyAccountKey', value:deposito?.account?.custodyAccountKey /}
+		#{button id:'accountHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'accountName', name:'deposito.account.name', value:deposito?.account?.name, readOnly:true, width:'250px' /}
+		<span id="accountNoError" class="error">#{error 'Account No is' /}</span> 
+	</p>
+	<p>
+		#{textBox id:'securityType', name:'deposito.security.securityType.securityType', label:'Security Type', value:deposito?.security?.securityType?.securityType, readOnly:readOnly, required:true, class:'capitalize', width:'100px' /}
+		#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'securityTypeDesc', name:'deposito.security.securityType.description', value:deposito?.security?.securityType?.description, readOnly:true, width:'250px' /}
+		<span class="error">#{error 'Security Type is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'securityId', name:'deposito.security.securityId', label:'Security Code', value:deposito?.security?.securityId, required:true, class:'capitalize', readOnly:readOnly, width:'100px' /}
+		#{hidden id:'securityKey', name:'deposito.security.securityKey', value:deposito?.security?.securityKey /}
+		#{button id:'securityHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'securityDesc', name:'deposito.security.description', value:deposito?.security?.description, readOnly:true, width:'250px' /}
+		<span class="error">#{error 'Security Code is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'currencyCode', name:'currencyCode', label:'Currency', value:deposito?.security?.currency?.currencyCode, class:'capitalize', readOnly:true, width:'100px' /}
+		#{hidden id:'currencyCodeHidden', name:'deposito.security.currency.currencyCode', value:deposito?.security?.currency?.currencyCode /}
+	</p>
+	<p>
+		#{textBox id:'issuerCode', name:'issuerCode', label:'Issuer Bank', value:deposito?.security?.issuer?.thirdPartyCode,  class:'capitalize', readOnly:true, width:'100px' /}
+		#{hidden id:'issuerCodeHide', name:'deposito.security.issuer.thirdPartyCode', value:deposito?.security?.issuer?.thirdPartyCode /}
+		#{hidden id:'issuerCodeKey', name:'deposito.security.issuer.thirdPartyKey', value:deposito?.security?.issuer?.thirdPartyKey /}
+		#{textBox id:'issuerCodeDesc', name:'issuerCodeDesc', value:deposito?.security?.issuer?.thirdPartyName, class:'capitalize',readOnly:true, width:'272px' /}
+		#{hidden id:'issuerCodeDescHide', name:'deposito.security.issuer.thirdPartyName', value:deposito?.security?.issuer?.thirdPartyName /}
+	</p>
+	<p>
+		#{textBox id:'branchCode', name:'deposito.branchCode', label:'Branch', value:deposito?.branchCode,class:'capitalize', required:true, readOnly:readOnly, width:'100px', maxLength:100/}
+		<span class="error">#{error 'Branch is' /}</span>
+	</p>
+	<p id="pNetAmount">
+		#{textBox id:'netAmount',  label:'Nominal', value:deposito?.amount, format:'#,##0.####', class:'numeric', readOnly:true /}
+		#{hidden id:'netAmountStripped', name:'deposito.amount', value:deposito?.amount /}
+		<span class="error">#{error 'Nominal is' /}</span>
+	</p>
+	<div style="float:left; width:400px">
+		<p>
+			#{textBox id:'effectiveDate', name:'effectiveDate', label:'Effective Date', value:deposito?.effectiveDate?.format(appProp.dateFormat), class:'calendar', readOnly:true /}(${appProp.displayDateFormat})
+			#{hidden id:'effectiveDateHidden', name:'deposito.effectiveDate', class:'calendar', value:deposito?.effectiveDate?.format(appProp.dateFormat) /}
+			
+		</p>
+		<p id='pMaturityDate'>
+			#{textBox id:'maturityDate', name:'maturityDate', label:'Maturity Date', value:deposito?.maturityDate?.format(appProp.dateFormat), class:'calendar', readOnly:true /}
+			#{hidden id:'maturityDateHidden', name:'deposito.maturityDate', class:'calendar', value:deposito?.maturityDate?.format(appProp.dateFormat) /}
+			
+			<span id="maturityDateError" class="error">#{error 'Maturity Date is' /}</span>
+			(${appProp.displayDateFormat})
+		</p>
+		<p>
+			#{radioButton id:'script', name:'script', value:((deposito?.script)?'true':'false'), label:'Script', options:operators, readOnly:true /}
+			#{hidden id:'scriptHidden', name:'deposito.script', value:((deposito?.script)?'true':'false') /}
+		</p>
+	</div>
+	<div class="right">
+		<p id='pInterestRate'>
+			#{textBox id:'interestRate', label:'Interest Rate (gross)', value:deposito?.interestRate, format:'#,##0.####', class:'numeric', required:true, readOnly:true, width: '150px' /} %
+			#{hidden id:'interestRateStripped', name:'deposito.interestRate', value:deposito?.interestRate /}
+			<span class="error">#{error 'Interest Rate is' /}</span>
+		</p>
+		<p>
+			#{textBox id:'interestFrequency', label:'Int. Payment Freq', name:'deposito.interestFrequency.lookupDescription', value:deposito?.interestFrequency?.lookupDescription, readOnly:true, width: '150px' /}
+		</p>
+		<p>
+			#{textBox id:'sertifikat', label:'Certificate No', value:sertifikat, readOnly:true, width: '150px' /}
+		</p>
+	</div>
+					
+<p><b><span id="errGlobal" class="error"></span></b></p>
+
+	<div id="tabs" style="height:auto;width:850px">
+		<ul>
+			<li><a href="#tab1">Transaction History</a></li>
+			<li><a href="#tab2">Rollover History</a></li>
+		</ul>
+		<div id="tab1">
+			<div style="height:auto">
+				<div id="transactionDiv" style="overflow-y:scroll;max-height:170px;width:100%">
+					<table id="transactionList" class="display">
+						<thead>
+							<tr>
+								<th style="display: none;">key</th>
+								<th style="width:50px">No</th>
+								<th style="width:120px">Transaction Date</th>
+								<th style="width:120px">Transaction Type</th>
+								<th style="width:120px">Nominal</th>
+								<th style="width:90px">Int. Rate(%)</th>
+								<th style="width:70px">Status</th>
+							</tr>
+						</thead>
+						<tbody>
+							#{list transactionHistory, as:'transaction'}
+							<tr>
+								<td id='keytrans' style="display: none;">
+									${transaction?.transactionKey}
+								</td>
+								<td id='no' align="center">
+									${transaction_index}
+								</td>
+								<td id='transactionDate'>
+									${transaction?.transactionDate?.format(appProp.dateFormat)}
+								</td>
+								<td id='transactionType'>
+									${transaction?.depositoTrxTemplate?.depositoTemplate?.lookupDescription}
+								</td>
+								<td id='nominal' align="right">
+									${transaction?.amount?.format('#,##0.####')}
+								</td>
+								<td id='interestRate' align="right">
+									${transaction?.interestRate?.format('#,##0.####')}				
+								</td>
+								<td id='status' align="center">
+									${transaction?.status?.decodeDataStatus()}
+								</td>
+							</tr>
+						#{/list}
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="buttons">
+				<input type="button" id="prev1" value="&lt; Previous" disabled="disabled" />
+				<input type="button" id="next1" value="Next &gt;" />
+			</div>
+		</div>
+		<div id="tab2">
+			<div style="height:auto">
+				<div id="rolloverDiv" style="overflow-y:scroll;max-height:170px;width:100%">
+					<table id="rolloverList" class="display">
+						<thead>
+							<tr>
+								<th style="width:50px">No</th>
+								<th style="width:120px">Transaction Date</th>
+								<th style="width:120px">Transaction Type</th>
+								<th style="width:120px">Nominal</th>
+								<th style="width:90px">Int. Rate(%)</th>
+								<th style="width:70px">Status</th>
+							</tr>
+						</thead>
+						<tbody>
+							#{list rolloverHistory, as:'rollover'}
+							<tr>
+								<td>
+									${rollover_index}
+								</td>
+								<td>
+									${rollover?.transactionDate?.format(appProp.dateFormat)}
+								</td>
+								<td>
+									${rollover?.depositoTrxTemplate?.depositoTemplate?.lookupDescription}
+								</td>
+								<td align="right">
+									${rollover?.amount?.format('#,##0.####')}
+								</td>
+								<td align="right">
+									${rollover?.interestRate?.format('#,##0.####')}				
+								</td>
+								<td align="center">
+									${rollover?.status?.decodeDataStatus()}
+								</td>
+							</tr>
+						#{/list}
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="buttons">
+				<input type="button" id="prev2" value="&lt; Previous" />
+				<input type="button" id="next2" value="Next &gt;" disabled="disabled" />
+			</div>
+		</div>
+	</div>
+</form>
+<input type="hidden" id="dummy" />

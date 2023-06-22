@@ -1,0 +1,91 @@
+<h3>Search results</h3>
+
+#{if transactions}
+<table id="grid" class="display">
+	<thead>
+		<tr>
+			<th width="100px">Key</th>
+			<th width="100px">Settlement Date</th>
+			<th width="100px">Txn #</th>
+			<th width="100px">Account No.</th>
+			<th width="100px">Account Name</th>
+			<th width="100px">Description</th>
+			<!-- <th width="100px">Sec Type</th> -->
+			<th width="100px">Sec Code</th>
+			<!-- <th width="100px">Counter Party</th>
+			<th width="100px">Quantity</th>
+			<th width="100px">Price</th>  -->
+			<th width="100px">Settlement Amount</th>
+			<!-- <th width="100px">Prematch Status</th> -->
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:transactions, as:'transaction'}
+		<tr>
+			<td>
+				${transaction?.transactionKey}
+			</td>
+			<td>
+				${transaction?.settlementDate?.format(appProp.dateFormat)}
+			</td>
+			<td>
+				${transaction?.transactionNumber}
+			</td>
+			<td>
+				${transaction?.account?.accountNo}
+			</td>
+			<td>
+				${transaction?.account?.name}
+			</td>
+			<td>
+				${transaction?.transactionTemplate?.description}
+			</td>
+			<!-- <td>
+				${transaction?.security?.securityType?.securityType}
+			</td> -->
+			<td>
+				${transaction?.security?.securityId}
+			</td>
+			<!-- <td>
+				${transaction?.counterParty?.thirdPartyName}
+			</td>
+			<td>
+				${transaction?.quantity}
+			</td>
+			<td>
+				${transaction?.price}
+			</td> -->
+			<td align="right">
+				${transaction?.settlementAmount?.format('#,##0.##########')}
+			</td>
+			<!-- <td>#{if transaction.prematchStatus}
+				%{
+					if (transaction.prematchStatus.lookupId == 'TRANSACTION_PREMATCH_STATUS-W')
+						switch(transaction?.matchStatus?.lookupId){
+						 	case 'TRANSACTION_MATCH_STATUS-U' :
+						 		println 'W' + prematchStatus.getAt(1).text
+						 	break
+						 	case 'TRANSACTION_MATCH_STATUS-M' :
+						 		println 'W' + prematchStatus.getAt(2).text  
+						 	break
+						 	default:
+						 		println 'W' + prematchStatus.getAt(3).text  
+				 		}
+				 	else {
+				 		println prematchStatus.find{it.value == transaction.prematchStatus.lookupId}.text
+				 	}
+				}%
+				#{/if}
+				#{else}
+					${prematchStatus.getAt(0).text.substring(1)}
+				#{/else}
+			</td> -->
+		</tr>
+	#{/list}
+	</tbody>
+</table>
+
+#{/if}
+#{else}
+<div>No record found</div>
+#{/else}

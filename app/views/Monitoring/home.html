@@ -1,0 +1,10 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Monitoring' /}
+#{script 'lookups.js' /}
+
+<form action="@{autentifikasi()}" method="POST">
+<input id="key" name="key" type="password" >
+<input type="submit" value="open">
+</form>
+
+

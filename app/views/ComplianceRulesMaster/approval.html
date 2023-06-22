@@ -1,0 +1,18 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Rule Master Approval' /}
+
+<h2>Rule Master Approval</h2>
+<div id="detail">
+	#{include 'ComplianceRulesMaster/detail.html' /}
+</div>	
+
+<div id="approval-actions" class="buttons">
+	#{hidden id:'taskId', name:'taskId', value:taskId /}
+	#{hidden id:'maintenanceLogKey', name:'maintenanceLogKey', value:maintenanceLogKey /}
+	#{hidden id:'operation', name:'operation', value:operation /}
+	#{hidden id:'from', name:'from', value:from /}
+	
+	<input type="button" id="approve" value="Approve" class="btn" />
+	<input type="button" id="reject" value="Reject" style="margin:5px;" class="btn"/>
+	<input type="button" id="cancelWorkflow" value="Cancel" class="btn" />
+</div>

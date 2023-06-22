@@ -1,0 +1,82 @@
+#{if contact?.isCustomer == true }	
+	#{set readOnlyIsCustomer: true /}
+#{/if}
+#{else}
+	#{set readOnlyIsCustomer: readOnly /}
+#{/else}
+#{script 'validation/numericOnly.js' /}
+
+<script type="text/javascript">	
+$(function() {
+	//$('#addressType').trigger('change');
+	$('#accordionContact').accordion({
+		collapsible: false,
+		autoHeight: false 
+	});
+
+	$('.calendar').datepicker();
+});
+</script>
+
+<form id="contactForm" class="form">
+#{hidden id:'rowPosition' /}
+#{hidden id:'oldAddressType' /}
+#{hidden id:'newAddressType' /}
+#{hidden id:'contactKey', name:'contact.contactKey', value:contact?.contactKey /}
+#{hidden id:'isCustomer', name:'contact.isCustomer', value:contact?.isCustomer /}
+	<div>
+		<p>
+			#{dropDownList id:'addressType', name:'contact.addressType.lookupId', label:'Address Type', value:contact?.addressType?.lookupId, options:addressType, readOnly:readOnly, width:'145px', required:true /}
+			#{hidden id:'addressTypeDesc', name:'contact.addressType.lookupDescription', value:contact?.addressType?.lookupDescription /}			
+			<span id="errmsgAddressType" class="errorMessage"></span>
+			<span id="duplicateErrorMessage" class="error errorMessage"></span>
+		</p>
+		<p>			
+			#{textBox id:'address1', name:'address1', label:'Address', value:contact?.address1, readOnly:readOnlyIsCustomer, class:'capitalize sameAs specialField', width:'328px', maxLength:150, required:true /}
+			<span id="address1Error" class="errorMessage"></span>
+		</p>
+		<p>	
+			<label></label>		
+			#{textBox id:'address2', name:'address2', value:contact?.address1, readOnly:readOnlyIsCustomer, class:'capitalize sameAs specialField', width:'328px', maxLength:40 /}
+		</p>
+		<p>	
+			<label></label>		
+			#{textBox id:'address3', name:'address3', value:contact?.address1, readOnly:readOnlyIsCustomer, class:'capitalize sameAs specialField', width:'328px', maxLength:35 /}
+			#{hidden id:'addressHide', name:'contact.address1', value:contact?.address1 /}
+		</p>
+		<p>
+			#{textBox id:'address1CountryCode', name:'contact.address1Country.lookupCode', label:'Country', value:contact?.address1Country?.lookupCode, dataold:contact?.address1Country?.lookupCode, class:'capitalize sameAs', readOnly:readOnly, width:'80px', required:true /}
+			#{hidden id:'address1Country', name:'contact.address1Country.lookupId', value:contact?.address1Country?.lookupId, class:'sameAs' /}
+			#{button id:'address1CountryHelp', value:'?', class:'small', readOnly:readOnlyIsCustomer /}	
+			#{textBox id:'address1CountryDesc', name:'contact.address1Country.lookupDescription', value:contact?.address1Country?.lookupDescription, readOnly:true, width:'220px' /}
+			<span id="address1CountryCodeError" class="errorMessage"></span>
+		</p>
+		<p>
+			#{textBox id:'address1StateCode', name:'contact.address1State.lookupCode', label:'State', value:contact?.address1State?.lookupCode, dataold:contact?.address1State?.lookupCode, class:'capitalize sameAs', readOnly:readOnly, width:'80px' , required:true/}
+			#{hidden id:'address1State', name:'contact.address1State.lookupId', value:contact?.address1State?.lookupId, class:'sameAs', /}
+			#{button id:'address1StateHelp', value:'?', class:'small', readOnly:readOnlyIsCustomer /}
+			#{textBox id:'address1StateDesc', name:'contact.address1State.lookupDescription', value:contact?.address1State?.lookupDescription, readOnly:true, width:'220px' /}&nbsp;<span class="errmsg"></span>
+			<span id="address1StateCodeError" class="errorMessage"></span>
+		</p>
+		<p>
+			#{textBox id:'address1AreaCode', name:'contact.address1Area.lookupCode', label:'Area', value:contact?.address1Area?.lookupCode, class:'capitalize sameAs', readOnly:readOnly, width:'80px', required:true /}
+			#{hidden id:'address1Area', name:'contact.address1Area.lookupId', value:contact?.address1Area?.lookupId, class:'sameAs', /}
+			#{button id:'address1AreaHelp', value:'?', class:'small', readOnly:readOnlyIsCustomer /}
+			#{textBox id:'address1AreaDesc', name:'contact.address1Area.lookupDescription', value:contact?.address1Area?.lookupDescription, readOnly:true, width:'220px' /}&nbsp;<span class="errmsg"></span>
+			<span id="address1AreaCodeError" class="errorMessage"></span>				
+		</p>
+		<p>			
+			#{textBox id:'address1ZipCode', name:'contact.address1ZipCode', label:'Postal Code', value:contact?.address1ZipCode, readOnly:readOnly, class:'capitalize sameAs', width:'328px', maxLength:50 /}
+		</p>
+		<p atr="mandatoryDirect">			
+			#{textBox id:'address1Phone1', name:'contact.address1Phone1', label:'Phone', value:contact?.address1Phone1, readOnly:readOnly, required:true,class:'sameAs', width:'328px', maxLength:50 /}
+			<span id="address1Phone1Error" class="error errorMessage"></span>
+		</p>
+		<p>			
+			#{textBox id:'address1Phone2', name:'contact.address1Phone2', label:'Mobile Phone', value:contact?.address1Phone2, readOnly:readOnly,  class:'sameAs', width:'328px', maxLength:50 /}
+		</p>
+		<p>			
+			#{textBox id:'address1Phone3', name:'contact.address1Phone3', label:'Fax Number', value:contact?.address1Phone3, readOnly:readOnly, class:'sameAs', width:'328px', maxLength:50 /}
+		</p>
+	</div>	
+</form>

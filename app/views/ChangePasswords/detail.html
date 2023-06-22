@@ -1,0 +1,338 @@
+#{extends 'templates/detail1.html' /}
+#{set pageTitle: 'Change Password Form' /}
+#{if flash.successMessage}
+    <div class="success">
+		${flash.successMessage}
+    </div>
+#{/if}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{script 'jquery.rc4.js' /}
+
+<script type="text/javascript">
+$(function(){
+	$('#save').button();
+	$('#cancel').button();
+	$('#logout').insertAfter('#cancel');
+	$('#logout').css('display', 'none');
+	#{if flash.successMessage}
+		$('#cancel').css('display', 'none');
+		$('#logout').css('display', '');
+	#{/if}
+	
+	var backToScreen = function() {
+		loading.dialog('open');
+		if ('${from}'=='forceChange'){
+			location = "@{Secure.logout}";
+		} else {
+			location = "@{Application.index}";
+		};
+	}
+		
+	if ('${loginLDAP}'=='true'){
+		messageAlertOk("Password changes can not be done, please contact your Administrator.", "ui-icon1 ui-icon-alert", "Warning Message", backToScreen);
+	}
+	
+	$('#logout').click(function(){
+		location.href='@{Secure.logout}';
+	});
+	
+	$('#newPass').change(function(){
+		var result = validatePassword();
+		if (result) return true;
+		if ($('#newPass').val()==''){
+			$('#newPass').removeClass('fieldError');
+			$('#passErr').html('');
+		}
+	});
+	
+	$('#confPass').change(function(){
+		if ((!$('#newPass').hasClass('fieldError'))&&($('#newPass').val()!='')){
+			if ($('#newPass').val() != $('#confPass').val()){
+				$('#confPass').addClass('fieldError');
+				$('#confPassError').html('Password do not match');
+				return false;
+			} else {
+				$('#confPass').removeClass('fieldError');
+				$('#confPassError').html('');
+			}
+		}
+	});
+});
+
+
+function doCancel(){
+	if ('${from}'=='forceChange'){
+		location.href='@{Secure.logout}';
+	} else {
+		location.href='@{Application.index}';
+	}
+	
+}
+
+function doSave(){
+	if (($('#newPass').hasClass('fieldError'))||($('#confPass').hasClass('fieldError'))){
+		return false;
+	}
+	
+	$('#history').val($('#newPass').val());
+ 	encrypt();
+	return true; 
+}
+
+function doConfirm() {
+	encrypt();
+	return true;
+}
+function encrypt() {
+	var id = '${session.id}';
+	for (i = 0; i < id.length; i++) {
+		if (!isNaN(id.substring(i, i+1))) {
+			var start = Number(id.substring(i, i+1));
+			if ($('#currPass').val() != '') {
+				$('#currPass').rc4({
+					key: id.substring(start, start + 8)
+				});
+			}
+			if ($('#newPass').val() != '') {
+				$('#newPass').rc4({
+					key: id.substring(start, start + 8)
+				});
+			}
+			if ($('#confPass').val() != '') {
+				$('#confPass').rc4({
+					key: id.substring(start, start + 8)
+				});
+			}
+			break;
+		}
+	}		
+}
+
+function validatePassword(){
+	var currPass = $('#currPass').val();
+	var newPass = $('#newPass').val();
+	
+	var confPass = $('#confPass').val();
+ 	var passMinLength = $('#passMinLength').val();
+	var passMaxLength = $('#passMaxLength').val();
+	var passCombiChar = $('#passCombiChar').val();
+	var passMinUpper = $('#passMinUpper').val();
+	var passMinLower = $('#passMinLower').val();
+	var passMinChar = $('#passMinChar').val();
+	var passCombiNum = $('#passCombiNum').val();
+	var passMinNum = $('#passMinNum').val();
+	var passCombiSpechar = $('#passCombiSpechar').val();
+	var passMinSpechar = $('#passMinSpechar').val();
+	var listPassRestricted = $('#listPassRestricted').val();
+	var listPassCycles = $('#listPassCycles').val();
+	
+ 
+ 		// validate minimum length password
+ 		if (newPass.length < passMinLength){
+	 		$('#newPass').addClass('fieldError');
+	 		$('#passErr').html('Password must have min length = '+passMinLength);
+	 		return false;
+	 	}
+ 
+ 		// validate maximum length password
+	 	if (newPass.length > passMaxLength){
+	 		$('#newPass').addClass('fieldError');
+	 		$('#passErr').html('Password must have max length = '+passMaxLength);
+	 		return false;
+	 	} 
+	 	
+	 	// validate if password use combination of characters
+	 //	alert("passCombiChar = " +passCombiChar);
+	 	if (passCombiChar){
+	 		var path=/[a-z, A-Z]/g;
+	 		if ((newPass.match(path)==null)||(newPass.match(/\s/g))){
+				$('#newPass').addClass('fieldError');
+		 		$('#passErr').html('Password must have character value');
+		 		return false;
+			}
+	 		
+			// validate minimal char
+	 		if (newPass.replace(/[^a-z, ^A-Z]/g, "").length < passMinChar){
+	 			$('#newPass').addClass('fieldError');
+		 		$('#passErr').html('Password must have a minimum of '+passMinChar+' Character');
+		 		return false;
+	 		};
+	 		 
+	 		// validate count uppercase in password
+ 	 		if (newPass.replace(/[^A-Z]/g, "").length < passMinUpper){
+	 			$('#newPass').addClass('fieldError');
+		 		$('#passErr').html('Passwords must have a minimum number of '+passMinUpper+' Uppercase Character');
+		 		return false;
+	 		};
+	 		
+	 		// validate count lowercase in password
+	 		if (newPass.replace(/[^a-z]/g, "").length < passMinLower){
+	 			$('#newPass').addClass('fieldError');
+		 		$('#passErr').html('Passwords must have a minimum number of '+passMinLower+' Lowercase Character');
+		 		return false;
+	 		};
+	 	} else {
+	 		// validate if password not use combination of characters
+	 		if (newPass.replace(/[^a-z, ^A-Z]/g, "").length > '0'){
+	 			$('#newPass').addClass('fieldError');
+		 		$('#passErr').html('Character are not allowed as a password');
+		 		return false;
+	 		}
+	 	} 
+	 	
+	 	// validate if password user combination of characters
+	 	if (passCombiNum){
+ 	 		var path=/[0-9]/g;
+
+	 		// validate match pattern numeric
+			if (newPass.match(path)==null){
+				$('#newPass').addClass('fieldError');
+		 		$('#passErr').html('Password must have number value');
+		 		return false;
+			} 
+	 		
+	 		// validate minimum numeric value
+	 		if (newPass.replace(/[^0-9]/g, "").length < passMinNum){
+	 			$('#newPass').addClass('fieldError');
+		 		$('#passErr').html('Password must have a minimum of '+passMinNum+' Number');
+		 		return false;
+	 		}
+	 		
+	 		var strArray = new Array();
+	 		var strListOrdNum = $('#listOrdNum').val();
+	 		var strSplit = strListOrdNum.split("|");
+	 		var a=0;
+	 		
+	 		for ( var i = 0; i < strSplit.length; i++) {
+	 			if (strSplit[i] != "") {
+	 				strArray[a] = strSplit[i];
+	 				a+=1;
+	 				if (newPass.indexOf(strArray[i]) > 0){
+	 					$('#newPass').addClass('fieldError');
+	 			 		$('#passErr').html('There is a order numbers that are not allowed');
+	 			 		return false;
+	 			 		break;
+	 			 		
+	 				}
+	 			}
+	 		}
+	 		
+	 	 } else {
+	 		 if (newPass.replace(/[^0-9]/g, "").length > '0'){
+	 		 	 $('#newPass').addClass('fieldError');
+		 		 $('#passErr').html('Number are not allowed as a password');
+		 		 return false;
+	 		 }
+	 	 }
+	 	
+	 	
+	 	 if (passCombiSpechar){
+	 	//	alert("spechar = " +newPass.match(/[a-z]/g));
+	 	//	alert("spechar = " +newPass.match(/[^a-z, ^A-Z, ^0-9]/g));
+	 	//	alert("space = " +newPass.match(/\s/g));
+	 		
+	 		if (newPass.match(/[^a-z, ^A-Z, ^0-9]/g)==null){
+	 			$('#newPass').addClass('fieldError');
+		 		$('#passErr').html('Password must have special character!');
+		 		return false;
+	 		}
+	 		
+	 		if (newPass.replace(/[a-z, A-Z, 0-9]/g,"").length < passMinSpechar){
+	 			$('#newPass').addClass('fieldError');
+		 		$('#passErr').html('Password must have a minimum of '+passMinSpechar+' special character');
+		 		return false;
+	 		}
+	 	 } else {
+	 		 if (newPass.replace(/[a-z, A-Z, 0-9]/g,"").length > '0'){
+	 			 $('#newPass').addClass('fieldError');
+		 		 $('#passErr').html('Special Character are not allowed as a password');
+		 		 return false;
+	 		 }
+	 	 } 
+
+	 	// validate Restricted Password
+	 	var strArrayRest = new Array();
+ 		var strSplitRest = listPassRestricted.split("|");
+ 		var count=0;
+ 	//	alert(strSplitRest.length);
+ 		for ( var i = 0; i < strSplitRest.length; i++) {
+ 			if (strSplitRest[i] != "") {
+ 				strArrayRest[count] = strSplitRest[i];
+ 				count+=1;
+ 				if (newPass.indexOf(strSplitRest[i]) > 0){
+ 					$('#newPass').addClass('fieldError');
+ 			 		$('#passErr').html('Password must not contain Restricted Password');
+ 			 		return false;
+ 			 		break;
+ 			 		
+ 				}
+ 			}
+ 		 }  
+		
+ 		// validate Password Cycle/Reuse in History
+ 		var strArrayCycle = new Array();
+ 		var strSplitCycle = listPassCycles.split("|");
+ 		for ( var i = 0; i < strSplitCycle.length; i++) {
+ 			if (strSplitCycle[i] != "") {
+ 				strArrayCycle[count] = strSplitCycle[i];
+ 				count+=1;
+ 				if (newPass == strSplitCycle[i]){
+ 					$('#newPass').addClass('fieldError');
+ 			 		$('#passErr').html('Password cannot be Reuse');
+ 			 		return false;
+ 			 		break;
+ 			 		
+ 				}
+ 			}
+ 		 } 
+	 	 
+
+ 	$('#newPass').removeClass('fieldError');
+	$('#passErr').html('');
+ 	return true;
+}
+
+</script>
+<br>
+<form id="changePassForm" class="form">
+#{hidden id:'from', name:'from', value:from /}
+#{hidden id:'passMinLength', name:'passParam.minLength', value:passParam?.minLength /}
+#{hidden id:'passMaxLength', name:'passParam.maxLength', value:passParam?.maxLength /}
+
+#{hidden id:'passCombiChar', name:'passParam.combiChar', value:passParam?.combiChar /}
+#{hidden id:'passMinUpper', name:'passParam.minUpper', value:passParam?.minUpper /}
+#{hidden id:'passMinLower', name:'passParam.minLower', value:passParam?.minLower /}
+#{hidden id:'passMinChar', name:'passParam.minChar', value:passParam?.minChar /}
+
+#{hidden id:'passCombiNum', name:'passParam.combiNum', value:passParam?.combiNum /}
+#{hidden id:'passMinNum', name:'passParam.minNum', value:passParam?.minNum /}
+#{hidden id:'listOrdNum', name:'passParam.listOrderedNumber', value:passParam?.listOrderedNumber /}
+
+#{hidden id:'passCombiSpechar', name:'passParam.combiSpechar', value:passParam?.combiSpechar /}
+#{hidden id:'passMinSpechar', name:'pasParam.minSpechar', value:passParam?.minSpechar /}
+
+#{hidden id:'listPassRestricted', name:'listPassRestricted', value:listPassRestricted /}
+#{hidden id:'listPassCycles', name:'listPassCycles', value:listPassCycles /}
+#{hidden id:'history', name:'user.history', value:user?.history /}
+	<fieldset style="width: 550px;height: 120px;">
+	<span id="passErr" class="error"></span>
+	<br />
+	<br />
+	<p>
+		#{textBox id:'currPass', name:'user.currentPassword', label:'Current Password', value:user?.currentPassword, required:true, password:true, readOnly:readOnly /}
+		<span class="error">#{error 'Current Password is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'newPass', name:'user.password', label:'New Password', value:user?.password, required:true, password:true, readOnly:readOnly /}
+		<span id="newPassErr" class="error">#{error 'New Password is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'confPass', name:'user.confirmPassword', label:'Confirm Password', value:user?.confirmPassword, required:true, password:true, readOnly:readOnly /}
+		<span id="confPassError" class="error">#{error 'Confirm Password is' /}</span>
+	</p>
+	</fieldset>
+	
+	<div class="buttons">
+		<button id="logout">Logout</button>
+	</div>
+</form>

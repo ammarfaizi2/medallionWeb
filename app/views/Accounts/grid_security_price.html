@@ -1,0 +1,41 @@
+<div style="overflow-y:scroll;height:250px;">
+	<table id="gridSecurityPrice" class="display">
+		<thead>
+			<tr>
+				<th >Security Type</th>
+				<th>Price Reference</th>
+				<th width="100px">Action</th>
+			</tr>
+		</thead>
+		<tbody>
+		 	#{list account?.priceGroupSetups, as:'priceGroupSetup'}
+			<tr>	
+				<td>${priceGroupSetup?.securityType?.securityType}</td>
+				<td>${priceGroupSetup?.lookupSecurityPriceGroup?.lookupCode}</td>
+				<td>
+					<span>
+						<center><input type="button" value="Delete" id="deleteSecurity" #{if readOnly}disabled='disabled'#{/if} /></center>
+					</span>
+					#{hidden name:'priceGroupSetups[' + (priceGroupSetup_index-1) + '].securityType.securityType', value:priceGroupSetup?.securityType?.securityType /}
+					#{hidden name:'priceGroupSetups[' + (priceGroupSetup_index-1) + '].securityType.description', value:priceGroupSetup?.securityType?.description /}
+					#{hidden name:'priceGroupSetups[' + (priceGroupSetup_index-1) + '].lookupSecurityPriceGroup.lookupCode', value:priceGroupSetup?.lookupSecurityPriceGroup?.lookupCode /}
+					#{hidden name:'priceGroupSetups[' + (priceGroupSetup_index-1) + '].lookupSecurityPriceGroup.lookupId', value:priceGroupSetup?.lookupSecurityPriceGroup?.lookupId/}
+					#{hidden name:'priceGroupSetups[' + (priceGroupSetup_index-1) + '].lookupSecurityPriceGroup.lookupDescription', value:priceGroupSetup?.lookupSecurityPriceGroup?.lookupDescription /}
+					#{hidden name:'priceGroupSetups[' + (priceGroupSetup_index-1) + '].id.custodyAccountKey', value:priceGroupSetup?.id?.custodyAccountKey /}
+					#{hidden name:'priceGroupSetups[' + (priceGroupSetup_index-1) + '].id.securityType', value:priceGroupSetup?.id?.securityType /}
+					#{hidden name:'priceGroupSetups[' + (priceGroupSetup_index-1) + '].id.securityPriceGroup', value:priceGroupSetup?.id?.securityPriceGroup /}
+				</td>
+			</tr>
+			#{/list}
+		</tbody>
+		<tfoot style="display:none">
+			<tr>
+				<td></td>
+				<td>
+					<input type="hidden" id="securityType" />
+					<input type="hidden" id="description" />
+				</td>
+			</tr>
+		</tfoot>
+	</table>
+</div>

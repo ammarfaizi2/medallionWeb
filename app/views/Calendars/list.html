@@ -1,0 +1,21 @@
+#{extends 'templates/list.html' /}
+#{set dialogTitle:'Calendar' /}
+
+<script type="text/javascript">
+	$(function() {
+		$('.buttons button').button();
+		$('.button').button();
+	})
+</script>
+
+<h2>Calendar Maintenance</h2>
+
+<div id="list">
+	#{include 'Calendars/detail.html' /}
+</div>
+
+	
+
+	
+
+

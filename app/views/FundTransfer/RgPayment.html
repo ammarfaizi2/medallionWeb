@@ -1,0 +1,109 @@
+#{script 'lookuppaging.js' /}
+#{script 'lookups.js' /}
+
+<form id="rootRgPayment" class="form">
+	#{hidden id:'cmsRGPayDate' /}
+	#{hidden id:'cmsRGPayProfKey', name:'param.sysRGPayProfile', value:param?.sysRGPayProfile /}
+	#{hidden id:'batchNoRegularRGPay', name:'' /}
+
+	<input id='applicationDate' value="${param.applicationDate}" type="hidden"/>
+	<p>
+		#{textBox id:'fundBatchNoRGPay', label:'Fund Batch No', width:'120px', readOnly:true, class:'capitalize', required:false /}
+	</p>
+	<p>
+		<label>Payment Date</label>
+		<input id='checkAsOfDateRgp' type='radio' name='checkRGPayDate' checked="checked"/>
+		<b>As Of&nbsp;</b>
+		#{textBox id:'asOfDateRgp', label:'', width:'80px', readOnly:false, class:'calendar', required:false /}
+		<span id="asOfDateErrRgp" class="error"></span>	
+	</p>
+	<p>
+		<label>&nbsp;</label>
+		<input id='checkFromToRgp' type='radio' name='checkRGPayDate'/>
+		<b>From&nbsp;</b>
+		#{textBox id:'fromDateRgp', label:'', width:'80px', readOnly:true, class:'calendar', required:false /}
+		<b>&nbsp;To&nbsp;</b>
+		#{textBox id:'toDateRgp', label:'', width:'80px', readOnly:true, class:'calendar', required:false /}
+		<span id="fromToErr" class="error"></span>
+	</p>	
+	<p>
+		#{textBox id:'fundCode', label:'Fund Code', width:'120px', readOnly:readOnly, class:'capitalize', required:false /}
+		#{hidden  id:'fundCodeKey' /}
+		#{button  id:'fundCodeHelp', value:'?', class:'small', readOnly:readOnly/}
+		#{textBox id:'fundCodeDesc', readOnly:true, width:'245px' /}
+	</p>
+	<p>
+		#{dropDownList id:'transactionTypeRg', label:'Transaction Type', options:listType, readOnly:readOnly,width:'120px', required:true /}
+		<span id="transactionTypeRgError" class="error"></span>
+	</p>
+	<p>
+		#{textBox id:'currencyRG', name:'', label:'Currency', class:'capitalize', required:true, readOnly:readOnly, width:'120px', maxLength:'10' /}
+		#{button id:'currencyRGHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'currencyRGDesc', name:'', readOnly:true, width:'245px' /}	
+		<span id="currencyRGError" class="error"></span>	
+	</p>
+	<p>
+		&nbsp;
+	</p>
+	<p>
+		<input id='btnPopulate' type="button" value="Populate" ></input>
+		<input id='btnReset' type="button" value="Reset"></input>
+		
+	</p>
+	<p>
+		<table id='tblFundTransferRgPayment'>
+			<thead>
+				<tr>
+					<td><input id='checkAll' type="checkbox"/></td>
+					<td>No</td>
+					<td>Date</td>
+					<td>Account&nbsp;Name</td>
+					<td>Fund</td>
+					<td>Currency</td>
+					<td>Transaction&nbsp;No</td>
+					<td>Payment&nbsp;Amount</td>
+					<td>RED/DIV/SWT</td>
+					<td>Status</td>
+					<td>Sender&nbsp;Branch&nbsp;Code</td>	
+					<td>Sender&nbsp;Bank&nbsp;Code</td>
+					<td>Sender&nbsp;A/C&nbsp;Name</td>				
+					<td>Sender&nbsp;A/C&nbsp;No</td>
+					<td>Sender&nbsp;Currency&nbsp;</td>					
+					<td>Benef&nbsp;Bank</td>
+					<td>Benef&nbsp;Bank&nbsp;Name</td>					
+					<td>Benef&nbsp;A/C&nbsp;No</td>
+					<td>Benef&nbsp;A/C&nbsp;Name</td>
+					<td>Benef&nbsp;Currency&nbsp;</td>					
+					<td>Charge&nbsp;Amount</td>
+					<td>Net&nbsp;Payment&nbsp;Amount</td>
+					<td>Payment&nbsp;Type&nbsp;Code</td>
+				</tr>
+			</thead>
+		</table>
+	</p>
+	<p>&nbsp;</p>
+	<div>
+			<input id='btnSaveRGPay' type="button" value="Save"></input>
+			<input id='btnConfirmRGPay' type="button" value="Confirm"></input>
+		<div id='total' style="float: right;position: relative;display: none;">
+			<p>
+				<b>Total&nbsp;Net&nbsp;Amount&nbsp;<input id='totalAmount' type="text" disabled="disabled"/></b>
+			</p>	
+			<p>
+				<b>Total&nbsp;Charge&nbsp;Amount&nbsp;<input id='totalChageAmount' type="text" disabled="disabled"/></b>
+			</p>	
+		</div>
+	</div>	
+	<p>
+		&nbsp;
+	</p>
+	<p>&nbsp;</p>
+	<p>&nbsp;</p>
+</form>	
+
+<script type="text/javascript">
+	#{include 'FundTransfer/RgPayment.js' /}
+	$(document).ready(function() {
+		RgPayment($("#rootRgPayment"));
+	});
+</script>

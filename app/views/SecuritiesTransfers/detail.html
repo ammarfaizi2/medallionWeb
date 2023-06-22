@@ -1,0 +1,159 @@
+#{extends 'templates/detail1.html' /}
+#{set pageTitle: 'Securities Transfer' /}
+#{set readOnly:((mode!='entry')||(confirming)) /}
+#{set id:cBestMessage?.msgid /}
+#{script 'lookups.js' /}
+
+<div id="accordion">
+	#{hidden id:'msgid', name:'cBestMessage.msgid', value:cBestMessage?.msgid /}
+	<fieldset>
+		<legend><b>General Information</b></legend>
+			<p>
+				#{textBox id:'externalreference', name:'cBestMessage.data.externalreference', value:cBestMessage?.data?.externalreference, label:'External Reference', readOnly:readOnly, class:'capitalize', required:'true', maxLength:40 /}
+				<span class="error">#{error 'External Reference' /}</span>
+			</p>
+			<p>
+				#{textBox id:'instructiontype', name:'cBestMessage.data.instructiontype', value:'SECTRS', label:'Instruction Type', readOnly:'true' /}
+			</p>
+	</fieldset>
+	<br/>
+	<fieldset>
+		<legend><b>Settlement Information</b></legend>
+			<p>
+				#{textBox id:'participantcode', name:'cBestMessage.data.participantcode', label:'Participant Code', value:'8M001', readOnly:'true', maxLength:5 /}
+			</p>
+			<p>
+				#{textBox id:'key_sourceaccount', name:'cBestMessage.data.sourceaccount', value:cBestMessage?.data?.sourceaccount, class:'capitalize', required:true, readOnly:readOnly, label:'Source Account', width:'150px', required:'true', maxLength:14 /}
+				#{hidden id:'h_key_sourceaccount', name:'h_key_sourceaccount', value:cBestMessage?.data?.sourceaccount /}
+				#{button id:'groupSourceAccountHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'names_sourceaccount', name:'', value:sourceaccountname, width:'250px', readOnly:true/}
+				<span class="error">#{error 'Source Account' /}</span>
+			</p>
+			<p>
+				#{textBox id:'key_targetaccount', name:'cBestMessage.data.targetaccount', value:cBestMessage?.data?.targetaccount, class:'capitalize', required:true, readOnly:readOnly, label:'Target Account', width:'150px', required:'true', maxLength:14 /}
+				#{hidden id:'h_key_targetaccount', name:'h_key_targetaccount', value:cBestMessage?.data?.targetaccount /}
+				#{button id:'groupTargetAccountHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'names_targetaccount', name:'', value:targetaccountname, width:'250px', readOnly:true/}
+				<span class="error">#{error 'Target Account' /}</span>
+			</p>
+			<p>
+				#{dropDownList id:'securitycodetype', name:'cBestMessage.data.securitycodetype', label:'Security Code Type', value:cBestMessage?.data?.securitycodetype, options:securityCodeOptions, readOnly:readOnly, required:'true' /}
+				<span class="error">#{error 'Security Code Type' /}</span>
+			</p>
+			<p>
+				#{textBox id:'key_securitycode', name:'cBestMessage.data.securitycode', value:cBestMessage?.data?.securitycode, readOnly:readOnly, required:'true', label:'Security Code', class:'capitalize', maxLength:20, width:'150px' /}
+				#{hidden id:'h_key_securitycode', name:'h_key_securitycode', value:cBestMessage?.data?.securitycode /}
+				#{button id:'groupSecurityCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'names_securitycode', name:'', value:securitycodename, width:'250px', readOnly:true/}
+				<span class="error">#{error 'Security Code' /}</span>
+			</p>
+			<p>
+				#{textBox id:'numberofsecurities', name:'cBestMessage.data.securityquantity', label:'Security Quantity', class:'numeric', readOnly:readOnly, value:cBestMessage?.data?.securityquantity, required:'true', maxLength:47 /}
+				<span class="error">#{error 'Security Quantity' /}</span>
+			</p>
+			<p>
+				#{textBox id:'settlementdate', name:'cBestMessage.data.settlementdate', class:'calendar', label:'Settlement Date', readOnly:readOnly, value:cBestMessage?.data?.settlementdate, required:'true' /}&nbsp;&nbsp;(${appProp.displayDateFormat})
+				<span id="settlementdateError" class="error">#{error 'Settlement Date' /}</span>
+			</p>
+			<p>
+				#{textArea id:'description', name:'cBestMessage.data.description', label:'Description', readOnly:readOnly, value:cBestMessage?.data?.description, class:'capitalize', width:'318px', maxLength:240  /}
+			</p>
+	</fieldset>
+</div>
+<div class="buttons">
+	<button id="reset">Reset</button>
+</div>
+
+<script type="text/javascript">
+	$(function() {
+		// source account
+		$('#key_sourceaccount').lookup({
+			list:'@{Pick.accounts()}',
+			get:{
+				url:'@{Pick.account()}',
+				success: function(data){
+					$('#key_sourceaccount').removeClass('fieldError');
+					$('#key_sourceaccount').val(data.accountNo);
+					$('#h_key_sourceaccount').val(data.accountNo);
+					$('#names_sourceaccount').val(data.description);				
+				},
+				error : function(data){
+					$('#key_sourceaccount').addClass('fieldError');
+					$('#key_sourceaccount').val('');
+					$('#names_sourceaccount').val('NOT FOUND');
+				}
+			},
+			
+			description:$('#names_sourceaccount'),
+			help:$('#groupSourceAccountHelp')			
+		});
+		
+		// target account
+		$('#key_targetaccount').lookup({
+			list:'@{Pick.accounts()}',
+			get:{
+				url:'@{Pick.account()}',
+				success: function(data){
+					$('#key_targetaccount').removeClass('fieldError');
+					$('#key_targetaccount').val(data.accountNo);
+					$('#h_key_targetaccount').val(data.accountNo);
+					$('#names_targetaccount').val(data.description);				
+				},
+				error : function(data){
+					$('#key_targetaccount').addClass('fieldError');
+					$('#key_targetaccount').val('');
+					$('#names_targetaccount').val('NOT FOUND');
+				}
+			},
+			
+			description:$('#names_targetaccount'),
+			help:$('#groupTargetAccountHelp')			
+		});
+		
+		// security code
+		$('#key_securitycode').lookup({
+			list:'@{Pick.securities()}',
+			get:{
+				url:'@{Pick.security()}',
+				success: function(data){
+					$('#key_securitycode').removeClass('fieldError');
+					$('#key_securitycode').val(data.securityId);
+					$('#h_key_securitycode').val(data.securityId);
+					$('#names_securitycode').val(data.description);				
+				},
+				error : function(data){
+					$('#key_securitycode').addClass('fieldError');
+					$('#key_securitycode').val('');
+					$('#names_securitycode').val('NOT FOUND');
+				}
+			},
+			
+			description:$('#names_securitycode'),
+			help:$('#groupSecurityCodeHelp')			
+		});
+		
+		$('#reset').insertAfter("#cancel");
+		$('.buttons #cancel').hide();
+		
+		var backButton = $('#back').attr("id");
+		if (backButton !== undefined) {
+			$('.buttons #reset').hide();
+		}
+		
+		$('#reset').click(function(){
+			// reset all field
+			$('#externalreference').val('');
+			$('#key_sourceaccount').val('');
+			$('#names_sourceaccount').val('');
+			$('#key_targetaccount').val('');
+			$('#names_targetaccount').val('');
+			$('#securitycodetype').val('');
+			$('#key_securitycode').val('');
+			$('#names_securitycode').val('');
+			$('#numberofsecurities').val('');
+			$('#settlementdate').val('');
+			$('#description').val('');
+			return false;
+		});
+	});
+</script>

@@ -1,0 +1,52 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: ' ' /}
+#{set fixData: true /}
+#{set mode: mode /}
+#{script 'lookups.js' /}
+
+
+<fieldset id="divDescription" style="display:none;width:590;height:90;position:relative;right:0;top:23;">		
+			<legend>Detail</legend>
+				<label style="width: 90px" id="idBatch"/>Batch No </label> 
+				${idBatch}  &nbsp;&nbsp;&nbsp; 
+				#{textBox id:'description',width:'235px' /}
+				<br>
+				<br>
+				<label style="width: 90px">Status </label> 
+				#{textBox id:'status',width:'50px'/}
+				<br>
+				<label style="width: 90px"> &nbsp;  </label>  
+				<label style="width: 150px"> Total Record Success : </label> ${sizeSuccess}
+				<br>
+				<label style="width: 90px"> &nbsp;  </label> 
+				<label style="width: 150px"> Total Record Failed : </label> ${sizeFailed}
+		</fieldset>
+		<br/>
+		<br/>
+		<p>
+			<table id="tblPopulateUpload">
+				<thead id="tblHead">
+					<tr id="tblTr"></tr>
+				</thead>
+				<tbody id="tblBody"></tbody>
+			</table>
+		</p>
+		<div class="buttons">
+			<input id='btnRealUpload' type="button" value="Exec. Upload" ></input>
+			<input id='btnRealCancel' type="button" value="Cancel" ></input>
+			`
+			<input id='btnRealReset' type="button" value="Reset" style="display: none"></input>
+			
+		</div>
+		
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'UploadDownload/ExecuteUpload.js' /}
+	$(document).ready(function() {
+		$('#btnPopulate').button();
+		$('#btnRealUpload').button();
+		$('#btnRealCancel').button();
+		$('.buttons input:button').button();
+		ExecuteUpload($("#html"));
+	});
+</script>

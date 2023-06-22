@@ -1,0 +1,33 @@
+#{if lookups}
+<table id="grid" class="display">
+		<thead>
+		<tr>
+			<th width="50px">Lookup Id</th> 
+			<th width="120px">Lookup Id</th> 
+			<th width="120px">Lookup Code</th> 
+			<th width="300px">Lookup Desc</th>
+		</tr>
+		</thead>
+		<tbody>
+		#{list items:lookups, as:'lookup'}
+		<tr>
+			<td>
+				${lookup.lookupId}
+			</td>
+			<td>
+				${lookup.lookupId}
+			</td>
+			<td>
+				${lookup.lookupCode}
+			</td>
+			<td>
+				${lookup.lookupDescription}
+			</td>
+		</tr>
+		#{/list}
+		</tbody>
+	</table>
+#{/if}
+#{else}
+<div>No record found</div>
+#{/else}

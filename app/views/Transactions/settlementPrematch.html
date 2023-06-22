@@ -1,0 +1,292 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Settlement Prematch' /}
+#{script 'forms.js' /}
+#{script 'date.js', characterset:'utf-8' /}
+#{script 'lookuppaging.js' /}
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+#{script 'transaction.js' /}
+
+<script type="text/javascript">
+#{include 'RegistrySubscription/Util.js' /}
+$(function() {
+	$('.buttons input:button').button();
+	
+	// Search section
+	$('#accordion').accordion({
+		collapsible: true
+	});
+	
+	$('#settlementDateSearch').val('${currentDate?.format( appProp.dateFormat )}');
+	$('.buttons button:first').button({
+		icons: {
+			primary: 'ui-icon-search'
+		}
+	}).next().button();	
+
+	// end of Search
+	$('#reset').click(function() {
+		location.href="@{Transactions.settlementPrematch()}";
+	});
+
+	$('#settlementDateFrom').change(function(){
+		$("#pSettlementDateFrom label span").remove();
+        if($(this).val() != '' || $('#settlementDateTo').val() != ''){
+			$("#pSettlementDateFrom label").append("<span class='req'>*</span>");
+		}
+	});
+	
+	$('#settlementDateTo').change(function(){
+		$("#pSettlementDateFrom label span").remove();
+        if($(this).val() != '' || $('#settlementDateFrom').val() != ''){
+			$("#pSettlementDateFrom label").append("<span class='req'>*</span>");
+		}
+	});
+	
+	$('#customerCode').change(function(){
+		if ($(this).val()==''){
+			$('#customerCode').removeClass('fieldError');
+			$('#customerCode').val('');
+			$('#customerCodeId').val('');
+			$('#customerCodeName').val('');
+			$('#h_customerCodeName').val('');
+		}
+	});
+
+	$('#customerCode').dynapopup('PICK_CF_MASTER', '', 'securityType', 
+		function(data){
+			$('#customerCode').removeClass('fieldError');
+			$('#customerCodeId').val(data.code);
+			$('#customerCodeName').val(data.description);
+			$('#h_customerCodeName').val(data.description);
+		},
+		function(){
+			$('#customerCode').addClass('fieldError');
+			$('#customerCode').val('');
+			$('#customerCodeId').val('');
+			$('#customerCodeName').val('NOT FOUND');
+			$('#h_customerCodeName').val('');
+		}
+	);
+
+	//======== securityType start
+		$('#securityTypeCode').change(function() {
+		if ($('#securityTypeCode').val() == "") {
+			$('#securityTypeCode').val("");
+			$('#securityTypeKey').val("");
+			$('#securityTypeDesc').val("");
+			$('#h_securityTypeCode').val("");
+			
+			$('#securityId').val("");
+			$('#securityKey').val("");
+			$('#securityDesc').val("");
+			$('#h_securityDesc').val("");
+		}
+	});
+	
+	$('#securityTypeCode').lookup({
+		list:'@{Pick.securityTypes()}',
+		get:{
+			url:'@{Pick.securityType()}',
+			success: function(data){
+				$('#securityTypeCode').removeClass('fieldError');
+				$('#securityTypeKey').val(data.code);
+				$('#securityTypeDesc').val(data.description);
+				$('#h_securityTypeCode').val(data.code);
+				
+				$('#securityId').val("");
+				$('#securityKey').val("");
+				$('#securityDesc').val("");
+				$('#h_securityDesc').val("");
+				attachSecuritiesPaging();
+			},
+			error: function(data){
+				$('#securityTypeCode').addClass('fieldError');
+				$('#securityTypeCode').val('');
+				$('#securityTypeKey').val('');
+				$('#securityTypeDesc').val('NOT FOUND');
+				$('#h_securityTypeCode').val('');
+				attachSecuritiesPaging();
+			}
+		},
+		description:$('#securityTypeCodeDesc'),
+		help:$('#securityTypeHelp')
+	});
+	//======== securityType end
+
+	//======== securityId start
+		$('#securityId').change(function() {
+		if ($('#securityId').val() == "") {
+			$('#securityId').val("");
+			$('#securityKey').val("");
+			$('#securityDesc').val("");
+			$('#h_securityDesc').val("");
+		}
+	});
+	
+	function attachSecuritiesPaging() {
+		var securityType = $('#securityTypeCode').val();
+		var pickName = (securityType == '') ? 'PICK_SC_MASTER' : 'PICK_SC_MASTER_BY_SEC_TYPE';
+		$('#securityId').dynapopup2({key:'securityKey', help:'securityHelp', desc:'securityDesc'}, pickName, securityType, 'transactionSearchNo', function(data){
+			$('#securityId').removeClass('fieldError');
+			$('#securityKey').val(data.code);
+			$('#securityDesc').val(data.description);
+			$('#h_securityId').val(data.code);
+		},function(data){
+			$('#securityId').addClass('fieldError');
+			$('#securityId').val('');
+			$('#securityKey').val('');
+			$('#securityDesc').val('NOT FOUND');
+			$('#h_securityId').val('');
+		});
+	}
+	attachSecuritiesPaging();
+
+	//======== securityId end
+
+	//======== thirdParty start
+	$('#counterPartyCode').change(function() {
+		if ($('#counterPartyCode').val() == "") {
+			$('#counterPartyCode').val("");
+			$('#counterPartyCodeKey').val("");
+			$('#counterPartyName').val("");
+			$('#h_counterPartyCode').val("");
+		}
+	});
+	
+	$('#counterPartyCode').lookup({
+		list : '@{Pick.thirdParties()}?type=THIRD_PARTY-BROKER',
+		get : {
+			url:'@{Pick.thirdParty()}?type=THIRD_PARTY-BROKER',
+			success: function(data){
+				$('#counterPartyCode').removeClass('fieldError');
+				$('#counterPartyKey').val(data.code);
+				$('#counterPartyName').val(data.description);
+				$('#h_counterPartyCode').val(data.code);
+			},
+			error: function(data){
+				$('#counterPartyCode').addClass('fieldError');
+				$('#counterPartyCode').val('');
+				$('#counterPartyKey').val('');
+				$('#counterPartyName').val('NOT FOUND');
+				$('#h_counterPartyCode').val('');
+			}
+		},
+		description:$('#counterPartyName'),
+		help:$('#counterPartyHelp')
+	});
+	//======== thirdParty end
+	
+});	
+
+function validateSearch() {
+	if (($('#settlementDateFrom').val() == '')||($('#settlementDateTo').val() == '') ||
+		($('#settlementDateFrom').hasClass('fieldError')) || ($('#settlementDateTo').hasClass('fieldError'))){
+		if ($('#settlementDateFrom').val() == '') {
+			$('#settlementDateFromError').html('required');	
+		} else {
+			$('#settlementDateFromError').html('');
+		}
+		
+		if ($('#settlementDateTo').val() == '') {
+			$('#settlementDateToError').html('required');	
+		} else {
+			$('#settlementDateToError').html('');
+		}
+		
+		return false;
+	} else {
+		return true;
+	}
+}
+
+</script>
+
+<div id="accordion">
+	<h3><a href="#">Search Transaction</a></h3>
+	<form id="searchForm" class="form">
+	#{hidden id:'query', name:'params.query', value:params?.query /}
+	<p id="pSettlementDateFrom">
+		#{textBox id:'settlementDateFrom', name:'params.settlementDateFrom', label:'Settlement Date', value:params.settlementDateFrom?.format(appProp.dateFormat), width:'100px', class:'calendar' /}
+		(${appProp.displayDateFormat})
+		<span id="settlementDateFromError" class="error"></span> 
+		<b>To</b>
+		#{textBox id:'settlementDateTo', name:'params.settlementDateTo', value:params.settlementDateTo?.format(appProp.dateFormat), width:'100px', class:'calendar' /}
+		(${appProp.displayDateFormat})
+		<span id="settlementDateToError" class="error"></span>
+	</p>
+	<!-- <p>
+		#{textBox id:'accountNo', name:'params.accountNo', label:'Account No', class:'capitalize', readOnly:readOnly, width:'100px' /}
+		#{hidden id:'accountKey', name:'params.custodyAccountKey' /}
+		#{button id:'accountHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'accountName', name:'params.accountName', readOnly:true, width:'300px' /}
+	</p> -->
+	<p>
+		#{textBox id:'customerCode',width:'100px', name:'', label:'Customer Code', value:'', class:'capitalize' /}
+		#{hidden id:'customerCodeId', name:'params.customerCode', value:params.customerCode /}
+		#{button id:'customerCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'customerCodeName', name:'customer.customerName', value:customer?.customerName, readOnly:true, width:'300px' /}
+		<span id="errGroupCode" class="error"></span>
+	</p>
+	<p>
+		#{textBox id:'securityTypeCode', name:'params.securityType', label:'Security Type', class:'capitalize',readOnly:readOnly, width:'100px' /}
+		#{hidden id:'securityTypeKey', name:'params.transactionTemplateKey' /}
+		#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'securityTypeDesc', name:'params.securityTypeDescription', readOnly:true, width:'300px' /}
+	</p>
+	<p>
+		#{textBox id:'securityId', name:'params.securityId', label:'Security Code', value:transaction?.security?.securityId, class:'capitalize', readOnly:readOnly, width:'100px' /}
+		#{hidden id:'securityKey', name:'params.securityKey' /}
+		#{button id:'securityHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'securityDesc', name:'params.securityDescription', readOnly:true, width:'300px' /}
+		<span id="errmsgSec"></span>
+		<span class="error">#{error 'Security Code is' /}</span>
+	</p>
+	<!-- <p>
+		#{textBox id:'counterPartyCode', name:'params.thirdPartyCode', label:'Counter Party', class:'capitalize', readOnly:readOnly, width:'100px' /}
+		#{hidden id:'counterPartyKey', name:'params.thirdPartyKey' /}
+		#{button id:'counterPartyHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'counterPartyName', name:'params.thirdPartyName', readOnly:true, width:'300px' /}
+		<span class="error">#{error 'Counter Party is' /}</span>
+	</p> -->
+	<p>
+		#{textBox id:'transactionSearchNo', name:'params.transactionNo', label:'Transaction No', value:params.transactionNo, class:'numberOnly', width:'100px' /}
+	</p>
+	<p>
+		<div class="buttons">
+			<input type="button" id="search" value="Search" />				
+			<input type="button" id="reset" value="Reset" />					
+		</div>
+	</p>
+</form>
+</div>	
+
+<!-- <div id="result" style="display:none">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<div class="response"></div>
+</div> -->
+<div id="result" style="display:none">
+	<table id="tablePagingSettle" class="display">
+		<thead>
+			<tr>
+				<th field="settlementDate|date|date|center|sort" width="110px">Settlement Date</th>
+				<th field="transactionNumber|string|none|left|sort">Txn #</th>
+				<th field="account.accountNo|string|none|left|sort">Account No</th>
+				<th field="account.name|string|none|left|sort">Account Name</th>
+				<th field="transactionTemplate.description|string|none|left|sort">Description</th>
+				<th field="security.securityId|string|none|left|sort">Sec Code</th>
+				<th field="settlementAmount|number|decimal4|right|sort">Settlement Amount</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+</div>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'Transactions/pagingSettlementPrematch.js' /}
+	$(document).ready(function() {
+		Paging($("#accordion").add("#result"));
+	});
+</script>

@@ -1,0 +1,105 @@
+<script type="text/javascript">
+	$(function(){
+		/* $('#transactionNo').blur(function(){
+			if ($('#detailForCertificateTransDetails #detailCertificateTransForm #transactionNo').val()=="") {
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #transactionNo').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #transactionkey').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #transactionDate').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #transactionStatus').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #accountNo').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #accountKey').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #accountName').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #description').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #securityKey').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #securityCode').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #securityDesc').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #securityType').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #settlementDate').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #quantity').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #price').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #quantityStripped').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #priceStripped').val('');
+			}
+			$('#detailForCertificateTransDetails #detailCertificateTransForm  #newTransactionKey').val($('#detailForCertificateTransDetails #detailCertificateTransForm #transactionNo').val());
+		});
+		
+		$('#cancelCertificateTransDetail').click(function() {
+			$("#detailForCertificateTransDetails #detailCertificateTransForm").find("span[id*='Error']").html("");
+			$("#detailForCertificateTransDetails").dialog('close');
+			return false;
+		}) */
+	});
+	
+</script>
+<style type="text/css">
+  .errmsg { color:red; }
+</style>
+<div>
+<span id="errmsgNull" class="errmsg" ></span>
+	<p>
+		#{hidden id:'oldDepositoKey' /}
+		#{hidden id:'newDepositoKey' /}
+		#{hidden id:'rowPosition' /}
+		
+		
+	</p>
+
+	<p>
+		#{textBox id:'depositoNo', name:'tdMaster.depositoNo', label:'Deposito No', value:tdMaster?.depositoNo, dataold:tdMaster?.depositoNo, class:'capitalize', width:'100px', required:true, readOnly:readOnly /}
+		#{hidden id:'depositoKey', name:'tdMaster.depositoKey', value:tdMaster?.depositoKey /}
+		#{button id:'depositoHelp', value:'?', class:'small', readOnly:readOnly /}
+		&nbsp; <span id="depositoNoError" class="error">#{error 'Deposito No is' /}</span>
+	</p>
+	<p>
+			#{textBox id:'amount', name:'amount', label:'Current Holding', value:tdMaster?.amount, format:'#,##0.####', class:'numeric', width:'100px', readOnly:true /}
+			#{hidden id:'amountStripped', name:'tdMaster.amount', value:tdMaster?.amount /}
+	</p>
+	<fieldset style="width: 550px"> <legend><b>Detail</b></legend>
+		<p>
+			#{textBox id:'placementDate', name:'tdMaster.placementDate', label:'Placement Date', class:'calendar', value:tdMaster?.placementDate?.format(appProp.dateFormat), readOnly:true, width:'100px' /} (${appProp.displayDateFormat})
+			&nbsp; <span><b>Status</b></span>
+			#{textBox id:'depositoStatus', name:'depositoStatus', value:'', readOnly:true, width:'100px' /}
+			#{hidden id:'depositoStatusHidden', name:'tdMaster.depositoStatus', value:tdMaster?.depositoStatus, readOnly:true, width:'50px' /}
+		</p>
+		<p>
+			#{textBox id:'accountNo', name:'tdMaster.account.accountNo', label:'Account No', value:tdMaster?.account?.accountNo, class:'capitalize', readOnly:true, width:'100px' /}
+			#{hidden id:'accountKey', name:'tdMaster.account.custodyAccountKey', value:tdMaster?.account?.custodyAccountKey /}
+			#{textBox id:'accountName', name:'tdMaster.account.name', value:tdMaster?.account?.name, readOnly:true, width:'241.5px' /}
+			<span id="accountNoError" class="error"></span>
+		</p>
+		<p>
+			#{textBox id:'securityType', name:'tdMaster.security.securityType.securityType', label:'Security Type', value:tdMaster?.security?.securityType?.securityType, class:'capitalize', readOnly:true, width:'100px' /}
+		</p>
+		<p>
+			#{textBox id:'securityCode', name:'tdMaster.security.securityId', label:'Security Code', class:'capitalize', value:tdMaster?.security?.securityId, readOnly:true, width:'100px' /}
+			#{textBox id:'securityDesc', name:'tdMaster.security.description', value:tdMaster?.security?.description, readOnly:true, width:'241.5px' /}
+			#{hidden id:'securityKey', name:'tdMaster.security.securityKey', value:tdMaster?.security?.securityKey /}
+			<span id="securityCodeError" class="error"></span>
+		</p>
+		<p>
+			#{textBox id:'currencyCode', name:'tdMaster.security.currency.currencyCode', label:'Currency', value:tdMaster?.security?.currency?.currencyCode, class:'capitalize', readOnly:true, width:'100px' /}
+		</p>
+		<p>
+			#{textBox id:'thirdPartyCode', name:'tdMaster.security.issuer.thirdPartyCode', label:'Issuer Bank', class:'capitalize', value:tdMaster?.security?.issuer?.thirdPartyCode, readOnly:true, width:'100px' /}
+			#{textBox id:'thirdPartyName', name:'tdMaster.security.issuer.thirdPartyName', value:tdMaster?.security?.issuer?.thirdPartyName, readOnly:true, width:'241.5px' /}
+		</p>
+		<p>
+			#{textBox id:'branchCode', name:'tdMaster.branchCode', label:'Branch', value:tdMaster?.branchCode, class:'capitalize', readOnly:true, width:'100px' /}
+		</p>
+		<p>
+			#{radioButton id:'script', name:'script', value:((tdMaster?.script)?'true':'false'), label:'Script', options:operators, readOnly:true /}
+			#{hidden id:'scriptHidden', name:'tdMaster.script', value:((tdMaster?.script)?'true':'false') /}
+		</p>
+		<p>
+			#{textBox id:'nominal', name:'nominal', label:'Nominal', value:tdMaster?.nominal, format:'#,##0.####', class:'numeric', width:'100px', readOnly:true /}
+			#{hidden id:'nominalStripped', name:'tdMaster.nominal', value:tdMaster?.nominal /}
+		</p>
+		<p>
+			#{textBox id:'interestRate', name:'tdMaster.interestRate', label:'Interest Rate(gross)', value:tdMaster?.interestRate, class:'numeric', width:'100px', readOnly:true /}
+			<span>%</span>
+		</p>
+		<p>
+			#{textBox id:'maturityDate', name:'tdMaster.maturityDate', label:'Maturity Date', class:'calendar', value:tdMaster?.maturityDate?.format(appProp.dateFormat), readOnly:true, width:'100px' /} (${appProp.displayDateFormat})
+		</p>
+	</fieldset>
+</div> 

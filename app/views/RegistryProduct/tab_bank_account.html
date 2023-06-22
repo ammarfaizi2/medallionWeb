@@ -1,0 +1,61 @@
+<p></p>
+
+<p>
+    <div>
+        <div style="overflow-y:scroll;max-height:400px;">				
+            <table id="bankInfoTable" class="display">
+				<thead>
+					<tr>
+						<th>Account No</th>
+						<th>Bank Code</th>
+						<th>Beneficiary Name</th>
+						<th>Currency</th>
+						<th>Default</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					#{list prd?.listBankAccounts, as:'ba'}
+						<tr>
+							<td>
+							    ${ba?.bankAccountNo}
+							</td>
+							
+							<td>
+								${ba?.thirdPartyKey}
+							</td>
+							
+							<td>
+								${ba?.beneficiaryName}
+							</td>
+							
+							<td>
+                                ${ba?.currencyCode}
+                            </td>
+							
+							<td>
+								#{hidden name:'prd.listBankAccounts['+(ba_index-1)+'].defaultRgProductBankAccount', value:ba?.defaultRgProdBankAccount/}
+								<input type='radio' id='radioStatus${ba?.defaultRgProductBankAccount}' name="bankStatus" value='${ba?.defaultRgProdBankAccount}' #{if readOnly}disabled="disabled"#{/if} />
+							</td>
+							
+							<td></td>
+							
+							<td>
+								#{button sim='btnDelBankAcc', id:'btnDel'+ba?.defaultRgProductBankAccount, value:'Delete',  readOnly:readOnly/}
+								#{hidden name:'prd.listBankAccounts['+(ba_index-1)+'].bankAccountKey', value:ba?.bankAccountKey/}
+								#{hidden name:'prd.listBankAccounts['+(ba_index-1)+'].rgProduct.productCode', value:prd?.productCode/}
+							</td>	
+						</tr>
+					#{/list}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</p>
+
+<p>
+    #{hidden id:'bankAccountKey', name:'prd.bankAccount.bankAccountKey', value:prd?.bankAccount?.bankAccountKey /}  
+    #{hidden id:'defaultProductBankAccount', name:'prd.defaultProductBankAccount', value:prd?.defaultProductBankAccount /}
+    #{button id:'btnBankAccountAdd', value:'New Data', readOnly:readOnly /} 
+    <span id="btnBankAccountAddError" class="error"><span></span>#{error 'Bank Account is' /}</span>
+</p>

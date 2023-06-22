@@ -1,0 +1,297 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<html>
+	<head>
+	    <title>MEDALLION*</title>
+	  	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	    <link rel="shortcut icon" type="image/png" href="@{'/public/images/medallion-ico.png'}">
+	    
+	    #{stylesheet 'fg.menu.css' /}
+	    #{stylesheet 'jquery-ui.custom.css' /}
+	    #{stylesheet 'jquery.dataTables.css' /}
+	    #{stylesheet 'TableTools.css' /}
+	    #{stylesheet 'menu.css' /}    
+	    <!--[if IE]>
+	    #{stylesheet 'siteIE.css' /}
+	    <![endif]-->
+	    
+	    <!--[if ! IE]><!-->
+	   	 #{stylesheet 'site.css' /}
+	    <!--<![endif]-->
+	   	#{script 'jquery-1.4.4.min.js', characterset:'utf-8' /}
+	   	#{script 'jquery-ui-1.8.13.min.js', characterset:'utf-8' /}
+	   	#{script 'jquery.dataTables-1.8.1.min.js', characterset:'utf-8' /}
+	   	#{script 'TableTools.min.js', characterset:'utf-8' /}
+	   	#{script 'fg.menu.min.js', characterset:'utf-8' /}
+	   	#{script 'autoNumeric-1.7.1.js', characterset:'utf-8' /}
+	   	#{script 'date.format.min.js', characterset:'utf-8' /}
+	   	#{script 'console.js', characterset:'utf-8' /}
+	   	#{script 'validation/jquery.maskedinput-1.3.min.js', characterset:'utf-8' /}
+	   	#{script 'validation/jquery.private.js', characterset:'utf-8' /}
+	    #{script 'validation/numericOnly.js', characterset:'utf-8' /}
+	    #{script 'external/dialogmessage.js', characterset:'utf-8' /}
+	    #{script 'validation/compareDate.js' /}
+	    #{script 'FormUtils.js', characterset:'utf-8' /}
+	    #{script 'json2.min.js', characterset:'utf-8' /}
+	    
+	   	<style>
+		   	body { position: relative; margin: 0; }
+			.centered { position: fixed; top: 50%; left: 50%; margin-top: -50px; margin-left: -100px; z-index: 1001; }
+	   	</style>
+	</head>
+	<script type="text/javascript">
+		$(function() {
+			loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Processing...</div>').appendTo('body');
+			loadingDialog(loading);
+			loading.dialog('close');
+			
+			$('input:text.capitalize').live('change', function() {
+				$(this).val($.trim($(this).val().toUpperCase()));
+			});	
+			
+			$('input:text.capitalize').live('blur', function() {
+				$(this).val($.trim($(this).val().toUpperCase()));
+			});	
+			
+			$('input:text.capitalize').live('keydown', function(event) {
+				//shift+5 = % -> prevent;
+				if (event.shiftKey && (event.which==53 || event.which==191)) {				
+					event.preventDefault();
+					return false;
+				}
+			});
+			
+			$("input.onlyNumber").keypress(function (e) { 
+				if ( e.which!=8 && e.which!=0 && (e.which<48 || e.which>57)) {
+				    return false;
+				}	
+			});
+	
+			$('input:text.capitalize').live('keyup', function(event) {		
+				//regex : /%/gi 
+				if (event.shiftKey && (event.which==53 || event.which==191)) {
+					$(this).val($(this).val().toUpperCase().replace(/%/gi,"").replace(/\?/gi,""));
+					return false;
+				}
+			});	
+					
+			$('textarea.capitalize').live('change', function() {
+				$(this).val($(this).val().toUpperCase());
+			});	
+			
+			$('input.percent').autoNumeric({vMax: '100.0000'});
+			$('input.percent').live('blur', function() {
+				var el = $(this);
+				var id = this.id;
+				var stripped = "#" + id + "Stripped";
+				if (el.val() == '') {
+					el.siblings(stripped).val('');
+					return;
+				}
+				el.siblings(stripped).val(el.autoNumericGet());
+			});
+	
+			$('input.email').change(function() {
+				var el = $(this);
+				var email = $.trim(el.val());
+				var id = this.id;
+				var errorId= "#" + id + "Error";
+				el.removeClass('fieldError');
+				$(errorId).html("");
+				if (!email.isEmpty() && !validateEmail(email)) {
+					el.addClass('fieldError');
+					$(errorId).html("Invalid email format").show();
+				} else {
+					el.removeClass('fieldError');
+					el.val(email);
+				}
+			});
+			
+			$('input.noSpace').keypress(function(e){
+				if (e.which == 32){
+					return false;
+				}
+			});
+			
+			$('input.alphaNumeric').keypress(function(e){
+				var regex = new RegExp("^[a-zA-Z0-9\b]+$");
+			    var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+			    if (regex.test(str)) {
+			        return true;
+			    }
+
+			    e.preventDefault();
+			    return false;
+			});
+			
+			$("input.calendar").mask("${appProp?.dateMask}", { placeholder:" " });
+			$("input.calendar").datepicker({dateFormat:'${appProp?.jqueryDateFormat}', yearRange: '1000:9999'});
+			$('input.calendar').change( function(){
+				var el = $(this);
+				var dateVal =  el.val();
+				var id = this.id;
+				var errorId= "#" + id + "Error";
+				el.removeClass("fieldError");
+				$(errorId).html("");
+				try {
+					if(dateVal == ""){
+						el.addClass("fieldError");
+				    	$(errorId).html("Required").show();//ini gimana jika elmennya bukan mandatory????????sementara set di bukan mandatorynya di js sendiri
+				    	return;
+					}
+					var formatdate = '${appProp?.jqueryDateFormat}';
+					var formatArr = formatdate.split("/");
+					var valueArr = dateVal.split("/");
+					if (formatArr.length == 3 && valueArr.length == 3) {
+						var yearIdx = -1;
+						for (x in formatArr) { if (formatArr[x] == 'yy') yearIdx = x; }
+						if (yearIdx != -1) {
+							var number = Number(valueArr[yearIdx]);
+							if (number < 1 || number > 9999) { throw true; }
+						}
+					}
+			        if(dateVal.length >0)
+			        	$.datepicker.parseDate('${appProp?.jqueryDateFormat}', dateVal, null);
+			        else
+			        	throw true;
+			    } catch(error) {
+			    	el.val('');
+				    el.addClass("fieldError");
+			    	$(errorId).html("Invalid date format").show();
+			    }
+			});
+			
+			$('input.numeric').autoNumeric({vMax:'9999999999999.', mDec:15});		
+			$('input.numericnosep').autoNumeric({vMax:'999999999999.', mDec:0, aSep:""});		
+	
+			$('input.numeric').live('blur', function() {
+				var el = $(this);
+				var id = this.id;
+				var stripped = "#" + id + "Stripped";
+				if (el.val() == '') {
+					el.siblings(stripped).val('');
+					return;
+				}
+				el.siblings(stripped).val(el.autoNumericGet());
+			});
+			
+			$('input.numericminus').autoNumeric({vMin: '-999999999999.', mDec:2, mType:'S'});
+			$('input.numericminus').live('blur', function() {
+				var el = $(this);
+				var id = this.id;
+				var stripped = "#" + id + "Stripped";
+				if (el.val() == '') {
+					el.siblings(stripped).val('');
+					return;
+				}
+				el.siblings(stripped).val(el.autoNumericGet());
+			});
+			
+			$('input.rgNumeric').autoNumeric({vMin: '-999999999999.', vMAx:'999999999999.', mDec:10});
+			$('input.rgNumeric').live('blur', function() {
+				var el = $(this);
+				var id = this.id;
+				var stripped = "#" + id + "Stripped";
+				if (el.val() == '') {
+					el.siblings(stripped).val('');
+					return;
+				}
+				el.siblings(stripped).val(el.autoNumericGet());
+			});
+			
+			$('input.securityNumeric').autoNumeric({vMin: '-999999999999.', vMAx:'999999999999.', mDec:4});
+			$('input.securityNumeric').live('blur', function() {
+				var el = $(this);
+				var id = this.id;
+				var stripped = "#" + id + "Stripped";
+				if (el.val() == '') {
+					el.siblings(stripped).val('');
+					return;
+				}
+				el.siblings(stripped).val(el.autoNumericGet());
+			});
+			
+			$('input.securityNumOnly').autoNumeric({vMin: '0', vMAx:'999999999999', mDec:0});
+			$('input.securityNumOnly').live('blur', function() {
+				var el = $(this);
+				var id = this.id;
+				var stripped = "#" + id + "Stripped";
+				if (el.val() == '') {
+					el.siblings(stripped).val('');
+					return;
+				}
+				el.siblings(stripped).val(el.autoNumericGet());
+			});
+		});
+	</script>
+
+	<body>
+		<div id="parentDiv" >
+			<img class="centered" id="loadingLogo" style="display:none" alt="" src="@{'/public/images/loading2.gif'}">
+			<div id="container">
+				<div id="topmenu">
+					<span id="appDateScreen"><label id="mainTime">&nbsp;</label></span>
+					<div>
+						<span id="logo">
+						#{include 'templates/logo.html' /}
+					</span>
+					<span id="menu">#{include 'templates/menu.html' /}</span>
+					</div>
+				</div>	
+				
+				<div id="main">
+					#{if flash.breadcrumb}
+						<div id="breadcrumb">
+							${flash.breadcrumb}
+						</div>
+					#{/if}
+					#{doLayout /}
+					#{if flash.warningError}
+					    <div class="error">
+							<li>${flash.warningError}</li>
+							#{ifErrors}
+								#{errors}
+								 <li>${warningError.key} ${warningError}</li>
+								#{/errors}
+							#{/ifErrors}
+				    	</div>
+					#{/if}
+				</div>
+				<div id="footer">#{include 'templates/footer.html' /}</div>
+				<div>#{include 'templates/messageAlert.html' /}</div>
+			</div>		
+		</div>
+	</body>
+</html>
+<script type="text/javascript">
+	$(document).ready(function() {
+		function checkRedirect(data) {
+			if (data == "/login") { window.location.href = data; 
+			}else if ((""+data).indexOf("<title>MEDALLION*</title>") >=0){
+				if ($('#logoutTag').length != 0) {
+					$('#logoutTag')[0].click();	
+				}
+			}
+		}
+		
+		function getServerDate() {
+			var returnData;
+	    	$.ajaxSetup({ async : false });
+			$.get("@{Pick.getServerDate()}", function(data) {
+				checkRedirect(data);
+				returnData = data;
+			});
+			return new Date(returnData);
+		}
+
+		if ($("#signin").length == 0) {
+			var serverDate = getServerDate();
+
+			$("#mainTime").html(serverDate.format('dddd, mmmm dS yyyy HH:MM'));
+			setInterval(function(){
+				serverDate.setSeconds(serverDate.getSeconds() + 1);
+				$("#mainTime").html(serverDate.format('dddd, mmmm dS yyyy HH:MM'));
+			}, 1000);
+		}
+	});
+</script>

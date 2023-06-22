@@ -1,0 +1,42 @@
+<div id="gBank" style="overflow-x:scroll;width:901px">
+	<table id="grid-bank" class="display">
+		<thead>
+			<tr>
+				<th width="200px">Account No</th>
+				<th width="270px">Bank Name</th>
+				<th width="300px">Beneficiary Name</th>
+				<th width="70px">Action</th>
+			</tr>
+		</thead>
+		<tbody>
+		#{list customer?.listBankAccounts, as:'bankAccount'}
+			<tr>
+				<td>
+					${bankAccount?.accountNo}
+				</td>
+				<td>
+					${bankAccount?.bankCode?.thirdPartyName}
+				</td>
+				<td>
+					${bankAccount?.name}
+				</td>
+				<td>					
+					#{hidden id:'bankAccountKey', name:'banks[' + (bankAccount_index-1) + '].bankAccountKey', value:bankAccount?.bankAccountKey /}
+					#{hidden id:'thirdPartyKey', name:'banks[' + (bankAccount_index-1) + '].bankCode.thirdPartyKey', value:bankAccount?.bankCode?.thirdPartyKey /}
+					#{hidden id:'thirdPartyCode', name:'banks[' + (bankAccount_index-1) + '].bankCode.thirdPartyCode', value:bankAccount?.bankCode?.thirdPartyCode /}
+					#{hidden id:'thirdPartyName', name:'banks[' + (bankAccount_index-1) + '].bankCode.thirdPartyName', value:bankAccount?.bankCode?.thirdPartyName /}
+					#{hidden id:'accountNo', name:'banks[' + (bankAccount_index-1) + '].accountNo', value:bankAccount?.accountNo /}
+					#{hidden id:'name', name:'banks[' + (bankAccount_index-1) + '].name', value:bankAccount?.name /}
+					#{hidden id:'currencyCode', name:'banks[' + (bankAccount_index-1) + '].currency.currencyCode', value:bankAccount?.currency?.currencyCode /}
+					#{hidden id:'description', name:'banks[' + (bankAccount_index-1) + '].currency.description', value:bankAccount?.currency?.description /}
+					#{hidden id:'branch', name:'banks[' + (bankAccount_index-1) + '].branch', value:bankAccount?.branch /}
+					#{hidden id:'bicCode', name:'banks[' + (bankAccount_index-1) + '].bicCode', value:bankAccount?.bicCode /}
+					#{hidden id:'description', name:'banks[' + (bankAccount_index-1) + '].description', value:bankAccount?.description /}
+					<input type="button" value="Delete" id="deleteBank" #{if readOnly}disabled='disabled'#{/if} />
+				</td>
+			</tr>		
+		#{/list}
+		</tbody>
+	</table>			
+</div>
+<b><span id="errGlobalBankAccount" class="error"></span></b>

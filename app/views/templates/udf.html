@@ -1,0 +1,35 @@
+<ul>
+#{list items: udfs, as: 'item'}
+	
+	<li>
+			<div class="udf_type_all">
+				#{if item?.displayType?.lookupId == 'DISPLAY_TYPE-2'}
+					#{dropDownList id:'udfsValue['+(item_index-1)+']', name:'udfs['+(item_index-1)+'].value', label:item?.label, value:item?.value , options:item?.options, readOnly:readOnly, class:'empty' /}
+				#{/if}
+				
+				#{elseif item?.dataType?.lookupId == 'DATA_TYPE-STR'}
+						#{textBox id:'udfsValue['+(item_index-1)+']', name:'udfs['+(item_index-1)+'].value', label:item?.label, value:item?.value , maxLength:item?.length, readOnly:readOnly, class:'empty capitalize' /}
+				#{/elseif}
+				
+				#{elseif item?.dataType?.lookupId == 'DATA_TYPE-NUM'}
+					#{textBox id:'udfsValue['+(item_index-1)+']', name:'udfs['+(item_index-1)+'].value', label:item?.label, value:item?.value ,class:'float empty', maxLength:item?.length, readOnly:readOnly  /}
+				#{/elseif}
+				
+				#{else}
+					#{textBox id:'udfsValue['+(item_index-1)+']', name:'udfs['+(item_index-1)+'].value', label:item?.label, value:item?.value , class:'calendar empty', readOnly:readOnly /}(${appProp.displayDateFormat})
+				#{/else}
+			</div>
+
+	
+	</li>
+	#{hidden id:'udfsFieldName['+(item_index-1)+']', name:'udfs['+(item_index-1)+'].fieldName', value:item?.fieldName /}
+	#{hidden id:'udfsDisplayType['+(item_index-1)+']', name:'udfs['+(item_index-1)+'].displayType.lookupId', value:item?.displayType?.lookupId /}
+	#{hidden id:'udfsDataType['+(item_index-1)+']', name:'udfs['+(item_index-1)+'].dataType.lookupId', value:item?.dataType?.lookupId /}
+	#{hidden id:'udfsLabel['+(item_index-1)+']', name:'udfs['+(item_index-1)+'].label', value:item?.label /}
+	#{hidden id:'udfsLookupGroup['+(item_index-1)+']', name:'udfs['+(item_index-1)+'].lookupGroup.lookupGroup', value:item?.lookupGroup?.lookupGroup /}
+	#{hidden id:'udfsSequence['+(item_index-1)+']', name:'udfs['+(item_index-1)+'].sequence', value:item?.sequence /}
+#{/list}
+</ul>
+
+
+	

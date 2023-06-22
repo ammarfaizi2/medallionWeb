@@ -1,0 +1,60 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Process Fund Action' /}
+
+<script type="text/javascript">
+	function doEdit(data) {
+		return false;
+	}
+</script>
+<table class="display">
+	#{hidden id:'dispatch', value:id/}
+	<thead>
+		<tr>
+			<th align="left">Invest Acct No</th>
+			<th align="left">Invest Acct No</th>
+			<th align="left">Unit Balance</th>
+			<th align="left">Trade Date</th>
+			<th align="left">Post Date</th>
+			<th align="left">Net Amount</th>
+			<th align="left">Price</th>
+			<th align="left">Unit</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list trades, as:'trade'}
+		<tr>
+			<td>${trade?.rgInvestmentaccount?.accountNumber}</td>
+			<td>${trade?.rgInvestmentaccount?.accountNumber}</td>
+			<td>${trade?.availabelUnit?.format('#,##0.00')}</td>
+			<td>${trade?.tradeDate?.format('MM/dd/yyyy')}</td>
+			<td>${trade?.postDate?.format('MM/dd/yyyy')}</td>
+			<td>${trade?.netAmount?.format('#,##0.00')}</td>
+			<td>${trade?.price?.format('#,##0.00')}</td>
+			<td>${trade?.unit?.format('#,##0.00')}</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>
+<div class="buttons" style="padding-top:5px;">
+	<input type="button" value="Process" id="btnProcess" />				
+	<input type="button" value="Cancel" id="btnCancel" />
+</div>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	$(document).ready(function() {
+		$('#new').remove();
+		$('.buttons input:button').button();
+		
+		var html = $("#main");
+		
+		html.id("btnProcess").click(function(){
+			var id = html.id("dispatch").val();
+			if (id) location.href='@{process()}/' + id; 
+		});
+		
+		html.id("btnCancel").click(function(){
+			location.href='@{list()}'; 
+		});
+	});
+</script>

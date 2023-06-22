@@ -1,0 +1,89 @@
+#{extends 'templates/main.html' /}
+#{script 'lookuppaging.js' /}
+#{script 'lookups.js' /}
+
+<div id="root">
+	<h3><a href="#">Search Deposito Instruction Letter</a></h3>
+	<form id="searchForm" class="form">
+		<input id="param" name="params.param" type="hidden" value="${param}"/>
+		<p>
+			#{textBox id:'customerCode',width:'100px', name:'', label:'Customer Code', value:'', required:true, class:'capitalize' /}
+			#{hidden id:'customerCodeKey', name:'params.customerCode', value:params.customerCode /}
+			#{button id:'customerCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'customerCodeDesc', name:'', value:customer?.customerName, readOnly:true, width:'200px' /}
+			<span id="customerCodeError" class="error"></span>
+		</p>
+		<p>
+			#{textBox id:'securityType',width:'100px', name:'', label:'Security Type', value:'', class:'capitalize' /}
+			#{hidden id:'securityTypeId', name:'params.securityType', value:params?.securityType /}
+			#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'securityTypeName', name:'transaction.transactionTemplate.securityType.description', value:transaction?.transactionTemplate?.securityType?.description, readOnly:true, width:'200px' /}
+			<span id="securityTypeError" class="error"></span>
+		</p>
+		<p>
+			#{textBox id:'securityCode',width:'100px', name:'', label:'Security Code', value:'', class:'capitalize' /}
+			#{hidden id:'securityCodeId', name:'params.securityCode', value:params?.securityCode /}
+			#{button id:'securityCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'securityCodeName', name:'transaction.security.description', value:transaction?.security?.description, readOnly:true, width:'200px' /}
+			<span id="securityCodeError" class="error"></span>
+		</p>
+		<p>
+			#{textBox id:'type',width:'100px', name:'', label:'Type', value:'', class:'capitalize' /}
+			#{hidden id:'typeId', name:'params.typeId', value:params?.type /}
+			#{button id:'typeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'typeDesc', name:'', value:'', readOnly:true, width:'200px' /}
+			<span id="typeError" class="error"></span>
+		</p>
+		<p id="pDate">
+			#{textBox id:'dateFrom', name:'params.dateFrom', label:'Date', value:params?.dateFrom?.format(appProp.dateFormat), width:'100px', class:'calendar', required:true /} 
+			(${appProp.displayDateFormat})
+			<span id="dateFromError" class="error"></span>
+			<b>To</b>
+			#{textBox id:'dateTo', name:'params.dateTo', value:params?.dateTo?.format(appProp.dateFormat), width:'100px', required:true, class:'calendar' /}
+			(${appProp.displayDateFormat})
+			<span id="dateToError" class="error"></span>
+		</p>
+		
+		<div class="buttons">
+				<input type="button" id="search" value="Search" />				
+				<input type="button" id="reset" value="Reset" />					
+			</div>
+		
+	</form>
+</div>
+<br />
+<div id="result" style="display:none">
+	<table id="tabledeposito" class="display">
+		<thead>
+			<tr>
+				<th width="80px" field="transactionDate|string|none|left|sort">Transaction Date</th>
+				<th width="100px" field="transactionNo|string|none|left|sort">Transaction No</th>
+				<th width="100px" field="security|string|none|left|sort">Security</th>
+				<th width="100px" field="lookupDescription|string|none|left|sort">Type</th>
+				<th width="100px" field="depositoNo|string|none|left|sort">Deposito No</th>
+				<th width="100px" field="certificateNo|string|none|left|sort">Certificate No</th>
+				<th width="100px" field="nominal|string|none|left|sort">Nominal</th>
+				<th width="100px" field="interestRate|string|none|left|sort">Interest Rate</th>
+				<th width="100px" field="effectiveDate|string|none|left|sort">Effective Date</th>
+				<th width="100px" field="maturityDate|string|none|left|sort">Maturity Date</th>
+				<th width="100px" field="accruedInterest|string|none|left|sort">Accrued Interest</th>
+				<th width="100px" field="taxOnInterest|string|none|left|sort">Tax On Accrued Interest</th>
+				<th width="100px" field="charges|string|none|left|sort">Charges</th>
+				<th width="100px" field="settlementAmount|string|none|left|sort">Settlement Amount</th>
+				<th width="100px" field="nextPaymentDate|string|none|left|sort">Next Payment Date</th>
+				<th width="100px" field="newIntRate|string|none|left|sort">New Int Rate</th>
+				<th width="100px" field="status|string|none|left|sort">Status</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+</div>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'DepositoLetter/depositoLetter.js' /}
+	$(document).ready(function() {
+		Paging($("#root").add("#result"));
+	});
+</script>

@@ -1,0 +1,845 @@
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="param"
+
+edit
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="status"
+
+A 
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="account.custodyAccountKey"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="account.name"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="account.settlementAccount.accountNo"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="account.settlementAccount.name"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.organization.organizationId"
+
+2FE3AD52-C618-484F-857E-A9D530EF716A
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.customerKey"
+
+69239
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="currentDate"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.customerKey"
+
+69239
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.customerType.lookupId"
+
+CUSTOMER_TYPE-I
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.customerNo"
+
+75341814
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.firstName"
+
+NUR
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.middleName"
+
+AZIZAH
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.lastName"
+
+NASUTION
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customerName"
+
+NUR AZIZAH NASUTION
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.customerName"
+
+NUR AZIZAH NASUTION
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.customerCategory.lookupId"
+
+CUSTOMER_CATEGORY-DIRECT
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.directId"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.custRetailFlag"
+
+true
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.customerGroup.thirdPartyCode"
+
+RITELBSM
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.customerGroup.thirdPartyKey"
+
+89556
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.customerGroup.thirdPartyName"
+
+PT. BANK SYARIAH INDONESIA, TBK
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.externalNo"
+
+75341814
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="currencyCode"
+
+IDR
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.currency.currencyCode"
+
+IDR
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.currency.description"
+
+INDONESIAN RUPIAH
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.taxProfile.taxProfileCode"
+
+IND
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.taxProfile.description"
+
+INDIVIDU DALAM NEGERI
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.lkpbu.lookupCode"
+
+S14
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.lkpbu.lookupId"
+
+LKPBU_CODE-XXX
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.lkpbu.lookupDescription"
+
+Perorangan
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.cisNo"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.isActive"
+
+true
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.jointDate"
+
+09/09/2022
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.lastModifDate"
+
+26/10/2022
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.lastModifDateWithTime"
+
+26/10/2022 05:08:52
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.flagNoChangeData"
+
+true
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.cashProjection"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.amlCustomer.amlId"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="amlKey"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.taxId.lookupCode"
+
+1010
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.taxId.lookupId"
+
+TAX_ID-1010
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.taxId.lookupDescription"
+
+INDIVIDUAL – DOMESTIC
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.nationality.lookupCode"
+
+ID
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.nationality.lookupId"
+
+COUNTRY-ID
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.nationality.lookupDescription"
+
+INDONESIA
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.birthPlace.lookupCode"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.birthPlace.lookupId"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.birthPlace.lookupDescription"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.birthArea.lookupCode"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.birthArea.lookupId"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.birthArea.lookupDescription"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.birthPlaceOther"
+
+SEI KARANG
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.birthDate"
+
+29/12/1985
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.religion.lookupId"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.gender.lookupId"
+
+GENDER-F
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.maritalStatus.lookupId"
+
+MARITAL_STATUS-2
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.spouseName"
+
+SUAMI
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.motherName"
+
+ASIAH
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.heirName"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.heirRelation"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.educationBackground.lookupId"
+
+EDUCATION-S1
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.educationBackgroundOthers"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.occupation.lookupId"
+
+OCCUPATION-4
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.occupationOthers"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.occupationDescription"
+
+BISNIS SENDIRI
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.annualIncomeRange.lookupId"
+
+INCOME_IND-3
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.npwp"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.npwpDate"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="identificationType1"
+
+IDENTIFICATION_TYPE-1
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.identificationType1.lookupId"
+
+IDENTIFICATION_TYPE-1
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.identification1No"
+
+1471126912820061
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.identification1Expiry"
+
+31/12/9998
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.identificationType2.lookupId"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.identification2No"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.identification2Expiry"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.identificationType3.lookupId"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.identification3No"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.identification3Expiry"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.identificationType4.lookupId"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.identification4No"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.identification4Expiry"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[1].addressType.lookupId"
+
+ADDRESS_TYPE-2
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[1].addressType.lookupDescription"
+
+2'ND ADDRESS
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[1].address1"
+
+JL KURNIA II NO 10
+ 005/002 LIMBUNGAN BARU
+ RUMBAI PESISIR
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[1].address1Area.lookupCode"
+
+80
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[1].address1Area.lookupId"
+
+AREA-80
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[1].address1Area.lookupDescription"
+
+PEKAN BARU
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[1].address1Phone1"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[1].address1Country.lookupCode"
+
+ID
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[1].address1Country.lookupId"
+
+COUNTRY-ID
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[1].address1Country.lookupDescription"
+
+INDONESIA
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[1].address1State.lookupCode"
+
+25
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[1].address1State.lookupId"
+
+STATE-25
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[1].address1State.lookupDescription"
+
+RIAU
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[1].address1ZipCode"
+
+28261
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[1].address1Phone2"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[1].address1Phone3"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[1].addressExt1"
+
+JL KURNIA II NO 10
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[1].addressExt2"
+
+005/002 LIMBUNGAN BARU
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[1].addressExt3"
+
+RUMBAI PESISIR
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[1].isCustomer"
+
+true
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[1].contactKey"
+
+135247
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[0].addressType.lookupId"
+
+ADDRESS_TYPE-1
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[0].addressType.lookupDescription"
+
+MAIN ADDRESS
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[0].address1"
+
+JL KURNIA II NO 10
+ 005/002 LIMBUNGAN BARU
+ RUMBAI PESISIR
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[0].address1Area.lookupCode"
+
+80
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[0].address1Area.lookupId"
+
+AREA-80
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[0].address1Area.lookupDescription"
+
+PEKAN BARU
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[0].address1Phone1"
+
++62-761586893
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[0].address1Country.lookupCode"
+
+ID
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[0].address1Country.lookupId"
+
+COUNTRY-ID
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[0].address1Country.lookupDescription"
+
+INDONESIA
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[0].address1State.lookupCode"
+
+25
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[0].address1State.lookupId"
+
+STATE-25
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[0].address1State.lookupDescription"
+
+RIAU
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[0].address1ZipCode"
+
+28261
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[0].address1Phone2"
+
++62-85377488166
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[0].address1Phone3"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[0].addressExt1"
+
+JL KURNIA II NO 10
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[0].addressExt2"
+
+005/002 LIMBUNGAN BARU
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[0].addressExt3"
+
+RUMBAI PESISIR
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[0].isCustomer"
+
+true
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="contacts[0].contactKey"
+
+135248
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.email"
+
+NURAZIZAHNASUTION35@GMAIL.COM
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.password"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.correspondenceAddress.lookupId"
+
+ADDRESS_TYPE-2
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+SRC_OF_FUND_IND-2
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.sourceOfFundOthers"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="hidInvestObjs"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="hidInvestObjs"
+
+PURPOSE_OF_INV_IND-3
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="hidInvestObjs"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="hidInvestObjs"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="hidInvestObjs"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.purposeOfInvestmentOthers"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.swiftCode"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.swiftStatus.lookupId"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.assetOwner.lookupId"
+
+ASSET_OWNER-1
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.remarks"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="isAttachment"
+
+false
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.attachment"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.flagAttachFile"
+
+false
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="accounts[0].custodyAccountKey"
+
+20509
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="accounts[0].accountNo"
+
+75341814
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="accounts[0].name"
+
+NUR AZIZAH NASUTION
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="accounts[0].balance"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="bankAccounts[0].bankAccountKey"
+
+25200
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="bankAccounts[0].accountNo"
+
+7142420777
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="bankAccounts[0].name"
+
+NUR AZIZAH NASUTION
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="bankAccounts[0].balance"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.flagChangeBankAccount"
+
+false
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.oriBankAccountInvoice.accountNo"
+
+7142420777
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.oriBankAccountInvoice.bankAccountKey"
+
+25200
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.oriBankAccountInvoice.name"
+
+NUR AZIZAH NASUTION
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="accountNo"
+
+7142420777
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.bankAccountInvoice.accountNo"
+
+7142420777
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.bankAccountInvoice.bankAccountKey"
+
+25200
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.bankAccountInvoice.name"
+
+NUR AZIZAH NASUTION
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.oriBankAccountInvoice.currency.currencyCode"
+
+IDR
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.oriBankAccountInvoice.currency.description"
+
+INDONESIAN RUPIAH
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="currencyCode"
+
+IDR
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.bankAccountInvoice.currency.currencyCode"
+
+IDR
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.bankAccountInvoice.currency.description"
+
+INDONESIAN RUPIAH
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.exchangeRateRef.lookupCode"
+
+BI
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.exchangeRateRef.lookupId"
+
+EXCHANGE_RATE_REF-BI
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.customer.lookupDescription"
+
+BI MIDDLE RATE
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.paymentMethod.lookupCode"
+
+1
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.paymentMethod.lookupId"
+
+PAYMENT_METHOD-1
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="customer.customer.lookupDescription"
+
+POOL ACCOUNT
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="udfs[0].value"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="udfs[0].fieldName"
+
+FATCA
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="udfs[0].displayType.lookupId"
+
+DISPLAY_TYPE-2
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="udfs[0].dataType.lookupId"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="udfs[0].label"
+
+FATCA
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="udfs[0].lookupGroup.lookupGroup"
+
+LOOKUP_YN
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="udfs[0].sequence"
+
+1
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="udfs[1].value"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="udfs[1].fieldName"
+
+TIN
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="udfs[1].displayType.lookupId"
+
+DISPLAY_TYPE-1
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="udfs[1].dataType.lookupId"
+
+DATA_TYPE-STR
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="udfs[1].label"
+
+TAXPAYER ID NO
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="udfs[1].lookupGroup.lookupGroup"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="udfs[1].sequence"
+
+2
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="udfs[2].value"
+
+LOW
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="udfs[2].fieldName"
+
+BRANCH_CODE
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="udfs[2].displayType.lookupId"
+
+DISPLAY_TYPE-1
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="udfs[2].dataType.lookupId"
+
+DATA_TYPE-STR
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="udfs[2].label"
+
+BRANCH CODE
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="udfs[2].lookupGroup.lookupGroup"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="udfs[2].sequence"
+
+3
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="udfs[3].value"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="udfs[3].fieldName"
+
+DORMANT
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="udfs[3].displayType.lookupId"
+
+DISPLAY_TYPE-2
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="udfs[3].dataType.lookupId"
+
+
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="udfs[3].label"
+
+DORMANT
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="udfs[3].lookupGroup.lookupGroup"
+
+LOOKUP_YN
+-----------------------------34335363752810964541078693889
+Content-Disposition: form-data; name="udfs[3].sequence"
+
+4
+-----------------------------34335363752810964541078693889--

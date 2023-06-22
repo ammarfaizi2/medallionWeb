@@ -1,0 +1,232 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Cancel Transaction Settlement' /}
+#{script 'forms.js' /}
+#{script 'date.js', characterset:'utf-8' /}
+#{script 'lookups.js' /}
+#{script 'transaction.js' /}
+
+<script type="text/javascript">
+	$(function(){
+		$('.buttons input:button').button();
+		$('.calendar').datepicker();
+		
+		// Search section
+		$('#accordion').accordion({
+			collapsible: true
+		});
+		
+		$('.buttons button:first').button({
+			icons: {
+				primary: 'ui-icon-search'
+			}
+		}).next().button();	
+		
+		$('#search').click(function() {
+			if ($('#settlementDate').val()==''){
+				$('#settlementDate').addClass('fieldError');
+				$('#settlementDateError').html('Required');
+				return false;
+			} 
+			
+			if ($('#settlementDate').hasClass('fieldError')){
+				$('#settlementDate').removeClass('fieldError');
+				$('#settlementDateError').html('');
+				return false;
+			}
+			search();
+		});
+		// end of Search
+		
+		$('#reset').click(function() {
+			location.href="@{list()}";
+		});
+		
+		var search = function() {
+			$('#result .loading').show();
+			$('#result .response').hide();
+			$('#result').show();
+			$.get('@{searchCustodyCancelTrade()}', $('#searchForm').serialize(), function(data) {
+				checkRedirect(data);
+				$('#result .response').html(data);
+				$('#result .loading').hide();
+				$('#result .response').show();
+				setupTable();
+			});
+		};
+		
+		//======== START - Account Lookup
+		$('#accountNo').change(function(){
+			if ($('#accountNo').val() == "") {
+				$('#accountNo').val("");
+				$('#accountKey').val("");
+				$('#accountName').val("");
+				$('#h_accountName').val("");
+				
+				$('#portfolioNo').removeClass('fieldError');
+				$('#portfolioNo').val("");
+				$('#portfolioNoKey').val("");
+				$('#portfolioNoName').val("");
+				$('#h_portfolioNo').val("");
+				
+				$('#effectiveDate').removeClass('fieldError');
+				$('#effectiveDate').val("");
+				$('#h_effectiveDate').val("");
+				$('#effectiveDateHide').val("");
+			}
+		});
+		
+		$('#accountNo').lookup({
+			list:'@{Pick.accounts()}',
+			get:{
+				url:'@{Pick.account()}',
+				success: function(data){
+					$('#accountNo').removeClass('fieldError');
+					$('#accountKey').val(data.code);
+					$('#accountName').val(data.description);
+					$('#h_accountNo').val(data.code);
+					$('#h_accountName').val(data.description);	
+					
+					$('#portfolioNo').removeClass('fieldError');
+					$('#portfolioNo').val("");
+					$('#portfolioNoKey').val("");
+					$('#portfolioNoName').val("");
+					$('#h_portfolioNo').val("");
+					
+					$('#effectiveDate').removeClass('fieldError');
+					$('#effectiveDate').val("");
+					$('#h_effectiveDate').val("");
+					$('#effectiveDateHide').val("");
+				},
+				error: function(data){
+					$('#accountNo').addClass('fieldError');
+					$('#accountNo').val('');
+					$('#accountKey').val('');
+					$('#accountName').val('NOT FOUND');
+					$('#h_accountNo').val('');
+				}
+			},
+			description:$('#accountName'),
+			help:$('#accountHelp')
+		});
+		//======== END - Account Lookup
+		
+		//======== securityType start
+		$('#securityTypeCode').change(function() {
+			if ($('#securityTypeCode').val() == "") {
+				$('#securityTypeCode').val("");
+				$('#securityTypeKey').val("");
+				$('#securityTypeDesc').val("");
+				$('#h_securityTypeCode').val("");
+				
+				$('#securityId').val("");
+				$('#securityKey').val("");
+				$('#securityDesc').val("");
+				$('#h_securityDesc').val("");
+			}
+		});
+		
+		$('#securityTypeCode').lookup({
+			list:'@{Pick.securityTypes()}',
+			get:{
+				url:'@{Pick.securityType()}',
+				success: function(data){
+					$('#securityTypeCode').removeClass('fieldError');
+					$('#securityTypeKey').val(data.code);
+					$('#securityTypeDesc').val(data.description);
+					$('#h_securityTypeCode').val(data.code);
+					
+					$('#securityId').val("");
+					$('#securityKey').val("");
+					$('#securityDesc').val("");
+					$('#h_securityDesc').val("");
+				},
+				error: function(data){
+					$('#securityTypeCode').addClass('fieldError');
+					$('#securityTypeCode').val('');
+					$('#securityTypeKey').val('');
+					$('#securityTypeDesc').val('NOT FOUND');
+					$('#h_securityTypeCode').val('');
+				}
+			},
+			description:$('#securityTypeCodeDesc'),
+			help:$('#securityTypeHelp')
+		});
+		//======== securityType end
+		
+		//======== securityId start
+		$('#securityId').change(function() {
+			if ($('#securityId').val() == "") {
+				$('#securityId').val("");
+				$('#securityKey').val("");
+				$('#securityDesc').val("");
+				$('#h_securityDesc').val("");
+			}
+		});
+
+		$('#securityId').lookup({
+			list:'@{Pick.securities()}',
+			get:{
+				url:'@{Pick.security()}',
+				success: function(data){
+					$('#securityId').removeClass('fieldError');
+					$('#securityKey').val(data.code);
+					$('#securityDesc').val(data.description);
+					$('#h_securityId').val(data.code);
+				},
+				error: function(data){
+					$('#securityId').addClass('fieldError');
+					$('#securityId').val('');
+					$('#securityKey').val('');
+					$('#securityDesc').val('NOT FOUND');
+					$('#h_securityId').val('');
+				}
+			},
+			filter : $('#securityTypeCode'),
+			description:$('#securityDesc'),
+			help:$('#securityHelp')
+		});
+		//======== securityId end
+	});
+</script>
+
+<div id="accordion">
+	<h3><a href="#">Search Settlement</a></h3>
+	<form id="searchForm" class="form">
+		<p>
+			#{textBox id:'settlementNo', name:'params.settlementNo', value:params?.settlementNo, label:'Settlement No', class:'capitalize', readOnly:readOnly, width:'100px', class:'numberOnly' /}
+		</p>
+		<p>
+			#{textBox id:'accountNo', name:'params.accountNo', label:'Account No', value:params?.accountNo, class:'capitalize', readOnly:readOnly, width:'100px' /}
+			#{hidden id:"accountKey", name:'params.custodyAccountKey', value:params?.custodyAccountKey /}
+			#{button id:'accountHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'accountName', name:'params.accountName', value:params?.accountName, readOnly:true, width:'300px' /}
+		</p>
+		<p>
+			#{textBox id:'securityTypeCode', name:'params.securityType', label:'Security Type', class:'capitalize',readOnly:readOnly, width:'100px' /}
+			#{hidden id:'securityTypeKey', name:'params.transactionTemplateKey' /}
+			#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'securityTypeDesc', name:'params.securityTypeDescription', readOnly:true, width:'300px' /}
+		</p>
+		<p>
+			#{textBox id:'securityId', name:'params.securityId', label:'Security Code', value:params?.securityId, class:'capitalize', readOnly:readOnly, width:'100px' /}
+			#{hidden id:'securityKey', name:'params.securityKey' /}
+			#{button id:'securityHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'securityDesc', name:'params.securityDescription', readOnly:true, width:'300px' /}
+		</p>
+		<p>
+			#{textBox id:'settlementDate', name:'params.settlementDate', label:'Settlement Date', value:params?.settlementDate?.format(appProp.dateFormat), class:'calendar', required: true /} (${appProp.displayDateFormat})
+			<span id="settlementDateError" class="error"></span>
+		</p>
+		<p>
+			<div class="buttons">
+				<input type="button" id="search" value="Search" />
+				<input type="button" id="reset" value="Reset" />
+			</div>
+		</p>
+	</form>
+</div>
+<br />
+<div id="result" style="display:none">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<div class="response"></div>
+</div>

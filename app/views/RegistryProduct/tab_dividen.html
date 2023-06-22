@@ -1,0 +1,90 @@
+<table>
+	<tr>
+        <td valign="top" style="width:541px;">
+            <p>
+				#{checkBox id:'divByCash', name:'prd.divByCash', value:prd?.divByCash ,label:'Dividend Type', readOnly:readOnly /} By Cash
+            </p>
+
+            <p>
+				#{checkBox id:'divByRedemption', name:'prd.divByRedeem', value:prd?.divByRedeem, label:' ', value:prd?.divByRedeem, readOnly:readOnly /} By Redemption
+            </p>
+
+            <p>
+                #{checkBox id:'divByReInvestment', name:'prd.divByReinvest', value:prd?.divByReinvest, label:' ', value:prd?.divByReinvest, readOnly:readOnly /} By Reinvestment
+            </p>
+
+			<br>
+			
+			<p>
+                <label>Cum Date<span id="spanDivCumPeriod" class="req"> *</span></label>
+                #{textBox id:'divCumPeriod', value:prd?.divCumPeriod, format:'#,##0.####', class:'numericminus', width:'100px', readOnly:readOnly /} (T+n)
+                #{hidden  id:'divCumPeriodStripped', name:'prd.divCumPeriod', value:prd?.divCumPeriod /}
+                <span class="error">#{error 'Cum Date in tab Dividend is' /}</span>
+            </p>
+            
+            <p>
+                <label>NAV Date<span id="spanDivNavUsed" class="req"> *</span></label>
+                #{textBox id:'divNavUsed', value:prd?.divNavUsed, format:'#,##0.####', class:'numericminus', width:'100px', readOnly:readOnly /} (T+n)
+                #{hidden  id:'divNavUsedStripped', name:'prd.divNavUsed', value:prd?.divNavUsed /}
+                <span class="error">#{error 'NAV Date in tab Dividend is' /}</span>
+            </p>
+             
+            <p>
+                <label>Posting Date<span id="spanDivPostPeriod" class="req"> *</span></label>
+                #{textBox id:'divPostPeriod', value:prd?.divPostPeriod, format:'#,##0.####', class:'numericminus', width:'100px', readOnly:readOnly /} (T+n)
+                #{hidden  id:'divPostPeriodStripped', name:'prd.divPostPeriod', value:prd?.divPostPeriod /}
+                <span class="error">#{error 'Posting Date in tab Dividend is' /}</span>
+            </p>
+            
+            <p>
+                <label>Payment Date<span id="spanDivPayPeriod" class="req"> *</span></label>
+                #{textBox id:'divPayPeriod', value:prd?.divPayPeriod, format:'#,##0.####', class:'numericminus', width:'100px', readOnly:readOnly /} (T+n)
+                #{hidden  id:'divPayPeriodStripped', name:'prd.divPayPeriod', value:prd?.divPayPeriod /}
+                <span class="error">#{error 'Payment Date in tab Dividend is' /}</span>
+            </p>
+		</td>
+		<td valign="top">
+            <fieldset style="width:345px; height:325px">
+			    <legend><b>Dividend Window</b></legend>
+                <p>
+                    #{radioButton id:'divLock', name:'prd.divLock', label:'Lock', options:operators, value:((prd?.divLock)?'true':'false'), readOnly:readOnly /}
+                </p>
+                
+                <p>
+                    #{textBox id:'divExceptionDate', name:'divExceptionDate', class:'calendar invalidDateFormat', value:"", readOnly:readOnly, width:'80px' /}
+                    <input type="button" id="divAddDate" value="Insert" #{if readOnly}disabled='disabled'#{/if}></input> (${appProp.displayDateFormat})
+                </p>
+                
+                <p style="margin-left: 162px">
+                    <span id="divExceptionDateError" class="error"></span>
+                </p>
+                
+                <p></p>
+
+				<div class="tier-box-IE" style="overflow-y:scroll;max-height:140px">
+					<table id="divExceptionSpecificDate" class="display">
+						<thead>
+							<tr>
+								<th>Date</th>
+								<th>Action</th>
+							</tr>
+						</thead>
+						<tbody>
+							#{list prd?.divLockExceptions, as:'lockException'}
+			 					<tr>
+									<td>${lockException?.id?.exceptionDate?.format(appProp.dateFormat)}</td>
+									<td del='true'>
+										<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} exceDateType="DIVIDEND" /></center>
+										#{hidden id:'exceptionDate'+(lockException_index-1), name:'prd.divLockExceptions[' + (lockException_index-1) + '].id.exceptionDate', value:lockException?.id?.exceptionDate?.format(appProp.dateFormat) /}
+										#{hidden id:'productCode'+(lockException_index-1), name:'prd.divLockExceptions[' + (lockException_index-1) + '].id.productCode', value:lockException?.id?.productCode /}
+										#{hidden id:'exceDateType'+(lockException_index-1), name:'prd.divLockExceptions[' + (lockException_index-1) + '].id.type', value:lockException?.id?.type /}
+									</td>
+								</tr>
+							#{/list}
+			 			</tbody>
+					</table>
+				</div>
+			</fieldset>
+		</td>
+	</tr>
+</table>

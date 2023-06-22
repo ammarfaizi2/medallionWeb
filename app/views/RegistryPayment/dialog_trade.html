@@ -1,0 +1,140 @@
+<!-- MAIN SCREEN -->
+<form id="tradeForm" class="form" method="POST" name="product">
+    #{hidden id:'rowPosition' /}
+    #{hidden id:'productCustomerKeyDialog' /}
+
+    <table>
+        <tr>
+            <td valign="top">
+                <p>
+                    #{textBox id:'tradeKeyDialog', name:'tradeKey', label:'Transaction No', class:'capitalize',  width:'120px', readOnly:true /}
+                </p>
+
+                <p></p>
+
+                <fieldset>
+                    <p>
+                       #{textBox id:'fundCodeDialog', name:'rgProduct.productCode', label:'Fund Code', width:'120px', readOnly:true, class:'capitalize' /}
+                       #{button id:'fundCodeHelpDialog', value:'?', class:'small', readOnly:true /}
+                       #{textBox id:'fundCodeDescDialog',  name:'rgProduct.name', readOnly:true, width:'250px' /}
+                   </p>
+                
+                    <p>
+                        #{textBox id:'currencyDialog', name:'rgProduct.currencyCode', label:'Currency', readOnly:true, class:'capitalize' /}
+                    </p>
+                
+                    <p>
+                        #{textBox id:'accountDialog', name:'rgInvestmentaccount.accountNumber', label:'Account No', width:'120px', readOnly:true, class:'capitalize' /}
+                        #{button  id:'accountHelpDialog', value:'?', class:'small', readOnly:true /}
+                        #{textBox id:'accountDescDialog', name:'rgInvestmentaccount.name', readOnly:true, width:'250px' /}
+                    </p>
+                    
+                    <p>
+                        #{textBox id:'transactionDateDialog', name:'tradeDateDialog', label:'Transaction Date', class:'calendar', readOnly:true /}
+                    </p>
+                    
+                    <p>
+                        #{textBox id:'paymentDateDialog', name:'paymentDateDialog', label:'Payment Date', class:'calendar', readOnly:true /}
+                    </p>
+                    
+                    <p>         
+                        #{textBox id:'sellingAgentDialog', name:'rgInvestmentaccount.accountNumber', label:'Selling Agent', width:'120px', readOnly:true, class:'capitalize' /}
+                        #{button  id:'sellingAgentHelpDialog', value:'?', class:'small', readOnly:true /}
+                        #{textBox id:'sellingAgentDescDialog', name:'rgInvestmentaccount.name', readOnly:true, width:'250px' /}
+                    </p>
+                    
+                    <p>
+	                    #{textBox id:'externalReferenceDialog', name:'externalReference', label:'Extenal Reference', readOnly:true /}
+	                </p>
+                </fieldset>
+            </td>
+            
+            <td valign="top">
+                <fieldset>
+                    <legend><b>Detail Transaction</b></legend>
+    
+                    <p>
+                       #{textBox id:'unitDialog', name:'rgTransaction.unit', label:'Unit', format:'#,##0.####', readOnly:true, class:'numeric' /}
+                   </p>
+    
+                    <p>
+                       #{textBox id:'priceDialog', name:'rgTransaction.price', label:'Price', format:'#,##0.####', readOnly:true, class:'numeric' /}
+                   </p>
+                
+                    <p>
+                       #{textBox id:'amountDialog', name:'rgTransaction.amount', label:'Amount', format:'#,##0.####', readOnly:true, class:'numeric' /}
+                   </p>
+                   
+                   <p>
+                       #{textBox id:'totalFeeAmountDialog', name:'rgTransaction.amount', label:'Total Fee Amount', format:'#,##0.####', readOnly:true, class:'numeric' /}
+                   </p>
+                   
+                   <p>
+                       #{textBox id:'paymentDialog', name:'rgTransaction.amount', label:'Payment Amount', format:'#,##0.####', readOnly:true, class:'numeric' /}
+                   </p>
+                </fieldset>
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td valign="top">
+                <fieldset>
+                    <legend id="productBankAccount"><b></b></legend>
+                    <span id="rgProductBnAccountErrorGlobal" class="error"></span>
+
+                    #{hidden id:'rgProductBnAccountBankAccountKey' /}
+                    #{hidden id:'rgProductBnAccountThirdPartyKey' /}
+
+                    <p>
+                        #{textBox id:'rgProductBnAccount', width:'100px', name:'rgProductBnAccount.accountNo', label:'Account No', required:true, class:'capitalize', readOnly:readOnly /}
+                        #{button id:'rgProductBnAccountHelp', value:'?', class:'small', readOnly:readOnly /}
+                        <span id="rgProductBnAccountError" class="error"></span>
+                    </p>
+                
+                    <p>
+                        #{textBox id:'rgProductBnAccountThirdPartyCode', name:'rgProductBnAccount.thirdPartyCode', label:'Bank Code', readOnly:true, width:'60px' /}
+                        #{textBox id:'rgProductBnAccountThirdPartyName', name:'rgProductBnAccount.thirdPartyName', readOnly:true, width:'170px' /}
+                    </p>
+                
+                    <p>
+                        #{textBox id:'rgProductBnAccountBeneficiaryName', name:'rgProdBnAccount.customer.customerName', label:'Beneficiary Name', class:'capitalize', readOnly:true, width:'230px' /}
+                    </p>
+                
+                    <p>
+                        #{textBox id:'rgProductBnAccountCurrencyCode', name:'rgProductBnAccount.currency.currencyCode', label:'Currency', class:'capitalize', readOnly:true, width:'100px' /}
+                    </p>
+                </fieldset>
+            </td>
+            
+            <td valign="top">
+                <fieldset>
+                    <legend id="investorBankAccount"><b></b></legend>
+                    <span id="bankAccountErrorGlobal" class="error"></span>
+
+                    #{hidden id:'bankAccountBankAccountKey' /}
+                    #{hidden id:'bankAccountThirdPartyKey' /}
+
+                    <p>
+                        #{textBox id:'bankAccount', width:'100px', name:'bankAccount.accountNo', label:'Account No', required:true, class:'capitalize', readOnly:readOnly /}
+                        #{button id:'bankAccountHelp', value:'?', class:'small', readOnly:readOnly /}
+                        <span id="bankAccountError" class="error"></span>
+                    </p>
+                
+                    <p>
+                        #{textBox id:'bankAccountThirdPartyCode', name:'bankAccount.thirdPartyCode', label:'Bank Code', readOnly:true, width:'60px' /}
+                        #{textBox id:'bankAccountThirdPartyName', name:'bankAccount.thirdPartyName', readOnly:true, width:'170px' /}
+                    </p>
+                
+                    <p>
+                        #{textBox id:'bankAccountBeneficiaryName', name:'bankAccount.customer.customerName', label:'Beneficiary Name', class:'capitalize', readOnly:true, width:'230px' /}
+                    </p>
+                
+                    <p>
+                        #{textBox id:'bankAccountCurrencyCode', name:'bankAccount.currency.currencyCode', label:'Currency', class:'capitalize', readOnly:true, width:'100px' /}
+                    </p>
+                </fieldset>
+            </td>
+        </tr>
+    </table>
+</form>

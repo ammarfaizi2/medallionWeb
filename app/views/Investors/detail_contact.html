@@ -1,0 +1,151 @@
+#{if contact?.isCustomer == true }	
+	#{set readOnlyIsCustomer: true /}
+#{/if}
+#{else}
+	#{set readOnlyIsCustomer: readOnly /}
+#{/else}
+#{script 'validation/numericOnly.js' /}
+
+<script type="text/javascript">	
+$(function() {
+	
+	$('#accordionContact').accordion({
+		collapsible: false,
+		autoHeight: false 
+	});
+
+	$('.calendar').datepicker();
+});
+</script>
+
+<form id="contactForm" class="form">
+#{hidden id:'rowPosition' /}
+#{hidden id:'oldContactType' /}
+#{hidden id:'newContactType' /}
+#{hidden id:'contactKey', name:'contact.contactKey', value:contact?.contactKey /}
+	<div>
+		<p >
+			#{dropDownList id:'contacTypeCorp', name:'contact.addressType.lookupId', label:'Contact Person', value:contact?.addressType?.lookupId, options:contactType, readOnly:readOnly, required:true /}
+			#{hidden id:'contactTypeDescCorp', name:'contact.addressType.lookupDescription', value:contact?.addressType?.lookupDescription /}			
+			<span id="errmsgAddressTypeCorp" class="errorMessage"></span>
+			<span id="duplicateErrorMessageCorp" class="error errorMessage"></span>
+		</p>
+		
+		<p id="contactNameP">
+			#{textBox id:'contactName', name:'contact.contactName', label:'Contact Name', value:contact?.contactName, readOnly:readOnlyIsCustomer, class:'isCustomer capitalize', width:'300px', maxLength:100, required:true /}
+			<span id="errmsgContactName" class="errorMessage"></span>
+		</p>
+		<p>
+			#{textBox id:'contactPosition', name:'contact.contactPosition', label:'Position', value:contact?.contactPosition, required:true, readOnly:readOnlyIsCustomer, class:'isCustomer capitalize', width:'300px', maxLength:100 /}
+			<span id="errmsgContactPos" class="errorMessage"></span>
+		</p>
+		<p>
+			#{textBox id:'contactNpwpNo', name:'contact.npwp', label:'NPWP Number', value:contact?.npwp, readOnly:readOnly, width:'300px', maxLength:50, class:'capitalize' /}
+			<span id="contactNpwpNoError" class="errorMessage">#{error 'NPWP Number in tab ID Info is' /}</span>
+		</p>
+		<p>
+			#{textBox id:'contactNpwpRegDate', name:'contact.npwpDate', label:'NPWP Registration Date', value:contact?.npwpDate?.format(appProp.dateFormat), class:'calendar', readOnly:readOnly, maxLength:10 /} (${appProp.displayDateFormat})
+			<span id="contactNpwpRegDateError" class="errorMessage"></span>
+		</p>
+	</div>
+	
+	<br />
+	
+	<div>
+		<table style="width: 80%;">
+			<tr>
+				<td width="100px"></td>
+				<td width="100px">
+					<label style="margin-left: 10px; width: 70px">ID Type</label>
+				</td>
+				<td align="center" width="100px">
+					<label>ID Number</label>
+				</td>
+				<td align="center" width="60px" >
+					<label>Expiry Date</label>
+				</td>
+			</tr>
+			<tr>
+				<td >
+					<label>Identification 1 </label>
+				</td>
+				<td >
+					#{dropDownList id:'identificationType1', name:'contact.identificationType1.lookupId', value:contact?.identificationType1?.lookupId, options:identificationTypes, readOnly:readOnlyIsCustomer, class:'isCustomer dropdown', required:true /}
+				</td>
+				<td align="center">
+					#{textBox id:'identification1No', name:'contact.identification1No', value:contact?.identification1No, readOnly:readOnlyIsCustomer, width:'218px', class:'isCustomer identificationNo identificationNo capitalize', maxLength:50 /}	
+				</td>
+				<td align="center">
+					#{textBox id:'identification1ExpiryCon', name:'contact.identification1Expiry', value:contact?.identification1Expiry?.format(appProp.dateFormat), class:'calendar', readOnly:readOnly, maxLength:10 /} 
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><span id="errmsgIDType1" class="errorMessage"></span></td> 
+				<td align="center"><span id="identification1NoError" class="errorMessage"></span></td> 
+				<td align="center"><span id="identification1ExpiryConError" class="errorMessage"></span></td>
+			</tr>
+			<tr>
+				<td >
+					<label>Identification 2</label>
+				</td>
+				<td>
+					#{dropDownList id:'identificationType2', name:'contact.identificationType2.lookupId', value:contact?.identificationType2?.lookupId, options:identificationTypes, readOnly:readOnlyIsCustomer, class:'isCustomer dropdown' /}
+				</td>
+				<td align="center">
+					#{textBox id:'identification2No', name:'contact.identification2No', value:contact?.identification2No, readOnly:readOnly, width:'218px', class:'isCustomer identificationNo capitalize', maxLength:50 /}
+				</td>
+				<td align="center">
+					#{textBox id:'identification2ExpiryCon', name:'contact.identification2Expiry', value:contact?.identification2Expiry?.format(appProp.dateFormat), readOnly:readOnlyIsCustomer, class:'calendar isCustomer expiryDate invalidDateFormat', maxLength:10 /}
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><span id="errmsgIDType2" class="errorMessage"></span></td> 
+				<td align="center"><span id="identification2NoError" class="errorMessage"></span></td> 
+				<td align="center"><span id="identification2ExpiryConError" class="errorMessage"></span></td>
+			</tr>
+			<tr>
+				<td>
+					<label>Identification 3</label>
+				</td>
+				<td>
+					#{dropDownList id:'identificationType3', name:'contact.identificationType3.lookupId', value:contact?.identificationType3?.lookupId, options:identificationTypes, readOnly:readOnlyIsCustomer, class:'isCustomer dropdown' /}
+				</td>
+				<td align="center">
+					#{textBox id:'identification3No', name:'contact.identification3No', value:contact?.identification3No, readOnly:readOnlyIsCustomer, width:'218px', class:'isCustomer identificationNo capitalize', maxLength:50 /}
+				</td>
+				<td align="center">
+					#{textBox id:'identification3ExpiryCon', name:'contact.identification3Expiry', value:contact?.identification3Expiry?.format(appProp.dateFormat), readOnly:readOnlyIsCustomer, class:'calendar isCustomer expiryDate invalidDateFormat', maxLength:10 /}
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><span id="errmsgIDType3" class="errorMessage"></span></td> 
+				<td align="center"><span id="identification3NoError" class="errorMessage"></span></td> 
+				<td align="center"><span id="identification3ExpiryConError" class="errorMessage"></span></td>
+			</tr>
+			<tr>
+				<td >
+					<label>Identification 4</label>
+				</td>
+				<td>
+					#{dropDownList id:'identificationType4', name:'contact.identificationType4.lookupId', value:contact?.identificationType4?.lookupId, options:identificationTypes, readOnly:readOnlyIsCustomer, class:'isCustomer dropdown' /}
+				</td>
+				<td align="center">
+					#{textBox id:'identification4No', name:'contact.identification4No', value:contact?.identification4No, readOnly:readOnlyIsCustomer, width:'218px', class:'isCustomer identificationNo capitalize', maxLength:50 /}
+				</td>
+				<td align="center">
+					#{textBox id:'identification4ExpiryCon', name:'contact.identification4Expiry', value:contact?.identification4Expiry?.format(appProp.dateFormat), readOnly:readOnlyIsCustomer, class:'calendar isCustomer expiryDate invalidDateFormat', maxLength:10 /}
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><span id="errmsgIDType4" class="errorMessage"></span></td> 
+				<td align="center"><span id="identification4NoError" class="errorMessage"></span></td> 
+				<td align="center"><span id="identification4ExpiryConError" class="errorMessage"></span></td>
+			</tr>
+		</table>
+	</div>	
+			
+</form>

@@ -1,0 +1,1013 @@
+#{set readOnly:((mode !='edit' && mode !='entry') || confirming) /}
+#{set pageTitle:'Portfolio Update' /}
+#{set id:portfolio?.portfolioKey /}
+#{script 'date.js', characterset:'utf-8' /}
+#{script 'lookups.js' /}
+#{script 'transaction.js' /}
+#{script 'date.format.js' /}
+
+<!--[if !IE]>-->
+	<style type="text/css">
+		#fractionRatioSource {margin-left: -24px;}
+		#accIntAmt {margin-left: 11px}
+		#newAccIntAmt {margin-left: 11px}
+		.alignLeft {text-align:right}
+		#fractionSkeleton {margin-left: -3px;}
+		.amortization_only {margin-left: -1px;}
+	</style>
+<!--<![endif]-->
+
+<!--[if IE ]>
+	<style type="text/css">
+		#fractionRatioSource {margin-left: -23px;}
+		#fractionSkeleton {margin-left: -3px;}
+		.amortization_only {margin-left: -2px;}
+	</style>
+<![endif]-->
+
+<script type="text/javascript">
+	#{include 'Transactions/yieldByEIR.js' /}
+	#{include 'Transactions/calculateYield.js' /}
+
+	var PORTFOLIO_UPDATE_TYPE_INTEREST = "PORTFOLIO_UPDATE_TYPE-001";
+	var PORTFOLIO_UPDATE_TYPE_AMORTIZATION = "PORTFOLIO_UPDATE_TYPE-002";
+	
+	$(function() {
+		
+		portfolioUpdateTypeView();
+		percentage();
+		if ($('#type').val() == PORTFOLIO_UPDATE_TYPE_AMORTIZATION) {
+			getYield();
+		}
+		
+		$('#load').button();
+		$('#reset').button();
+		
+		$('#tabs').tabs();
+		
+		$('.calendar').datepicker();
+		
+		if (!$('#useFraction').is(':checked')){
+			$('#useFraction').val(false);
+		} else {
+			$('#useFraction').val(true);
+		}
+		
+		if ('${mode}'=='entry') {
+			$('#save').button('option','disabled', true);
+			$('.disabledField').attr('disabled', 'disabled');
+			$('input[name="portfolioUpdate.useFraction"]').attr('disabled', 'disabled');
+			$('p[id=fractionField] label span').html("");
+		}
+		
+		if('${mode}'=='view') {
+			$('#load').button('option', 'disabled', true);
+			if (!$('#useFraction').is(':checked')){
+				$('#fractionRatioSource').attr('disabled','disabled');
+				$('#fractionRatioTarget').attr('disabled','disabled');
+				$('p[id=fractionField] label span').html("");
+			} else {
+				$('#fractionRatioSource').removeAttr('disabled');
+				$('#fractionRatioTarget').removeAttr('disabled');
+				$('p[id=fractionField] label span').html(" *");
+			}
+			calculateAccruedInterest();
+			calculateNewInterestAmount();
+		}
+
+		if ('${confirming}'=='true') {
+			$('.disabledField').attr('disabled', 'disabled');
+			$('#load').button('option', 'disabled', true);
+			$('#reset').button('option', 'disabled', true);
+			calculateAccruedInterest();
+			calculateNewInterestAmount();
+		}
+		
+		if ('${taskId}' != "") {
+			$('.disabledField').attr('disabled', 'disabled');
+			$('#useFraction').attr('disabled', true);
+		}
+		
+		if ($('#effectiveDate').val() != "") {
+			$('#effectiveDateHide').val($('#effectiveDate').val());
+		}
+		
+		if ($('#lastPaymentDate').val() != "") {
+			$('#lastPaymentDateHide').val($('#lastPaymentDate').val());
+		}
+		
+		if ($('#nextPaymentDate').val() != "") {
+			$('#nextPaymentDateHide').val($('#nextPaymentDate').val());
+		}
+		
+		if ($('#maturityDate').val() != "") {
+			$('#maturityDateHide').val($('#maturityDate').val());
+		} 
+		
+		// =========== ALL BUTTON ACTION =============== //
+		$('#load').click(function(){
+			load('@{loadProcess()}');
+			//calculateAccruedInterest();
+			//calculateNewInterestAmount();
+		});
+		
+		$('#reset').click(function(){
+			location.href='@{entry()}';
+			return false;
+		});
+		
+		//======== START - Account Lookup
+		$('#accountNo').change(function(){
+			if ($('#accountNo').val() == "") {
+				$('#accountNo').val("");
+				$('#accountKey').val("");
+				$('#accountName').val("");
+				$('#h_accountName').val("");
+				
+				$('#portfolioNo').removeClass('fieldError');
+				$('#portfolioNo').val("");
+				$('#portfolioNoKey').val("");
+				$('#portfolioNoName').val("");
+				$('#h_portfolioNo').val("");
+				
+				$('#effectiveDate').removeClass('fieldError');
+				$('#effectiveDate').val("");
+				$('#h_effectiveDate').val("");
+				$('#effectiveDateHide').val("");
+			}
+		});
+		
+		$('#accountNo').lookup({
+			list:'@{Pick.accounts()}',
+			get:{
+				url:'@{Pick.account()}',
+				success: function(data){
+					$('#accountNo').removeClass('fieldError');
+					$('#accountKey').val(data.code);
+					$('#accountName').val(data.description);
+					$('#h_accountNo').val(data.code);
+					$('#h_accountName').val(data.description);	
+					
+					$('#portfolioNo').removeClass('fieldError');
+					$('#portfolioNo').val("");
+					$('#portfolioNoKey').val("");
+					$('#portfolioNoName').val("");
+					$('#h_portfolioNo').val("");
+					
+					$('#effectiveDate').removeClass('fieldError');
+					$('#effectiveDate').val("");
+					$('#h_effectiveDate').val("");
+					$('#effectiveDateHide').val("");
+				},
+				error: function(data){
+					$('#accountNo').addClass('fieldError');
+					$('#accountNo').val('');
+					$('#accountKey').val('');
+					$('#accountName').val('NOT FOUND');
+					$('#h_accountNo').val('');
+				}
+			},
+			description:$('#accountName'),
+			help:$('#accountHelp')
+		});
+		//======== END - Account Lookup
+
+		//======== START - Security Type Lookup
+		$('#securityTypeCode').change(function(){
+			if ($('#securityTypeCode').val() == "") {
+				$('#securityTypeCode').val("");
+				$('#securityTypeKey').val("");
+				$('#securityTypeDesc').val("");
+				$('#h_securityTypeCode').val("");
+				$('#h_securityTypeDesc').val("");
+				
+				$('#securityId').removeClass('fieldError');
+				$('#securityId').val("");
+				$('#securityKey').val("");
+				$('#securityDesc').val("");
+				$('#h_securityDesc').val("");
+				
+				$('#portfolioNo').removeClass('fieldError');
+				$('#portfolioNo').val("");
+				$('#portfolioNoKey').val("");
+				$('#portfolioNoName').val("");
+				$('#h_portfolioNo').val("");
+				
+				$('#effectiveDate').removeClass('fieldError');
+				$('#effectiveDate').val("");
+				$('#h_effectiveDate').val("");
+				$('#effectiveDateHide').val("");
+			}
+		});
+		
+		$('#securityTypeCode').lookup({
+			list:'@{Pick.securityTypes()}',
+			get:{
+				url:'@{Pick.securityType()}',
+				success: function(data){
+					$('#securityTypeCode').removeClass('fieldError');
+					$('#securityTypeKey').val(data.code);
+					$('#securityTypeDesc').val(data.description);
+					$('#h_securityTypeCode').val(data.code);
+					$('#h_securityTypeDesc').val(data.description);
+					$('#hasInterest').val(data.hasInterest);
+					
+					$('#securityId').removeClass('fieldError');
+					$('#securityId').val("");
+					$('#securityKey').val("");
+					$('#securityDesc').val("");
+					$('#h_securityDesc').val("");
+					
+					$('#portfolioNo').removeClass('fieldError');
+					$('#portfolioNo').val("");
+					$('#portfolioNoKey').val("");
+					$('#portfolioNoName').val("");
+					$('#h_portfolioNo').val("");
+					
+					$('#effectiveDate').removeClass('fieldError');
+					$('#effectiveDate').val("");
+					$('#h_effectiveDate').val("");
+					$('#effectiveDateHide').val("");
+					
+				},
+				error: function(data){
+					$('#securityTypeCode').addClass('fieldError');
+					$('#securityTypeCode').val('');
+					$('#securityTypeKey').val('');
+					$('#securityTypeDesc').val('NOT FOUND');
+					$('#h_securityTypeCode').val('');
+				}
+			},
+			description:$('#securityTypeCodeDesc'),
+			help:$('#securityTypeHelp')
+		});
+		//======== END - Security Type Lookup
+
+		//======== START - Security Code Lookup
+			$('#securityId').change(function() {
+			if ($('#securityId').val() == "") {
+				$('#securityId').val("");
+				$('#securityKey').val("");
+				$('#securityDesc').val("");
+				$('#h_securityDesc').val("");
+				
+				$('#portfolioNo').removeClass('fieldError');
+				$('#portfolioNo').val("");
+				$('#portfolioNoKey').val("");
+				$('#portfolioNoName').val("");
+				$('#h_portfolioNo').val("");
+				$('#h_portfolioNoName').val("");
+				
+				$('#effectiveDate').removeClass('fieldError');
+				$('#effectiveDate').val("");
+				$('#h_effectiveDate').val("");
+				$('#effectiveDateHide').val("");
+			}
+		});
+		
+		$('#securityId').lookup({
+			list:'@{Pick.securities()}',
+			get:{
+				url:'@{Pick.security()}',
+				success: function(data){
+					$('#securityId').removeClass('fieldError');
+					$('#securityKey').val(data.code);
+					$('#securityDesc').val(data.description);
+					$('#h_securityId').val(data.code);
+					$('#h_securityDesc').val(data.description);
+					$('#accrualTypePick').val(data.accrualBase);
+					$('#yearBasePick').val(data.yearBase);
+					
+					$('#portfolioNo').removeClass('fieldError');
+					$('#portfolioNo').val("");
+					$('#portfolioNoKey').val("");
+					$('#portfolioNoName').val("");
+					$('#h_portfolioNo').val("");
+					$('#h_portfolioNoName').val("");
+					
+					$('#effectiveDate').removeClass('fieldError');
+					$('#effectiveDate').val("");
+					$('#h_effectiveDate').val("");
+					$('#effectiveDateHide').val("");
+					
+				},
+				error: function(data){
+					$('#securityId').addClass('fieldError');
+					$('#securityId').val('');
+					$('#securityKey').val('');
+					$('#securityDesc').val('NOT FOUND');
+					$('#h_securityId').val('');
+				}
+			},
+			filter : $('#securityTypeCode'),
+			description:$('#securityDesc'),
+			help:$('#securityHelp')
+		});
+		//======== END - Security Code Lookup
+
+		//======== START - Porto. No Lookup
+		$('#portfolioNo').change(function() {
+			if ($('#portfolioNo').val() == "") {
+				$('#portfolioNo').val("");
+				$('#portfolioNoKey').val("");
+				$('#portfolioNoName').val("");
+				$('#h_portfolioNo').val("");
+				$('#h_portfolioNoName').val("");
+			}
+			
+			var el = $(this);
+			var length = el.val().length;
+			var word = el.val();
+			el.removeClass('fieldError');
+			if (!(word.indexOf("|") >= 0)) {
+				el.addClass('fieldError');
+				$('#portfolioNoName').val('NOT FOUND');
+			}
+		});
+		
+		$('#portfolioNo').lookup({
+			list : '@{Pick.csPortfolios()}',
+			get : {
+				url : '@{Pick.csPortfolio()}',
+				success: function(data){
+					$('#portfolioNo').removeClass('fieldError');
+					$('#portfolioNo').val(data.code);
+					$('#portfolioNoKey').val(data.code);
+					$('#portfolioNoName').val(data.description);
+					$('#h_portfolioNoName').val(data.description);
+					$('#h_portfolioNo').val(data.code);
+					//$('#effectiveDate').val(new Date(data.effectiveDate).format("mm/dd/yyyy"));
+					$('#effectiveDate').val(data.effectiveDate);
+					$('#effectiveDateHide').val($('#effectiveDate').val());
+				},
+				error: function(data){
+					$('#portfolioNo').addClass('fieldError');
+					$('#portfolioNo').val('');
+					$('#portfolioNoKey').val('');
+					$('#portfolioNoName').val('NOT FOUND');
+					$('#h_portfolioNo').val('');
+				}
+			},
+			filter:[$('#accountKey'), $('#securityTypeCode'),
+			        $('#securityKey')],
+			description:$('#portfolioNoName'),
+			help:$('#portfolioNoHelp')
+		});
+		//======== END - Porto. No Lookup
+		
+		// ===== Validation Date And Action in Date field
+	//	$("input.calendar").mask("${appProp?.dateMask}", { placeholder:" " });
+		// 1). Action in Effective Date Field
+		$('#effectiveDate').change(function(){
+			/* var el = $(this);
+			var dateVal =  el.val();
+			var id = this.id;
+			var errorId= "#" + id + "Error";
+			el.removeClass("fieldError");
+			$(errorId).html("");
+			try {
+		        $.datepicker.parseDate('${appProp?.jqueryDateFormat}', dateVal, null);
+		    } catch(error) {
+		    	el.addClass("fieldError");
+		    	$(errorId).html("Invalid date format").show();
+		    	return false;
+		    } */
+		    
+			var effectiveDate = new Date($("#effectiveDate").datepicker('getDate')).getTime();
+			var nextPaymentDate = new Date($("#nextPaymentDate").datepicker('getDate')).getTime();
+			if ((effectiveDate!='')&&(nextPaymentDate!='')){
+				if (effectiveDate > nextPaymentDate) {
+					$("#effectiveDate").addClass('fieldError');
+					$('#effectiveDateError').html('Must be equals or lest than Next Payment Date');
+					return false;
+				} else {
+					$("#effectiveDate").removeClass('fieldError');
+					$('#effectiveDateError').html('');
+					
+					$("#nextPaymentDate").removeClass('fieldError');
+					$('#nextPaymentDateError').html('');
+				}
+			}
+			
+			var lastPaymentDate = new Date($("#lastPaymentDate").datepicker('getDate')).getTime();
+			if ((effectiveDate!='')&&(lastPaymentDate!='')){
+				if (lastPaymentDate > effectiveDate) {
+					$("#effectiveDate").addClass('fieldError');
+					$('#effectiveDateError').html('Must be greather than Last Payment Date');
+					return false;
+				} else {
+					$("#lastPaymentDate").removeClass('fieldError');
+					$('#lastPaymentDateError').html('');
+					
+					$("#effectiveDate").removeClass('fieldError');
+					$('#effectiveDateError').html('');
+				}
+			}
+			$('#effectiveDateHide').val($('#effectiveDate').val());
+			//getDailyInterestAmount();
+			//calculateAccruedDays();
+			//calculateAccruedInterest();
+			//calculateNewInterestAmount();
+		});
+		
+		// 2). Action in Last Payment Date Field
+		$('#lastPaymentDate').change(function(){
+			/* var el = $(this);
+			var dateVal =  el.val();
+			var id = this.id;
+			var errorId= "#" + id + "Error";
+			el.removeClass("fieldError");
+			$(errorId).html("");
+			try {
+		        $.datepicker.parseDate('${appProp?.jqueryDateFormat}', dateVal, null);
+		    } catch(error) {
+		    	el.addClass("fieldError");
+		    	$(errorId).html("Invalid date format").show();
+		    	return false;
+		    } */
+		    
+			var effectiveDate = new Date($("#effectiveDate").datepicker('getDate')).getTime();
+			var lastPaymentDate = new Date($("#lastPaymentDate").datepicker('getDate')).getTime();
+			if ((effectiveDate!='')&&(lastPaymentDate!='')){
+				if (lastPaymentDate > effectiveDate) {
+					$("#lastPaymentDate").addClass('fieldError');
+					$('#lastPaymentDateError').html('Must be equals or less than Effective Date');
+					return false;
+				} else {
+					$("#lastPaymentDate").removeClass('fieldError');
+					$('#lastPaymentDateError').html('');
+					
+					$("#effectiveDate").removeClass('fieldError');
+					$('#effectiveDateError').html('');
+				}
+			}
+			
+			var nextPaymentDate = new Date($("#nextPaymentDate").datepicker('getDate')).getTime();
+			if ((lastPaymentDate!='')&&(nextPaymentDate!='')){
+				if (lastPaymentDate >= nextPaymentDate) {
+					$("#lastPaymentDate").addClass('fieldError');
+					$('#lastPaymentDateError').html('Must be less than Next Payment Date');
+					return false;
+				} else {
+					$("#lastPaymentDate").removeClass('fieldError');
+					$('#lastPaymentDateError').html('');
+					
+					$("#nextPaymentDate").removeClass('fieldError');
+					$('#nextPaymentDateError').html('');
+				}
+			}
+			$("#lastPaymentDateHide").val($("#lastPaymentDate").val());
+			calculateAccruedDays();
+			calculateTotalAccruedDays();
+			calculateAccruedInterest();
+			calculateNewInterestAmount();
+		});
+
+		// 3). Action in Next Payment Date Field
+		$('#nextPaymentDate').change(function(){
+			/* var el = $(this);
+			var dateVal =  el.val();
+			var id = this.id;
+			var errorId= "#" + id + "Error";
+			el.removeClass("fieldError");
+			$(errorId).html("");
+			try {
+		        $.datepicker.parseDate('${appProp?.jqueryDateFormat}', dateVal, null);
+		    } catch(error) {
+		    	el.addClass("fieldError");
+		    	$(errorId).html("Invalid date format").show();
+		    	return false;
+		    } */
+		    
+			var effectiveDate = new Date($("#effectiveDate").datepicker('getDate')).getTime();
+			var nextPaymentDate = new Date($("#nextPaymentDate").datepicker('getDate')).getTime();
+			if ((effectiveDate!='')&&(nextPaymentDate!='')){
+				if (effectiveDate > nextPaymentDate) {
+					$("#nextPaymentDate").addClass('fieldError');
+					$('#nextPaymentDateError').html('Must be equals or greather than Effective Date');
+					return false;
+				} else {
+					$("#effectiveDate").removeClass('fieldError');
+					$('#effectiveDateError').html('');
+					
+					$("#nextPaymentDate").removeClass('fieldError');
+					$('#nextPaymentDateError').html('');
+				}
+			}
+			
+			var lastPaymentDate = new Date($("#lastPaymentDate").datepicker('getDate')).getTime();
+			if ((lastPaymentDate!='')&&(nextPaymentDate!='')){
+				if (lastPaymentDate >= nextPaymentDate) {
+					$("#nextPaymentDate").addClass('fieldError');
+					$('#nextPaymentDateError').html('Must be greather than Last Payment Date');
+					return false;
+				} else {
+					$("#lastPaymentDate").removeClass('fieldError');
+					$('#lastPaymentDateError').html('');
+					
+					$("#nextPaymentDate").removeClass('fieldError');
+					$('#nextPaymentDateError').html('');
+				}
+			}
+			
+			var maturityDate = new Date($("#maturityDate").datepicker('getDate')).getTime();
+			if ((maturityDate!='')&&(nextPaymentDate!='')){
+				if (maturityDate <= nextPaymentDate) {
+					$("#nextPaymentDate").addClass('fieldError');
+					$('#nextPaymentDateError').html('Must be less than Maturity Date');
+					return false;
+				} else {
+					$("#maturityDate").removeClass('fieldError');
+					$('#maturityDateError').html('');
+					
+					$("#nextPaymentDate").removeClass('fieldError');
+					$('#nextPaymentDateError').html('');
+				}
+			}
+			$("#nextPaymentDateHide").val($("#nextPaymentDate").val());
+			calculateTotalAccruedDays();
+		});
+		
+		// 4). Action in Maturity Date Field
+		$('#maturityDate').change(function(){
+			/* var el = $(this);
+			var dateVal =  el.val();
+			var id = this.id;
+			var errorId= "#" + id + "Error";
+			el.removeClass("fieldError");
+			$(errorId).html("");
+			try {
+		        $.datepicker.parseDate('${appProp?.jqueryDateFormat}', dateVal, null);
+		    } catch(error) {
+		    	el.addClass("fieldError");
+		    	$(errorId).html("Invalid date format").show();
+		    	return false;
+		    } */
+		    
+			var maturityDate = new Date($("#maturityDate").datepicker('getDate')).getTime();
+			var nextPaymentDate = new Date($("#nextPaymentDate").datepicker('getDate')).getTime();
+			
+			if ((maturityDate!='')&&(nextPaymentDate!='')){
+				if (maturityDate <= nextPaymentDate) {
+					$("#maturityDate").addClass('fieldError');
+					$('#maturityDateError').html('Must be greather than Next Payment Date');
+					return false;
+				} else {
+					$("#maturityDate").removeClass('fieldError');
+					$('#maturityDateError').html('');
+					
+					$("#nextPaymentDate").removeClass('fieldError');
+					$('#nextPaymentDateError').html('');
+				}
+			}
+			$("#maturityDateHide").val($("#maturityDate").val());
+		});
+		
+		// ========= END Of Action in Date Field
+		
+		// == Field Interest Rate Action
+		$('#interestRate').blur(function(){
+			console.debug("interestRate = " + $('#interestRate').val());
+			console.debug("interestRateStripped = " + $('#interestRateStripped').val());
+			calculateAccruedInterest();
+			calculateNewInterestAmount();
+			if ($('#type').val() == PORTFOLIO_UPDATE_TYPE_AMORTIZATION) {
+				getYield();
+			}
+		});
+		
+		$('#interestRate').autoNumeric({vMax: '100'});
+		$('#interestRate').live('blur', function() {
+			var el = $(this);
+			var id = this.id;
+			var stripped = "#" + id + "Stripped";
+			if (el.val() == ''){
+				el.siblings(stripped).val('');
+				return;
+			}
+			el.siblings(stripped).val(el.autoNumericGet());
+		});
+
+		// == Field fractionRatioSource Action
+		$('#fractionRatioSource').blur(function(){
+			calculateAccruedInterest();
+			calculateNewInterestAmount();
+		});
+
+		// == Field fractionRatioTarget Action
+		$('#fractionRatioTarget').blur(function(){
+			calculateAccruedInterest();
+			calculateNewInterestAmount();
+		});
+
+		// == Field Accrued Interest Amount Action
+		$('#accIntAmt').change(function(){
+			calculateNewInterestAmount();
+		});
+
+		// == Action of Check/Uncheck
+		$('#useFraction').click(function(){
+			$('#fractionRatioSource').val("");
+			$('#fractionRatioTarget').val("");
+			$('#fractionRatioSourceStripped').val("");
+			$('#fractionRatioTargetStripped').val("");
+			$('#accIntAmt').val("");
+			$('#newAccIntAmt').val("");
+			if ($('#useFraction').is(':checked')){
+				$('#useFraction').val(true);
+				$('#fractionRatioSource').removeAttr('disabled');
+				$('#fractionRatioTarget').removeAttr('disabled');
+				$('p[id=fractionField] label span').html(" *");
+			} else {
+				$('#useFraction').val(false);
+				$('#fractionRatioSource').attr('disabled','disabled');
+				$('#fractionRatioTarget').attr('disabled','disabled');
+				$('p[id=fractionField] label span').html("");
+			}
+		});
+		
+		$('#type').change(function(){
+			portfolioUpdateTypeView();
+		});
+		
+		$('#purchaseValue').blur(function(){
+			calculateDiscountValue();
+		});
+
+	});	
+
+	function load(action,id) {
+		$('#searchForm').attr('action', action);
+		$('#searchForm').submit();
+		
+		//result form enable
+		$('.disabledField').removeAttr('disabled');
+		$('input[name="portfolio.checked"]').removeAttr('disabled');
+		$('.error').html('');
+		percentage();
+	}
+	
+	// Get Daily InterestAmount
+	function getDailyInterestAmount() {
+		var accountKey = $('#accountKey').val();
+		var securityKey = $('#securityKey').val();
+		var classification = $('#classification').val();
+		var holdingRefs = $('#holdingRefs').val();
+		var effectiveDate = $('#effectiveDate').val();
+		
+		if ((accountKey!='')&&(securityKey!='')&&(classification!='')&&
+				(holdingRefs!='')&&(effectiveDate!='')){
+			$.ajax({
+				url: '@{PortfolioUpdates.getDailyInterestAmount()}?accountKey='+accountKey+'&securityKey='+securityKey+'&classification='+classification+'&holdingRefs='+holdingRefs+'&effectiveDate='+effectiveDate,
+				success: function(data) {
+					checkRedirect(data);
+					$('#dailyInterestAmt').autoNumericSet(data)
+					$('#dailyInterestAmtStripped').val(data);
+				}		
+			});
+		}
+	}
+	
+	// Calculate Accrued Days
+	function calculateAccruedDays() {
+		var startDate = $('#effectiveDate').val();
+		var endDate = $('#lastPaymentDate').val();
+		var accBase = $('#accrualBase').val();
+		if ((accBase=='')||(accBase=='ACT')) accBase = 0;
+		if ((startDate!=null)&&(endDate!=null)) {
+			$.ajax({
+				url: '@{PortfolioUpdates.calculateAccruedDay()}?startDate='+startDate+'&endDate='+endDate+'&base='+accBase,
+				success: function(data) {
+					checkRedirect(data);
+					$('#accruedDays').val(data);
+				}		
+			});
+		}
+	}
+	
+	// Calculate Total Accrued Days
+	function calculateTotalAccruedDays() {
+		var startDate = $('#nextPaymentDate').val();
+		var endDate = $('#lastPaymentDate').val();
+		var accBase = $('#accrualBase').val();
+		
+		if ((accBase=='')||(accBase=='ACT')) accBase = 0;
+		if ((startDate!=null)&&(endDate!=null)) {
+			$.ajax({
+				url: '@{PortfolioUpdates.calculateAccruedDay()}?startDate='+startDate+'&endDate='+endDate+'&base='+accBase,
+				success: function(data) {
+					checkRedirect(data);
+					$('#totalAccruedDays').val(data);
+				}		
+			});
+		}
+	}
+	
+	// Calculate Accrued Interest Amount
+	function calculateAccruedInterest (){
+		var transaction = new Transaction();
+		transaction.lastPaymentDate = $.datepicker.parseDate('${appProp?.jqueryDateFormat}', $('#lastPaymentDate').val());
+		transaction.nextPaymentDate = $.datepicker.parseDate('${appProp?.jqueryDateFormat}', $('#nextPaymentDate').val());
+		transaction.settlementDate = $('#effectiveDate').datepicker('getDate');
+		transaction.frequency = transaction.decodeFrequency($('#frequencyCode').val());
+		transaction.accrualBase = transaction.decodeCalculationBase($('#accrualBase').val());
+		transaction.yearBase = transaction.decodeCalculationBase($('#yearBase').val());
+		console.debug(">>> useFraction = " + $('#useFraction').val());
+		transaction.isFraction = $('#useFraction').val();
+		transaction.fractionRatioSource = $('#fractionRatioSourceStripped').val();
+		transaction.fractionRatioTarget = $('#fractionRatioTargetStripped').val();
+		transaction.quantity = $('#holdingQtyStripped').val();
+		transaction.interestRate = $('#interestRateStripped').val();
+		console.debug(">>> transaction.lastPaymentDate = " + transaction.lastPaymentDate);
+		console.debug(">>> transaction.nextPaymentDate = " + transaction.nextPaymentDate);
+		console.debug(">>> transaction.settlementDate = " + transaction.settlementDate);
+		console.debug(">>> transaction.frequency = " + transaction.frequency);
+		console.debug(">>> transaction.accrualBase = " + transaction.accrualBase);
+		console.debug(">>> transaction.isFraction = " + transaction.isFraction);
+		console.debug(">>> transaction.fractionRatioSource = " + transaction.fractionRatioSource);
+		console.debug(">>> transaction.fractionRatioTarget = " + transaction.fractionRatioTarget);
+		console.debug(">>> transaction.quantity = " + transaction.quantity);
+		console.debug(">>> transaction.interestRate" + transaction.interestRate); 
+		if ((transaction.settlementDate!=null)&&(transaction.nextPaymentDate!=null)&&(transaction.lastPaymentDate!=null)){
+			var accruedInterest = transaction.calculateAccruedInterest();
+			console.debug(">>> in accruedInterest from calculateAccruedInterest = " + accruedInterest);
+			$('#accIntAmt').autoNumericSet(accruedInterest);
+			$('#accIntAmtStripped').val(accruedInterest);
+		}
+		console.debug(">>> out accruedInterest from calculateAccruedInterest = " + accruedInterest);
+	}
+	
+	// Calculate New Daily Interest Amount
+	function calculateNewInterestAmount() {
+		var totIntAmount = $('#accIntAmtStripped').val();
+		var totAccrDays = $('#totalAccruedDays').val();
+		var newIntAmount = totIntAmount / totAccrDays;
+		console.debug("newIntAmount --> " + totIntAmount + " / " + totAccrDays + " = " + newIntAmount);
+		if ($('#type').val() == PORTFOLIO_UPDATE_TYPE_INTEREST) {
+			$('#newAccIntAmt').autoNumericSet(newIntAmount);
+			$('#newAccIntAmtStripped').val(newIntAmount);
+		}
+	}
+	
+	function portfolioUpdateTypeView() {
+		if ($('#type').val() == PORTFOLIO_UPDATE_TYPE_AMORTIZATION) {
+			$("div.amortization_only").css("display", "");
+		} else {
+			$("div.amortization_only").css("display", "none");
+		}
+	}
+	
+	function percentage() {
+		if ($('#priceUnit').val() == '0.01'){
+			$('#percentage').show();
+		}else{
+			$('#percentage').hide();
+		}
+	}
+	
+	function getYield() {
+		var amortizationMethod = $("#method").val();
+		var parPrice = $('#parPriceStripped').val();
+		var priceUnit = $('#priceUnit').val();
+		var discAfterTax = $('#discountValueStripped').val();
+		var quantity = $('#holdingQtyStripped').val();
+		var nominal = $('#purchaseValueStripped').val();
+		var interestRate = $('#interestRateStripped').val();
+		var maturityDate = new Date($('#maturityDate').datepicker('getDate'));
+		var settlementDate = new Date($('#effectiveDate').datepicker('getDate'));
+		var parValue = quantity * parPrice * priceUnit;
+		
+		console.log("[GET YIELD] amortizationMethod = " +amortizationMethod);
+		console.log("[GET YIELD] parPrice = " +parPrice);
+		console.log("[GET YIELD] priceUnit = " +priceUnit);
+		console.log("[GET YIELD] discAfterTax = " +discAfterTax);
+		console.log("[GET YIELD] quantity = " +quantity);
+		console.log("[GET YIELD] nominal = " +nominal);
+		console.log("[GET YIELD] interestRate = " +interestRate);
+		console.log("[GET YIELD] maturityDate = " +maturityDate);
+		console.log("[GET YIELD] settlementDate = " +settlementDate);
+		console.log("[GET YIELD] parValue = " +parValue);
+		
+		var yield = calculateYield(
+				amortizationMethod,
+				parValue,
+				quantity,
+				nominal,
+				interestRate,
+				discAfterTax,
+				maturityDate,
+				settlementDate
+		) * 100;
+		
+		console.log("[GET YIELD] yield = " +yield);
+		$('#newYield').autoNumericSet(yield, {vMin:'-999999999999.9999'});
+		$('#newYieldStripped').val(yield);
+	}
+	
+	function calculateDiscountValue() {
+		var parValue = $('#parValueStripped').val();
+		var purchaseValue = $('#purchaseValueStripped').val();
+		
+		var discountValue = parValue - purchaseValue;
+		console.debug("discountValue = " + discountValue + " = " + parValue + " - " + purchaseValue);
+		$('#discountValue').autoNumericSet(discountValue, {vMin:'-999999999999.9999'});
+		$('#discountValueStripped').val(discountValue);
+	}
+	
+</script>
+
+<form id="searchForm" class="form" method="POST">
+	<p>
+		#{textBox id:'accountNo', name:'portfolioUpdate.account.accountNo', label:'Account No', value:portfolioUpdate?.account?.accountNo, class:'capitalize screenLoad', readOnly:readOnly, width:'100px', required:true /}
+		#{hidden id:'accountKey', name:'portfolioUpdate.account.custodyAccountKey', value:portfolioUpdate?.account?.custodyAccountKey /}
+		#{button id:'accountHelp', value:'?', class:'small screenLoad', readOnly:readOnly /}
+		#{textBox id:'accountName', name:'portfolioUpdate.account.name', value:portfolioUpdate?.account?.name, readOnly:true, width:'300px' /}
+		<span class="error">#{error 'Account No is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'securityTypeCode', name:'portfolioUpdate.securityType.securityType', label:'Security Type', value:portfolioUpdate?.securityType?.securityType, readOnly:readOnly, width:'100px' , class:'capitalize screenLoad', required:true /}
+		#{button id:'securityTypeHelp', value:'?', class:'small screenLoad', readOnly:readOnly /}
+		#{textBox id:'securityTypeDesc', name:'portfolioUpdate.securityType.description', readOnly:true, width:'300px' , value:portfolioUpdate?.securityType?.description/}
+		<span class="error">#{error 'Security Type is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'securityId', name:'portfolioUpdate.security.securityId', label:'Security Code', value:portfolioUpdate?.security?.securityId, class:'capitalize screenLoad', readOnly:readOnly, width:'100px', required:true /}
+		#{hidden id:'securityKey', name:'portfolioUpdate.security.securityKey' , value:portfolioUpdate?.security?.securityKey /}
+		#{button id:'securityHelp', value:'?', class:'small screenLoad', readOnly:readOnly /}
+		#{textBox id:'securityDesc', name:'portfolioUpdate.security.description', readOnly:true, width:'300px', value:portfolioUpdate?.security?.description /}
+		<span class="error">#{error 'Security Code is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'portfolioNo',  label:'Porto No', class:'capitalize screenLoad', readOnly:readOnly, value:portfolioUpdate?.portfolio?.portfolioKey, required:true, width:'100px' /}
+		#{hidden id:'portfolioNoKey', name:'portfolioUpdate.portfolio.portfolioKey', value:portfolioUpdate?.portfolio?.portfolioKey /}
+		#{button id:'portfolioNoHelp', value:'?', class:'small screenLoad', readOnly:readOnly /}
+		#{textBox id:'portfolioNoName', name:'portfolioUpdate.portfolio.classification.lookupDescription', value:portfolioUpdate?.portfolio?.classification?.lookupDescription, readOnly:true, width:'300px' /}
+		<span class="error">#{error 'Porto No is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'effectiveDate', name:'effectiveDate', label:'Effective Date', value:portfolioUpdate?.effectiveDate?.format(appProp.dateFormat), class:'calendar', width:'100px', readOnly:readOnly /} (${appProp.displayDateFormat})
+		#{hidden id:'effectiveDateHide', name:'portfolioUpdate.effectiveDate', value:portfolioUpdate?.effectiveDate  /}
+		<span id="effectiveDateError" class="error">#{error 'Effective Date is' /}</span>
+	</p>
+	<p>
+		#{dropDownList id:'type', name:'portfolioUpdate.portfolioUpdateType.lookupId', label:'Type', required:true, value:portfolioUpdate?.portfolioUpdateType?.lookupId, options:portfolioUpdateTypes, readOnly:readOnly, class:'screenLoad' /}
+		<span class="error">#{error 'Type is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'remarks', name:'portfolioUpdate.remarks', label:'Remark', value:portfolioUpdate?.remarks, readOnly:readOnly, class:'screenLoad capitalize', width:'428px' /}
+	</p>
+	<div class="buttons">
+		<button id="load" #{if confirming || mode =='view' || calculated == true} disabled #{/if}>Load</button>				
+		<button id="reset" #{if confirming || mode =='view' || calculated == true} disabled #{/if}>Reset</button>					
+	</div>
+	<br />
+	
+	<div id=tabs style="width: 850px" >
+		<ul>
+			<li><a href="#tabs-1">Result</a></li>
+		</ul>
+		<div class="pane" id="tabs-1">
+		<table>
+		<tr>
+		<td style="width: 400px">
+			#{hidden id:'hasInterest', name:'portfolioUpdate.security.securityType.hasInterest', value:portfolioUpdate?.security?.securityType?.hasInterest /}
+			#{hidden id:'holdingRefs', name:'portfolioUpdate.portfolio.holdingRefs', value:portfolioUpdate?.portfolio?.holdingRefs /}
+			#{hidden id:'classification', name:'portfolioUpdate.portfolio.classification.lookupId', value:portfolioUpdate?.portfolio?.classification?.lookupId /}
+			#{hidden id:'priceUnit', name:'portfolioUpdate.securityType.priceUnit', value:portfolioUpdate?.securityType?.priceUnit /}
+			<p>
+				#{textBox id:'holdingQty',  label:'Holding Qty', value:portfolioUpdate?.holdingQuantity, readOnly:true, width:'100px', class:'numeric', format:'#,##0.####' /}
+				#{hidden id:'holdingQtyStripped', name:'portfolioUpdate.holdingQuantity', value:portfolioUpdate?.holdingQuantity /}
+				<span class="error">#{error 'Holding Qty is' /}</span>
+			</p>
+			
+			<div class="amortization_only">	
+				<p>
+					#{textBox id:'parPrice',  label:'Par Price', value:portfolioUpdate?.security?.parUnitValue, readOnly:true, width:'100px', class:'numeric', format:'#,##0.####' /}
+					#{hidden id:'parPriceStripped', name:'portfolioUpdate.security.parUnitValue', value:portfolioUpdate?.security?.parUnitValue /}
+					<span id="percentage">%</span>
+				</p>
+				<p>
+					#{textBox id:'method',  label:'Method', name:'portfolioUpdate.portfolio.amortizationMethod', value:portfolioUpdate?.portfolio?.amortizationMethod, readOnly:true, width:'200px' /}
+				</p>
+				<p>
+					#{textBox id:'fairValue',  label:'Fair Value', value:portfolioUpdate?.portfolioAmortization?.fairValue, readOnly:true, width:'100px', class:'numeric', format:'#,##0.####' /}
+					#{hidden id:'fairValueStripped', name:'portfolioUpdate.portfolioAmortization.fairValue', value:portfolioUpdate?.portfolioAmortization?.fairValue /}
+					<span class="error">#{error 'Fair Value is' /}</span>
+				</p>
+				<p>
+					#{textBox id:'unamortizedAmount',  label:'Unamortized Amount', value:portfolioUpdate?.portfolioAmortization?.unamortAmount, readOnly:true, width:'100px', class:'numeric', format:'#,##0.####' /}
+					#{hidden id:'unamortizedAmountStripped', name:'portfolioUpdate.portfolioAmortization.unamortAmount', value:portfolioUpdate?.portfolioAmortization?.unamortAmount /}
+					<span class="error">#{error 'Unamortized Amount is' /}</span>
+				</p>
+				<p>
+					#{textBox id:'parValue',  label:'Par Value', value:portfolioUpdate?.parValue, readOnly:true, width:'100px', class:'numeric', format:'#,##0.####' /}
+					#{hidden id:'parValueStripped', name:'portfolioUpdate.parValue', value:portfolioUpdate?.parValue /}
+				</p>
+				<p>
+					#{textBox id:'yield',  label:'Yield', value:portfolioUpdate?.portfolio?.yield, readOnly:true, width:'100px', class:'numeric', format:'#,##0.####' /}
+					#{hidden id:'yieldStripped', name:'portfolioUpdate.portfolio.yield', value:portfolioUpdate?.portfolio?.yield /}
+					<span>%</span>
+				</p>
+				<p>
+					#{textBox id:'purchaseValue',  label:'Purchase Value', value:portfolioUpdate?.purchaseValue, readOnly:((mode !='edit' && mode !='entry' && mode !='view') || confirming), width:'100px', class:'disabledField numeric', format:'#,##0.####' /}
+					#{hidden id:'purchaseValueStripped', name:'portfolioUpdate.purchaseValue', value:portfolioUpdate?.purchaseValue /}
+				</p>
+				<p>
+					#{textBox id:'discountValue',  label:'Discount Value', value:portfolioUpdate?.discountValue, readOnly:true, width:'100px', class:'numeric', format:'#,##0.####' /}
+					#{hidden id:'discountValueStripped', name:'portfolioUpdate.discountValue', value:portfolioUpdate?.discountValue /}
+				</p>
+				<p>
+					#{textBox id:'newYield',  label:'New Yield', value:portfolioUpdate?.newYield, readOnly:true, width:'100px', class:'numeric', format:'#,##0.####' /}
+					#{hidden id:'newYieldStripped', name:'portfolioUpdate.newYield', value:portfolioUpdate?.newYield /}
+					<span>%</span>
+				</p>
+			</div>
+			
+			<p>
+				#{textBox id:'accrualBase', name:'portfolioUpdate.security.accrualBase.lookupCode', label:'Accrual Type', value:portfolioUpdate?.security?.accrualBase?.lookupCode, class:'capitalize alignLeft', readOnly:true, width:'100px' /}
+				#{textBox id:'yearBase', name:'portfolioUpdate.security.yearBase.lookupCode', value:portfolioUpdate?.security?.yearBase?.lookupCode, class:'capitalize alignLeft', readOnly:true, width:'100px' /}
+			</p>
+			<p>
+				#{textBox id:'frequency', name:'portfolioUpdate.security.frequency.lookupDescription', label:'Frequency', value:portfolioUpdate?.security?.frequency?.lookupDescription, class:'capitalize', readOnly:true, width:'100px' /}
+				#{hidden id:'frequencyCode', name:'portfolioUpdate.security.frequency.lookupCode', value:portfolioUpdate?.security?.frequency?.lookupCode /}
+			</p>
+			<p>
+				#{textBox id:'dailyInterestAmt', label:'Daily Interest Amount', value:portfolioUpdate?.oldDailyIntAmount, width:'100px',readOnly:true ,class:'numeric', format:'#,##0.####'/}
+				#{hidden id:'dailyInterestAmtStripped', name:'portfolioUpdate.oldDailyIntAmount', value:portfolioUpdate?.oldDailyIntAmount /}
+				<span class="error">#{error 'Daily Interest Amount is' /}</span>
+			</p>
+			<p>
+				#{textBox id:'lastPaymentDate', name:'lastPaymentDate', label:'Last Payment Date', value:portfolioUpdate?.lastPaymentDate?.format(appProp.dateFormat), width:'100px',required:true, class:'disabledField calendar' /} (${appProp.displayDateFormat})
+				#{hidden id:'lastPaymentDateHide', name:'portfolioUpdate.lastPaymentDate', value:portfolioUpdate?.lastPaymentDate  /}
+				<span class="error">#{error 'Last Payment Date is' /}</span>
+				<br/><span id="lastPaymentDateError" class="error"></span>
+			</p>
+			<p>
+				#{textBox id:'nextPaymentDate', name:'nextPaymentDate', label:'Next Payment Date', value:portfolioUpdate?.nextPaymentDate?.format(appProp.dateFormat), width:'100px', required:true, class:'disabledField calendar' /} (${appProp.displayDateFormat})
+				#{hidden id:'nextPaymentDateHide', name:'portfolioUpdate.nextPaymentDate', value:portfolioUpdate?.nextPaymentDate  /}
+				<span class="error">#{error 'Next Payment Date is' /}</span>
+				<br/><span id="nextPaymentDateError" class="error"></span>
+			</p>
+			<p>
+				#{textBox id:'maturityDate', name:'maturityDate', label:'Maturity Date', value:portfolioUpdate?.maturityDate?.format(appProp.dateFormat), width:'100px', required:true, class:'disabledField calendar' /} (${appProp.displayDateFormat})
+				#{hidden id:'maturityDateHide', name:'portfolioUpdate.maturityDate', value:portfolioUpdate?.maturityDate  /}
+				<span class="error">#{error 'Maturity Date is' /}</span>
+				<br/><span id="maturityDateError" class="error"></span>
+			</p>
+			<p>
+				#{textBox id:'accruedDays', name:'portfolioUpdate.accruedDays', label:'Accrued Days', value:portfolioUpdate?.accruedDays, width:'100px', readOnly:true, class:'alignLeft' /}
+			</p>
+			<p>
+				#{textBox id:'totalAccruedDays', name:'portfolioUpdate.totalAccruedDays', label:'Total Accr Days', value:portfolioUpdate?.totalAccruedDays, width:'100px',readOnly:true, class:'alignLeft' /}
+			</p>
+		</td>
+		<td>
+			<fieldset>
+			<legend><b>Calculation Type</b></legend>
+				<p>
+					#{textBox id:'interestRate', label:'Interest Rate', value:portfolioUpdate?.interestRate, width:'100px' , class:'disabledField numericMaxLength', format:'#,##0.####', required:true /}%
+					#{hidden id:'interestRateStripped', name:'portfolioUpdate.interestRate', value:portfolioUpdate?.interestRate /}
+					<span class="error">#{error 'Interest Rate is' /}</span>
+				</p>
+				<table id="fractionSkeleton">
+					<tr>
+						<td>
+							<p id="fractionField">
+								#{checkBox id:'useFraction', name:'portfolioUpdate.useFraction', value:portfolioUpdate?.useFraction, readOnly:((mode !='edit' && mode !='entry' && mode !='view') || confirming) /}
+								<label>Using Fraction<span class="req"> *</span></label>
+								#{textBox id:'fractionRatioSource', value:portfolioUpdate?.fractionRatio1, width:'100px', class:'disabledField numeric' ,format:'#,##0.####'/}
+								#{hidden id:'fractionRatioSourceStripped', name:'portfolioUpdate.fractionRatio1', value:portfolioUpdate?.fractionRatio1 /}
+							</p>
+							<p style="text-align:center;margin-left: 16em;">
+								<span class="error">#{error 'Using Fraction first field is' /}</span>
+							</p>
+						</td>
+						<td>
+							<p></p>
+							<p>
+								#{textBox id:'fractionRatioTarget', value:portfolioUpdate?.fractionRatio2, width:'100px', class:'disabledField numeric', format:'#,##0.####' /}
+								#{hidden id:'fractionRatioTargetStripped', name:'portfolioUpdate.fractionRatio2', value:portfolioUpdate?.fractionRatio2 /}
+							</p>
+							<p style="text-align:center;">
+								<span class="error">#{error 'Using Fraction second field is' /}</span>
+							</p>
+						</td>
+					</tr>
+				</table>
+			</fieldset>
+			<br />
+			<p>
+				#{textBox id:'accIntAmt', label:'Accrued Interest Amount',value:portfolioUpdate?.accruedIntAmount, width:'150px', required:true, format:'#,##0.####', class:'numeric disabledField' /}
+				#{hidden id:'accIntAmtStripped',name:'portfolioUpdate.accruedIntAmount', value:portfolioUpdate?.accruedIntAmount /}
+				<span class="error">#{error 'Accrued Interest Amount is' /}</span>
+			</p>
+			<p>
+				#{textBox id:'newAccIntAmt', label:'New Daily Interest Amount', value:portfolioUpdate?.newDailyIntAmount, width:'150px', readOnly:true , format:'#,##0.####', class:'numeric' /}
+				#{hidden id:'newAccIntAmtStripped',name:'portfolioUpdate.newDailyIntAmount', value:portfolioUpdate?.newDailyIntAmount /}
+			</p>
+		</td>
+		</tr>
+		</table>
+		</div>
+	</div>
+</form>

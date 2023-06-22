@@ -1,0 +1,16 @@
+#{extends 'templates/main.html' /}
+
+<script type="text/javascript">
+	$(function() {
+		$('#back').click(function() {			
+			location.href="${url.raw()}";
+		});
+	});
+</script>
+<h2>View Transaction</h2>
+<div id="detail">
+	#{include 'Transactions/detail.html' /}
+</div>	
+<div id="actions" class="buttons">
+	<input type="button" id="back" value="Back" />
+</div>

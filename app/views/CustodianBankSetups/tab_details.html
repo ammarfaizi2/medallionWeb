@@ -1,0 +1,100 @@
+<p>
+	#{textBox id:'custodianCode', name:'custodianCode', label:'Code', value:cust?.custodianCode, class:'capitalize', width:'100px',required:false,readOnly:true, maxLength:50 /}
+	#{hidden id:'custodianCodeHidden', name:'cust.custodianCode', value:cust?.custodianCode /}
+	<span class="error">#{error 'Code is' /}</span>
+</p>
+<p>
+	#{textBox id:'custodianName', name:'cust.custodianName', label:'Name', value:cust?.custodianName, class:'capitalize', width:'300px',required:true,readOnly:readOnly, maxLength:50 /}
+	<span class="error">#{error 'Name is' /}</span>
+	
+	&nbsp;&nbsp;&nbsp;
+	#{textBox id:'custodianDepartment', name:'cust.custodianDepartment', value:cust?.custodianDepartment, class:'capitalize', width:'300px', readOnly:readOnly, maxLength:100 /}
+</p>
+<p>
+	#{textBox id:'contactPerson1', name:'cust.contact1Name', label:'Contact Person 1',value:cust?.contact1Name, class:'capitalize', width:'300px',required:true,readOnly:readOnly, maxLength:100 /}
+	<span class="error">#{error 'Contact Person 1 is' /}</span>
+</p>
+<p>	
+	<label style="margin-left: 5em">Position <span class="req">*</span></label>
+	<span style="margin-left: -5em">
+	#{textBox id:'contactPosition1', name:'cust.contact1Position',value:cust?.contact1Position, class:'capitalize', width:'300px',required:true,readOnly:readOnly, maxLength:100 /}
+	<span class="error">#{error 'Position 1 is' /}</span>
+	</span>
+</p>
+<p>
+	#{textBox id:'contactPerson2', name:'cust.contact2Name', label:'Contact Person 2',value:cust?.contact2Name, class:'capitalize', width:'300px',required:true,readOnly:readOnly, maxLength:100 /}
+	<span class="error">#{error 'Contact Person 2 is' /}</span>
+</p>
+<p>	
+	<label style="margin-left: 5em">Position <span class="req">*</span></label>
+	<span style="margin-left: -5em">
+	#{textBox id:'contactPosition2', name:'cust.contact2Position', value:cust?.contact2Position, class:'capitalize', width:'300px',required:true,readOnly:readOnly, maxLength:100 /}
+	<span class="error">#{error 'Position 2 is' /}</span>
+	</span>
+</p>
+<p>
+	#{textBox id:'contactPerson3', name:'cust.contact3Name', label:'Contact Person 3',value:cust?.contact3Name, class:'capitalize', width:'300px',required:true,readOnly:readOnly, maxLength:100 /}
+	<span class="error">#{error 'Contact Person 3 is' /}</span>
+</p>
+<p>	
+	<label style="margin-left: 5em">Position <span class="req">*</span></label>
+	<span style="margin-left: -5em">
+	#{textBox id:'contactPosition3', name:'cust.contact3Position', value:cust?.contact3Position, class:'capitalize', width:'300px',required:true,readOnly:readOnly, maxLength:100 /}
+	<span class="error">#{error 'Position 3 is' /}</span>
+	</span>
+</p>
+<p>			
+	#{textBox id:'address1', name:'cust.address1', label:'Address', value:cust?.address1, readOnly:readOnly, class:'capitalize', width:'300px', maxLength:74, required:true /}
+	<span class="error">#{error 'Address is' /}</span>
+</p>
+<p>	
+	<label></label>		
+	#{textBox id:'address2', name:'cust.address2', value:cust?.address2, readOnly:readOnly, class:'capitalize', width:'300px', maxLength:74 /}
+	<span class="error">#{error 'Address 2 is' /}</span>
+</p>
+<p>	
+	<label></label>		
+	#{textBox id:'address3', name:'cust.address3', value:cust?.address3, readOnly:readOnly, class:'capitalize', width:'300px', maxLength:75 /}
+	#{hidden id:'addressHide', name:'cust.address', value:cust?.address /}
+</p>
+<p>
+	#{textBox id:'addressCountryCode', name:'cust.addressCountry.lookupCode', label:'Country', value:cust?.addressCountry?.lookupCode, class:'capitalize', readOnly:readOnly, width:'80px', required:true /}
+	#{hidden id:'addressCountry', name:'cust.addressCountry.lookupId', value:cust?.addressCountry?.lookupId /}
+	#{button id:'addressCountryHelp', value:'?', class:'small', readOnly:readOnly /}	
+	#{textBox id:'addressCountryDesc', name:'cust.addressCountry.lookupDescription', value:cust?.addressCountry?.lookupDescription, readOnly:true, width:'192px' /}
+	<span class="error">#{error 'Country is' /}</span>
+</p>
+<p>
+	#{textBox id:'addressStateCode', name:'cust.addressState.lookupCode', label:'State', value:cust?.addressState?.lookupCode,  class:'capitalize', readOnly:readOnly, width:'80px' , required:true/}
+	#{hidden id:'addressState', name:'cust.addressState.lookupId', value:cust?.addressState?.lookupId /}
+	#{button id:'addressStateHelp', value:'?', class:'small', readOnly:readOnly /}
+	#{textBox id:'addressStateDesc', name:'cust.addressState.lookupDescription', value:cust?.addressState?.lookupDescription, readOnly:true, width:'192px' /}
+	<span class="error">#{error 'State is' /}</span>
+</p>
+<p>
+	#{textBox id:'addressAreaCode', name:'cust.addressArea.lookupCode', label:'Area', value:cust?.addressArea?.lookupCode, class:'capitalize', readOnly:readOnly, width:'80px', required:true /}
+	#{hidden id:'addressArea', name:'cust.addressArea.lookupId', value:cust?.addressArea?.lookupId /}
+	#{button id:'addressAreaHelp', value:'?', class:'small', readOnly:readOnly /}
+	#{textBox id:'addressAreaDesc', name:'cust.addressArea.lookupDescription', value:cust?.addressArea?.lookupDescription, readOnly:true, width:'192px' /}
+	<span class="error">#{error 'Area is' /}</span>				
+</p>
+<p>			
+	#{textBox id:'addressZipCode', name:'cust.addressZipCode', label:'Postal Code', value:cust?.addressZipCode, readOnly:readOnly, required:true, class:'capitalize', width:'300px', maxLength:50 /}
+	<span class="error">#{error 'Postal Code is' /}</span>
+</p>
+<p>			
+	#{textBox id:'addressPhone1', name:'cust.addressPhone1', label:'Phone 1', value:cust?.addressPhone1, readOnly:readOnly, required:true, width:'300px', maxLength:50 /}
+	<span class="error">#{error 'Phone 1 is' /}</span>
+</p>
+<p>			
+	#{textBox id:'addressPhone2', name:'cust.addressPhone2', label:'Phone 2', value:cust?.addressPhone2, readOnly:readOnly, required:false, width:'300px', maxLength:50 /}
+</p>
+<p>			
+	#{textBox id:'addressPhone3', name:'cust.addressPhone3', label:'Fax Number', value:cust?.addressPhone3, readOnly:readOnly, required:true, width:'300px', maxLength:50 /}
+	<span class="error">#{error 'Fax Number is' /}</span>
+</p>
+<p>			
+	#{textBox id:'email', name:'cust.email', label:'Email', value:cust?.email, readOnly:readOnly, width:'250px', maxLength:250, class:'all email', required:true /}
+	ex: alan@simian.co.id
+	<span id="emailError" class="errorMessage">#{error 'Email in tab Contacts is' /}</span>
+</p> 

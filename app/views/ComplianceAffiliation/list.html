@@ -1,0 +1,38 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Compliance Affiliation Maintenance' /}
+
+#{script 'lookups.js' /}
+
+<script type="text/javascript">
+	function doEdit(data) {
+		if ((data[3] == "New") || (data[3] == "Updated")) {
+			view(data[0]);
+			return false;
+		} else {
+			return true;
+		}
+	}
+</script>
+<table class="display">
+	#{hidden  id:'dispatch', value:mode/}
+	<thead>
+		<tr>
+			<th>Fund Key</th>
+			<th align="left">Fund Manager Code</th>
+			<th align="left">Fund Manager Name</th>
+			<th align="center">Status</th>
+			<th align="center">Active</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list affiliations, as:'sub'}
+		<tr>
+			<td>${sub?.fundManager?.thirdPartyKey}</td>
+			<td align="left">${sub?.fundManager?.thirdPartyCode}</td>
+			<td align="left">${sub?.fundManager?.thirdPartyName}</td>
+			<td align="center">${sub?.status?.decodeStatus()}</td>
+			<td align="center">${(sub?.active) ? 'Yes' : 'No'}</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>

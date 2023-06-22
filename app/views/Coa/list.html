@@ -1,0 +1,501 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Chart Of Account' /}
+#{set fixData: true /}
+#{set mode: mode /}
+<style>
+	.expand { display: inline-block; width: 15px }
+	.collapsed { background: url(/public/images/plus.gif) no-repeat 2px 2px }
+	.expanded { background: url(/public/images/minus.gif) no-repeat 2px 2px }
+	.level0 { padding-left: 15px }
+	.level1 { padding-left: 30px }
+	.level2 { padding-left: 45px }
+	.level3 { padding-left: 60px }
+	.level4 { padding-left: 75px }
+	.level5 { padding-left: 90px }
+	#viewAs1 {margin-left:2em;}
+	#expandAll {margin-left:52em;}
+	#collapsAll {margin-left:2em;}
+</style>
+
+<script type="text/javascript">
+	$(function() {
+		// VARIABEL GLOBAL
+		var selected;
+		var rows;
+		var message;
+		var RECORD_STATUS_NEW = "New";
+		var RECORD_STATUS_UPDATED = "Updated";
+		var closeDialogMessage = function() {
+			$("#dialog-message").dialog('close');
+		}
+		//===============
+		
+		var getSource = '@{getActive()}';
+		$('#viewAs2').attr('checked', 'checked');
+		$('#viewAs1').removeAttr('checked');
+		$("input[name='viewAs']").change(function(){
+			//console.debug("1. " + $("input[name='viewAs']:checked").val());
+			table.fnClearTable();
+			if ($("input[name='viewAs']:checked").val() == 'true') {
+				getSource = '@{get()}';	
+				$.post(getSource, function(data) {
+		    		checkRedirect(data);
+					table.fnAddData(data);	
+				});
+			} else {
+				getSource = '@{getActive()}';
+				$.post(getSource, function(data) {
+		    		checkRedirect(data);
+					table.fnAddData(data);	
+				});
+			}
+			//console.debug("1. " + getSource);
+		});
+		
+		// DATA TABLE DECLARATION	
+		var table = 
+			$('#grid').dataTable({
+				sAjaxSource: getSource,
+				sAjaxDataProp: '',
+				aaSorting: [[ 3, 'asc' ]],
+				aaSortingFixed: [[3,'asc']],
+				aoColumns: [
+				            	{
+				            		mDataProp: 'sequence',
+				            		bVisible:false
+				            	},
+				            	{	
+				            		bVisible:false,
+				           			fnRender: function(obj) {
+				           				return obj.aData.parentStatus;
+				           			}
+				           		},
+				           		{	
+				            		bVisible:false,
+				           			fnRender: function(obj) {
+				           				return obj.aData.coaParent;
+				           			}
+				           		},
+				           		{	
+				            		bVisible:false,
+				           			fnRender: function(obj) {
+				           				return obj.aData.sequenced;
+				           			}
+				           		},
+/* 				           		{	
+				            		bVisible:false,
+				           			fnRender: function(obj) {
+				           				return obj.aData.isLastChild;
+				           			}
+				           		},
+ */				           		{
+				           			sClass: 'select',
+				           			fnRender: function(obj) {
+				           				return '<div class="level' + obj.aData.level + '"><div id="icon'+ obj.aData.sequence +'" class="expand collapsed">&nbsp;</div>' + obj.aData.description + '</div>';
+				           			}
+				           		},
+				           		{
+				           			fnRender: function(obj) {
+				           				return obj.aData.coaCode;
+				           			}
+				           		},
+				           		{
+				           			fnRender: function(obj) {
+				           				return obj.aData.nature;
+				           			}
+				           		},
+				           		{
+				           			fnRender: function(obj) {
+				           				return obj.aData.currency;
+				           			}
+				           		},
+				           		{
+				           			fnRender: function(obj) {
+				           				return obj.aData.decodeStatus;
+				           			}
+				           		},
+				           		{
+				           			fnRender: function(obj) {
+				           				return obj.aData.isActive;
+				           			}
+				           		}
+					   	   ],	
+				bJQueryUI:true,
+				bLengthChange:false,
+				bPaginate:false,
+				bAutoWidth:false,
+				bScrollCollapse:true,
+				sScrollX:'100%',
+				sScrollY:'400px'
+				
+			});
+			//===============
+		
+		// ACTION BUTTON EXPAND
+		$('.expand').live('click', function() {
+			var pos = table.fnGetPosition(this.parentNode.parentNode);
+			var currentRow = pos[0];
+			var row = table.fnGetData(currentRow);
+			var check = row.sequence + '-';
+			//console.debug("from neutral >>> pos = " + pos + " currentRow = " + currentRow + " check = " + check);
+			//console.debug($(this).hasClass('expanded'));
+			
+			if ($(this).hasClass('expanded')) {
+				//alert("1");
+				var data = table.fnGetData();
+				//console.debug("[EXPAND LIVE] >>> row.coaMasterKey = " + row.coaMasterKey);
+				//console.debug("[BEFORE] data[i].coaMasterKey = " + data[i].sequence + " check = " + check);
+				for (var i = 0; i < data.length; ) {
+					//console.debug("[EXPAND LIVE] >>> data.length = " + data.length);
+					//console.debug("[EXPAND LIVE] >>> data[i].coaMasterKey = " + data[i].coaMasterKey);
+					//console.debug("[EXPAND LIVE] >>> data[i].sequence = " + data[i].sequence);
+					//console.debug("[EXPAND LIVE] >>> check = " + check);
+					if (data[i].sequence.match(check)) {
+						//console.debug("from has expanded >>> data[i].sequence = " + data[i].sequence + " check = " + check);
+						table.fnDeleteRow(i);
+						data = table.fnGetData();
+					} else {	
+						i++;
+					}
+				}
+				$(this).removeClass('expanded');
+			} else {
+				
+				if ($("input[name='viewAs']:checked").val() == 'true') {
+					//alert("2"); 
+					$.post('@{get()}?parent='+row.coaMasterKey, function(data) {
+			    		checkRedirect(data);
+						table.fnSort( [ [3,'asc'] ] );
+						for(var i = 0; i < data.length; i++) {
+							data[i].sequence = row.sequence + "-" + data[i].sequence;
+							data[i].sequenced = row.sequenced+ "-" + data[i].sequenced;
+							table.fnAddData(data[i], false);
+							//console.debug("from hasn't expanded >>> data[i].sequence = " + data[i].sequence + " data[i] = " + data[i].coaMasterKey);
+						}
+						table.fnDraw();
+					});
+					$(this).addClass('expanded');
+				} else {
+					//alert("3"); 
+					$.post('@{getActive()}?parent='+row.coaMasterKey, function(data) {
+			    		checkRedirect(data);
+						table.fnSort( [ [3,'asc'] ] );
+						//console.debug("data.length = " + data.length);
+						for(var i = 0; i < data.length; i++) {
+							data[i].sequence = row.sequence + "-" + data[i].sequence;
+							data[i].sequenced = row.sequenced+ "-" + data[i].sequenced;
+							table.fnAddData(data[i], false);
+							//console.debug("from hasn't expanded >>> data[i].sequence = " + data[i].sequence + " data[i] = " + data[i].coaMasterKey);
+						}
+						table.fnDraw();
+						//$(this).focus();
+						//alert(row.coaCode);
+						//table.fnGetData().focus();
+						//$(row.sequence).focus();
+						//$("#edit").focus();
+					});
+					$(this).addClass('expanded');
+					//$(this).addClass('selected');
+					//var index = "#index" + row.sequence;
+					//alert(index + " | " + row.sequence);
+					
+					/* var tes = table.fnGetPosition(this);
+					var tr = table.fnGetNodes(tes[0]);
+					rows = tes[0]; */
+					//var data = table.fnGetData(rows);
+					if ($(this).hasClass('selected')) {
+						$(this).removeClass('selected');
+						//$(index).focus();
+						selected = null;
+						data.level="";
+					} else {
+						//var row = table.fnGetData(tes[0]);
+						selected = row.coaMasterKey;
+						$('.selected').each(function() {
+							$(this).removeClass('selected');
+						});
+						$(this).addClass('selected');
+						//$(index).focus();
+					}
+					
+				}
+			}
+			//alert($(this)); 
+			
+		});
+		//===============
+
+		// ACTION SELECT ROWS
+		$('.select').live('click', function() {
+			var pos = table.fnGetPosition(this);
+			var tr = table.fnGetNodes(pos[0]);
+			rows = pos[0];
+			var data = table.fnGetData(rows);
+			if ($(tr).hasClass('selected')) {
+				$(tr).removeClass('selected');
+				selected = null;
+				data.level="";
+			} else {
+				var row = table.fnGetData(pos[0]);
+				selected = row.coaMasterKey;
+				$('.selected').each(function() {
+					$(this).removeClass('selected');
+				});
+				$(tr).addClass('selected');
+			}
+		});
+		//===============
+				
+		$('.buttons button').button();
+		
+		// ACTION BUTTON NEW
+		$('#new').click(function() {
+			var tableCoa = $('#grid').dataTable();
+			var data = tableCoa.fnGetData(rows);
+			if (data.isActive == 'No') {
+				message = "Data is not active";
+				//dialogMessage(message);
+				messageAlertOk(message, "ui-icon1 ui-icon-alert", "Warning Message", closeDialogMessage);
+				return false;
+			} else if (data.level == 4) {
+				message = "Can not add COA, COA level must less than max level";
+				//dialogMessage(message);
+				messageAlertOk(message, "ui-icon1 ui-icon-alert", "Warning Message", closeDialogMessage);
+				return false;
+			} else { 
+				if(selected != null) {
+					location.href='@{Coa.entry()}?parentId='+selected;
+				} else {
+					location.href='@{Coa.entry()}';
+				}
+			}
+		});
+		//===============
+		
+		// ACTION BUTTON EDIT 
+		$('#edit').click(function() {
+			if (selected != null) {	
+				var tableCoa = $('#grid').dataTable();
+				var data = tableCoa.fnGetData(rows);
+				var id = data.coaMasterKey;
+				//console.debug("[EDIT] data.parentStatus = " + data.parentStatus);
+				if ((data.decodeStatus == RECORD_STATUS_NEW) || (data.decodeStatus == RECORD_STATUS_UPDATED)) {
+					view(id);
+					return false;
+				} else {
+					location.href='@{Coa.edit()}?id='+selected;
+				}	
+			} else {
+				message = "Please selected one of rows";
+				//dialogMessage(message);
+				messageAlertOk(message, "ui-icon1 ui-icon-alert", "Warning Message", closeDialogMessage);
+				return false;
+			}
+		});
+		//===============
+			
+		$('#expandAll').click(function() {
+			/* var pos = table.fnGetPosition($('#grid tbody tr').parentNode.parentNode);
+			var currentRow = pos[0];
+			var row = table.fnGetData(currentRow);*/
+			var check;
+			table.fnClearTable();
+			table.fnSort([[3,'asc']]);
+			if ($("input[name='viewAs']:checked").val() == 'true') {
+				getSource = '@{expandAll()}';	
+				$.post(getSource, function(data) {
+		    		checkRedirect(data);
+					//alert("length expand all = " + data.length);
+					table.fnAddData(data);
+					data = table.fnGetData();
+					var currCoaParent0; 
+					var currCoaParent1;
+					var currCoaParent2;
+					var currCoaParent3;
+					
+				 	for (i=0;i<data.length;i++) {
+				 		if (data[i].level == '0') 
+				 			currCoaParent0 = data[i].sequence;
+
+				 		if(data[i].level == '1') {
+				 			currCoaParent1 = data[i].sequence;
+				 			data[i].sequence = currCoaParent0 + '-' + data[i].sequence;
+				 		}
+				 		
+				 		if(data[i].level == '2') {
+				 			currCoaParent2 = data[i].sequence;
+				 			data[i].sequence = currCoaParent0 + '-' + currCoaParent1 + '-' + data[i].sequence;
+				 		}
+
+				 		if(data[i].level == '3') {
+				 			currCoaParent3 = data[i].sequence;
+				 			data[i].sequence = currCoaParent0 + '-' + currCoaParent1 + '-' + currCoaParent2 + '-' + data[i].sequence;
+				 		}
+				 		
+				 		if(data[i].level == '4') {
+				 			data[i].sequence = currCoaParent0 + '-' + currCoaParent1 + '-' + currCoaParent2 + '-' + currCoaParent3 + '-' + data[i].sequence;
+				 		}
+
+				 		//console.debug("data = " + data[i].sequence);
+				 		/* if (data[i].parentStatus == RECORD_STATUS_UPDATED) {
+				 			console.debug(data[i].parentStatus);
+							data[i].decodeStatus = RECORD_STATUS_UPDATED;
+						} */
+						$("div[id$='icon']").addClass('expanded');
+					} 
+				 	//for (i=0;i<data.length;i++) {
+					//	$("div[id$='icon']").addClass('expanded');
+					//	if ($("div.select").hasClass('level3')) {
+					//		$("div[id$='icon']").removeClass('expanded');	
+					//	}
+					//}
+					//table.fnDraw();
+				});
+			} else {
+				getSource = '@{expandAllActive()}';
+				$.post(getSource, function(data) {
+		    		checkRedirect(data);
+					//alert("length expand all active = " + data.length);
+					table.fnAddData(data);	
+					data = table.fnGetData();
+					var currCoaParent0; 
+					var currCoaParent1;
+					var currCoaParent2;
+					var currCoaParent3;
+					var sequence;
+					
+				 	for (i=0;i<data.length;i++) {
+				 		sequence = data[i].sequence;
+				 		coaMasterKey =  data[i].coaMasterKey;
+				 		
+				 		if (data[i].level == '0') 
+				 			currCoaParent0 = data[i].sequence;
+
+				 		if(data[i].level == '1') {
+				 			currCoaParent1 = data[i].sequence;
+				 			data[i].sequence = currCoaParent0 + '-' + data[i].sequence;
+				 		}
+				 		
+				 		if(data[i].level == '2') {
+				 			currCoaParent2 = data[i].sequence;
+				 			data[i].sequence = currCoaParent0 + '-' + currCoaParent1 + '-' + data[i].sequence;
+				 		}
+
+				 		if(data[i].level == '3') {
+				 			currCoaParent3 = data[i].sequence;
+				 			data[i].sequence = currCoaParent0 + '-' + currCoaParent1 + '-' + currCoaParent2 + '-' + data[i].sequence;
+				 		}
+				 		
+				 		if(data[i].level == '4') {
+				 			data[i].sequence = currCoaParent0 + '-' + currCoaParent1 + '-' + currCoaParent2 + '-' + currCoaParent3 + '-' + data[i].sequence;
+				 		}
+
+				 		//console.debug("rowNumber = " + data[i].rowNumber);
+				 		//console.debug("lastChild = " + data[i].isLastChild);
+				 		/* if (data[i].parentStatus == RECORD_STATUS_UPDATED) {
+				 			console.debug(data[i].parentStatus);
+							data[i].decodeStatus = RECORD_STATUS_UPDATED;
+						} */
+						$("div[id$='icon"+sequence+"']").addClass('expanded');
+						//console.debug("data[i].isLastChild = " + data[i].isLastChild); 
+						
+					}
+				 	
+					/* var action = '@{checkLastChild()}?coaMasterKey=' + coaMasterKey;
+					$.get(action, function(lastChild, status, xhr) {
+						
+						for (i=0;i<lastChild.length;i++) {
+							if (lastChild[i] == '1') {
+								//console.debug("data[i].level = " + data[i].level + " data[i].sequence = " + sequence);
+								//console.debug("1." + data.isLastChild);
+								console.debug(lastChild + " | " + sequence);
+								$("div[id$='icon"+sequence+"']").removeClass('expanded');
+								$("div[id$='icon"+sequence+"']").removeClass('collapsed');
+							}
+						}
+					}); */
+					//table.fnDraw();
+				});
+			}
+		});
+		
+		$('#collapsAll').click(function(){
+			//console.debug("2. " + $("input[name='viewAs']:checked").val());
+			table.fnClearTable();
+			if ($("input[name='viewAs']:checked").val() == 'true') {
+				getSource = '@{get()}';	
+				$.post(getSource, function(data) {
+		    		checkRedirect(data);
+					table.fnAddData(data);	
+				});
+			} else {
+				getSource = '@{getActive()}';
+				$.post(getSource, function(data) {
+		    		checkRedirect(data);
+					table.fnAddData(data);	
+				});
+			}
+			//console.debug("2. " + getSource);
+		});
+		
+	});
+	
+	/*
+	// DOEDIT FUNCTION
+	function doEdit(data) {
+		if ((data[4] == "New") || (data[4] == "Updated")) {
+			view(data[0]);
+			return false;
+		} else {
+			return true;
+		}
+	}
+	//===============
+	*/
+	
+	// VIEW FUNCTION	
+	function view(id) {
+		#{if subList}
+			location.href='@{list()}/' + id; 
+		#{/if}
+		#{else}
+			location.href='@{view()}/' +id + "#{if group}?group=${group}#{/}#{if param}${group?'&':'?'}param=${param}#{/}";
+		#{/else}
+	}
+	//===============
+	
+
+</script>
+
+<div>
+	<p>
+		<label><b>View As</b></label>
+		#{radioButton id:'viewAs', name:'viewAs', value:((viewAs)?'true':'false'), options:viewAs, readOnly:readOnly /}
+		#{button id:'expandAll', value:'+', class:'small', readOnly:readOnly /}&nbsp;<b>Expand All</b>
+		#{button id:'collapsAll', value:'-', class:'small', readOnly:readOnly /}&nbsp;<b>Collapse All</b>
+	</p>
+</div>
+
+<table id="grid" class="display">
+	<thead>
+		<tr>
+			<th>key</th>
+			<th>Coa Parent Status</th>
+			<th>Coa Parent</th>
+			<th>Row Number</th>
+			<!-- <th>Last Child</th> -->
+			<th width="320px">Description</th>
+			<th width="15px">Account No</th>
+			<th width="10px">Debit / Credit</th>
+			<th width="10px">Currency</th>
+			<th width="30px">Status</th>
+			<th width="30px">Active</th>
+		</tr>
+	</thead>
+</table>
+
+<div class="buttons">
+	<button id="new">Add</button>
+	<button id="edit">Edit</button>
+</div>
+

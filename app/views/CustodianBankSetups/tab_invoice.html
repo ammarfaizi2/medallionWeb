@@ -1,0 +1,62 @@
+<br/>
+<div>
+	#{hidden id:'invCustodianAccKey', name:'cust.invoiceAccount.custodianAccountKey', value:cust?.invoiceAccount?.custodianAccountKey /}
+	#{hidden id:'invCustodianBankKey', name:'cust.invoiceAccount.invoiceCustodianBank.custodianBankKey', value:cust?.invoiceAccount?.invoiceCustodianBank?.custodianBankKey /}
+	<p>
+		#{textBox id:'invBankAccountNo', name:'cust.invoiceAccount.invoiceCustodianBank.accountNo', label:'Account No', value:cust?.invoiceAccount?.invoiceCustodianBank?.accountNo, required:true, readOnly:readOnly, width:'300px', maxLength:'50', class:'capitalize' /}
+		<span class="error">#{error 'Invoice Account No is' /}</span>
+	</p>
+	<p>	
+		#{textBox id:'invBankCode', name:'cust.invoiceAccount.invoiceCustodianBank.bankCode.thirdPartyCode', label:'Bank', value:cust?.invoiceAccount?.invoiceCustodianBank?.bankCode?.thirdPartyCode, required:true, readOnly:readOnly, width:'80px', maxLength:'25', class:'capitalize' /}
+		#{hidden id:'invBankCodeKey', name:'cust.invoiceAccount.invoiceCustodianBank.bankCode.thirdPartyKey', value:cust?.invoiceAccount?.invoiceCustodianBank?.bankCode?.thirdPartyKey /}
+		#{button id:'invBankCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'invBankCodeDesc', name:'cust.invoiceAccount.invoiceCustodianBank.bankCode.thirdPartyName', value:cust?.invoiceAccount?.invoiceCustodianBank?.bankCode?.thirdPartyName, readOnly:true, width:'192px'  /}
+		<span class="error">#{error 'Invoice Bank is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'invAccountHolderName', name:'cust.invoiceAccount.invoiceCustodianBank.accountName', label:'Beneficiary Name', value:cust?.invoiceAccount?.invoiceCustodianBank?.accountName, required:true, readOnly:readOnly, width:'300px', maxLength:'100', class:'capitalize' /}
+		<span class="error">#{error 'Invoice Beneficiary Name is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'invBankCurrency', name:'cust.invoiceAccount.invoiceCustodianBank.currency.currencyCode', label:'Currency', value:cust?.invoiceAccount?.invoiceCustodianBank?.currency?.currencyCode, required:true, readOnly:readOnly, width:'80px', maxLength:'100', class:'capitalize' /}
+		#{button id:'invBankCurrencyHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'invBankCurrencyDesc', name:'cust.invoiceAccount.invoiceCustodianBank.currency.description', value:cust?.invoiceAccount?.invoiceCustodianBank?.currency?.description, readOnly:true, width:'192px'  /}
+		<span class="error">#{error 'Invoice Currency is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'invBankBranch', name:'cust.invoiceAccount.invoiceCustodianBank.branchCode', label:'Branch', value:cust?.invoiceAccount?.invoiceCustodianBank?.branchCode, readOnly:readOnly, width:'300px', maxLength:'50', class:'capitalize' /}
+		&nbsp; <span id="invBankBranchError" class="error"></span>
+	</p>
+	<p>
+		#{textArea id:'invBankReferences', name:'cust.invoiceAccount.invoiceCustodianBank.description', value:cust?.invoiceAccount?.invoiceCustodianBank?.description, label:'Description', class:'capitalize', readOnly:readOnly, width:'300px', maxLength:'200'/}
+	</p>
+	<p>
+		#{textBox id:'defaultTaxCode', name:'cust.taxMaster.taxCode', label:'Default Tax Code', value:cust?.taxMaster?.taxCode, class:'capitalize ', required:true, readOnly:readOnly, width:'100px' /}
+		#{hidden id:'defaultTaxKey', name:'cust.taxMaster.taxKey', value:cust?.taxMaster?.taxKey /}
+		#{button id:'defaultTaxHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'defaultTaxDesc', name:'cust.taxMaster.description', value:cust?.taxMaster?.description, readOnly:true, width:'250px' /}
+		<span class="error">#{error 'Default Tax Code in tab Invoice is' /}</span>
+	</p>
+</div>
+<br/>
+<div style="overflow-y:scroll;height:130px">
+<table id="gridInvoice" class="display">
+	<thead>
+		<tr>
+			<th>Charge Group</th>
+			<th>Tax Code</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+	</tbody>
+</table>
+</div>
+<div class="buttons">
+	<input type="button" id="newInvoice"  value="Add"  class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" #{if readOnly}disabled="disabled"#{/if}/>
+</div>

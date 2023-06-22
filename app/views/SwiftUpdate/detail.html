@@ -1,0 +1,406 @@
+#{extends 'templates/detail1.html' /}
+#{if mode == 'edit' || mode == 'entry' || mode == 'view'}
+	#{set pageTitle: 'Swift Update Detail' /}
+#{/if}
+#{else}
+	#{set pageTitle: 'Swift Update Approval' /}
+#{/else}
+#{set id:ui?.swiftKey /}
+
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+#{script 'validation/numericOnly.js' /}
+#{script 'external/Util.js' /}
+
+<div id="root">
+	#{hidden id:'swiftKey', name:'ui.swiftKey', value:ui.swiftKey/}
+	#{hidden id:'serviceId', name:'ui.serviceId', value:ui.serviceId/}
+	#{hidden id:'sessionNumber', name:'ui.sessionNumber', value:ui.sessionNumber/}
+	#{hidden id:'sequenceNumber', name:'ui.sequenceNumber', value:ui.sequenceNumber/}
+	#{hidden id:'tagSwiftStatus', value:bean?.status/}
+	#{hidden id:'tagSwiftErrorDescription', value:bean?.errorDescription/}
+	#{hidden id:'tagSwiftEntityNo', value:bean?.transactionNo/}
+	#{hidden id:'depositoryId', value:ui?.depositoryId/}
+	<!-- 
+		#{textBox value:ui.field95ToggleA/}
+		#{textBox value:ui.field95ToggleB/}
+	 -->
+	 
+	<div id="tabs" style="height:430px;width:850px">
+		<ul>
+			<li><a href="#tab1">Header</a></li>
+			<li><a href="#tab2">General Information</a></li>
+			<li><a href="#tab3">Trade Details</a></li>
+			<li><a href="#tab4">Financial Information</a></li>
+			<li><a href="#tab5">Settlement Details</a></li>
+			<li><a href="#tab6">Other</a></li>
+			<li><a href="#tab7">Text</a></li>
+		</ul>
+
+		<div id="tab1">
+			<p>
+				#{dropDownList id:'messageMode', name:'ui.messageMode', label:'Message Mode', options:messageModeOptions, value:ui.messageMode, readOnly:readOnly, required:false /}
+				<span id="messageModeErr" class="error"></span>
+			</p>
+			<p>	
+				#{dropDownList id:'messageType', name:'ui.messageType', label:'Message Type', options:messageTypeOptions, value:ui.messageType, readOnly:readOnly, required:true /}
+				<span id="messageTypeErr" class="error"></span>
+			</p>
+			<p>	
+				#{textBox id:'sender', width:'100px', name:'ui.sender', label:'Sender Code', value:ui.sender, class:'capitalize', readOnly:readOnly, required:false /}
+				#{hidden id:'senderId', value:ui.sender/}
+				#{button id:'senderHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'senderDesc',width:'300px', name:'ui.senderDesc', label:'', value:ui.senderDesc, class:'capitalize', readOnly:true /}
+				<span id="senderErr" class="error"></span>
+			</p>
+			<p>	
+				#{textBox id:'receiver', width:'100px', name:'ui.receiver', label:'Receiver Code', value:ui.receiver, class:'capitalize', readOnly:readOnly, required:false /}
+				#{hidden id:'receiverId', value:ui.receiver/}
+				#{button id:'receiverHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'receiverDesc',width:'300px', name:'ui.receiverDesc', label:'', value:ui.receiverDesc, class:'capitalize', readOnly:true /}
+				<span id="receiverErr" class="error"></span>
+			</p>
+			<p>	
+				#{hidden value:ui?.messagePriority, readOnly:true/}
+				#{dropDownList id:'messagePriority', name:'ui.messagePriority', label:'Message Priority', options:messagePriorityOptions, value:ui.messagePriority, readOnly:readOnly, required:false /}
+				<span id="messagePriorityErr" class="error"></span>
+			</p>			
+			<p>
+				#{hidden value:ui?.deliveryMonitoring, readOnly:true/}
+				#{dropDownList id:'deliveryMonitoring', name:'ui.deliveryMonitoring', label:'Non Delivery Notification Period', options:nonDiliveryNotificationPeriod1Options, value:ui.deliveryMonitoring, readOnly:readOnly, required:false /}
+				<span id="deliveryMonitoringErr" class="error"></span>
+			</p>
+			<p>
+				#{hidden value:ui?.obsolescencePeriod, readOnly:true/}
+				#{dropDownList id:'obsolescencePeriod', name:'ui.obsolescencePeriod', label:' ', options:nonDiliveryNotificationPeriod2Options, value:ui.obsolescencePeriod, readOnly:readOnly, required:false /}
+				<span id="obsolescencePeriodErr" class="error"></span>
+			</p>
+			<p>
+				#{textBox id:'bankingPriority',width:'100px', name:'ui.bankingPriority', label:'Banking Priority', value:ui.bankingPriority, class:'capitalize', readOnly:readOnly, required:false, maxLength:8 /}
+				<span id="bankingPriorityErr" class="error"></span>
+			</p>
+			<p>
+				#{textBox id:'messageUserReference',width:'200px', name:'ui.messageUserReference', label:'Message User Reference', value:ui.messageUserReference, readOnly:readOnly, required:false, maxLength:20 /}
+				<span id="messageUserReferenceErr" class="error"></span>
+			</p>
+		</div>	
+		<div id="tab2">
+			<p>
+				#{hidden id:'field20CSemeQualifier', name:'ui.field20CSemeQualifier', value:ui.field20CSemeQualifier/}
+				#{textBox id:'field20CSemeReference',width:'150px', name:'ui.field20CSemeReference', label:'Reference Message', value:ui.field20CSemeReference, class:'capitalize', readOnly:readOnly, required:true, maxLength:16 /}
+				<span id="field20CSemeReferenceErr" class="error"></span>
+			</p>
+			<p>				
+				#{dropDownList id:'field23G', name:'ui.field23G', label:'Message Function', options:messageFunctionOptions, value:ui.field23G, readOnly:readOnly, required:false /}
+				<span id="field23GErr" class="error"></span>
+			</p>
+			<p id='p20CCommReference'>
+				#{hidden id:'field20CCommQualifier', name:'ui.field20CCommQualifier', value:ui.field20CCommQualifier/}
+				#{textBox id:'field20CCommReference',width:'150px', name:'ui.field20CCommReference', label:'Common Reference', value:ui.field20CCommReference, class:'capitalize', readOnly:readOnly, required:false, maxLength:16 /}
+				<span id="field20CCommReferenceErr" class="error"></span>
+			</p>
+			<p id='p20CPrevReference'>
+				#{hidden id:'field20CPrevQualifier', name:'ui.field20CPrevQualifier', value:ui.field20CPrevQualifier/}
+				#{textBox id:'field20CPrevReference',width:'150px', name:'ui.field20CPrevReference', label:'Prev Reference', value:ui.field20CPrevReference, class:'capitalize', readOnly:readOnly, required:false, maxLength:16 /}
+				<span id="field20CPrevReferenceErr" class="error"></span>
+			</p>
+		</div>
+		<div id="tab3">
+			<p>
+				#{hidden id:'field98ATradQualifier', name:'ui.field98ATradQualifier', value:ui.field98ATradQualifier/}
+				#{textBox id:'field98ATradDate',width:'100px', name:'ui.field98ATradDate', label:'Trade Date', value:ui.field98ATradDate, class:'capitalize', readOnly:readOnly, required:true, maxLength:8 /}&nbsp;(YYYYMMDD)
+				<span id="field98ATradDateErr" class="error"></span>
+			</p>
+			<p>
+				<label>Settlement Date</label>
+				#{dropDownList id:'fieldSettDateFormat', name:'ui.fieldSettDateFormat', value:ui?.fieldSettDateFormat, options:settlementDateFormatOptions, readOnly:readOnly /}
+				
+				<span id='settDate98C'>
+					#{hidden id:'field98CSettQualifier', name:'ui.field98CSettQualifier', value:ui.field98CSettQualifier/}
+					#{textBox id:'field98CSettDate',width:'150px', name:'ui.field98CSettDate', label:'', value:ui.field98CSettDate, class:'capitalize', readOnly:readOnly, required:true, maxLength:14 /}
+					<span id="field98CSettDateErr" class="error"></span>
+				</span>
+				
+				<span id='settDate98A'>
+					#{hidden id:'field98ASettQualifier', name:'ui.field98ASettQualifier', value:ui.field98ASettQualifier/}
+					#{textBox id:'field98ASettDate',width:'150px', name:'ui.field98ASettDate', label:'', value:ui.field98ASettDate, class:'capitalize', readOnly:readOnly, required:true, maxLength:14 /}
+					<span id="field98ASettDateErr" class="error"></span>
+				</span>
+			</p>
+			<p>
+				#{hidden id:'field90ADealQualifier', name:'ui.field90ADealQualifier', value:ui.field90ADealQualifier/}
+				#{hidden id:'field90ADealPercentageTypeCode', name:'ui.field90ADealPercentageTypeCode', value:ui.field90ADealPercentageTypeCode/}
+				#{textBox id:'field90ADealPrice',width:'100px', name:'ui.field90ADealPrice', label:'Price', value:ui.field90ADealPrice, class:'numeric', readOnly:readOnly, maxLength:15 /}
+				<span id="field90ADealPriceErr" class="error"></span>
+			</p>
+			<p id='p35BIsin'>	
+				#{textBox id:'field35BIsin',width:'100px', name:'ui.field35BIsin', label:'ISIN Code', value:ui.field35BIsin, class:'capitalize', readOnly:readOnly, required:false, required:true /}
+				#{hidden id:'field35BIsinId', value:ui.field35BIsin/}
+				#{button id:'field35BIsinHelp', value:'?', class:'small', readOnly:readOnly, readOnly:readOnly /}
+				#{textBox id:'field35BIsinDesc',width:'300px', name:'ui.field35BIsinDesc', label:'', value:ui.field35BIsinDesc, class:'capitalize', readOnly:true /}
+				<span id="field35BIsinErr" class="error"></span>
+			</p>	
+			<p id='p35BDesciption'>	
+				#{textBox id:'field35BDesciption',width:'100px', name:'ui.field35BDesciption', label:'Security Code', value:ui.field35BDesciption, class:'capitalize', readOnly:readOnly, required:true /}
+				#{hidden id:'field35BDesciptionId', value:ui.field35BDesciption/}
+				#{button id:'field35BDesciptionHelp', value:'?', class:'small', readOnly:readOnly, readOnly:readOnly /}
+				#{textBox id:'field35BDesciptionDesc',width:'300px', name:'ui.field35BDesciptionDesc', label:'', value:ui.field35BDesciptionDesc, class:'capitalize', readOnly:true /}
+				<span id="field35BDesciptionErr" class="error"></span>
+			</p>
+			<p>
+				#{radioButton id:'field35BToggle', value:ui.field35BToggle, name:'ui.field35BToggle',  label:'', options:isinSecurityOptions, readOnly:readOnly /}
+			</p>
+		</div>
+		<div id="tab4">
+			<p>
+				#{hidden id:'field36BSettQualifier', name:'ui.field36BSettQualifier', value:ui.field36BSettQualifier /}
+				#{hidden id:'field36BSettQuantityTypeCode', name:'ui.field36BSettQuantityTypeCode', value:ui.field36BSettQuantityTypeCode /}
+				#{textBox id:'field36BSettQuantity',width:'100px', name:'ui.field36BSettQuantity', label:'Quantity', value:ui.field36BSettQuantity, class:'numeric', readOnly:readOnly, required:true, maxLength:15 /}
+				<span id="field36BSettQuantityErr" class="error"></span>
+			</p>
+			<p>	
+				#{dropDownList id:'field97AFiacQualifier', name:'ui.field97AFiacQualifier', label:'Account', options:accountTypeOptions, value:ui.field97AFiacQualifier, readOnly:readOnly, required:true /}
+				&nbsp;
+				#{textBox id:'field97AFiacAccount',width:'350px', name:'ui.field97AFiacAccount', label:'', value:ui.field97AFiacAccount, class:'capitalize', readOnly:readOnly, maxLength:35 /}
+				<span id="field97AFiacAccountErr" class="error"></span>
+			</p>
+		</div>
+		<div id="tab5">
+			<p>	
+				#{hidden value:ui.field22FSetrIndicator/}
+				#{hidden id:'field22FSetrQualifier', name:'ui.field22FSetrQualifier', value:ui.field22FSetrQualifier/}
+				#{dropDownList id:'field22FSetrIndicator', name:'ui.field22FSetrIndicator', label:'Settlement Indicator', options:settlementIndicatorOptions, value:ui.field22FSetrIndicator, readOnly:readOnly, required:true /}
+				<span id="field22FSetrIndicatorErr" class="error"></span>
+			</p>
+			<p>	
+				#{hidden value:ui.field22FRtgsIndicator/}
+				#{hidden id:'field22FRtgsQualifier', name:'ui.field22FRtgsQualifier', value:ui.field22FRtgsQualifier/}
+				#{dropDownList id:'field22FRtgsIndicator', name:'ui.field22FRtgsIndicator', label:'Payment Indicator', options:paymentIndicatorOptions, value:ui.field22FRtgsIndicator, readOnly:readOnly, required:true /}
+				<span id="field22FRtgsIndicatorErr" class="error"></span>
+			</p>
+			<p>&nbsp;</p>
+			<p><b>Settlement Parties 1</b></p>
+			<p>	
+				#{hidden id:'field95PBuyrQualifier', name:'ui.field95PBuyrQualifier', value:ui.field95PBuyrQualifier/}
+				#{textBox id:'field95PBuyrBic',width:'100px', name:'ui.field95PBuyrBic', label:'Buyer', value:ui.field95PBuyrBic, class:'capitalize', readOnly:readOnly, required:false /}
+				#{hidden id:'field95PBuyrBicId', value:ui.field95PBuyrBic/}
+				#{button id:'field95PBuyrBicHelp', value:'?', class:'small', readOnly:readOnly, readOnly:readOnly /}
+				#{textBox id:'field95PBuyrBicDesc',width:'300px', name:'ui.field95PBuyrBicDesc', label:'', value:ui.field95PBuyrBicDesc, class:'capitalize', readOnly:true /}
+				<span id="field95PBuyrBicErr" class="error"></span>
+			</p>
+			<p>	
+				#{hidden id:'field95PSellQualifier', name:'ui.field95PSellQualifier', value:ui.field95PSellQualifier/}
+				#{textBox id:'field95PSellBic',width:'100px', name:'ui.field95PSellBic', label:'Seller', value:ui.field95PSellBic, class:'capitalize', readOnly:readOnly, required:false /}
+				#{hidden id:'field95PSellBicId', value:ui.field95PSellBic/}
+				#{button id:'field95PSellBicHelp', value:'?', class:'small', readOnly:readOnly, readOnly:readOnly /}
+				#{textBox id:'field95PSellBicDesc',width:'300px', name:'ui.field95PSellBicDesc', label:'', value:ui.field95PSellBicDesc, class:'capitalize', readOnly:true /}
+				<span id="field95PSellBicErr" class="error"></span>
+			</p>
+			<p>&nbsp;</p>
+			<p>
+				<b>Settlement Parties 2</b>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#{radioButton id:'field95ToggleA', value:ui.field95ToggleA, name:'ui.field95ToggleA',  label:'', options:settlementOptions, readOnly:readOnly /}
+			</p>
+			<div id='field95ToggleAgentBIC'>
+				<p>
+					<span>
+						#{hidden id:'field95PReagQualifier', name:'ui.field95PReagQualifier', value:ui.field95PReagQualifier/}
+						#{dropDownList id:'field95PReagBic', width:'100px', name:'ui.field95PReagBic', label:'Receiving Agent', options:receivingAgentBICOptions, value:ui.field95PReagBic, readOnly:readOnly, required:true /}
+					</span>
+					<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+					<span>
+						#{hidden id:'field97AReagQualifier', name:'ui.field97AReagQualifier', value:ui.field97AReagQualifier/}
+						#{textBox id:'field97AReagBic',width:'150px', name:'ui.field97AReagBic', label:'Safekeeping Account', value:ui.field97AReagBic, class:'capitalize', readOnly:readOnly, required:true, maxLength:34 /}
+					</span>
+				</p>
+				<p>
+					<span>
+						#{hidden id:'field95PDeagQualifier', name:'ui.field95PDeagQualifier', value:ui.field95PDeagQualifier /}
+						#{dropDownList id:'field95PDeagBic', width:'100px', name:'ui.field95PDeagBic', label:'Delivering Agent', options:deliveringAgentBICOptions, value:ui.field95PDeagBic, readOnly:readOnly, required:true /}
+					</span>
+					<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+					<span>
+						#{hidden id:'field97ADeagQualifier', name:'ui.field97ADeagQualifier', value:ui.field97ADeagQualifier/}
+						#{textBox id:'field97ADeagBic',width:'150px', name:'ui.field97ADeagBic', label:'Safekeeping Account', value:ui.field97ADeagBic, class:'capitalize', readOnly:readOnly, required:true, maxLength:34 /}
+					</span>					
+				</p>
+			</div>
+			<div id='field95ToggleAgentDSC'>
+				<p>	
+					<span>
+						#{dropDownList id:'field95RReagDataSourceSchemeMC', width:'100px', name:'ui.field95RReagDataSourceSchemeMC', label:'Receiving Agent', options:receivingAgentDSCOptions, value:ui.field95RReagDataSourceSchemeMC, readOnly:readOnly, required:true /}
+					</span>
+					<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+					<span>
+						#{hidden id:'field95RReagQualifier', name:'ui.field95RReagQualifier', value:ui.field95RReagQualifier/}
+						#{textBox id:'field95RReagDataSourceScheme',width:'150px', name:'ui.field95RReagDataSourceScheme', label:'DSS', value:ui.field95RReagDataSourceScheme, class:'capitalize', readOnly:readOnly, required:true, maxLength:34 /}
+					</span>
+					<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+					<span>
+						#{textBox id:'field95RReagProprietaryCode',width:'150px', name:'ui.field95RReagProprietaryCode', label:'Proprietary Code', value:ui.field95RReagProprietaryCode, class:'capitalize', readOnly:readOnly, required:true, maxLength:34 /}
+					</span>
+				</p>
+				<p>
+					<span>
+						#{dropDownList id:'field95RDeagDataSourceSchemeMC', width:'100px', name:'ui.field95RDeagDataSourceSchemeMC', label:'Delivering  Agent', options:deliveringAgentDSCOptions, value:ui.field95RDeagDataSourceSchemeMC, readOnly:readOnly, required:true /}
+					</span>
+					<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+					<span>
+						#{hidden id:'field95RDeagQualifier', name:'ui.field95RDeagQualifier', value:ui.field95RDeagQualifier/}
+						#{textBox id:'field95RDeagDataSourceScheme',width:'150px', name:'ui.field95RDeagDataSourceScheme', label:'DSS', value:ui.field95RDeagDataSourceScheme, class:'capitalize', readOnly:readOnly, required:true, maxLength:34 /}
+					</span>
+					<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+					<span>
+						#{textBox id:'field95RDeagProprietaryCode',width:'150px', name:'ui.field95RDeagProprietaryCode', label:'Proprietary Code', value:ui.field95RDeagProprietaryCode, class:'capitalize', readOnly:readOnly, required:true, maxLength:34 /}
+					</span>
+				</p>		
+			</div>
+			<p>&nbsp;</p>
+			<p>
+				<b>Settlement Parties 3</b>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#{radioButton id:'field95ToggleB', value:ui.field95ToggleB, name:'ui.field95ToggleB',  label:'', options:settlementOptions, readOnly:readOnly /}
+			</p>
+			<div id='field95ToggleCustodianBIC'>
+				<p>
+					<span>
+						#{hidden id:'field95PRecuQualifier', name:'ui.field95PRecuQualifier', value:ui.field95PRecuQualifier/}
+						#{dropDownList id:'field95PRecuBic', width:'100px', name:'ui.field95PRecuBic', label:'Receiving Custodian', options:receivingCustodianBICOptions, value:ui.field95PRecuBic, readOnly:readOnly, required:false /}
+					</span>
+					<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+					<span>
+						#{hidden id:'field97ARecuQualifier', name:'ui.field97ARecuQualifier', value:ui.field97ARecuQualifier/}
+						#{textBox id:'field97ARecuBic',width:'150px', name:'ui.field97ARecuBic', label:'Safekeeping Account', value:ui.field97ARecuBic, class:'capitalize', readOnly:readOnly, required:false, maxLength:34 /}
+					</span>
+				</p>
+				<p>
+					<span>
+						#{hidden id:'field95PDecuQualifier', name:'ui.field95PDecuQualifier', value:ui.field95PDecuQualifier /}
+						#{dropDownList id:'field95PDecuBic', width:'100px', name:'ui.field95PDecuBic', label:'Delivering Custodian', options:deliveringCustodianBICOptions, value:ui.field95PDecuBic, readOnly:readOnly, required:false /}
+					</span>
+					<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+					<span>
+						#{hidden id:'field97ADecuQualifier', name:'ui.field97ADecuQualifier', value:ui.field97ADecuQualifier/}
+						#{textBox id:'field97ADecuBic',width:'150px', name:'ui.field97ADecuBic', label:'Safekeeping Account', value:ui.field97ADecuBic, class:'capitalize', readOnly:readOnly, required:false, maxLength:34 /}
+					</span>					
+				</p>			
+			</div>
+			<div id='field95ToggleCustodianDSC'>
+				<p>	
+					<span>						
+						#{dropDownList id:'field95RRecuDataSourceSchemeMC', width:'100px', name:'ui.field95RRecuDataSourceSchemeMC', label:'Receiving Custodian', options:receivingCustodianDSCOptions, value:ui.field95RRecuDataSourceSchemeMC, readOnly:readOnly, required:false /}
+					</span>
+					<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+					<span>
+						#{hidden id:'field95RRecuQualifier', name:'ui.field95RRecuQualifier', value:ui.field95RRecuQualifier/}
+						#{textBox id:'field95RRecuDataSourceScheme',width:'150px', name:'ui.field95RRecuDataSourceScheme', label:'DSS', value:ui.field95RRecuDataSourceScheme, class:'capitalize', readOnly:readOnly, required:false, maxLength:34 /}
+					</span>
+					<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+					<span>
+						#{textBox id:'field95RRecuProprietaryCode',width:'150px', name:'ui.field95RRecuProprietaryCode', label:'Proprietary Code', value:ui.field95RRecuProprietaryCode, class:'capitalize', readOnly:readOnly, required:false, maxLength:34 /}
+					</span>
+				</p>
+				<p>
+					<span>
+						#{dropDownList id:'field95RDecuDataSourceSchemeMC', width:'100px', name:'ui.field95RDecuDataSourceSchemeMC', label:'Delivering  Custodian', options:deliveringCustodianDSCOptions, value:ui.field95RDecuDataSourceSchemeMC, readOnly:readOnly, required:false /}
+					</span>
+					<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+					<span>
+						#{hidden id:'field95RDecuQualifier', name:'ui.field95RDecuQualifier', value:ui.field95RDecuQualifier/}
+						#{textBox id:'field95RDecuDataSourceScheme',width:'150px', name:'ui.field95RDecuDataSourceScheme', label:'DSS', value:ui.field95RDecuDataSourceScheme, class:'capitalize', readOnly:readOnly, required:false, maxLength:34 /}
+					</span>
+					<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+					<span>
+						#{textBox id:'field95RDecuProprietaryCode',width:'150px', name:'ui.field95RDecuProprietaryCode', label:'Proprietary Code', value:ui.field95RDecuProprietaryCode, class:'capitalize', readOnly:readOnly, required:false, maxLength:34 /}
+					</span>
+				</p>	
+			</div>
+			<p>&nbsp;</p>
+			<p><b>Settlement Parties 4</b></p>
+			<p>	
+				#{hidden value:ui.field95PPsetBic/}
+				#{hidden id:'field95PPsetQualifier', name:'ui.field95PPsetQualifier', value:ui.field95PPsetQualifier /}
+				#{dropDownList id:'field95PPsetBic', width:'100px', name:'ui.field95PPsetBic', label:'Place Of Settlement', options:placeOfSettlementOptions, value:ui.field95PPsetBic, readOnly:readOnly, required:false /}
+			</p>	
+			<p>&nbsp;</p>
+			<p><b>Amount</b></p> 
+			<div>
+				<p>
+					#{hidden id:'field19ASettQualifier', name:'ui.field19ASettQualifier', value:ui.field19ASettQualifier /}
+					#{textBox id:'field19ASettCurrency',width:'100px', name:'ui.field19ASettCurrency', label:'Currency', value:ui.field19ASettCurrency, class:'capitalize', readOnly:readOnly, required:true /}
+					#{hidden id:'field19ASettCurrencyId', value:ui.field19ASettCurrency/}
+					#{button id:'field19ASettCurrencyHelp', value:'?', class:'small', readOnly:readOnly, readOnly:readOnly /}
+					#{textBox id:'field19ASettCurrencyDesc',width:'300px', name:'ui.field19ASettCurrencyDesc', label:'', value:ui.field19ASettCurrencyDesc, class:'capitalize', readOnly:true, required:true /}
+					<span id="field19ASettCurrencyErr" class="error"></span>
+				</p>
+				<p>
+					#{textBox id:'field19ASettAmount',width:'100px', name:'ui.field19ASettAmount', label:'Settlement Amount', value:ui.field19ASettAmount, class:'numeric', readOnly:readOnly, required:true, maxLength:15 /}
+					<span id="field19ASettAmountErr" class="error"></span>
+				</p>
+			</div>
+		</div>
+		<div id="tab6">
+			<p>
+				#{textBox id:'chk' ,width:'100px', label:'CHK', value:ui?.chk, class:'capitalize', readOnly:true, required:false, maxLength:12 /}
+			</p>
+			<p>	
+				#{textBox id:'mac' ,width:'100px', label:'MAC', value:ui?.mac, class:'capitalize', readOnly:true, required:false, maxLength:12 /}
+			</p>
+			<p>	
+				#{dropDownList id:'systemStatus', label:'System Status', options:statusOptions, value:ui?.systemStatus, readOnly:true, required:false /}
+			</p>
+			<p>	
+				#{textBox id:'ackStatus' ,width:'100px', label:'ACK Status', value:ui?.ackStatus, class:'capitalize', readOnly:true, required:false, maxLength:12 /}
+			</p>
+			<p>	
+				#{textBox id:'responseStatus' ,width:'100px', label:'Response Status', value:ui?.responseStatus, class:'capitalize', readOnly:true, required:false, maxLength:12 /}
+			</p>
+			<p>
+			   #{textArea id:'errors', label:'Error', value:ui?.errors, required:false, width:'600px', readOnly:true /}
+		    </p>
+		</div>
+		<div id="tab7">
+			<table>
+				<thead>
+					<tr>
+						<td><b>Real Message</b></td>
+						<td><b>Edited Message</b></td>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>
+							#{textArea id:'realMessage', name:'ui.realMessage', value:ui.realMessage, label:'', width:'400px', class:'capitalize', maxLength:1000000, rows:'30', readOnly:true/}
+						</td>
+						<td>
+							#{textArea id:'message', name:'ui.message', value:ui.message, label:'', width:'400px', class:'capitalize', maxLength:1000000, rows:'30', readOnly:true/}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			
+		</div>
+	</div>	
+</div>
+
+<div id="dialog-message" title="Information">
+  <p>
+    <span class="ui-icon ui-icon-circle-check" style="float:left; margin:0 7px 50px 0;"></span>
+    <span id='dialogStsMsg'></span>
+  </p>
+</div>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'SwiftUpdate/detail.js' /}
+	var vDetail = null;
+	$(document).ready(function() {
+		vDetail = detail($("#root"));
+	});
+	
+	function doSave() {
+		vDetail.setEnabled();
+		return true;
+	}
+</script>

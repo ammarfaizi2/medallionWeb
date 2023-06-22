@@ -1,0 +1,381 @@
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.organization.organizationId"
+
+2FE3AD52-C618-484F-857E-A9D530EF716A
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.securityKey"
+
+831
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.securityType.category"
+
+
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.securityCategory"
+
+
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.todayPlusOne"
+
+
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="checkIsExpire"
+
+
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="fairValueTrade"
+
+
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="amortizedTrade"
+
+
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="fairValueAFS"
+
+
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="amortizedAFS"
+
+
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="fairValueHTM"
+
+
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="amortizedHTM"
+
+
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.nextPaymentDate"
+
+
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.lastPaymentDate"
+
+
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="status"
+
+A 
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.securityType.isPrice"
+
+false
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.securityType.isDiscounted"
+
+false
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.securityType.priceUnit"
+
+1
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.securityType.hasInterest"
+
+true
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="isreload"
+
+true
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.securityType.securityType"
+
+TDP
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.securityType.description"
+
+TIME DEPOSIT
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="securityClass"
+
+MM
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.securityType.securityClass.lookupCode"
+
+MM
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="securityClassDesc"
+
+MONEY MARKET
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.securityType.securityClass.lookupDescription"
+
+MONEY MARKET
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.securityId"
+
+SYNAT360
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.description"
+
+TDP BANK CIMB NIAGA UUS
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.syariah"
+
+true
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.apoloType.lookupCode"
+
+F110202
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.apoloType.lookupId"
+
+JENIS_EFEK-F110202
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.apoloType.lookupDescription"
+
+Sertifikat Deposito Syariah (TBC DPPS)
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.issuer.thirdPartyCode"
+
+BNGA2
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.issuer.thirdPartyKey"
+
+88298
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.issuer.thirdPartyName"
+
+BANK NIAGA SYARIAH
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.currency.currencyCode"
+
+IDR
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.currency.description"
+
+INDONESIAN RUPIAH
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.subSector.lookupCode"
+
+FINANCE
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.subSector.lookupId"
+
+SUB_SECTOR-FINANCE
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.subSector.lookupDescription"
+
+KEUANGAN
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.marketOfRisk.lookupCode"
+
+ID
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.marketOfRisk.lookupId"
+
+COUNTRY-ID
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.marketOfRisk.lookupDescription"
+
+INDONESIA
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.registrarCode.lookupCode"
+
+NA
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.registrarCode.lookupId"
+
+REGISTRAR-NA
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.registrarCode.lookupDescription"
+
+NOT AVAILABLE
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.isinCode"
+
+0
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="settlementDays"
+
+0
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.settlementDays"
+
+0
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.isExpire"
+
+false
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="isScript"
+
+false
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.isScript"
+
+false
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="isActive"
+
+true
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.isActive"
+
+true
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.issueDate"
+
+01/01/1900
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.maturityDate"
+
+
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.expiredDate"
+
+
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.accrualBase.lookupId"
+
+ACCRUAL_BASE-ACT
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.yearBase.lookupId"
+
+YEAR_BASE-360
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="frequency"
+
+FREQUENCY-Y
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.frequency.lookupId"
+
+FREQUENCY-Y
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.depositoryCode.lookupId"
+
+DEPOSITORY_CODE-N/A
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.externalCode"
+
+9022
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.externalType.lookupId"
+
+
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.checkTrade"
+
+false
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.checkAfs"
+
+false
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.checkHtm"
+
+true
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.valuationMethodTrade.lookupId"
+
+
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.valuationMethodAFS.lookupId"
+
+
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.valuationMethodHTM.lookupId"
+
+VALUATION_METHOD-NA
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="marketPriceTrade"
+
+
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.marketPriceTrade.lookupId"
+
+
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="marketPriceAFS"
+
+
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.marketPriceAFS.lookupId"
+
+
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="marketPriceHTM"
+
+MARKET_PRICE-NA
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.marketPriceHTM.lookupId"
+
+MARKET_PRICE-NA
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="amortizationMethodTrade"
+
+
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.amortizationMethodTrade.lookupId"
+
+
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.amortizationMethodAFS.lookupId"
+
+
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="amortizationMethodAFS"
+
+
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="amortizationMethodHTM"
+
+
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.amortizationMethodHTM.lookupId"
+
+
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="minTrxQuantity"
+
+0
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.minTrxQuantity"
+
+0
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security?.parUnitValue"
+
+1
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.parUnitValue"
+
+1
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security?.listedShare"
+
+0
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="security.listedShare"
+
+0
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="udfs[0].value"
+
+
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="udfs[0].fieldName"
+
+RATING
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="udfs[0].displayType.lookupId"
+
+DISPLAY_TYPE-1
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="udfs[0].dataType.lookupId"
+
+DATA_TYPE-STR
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="udfs[0].label"
+
+RATING
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="udfs[0].lookupGroup.lookupGroup"
+
+
+------WebKitFormBoundarywip6qghh0r4PTZaE
+Content-Disposition: form-data; name="udfs[0].sequence"
+
+1
+------WebKitFormBoundarywip6qghh0r4PTZaE--

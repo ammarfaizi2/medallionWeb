@@ -1,0 +1,95 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Corporate Action Entitlement Reprocess' /}
+#{set id:corporateAnnouncement?.corporateAnnouncementKey /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+
+<script type="text/javascript">
+$(function(){
+	$('.buttons input:button').button();
+	var closeDialogMessage = function() {
+		$("#dialog-message").dialog("close");
+	}
+	
+	var nextProcess = function() {
+		$("#dialog-message").dialog("close");
+		loading.dialog('open');
+		var action = "@{process()}";
+		$('#entitlementForm').attr('action', action);
+		$('#entitlementForm').submit();
+	}
+	
+	
+	$('#btnProcess').click(function(){
+		var currentDate = new Date($('#currentDate').datepicker('getDate')).getTime();
+		var entDate = new Date($('#entitlementDate').datepicker('getDate')).getTime();
+		/* var statusTaxCaLink = $('#statusAnnouncementTaxCaLink').val();
+		if (statusTaxCaLink!='' && statusTaxCaLink.indexOf("E") < 0){
+			messageAlertOk("This entitlement should be process after announcement no# "+$('#caCode').val()+" ", "ui-icon1 ui-icon-alert", "Warning Message", closeDialogMessage);
+			return false;
+		} else */ /*if (currentDate < entDate) {
+			messageAlertOk("Entitlement date cannot greater than application date", "ui-icon1 ui-icon-alert", "Warning Message", closeDialogMessage);
+			return false;
+		} else */if (entDate < currentDate){
+			messageAlertYesNo("Entitlement for this announcement already passed, do you want continue this process ?", "ui-icon ui-icon-notice", "Confirmation Message",nextProcess, closeDialogMessage)
+		} else {
+			nextProcess();	
+		}
+		
+		
+	});
+	
+	$('#btnReset').click(function(){
+		location.href = '@{list()}';
+		return false;
+	});
+});
+</script>
+
+<form id="entitlementForm" class="form" method="POST">
+	#{hidden id:'corporateAnnouncementKey', name:'corporateAnnouncement.corporateAnnouncementKey', value:corporateAnnouncement?.corporateAnnouncementKey /}
+	#{hidden id:'currentDate', name:'currentDate', value:currentDate?.format(appProp.dateFormat), class:'calendar' /}
+	<!-- #{hidden id:'statusTaxCaLink', name:'statusTaxCaLink', value:corporateAnnouncement?.taxCaLink?.status?.trim() /}
+	#{hidden id:'caCode', name:'caCode', value:caCode /} -->
+	#{hidden id:'statusAnnouncementTaxCaLink', name:'status', value:status /}
+	<p>      
+		#{textBox id:'entitlementNo', name:'entitlement.entitlementKey', label:'Entitlement No', class:'capitalize', value:entitlement?.entitlementKey, width:'150px', required:true, readOnly:true /} 
+	</p>
+	<p>      
+		#{textBox id:'corporateAnnouncementCode', name:'corporateAnnouncement.corporateAnnouncementCode', label:'Announcement No', class:'capitalize', value:corporateAnnouncement?.corporateAnnouncementCode, width:'150px', required:false, readOnly:true /} 
+	</p>			
+	<p>			
+		#{textBox id:'description', name:'corporateAnnouncement.description', label:'Subject', width:'308px',value:corporateAnnouncement?.description,required:false, class:'capitalize', readOnly:true , width:'457px'/}
+	</p>			
+	<p>
+		#{textBox id:'securityType', name:'corporateAnnouncement.securityType.securityType', label:'Security Type', value:corporateAnnouncement?.securityType?.securityType, class:'capitalize', required:false, readOnly:true, width:'100px' /}
+		#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:true  /}
+		#{textBox id:'securityTypeDesc', name:'corporateAnnouncement.securityType.description', value:corporateAnnouncement?.securityType?.description, readOnly:true, width:'330px' /}
+		#{hidden id:'securityTypeId'/}
+	</p>				
+	<p>
+		#{textBox id:'securityId', name:'corporateAnnouncement.security.securityId', label:'Security Code', value:corporateAnnouncement?.security?.securityId, class:'capitalize', readOnly:true, required:false, width:'100px' /}
+		#{hidden id:'securityKey', name:'corporateAnnouncement.security.securityKey', value:corporateAnnouncement?.security?.securityKey /}
+		#{button id:'securityIdHelp', value:'?', class:'small', readOnly:true /}
+		#{textBox id:'securityIdDescription', name:'corporateAnnouncement.security.description', value:corporateAnnouncement?.security?.description, readOnly:true, width:'330px' /}
+	</p>
+	<p>
+		#{textBox id:'actionCode', name:'corporateAnnouncement.actionTemplate.actionCode', label:'Action Code', class:'capitalize master', value:corporateAnnouncement?.actionTemplate?.actionCode, required:false, readOnly:true, width:'100px' /}
+		#{button id:'actionCodeHelp', value:'?', class:'small', readOnly:true /}
+		#{textBox id:'actionCodeDesc', name:'corporateAnnouncement.actionTemplate.description', value:corporateAnnouncement?.actionTemplate?.description, readOnly:true, width:'330px' /}
+		#{hidden id:'actionCodeKey', name:'corporateAnnouncement.actionTemplate.actionTemplateKey', value:corporateAnnouncement?.actionTemplate?.actionTemplateKey /}
+		<span class="error">#{error 'Action Code is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'entitlementDate', name:'corporateAnnouncement.entitlementDate', value:corporateAnnouncement?.entitlementDate?.format(appProp.dateFormat), label:'Entitlement Date', class:'calendar', readOnly:true/} (${appProp.displayDateFormat})
+	</p>
+	<div class="buttons">
+		<input type="button" id="btnProcess" value="Process" />
+		<input type="button" id="btnReset" value="Cancel" />
+	</div>
+	<p>
+	<textarea id='log' rows="10" cols="125" readonly="readonly">
+#{list logs, as:'log'}${log}
+#{/list}
+	</textarea>
+	</p>	
+</form>

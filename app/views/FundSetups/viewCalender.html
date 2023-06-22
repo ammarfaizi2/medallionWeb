@@ -1,0 +1,317 @@
+#{extends 'templates/main.html' /}
+#{script 'lookups.js' /}
+#{set id:faMaster?.fundKey /}
+#{set mode: mode/}
+#{set status: status/}
+<style>
+.holiday a {
+	color: black !important;
+}
+
+.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
+    color: #2E6E9E;
+    
+}
+
+#daysErrorMessage {
+	color: red;
+	margin-left:6px;
+}
+</style>
+
+<script type="text/javascript">
+	
+ 	var publishDates = [														// holidays Array declaration 
+ 	   	//1304182800000, 		//2011-5-1,
+ 	   	//1304960400000,		//2011-5-10,
+ 	   	//1305392400000			//2011-5-15
+ 	   	//1305478800000
+ 	   	//
+ 	   	#{list items:publishDates, as:'publishDate'}
+ 	    	#{if publishDate_isLast}
+ 	    		${publishDate.id.publishDate.time}
+ 	    	#{/if}
+ 	    	#{else}
+ 	    		${publishDate.id.publishDate.time},
+ 	    	#{/else}
+ 	    #{/list}
+ 	];
+ 	// end of declarattion
+ 	//alert(${year});
+	
+	
+			
+ 	$(function() {
+ 		$('.buttons button').button();
+ 		$('.buttons input:button').button();
+		
+		$("#year").val('${year}');
+		$("#key").val('${key}');
+		$("#id").val('${id}');
+		$("#mode").val('${mode}');
+		$('#list #detail').css("display","none");							// disable dialog list 
+		
+		$('#dialog-confirm').css("display","none");							// disable dialog confirm
+		
+		$("#reset").click(function(){										// reset function
+			var days = [];
+			resetCalendar(days);
+		});
+		// end of function
+		
+		//$('#calHolder').css("display","none");
+		//alert(${started} == true);
+		var isUsedAppDate = '${isUsedAppDate}';
+		console.log("isUsedAppDate : " + isUsedAppDate);
+		if (isUsedAppDate == 'CALENDAR') {
+			$("#save").disabled();
+			$('#swd').disabled();
+			$("#reset").disabled();
+			$("#datepicker").datepicker('disable');
+			$("#datepicker").datepicker("option", "disabled", true);
+		}
+		
+		
+		
+			
+		$("#save").click(function(){	
+			//saveDate (Long id,String mode,List<Long> dates, int year, Long key)
+			
+			 var action = "@{saveDate()}?id=${id}&mode=${mode}&status=${status}&year="+${year}+"#{if group}&group=${group}#{/}#{if param}&param=${param}#{/}#{if isPartial}&isPartial=${isPartial}#{/}&isUsedAppDate=${isUsedAppDate}";
+			 $('#fundSetupForm').attr('action', action);
+			 for( var idx_ in publishDates ){
+				 $('#fundSetupForm').append( "<input type=\"hidden\" name=\"dates[]\" value=\""+publishDates[idx_]+"\"/>" );
+			 }
+			 $('#fundSetupForm').submit();
+			 //return false;
+			 //$.post('@{saveDate()}', {'id':$('#id').val(),'mode':$('#mode').val(),'dates':publishDates,'year':$('#year').val(), 'key':$('#key').val()});
+			 //$.post(action, $('#fundSetupForm').serialize());
+		});
+	
+		// end of function
+		
+		/* $("#back").click(function(){
+			submit('@{entry()}?mode=${mode}#{if group}&group=${group}#{/}#{if param}&param=${param}#{/}#{if isPartial}&isPartial=${isPartial}#{/}');
+			//location.href="@{CalendarsPublishNav.list()}";
+		}); */
+		
+		$('#backCalender').click(function(){
+			  var action = "@{backCalender()}?id=${id}&mode=${mode}&status=${status}#{if group}&group=${group}#{/}#{if param}&param=${param}#{/}#{if isPartial}&isPartial=${isPartial}#{/}&isUsedAppDate=${isUsedAppDate}";
+			 $('#fundSetupForm').attr('action', action);
+			 $('#fundSetupForm').submit();  
+			//submit('@{backCalender()}?id=${id}&mode=${mode}#{if group}&group=${group}#{/}#{if param}&param=${param}#{/}#{if isPartial}&isPartial=${isPartial}#{/}');
+			//$.post('@{CalendarsPublishNav.confirm()}?id=${id}');
+		});
+		
+		
+		$('#swd').click(function(){ 										// set working days onClick function
+			//var days = [0, 1, 2, 3, 4, 5, 6];
+			//resetCalendar(days);
+			$('#list #detail').css('overflow','hidden');
+			$('#list #detail').dialog("destroy");
+			$('#daysErrorMessage').html("");
+			$( "#detail" ).dialog({
+				resizable: false,
+				height: 160,
+				width: 700,
+				modal: true,
+				buttons: {
+					"Set Days" : function() {								// set days function in dialog buttons
+						
+						var  //ckDay=[0,1,2,3,4,5,6]; 						// create a litteral array
+							 ckDay=[];
+												
+							if($("#sunday").is(":checked")){
+								//$(this).css("color","blue");
+								//ckDay.splice(0,1);
+								ckDay.push(0);
+								
+								//var day0 = [0];
+								//resetCalendar(day0)
+								//alert(" minggu : " + $("#sunday").is(":checked"));
+							}
+							if ($("#monday").is(":checked")){
+								//ckDay.splice(0,1);
+								ckDay.push(1);
+								//resetCalendar(day1)
+								//alert(" senin : " + $("#monday").is(":checked"));
+							}
+							if ($("#tuesday").is(":checked")){
+								//ckDay.splice(0,1);
+								ckDay.push(2);
+								//alert(" selasa : " + $("#tuesday").is(":checked"));
+							}
+							if ($("#wednesday").is(":checked")){
+								//ckDay.splice(0,1);
+								ckDay.push(3);
+								//	alert(" rabu : " + $("#wednesday").is(":checked"));
+							}
+							if ($("#thursday").is(":checked")){
+								//ckDay.splice(0,1);
+								ckDay.push(4);
+								//alert(" kamis : " + $("#thursday").is(":checked"));
+							}
+							if ($("#friday").is(":checked")){
+								//ckDay.splice(0,1);
+								ckDay.push(5);
+								//alert(" jumat : " + $("#friday").is(":checked"));
+							}
+							if ($("#saturday").is(":checked")){
+								//ckDay.splice(0,1);
+								ckDay.push(6);
+								//alert(" sabtu : " + $("#saturday").is(":checked"));
+							}
+						//	alert(ckDay);
+						
+						if (ckDay == "") {
+							$('#daysErrorMessage').html("Choose the days");								
+							return false;
+						}
+						
+						resetCalendar(ckDay);
+											
+						$( this ).dialog( "close" );						// close button
+						
+					},
+					
+					Cancel: function() {									// cencel function in dialog buttons
+						$( this ).dialog( "close" );
+					}
+				}							
+			});
+		});
+		// end of function
+		
+		// DATEPICKER SHOW ALL MONTHS
+		$("#datepicker").datepicker({										// call JQueryUI datapicker
+			//$( "#datepicker" ).datepicker({ disabled: true });
+			numberOfMonths: [3,4],
+			stepMonths: 12,
+			showButtonPanel: false,
+			hideIfNoPrevNext: true,
+			minDate: new Date(${year}, 0, 1),
+			maxDate: new Date(${year}, 11, 31),
+			beforeShowDay: isHoliday,
+			onSelect: function(dateText, inst) {
+				var isUsedAppDate = '${isUsedAppDate}';
+				if (isUsedAppDate == 'SPECIFIC') {
+					var found = false;
+					var date = $.datepicker.parseDate('mm/dd/yy', dateText);
+					for (i = 0; i < publishDates.length; i++) {
+						var holiday = new Date(publishDates[i]);
+						if (holiday.getTime() == date.getTime()) {
+							publishDates.splice(i, 1);
+							found = true;
+							break;
+						}
+					}
+					if (!found) {
+						publishDates.push(date.getTime());
+					}				
+					$("#datepicker").datepicker('refresh');
+				}
+				
+			}
+		});
+		
+ 	});
+ 	
+	function isHoliday(date) {												// isHoliday function
+		var isUsedAppDate = '${isUsedAppDate}';
+		if (isUsedAppDate == 'SPECIFIC') {
+			for (i = 0; i < publishDates.length; i++) {
+				//var holiday = new Date(holidays[i]);
+				if (date.getTime() == publishDates[i]) {
+					//console.debug( 'isHoliday:' + date);
+					return [true, 'holiday'];
+				}
+			}
+			//console.debug( 'notHoliday:' + date);
+			return [true, ''];
+		}else {
+			//schedule-type : CALENDAR. dibedakan karena gn_calendar berisi hari libur.
+			for (i = 0; i < publishDates.length; i++) {
+				//var holiday = new Date(holidays[i]);
+				if (date.getTime() == publishDates[i]) {
+					//console.debug( 'isHoliday:' + date);
+					return [true, ''];
+				}
+			}
+			//console.debug( 'notHoliday:' + date);
+			return [true, 'holiday'];
+		}		
+	}
+	// end of function
+	
+	
+	function resetCalendar(days) {										// resetCalendar function
+		publishDates = new Array();
+		var start = $('#datepicker').datepicker('option', 'minDate');
+		var end = $('#datepicker').datepicker('option', 'maxDate');
+		for (i = start; i <= end; ) {
+			for (j = 0; j < days.length; j++)
+				if (i.getDay() == days[j]) {
+					publishDates.push(i.getTime());
+					break;
+				}
+			i.setTime(i.getTime() + 24*60*60*1000);
+		}
+		// end of function
+		
+								
+		//for (i = 0; i < holidays.length; i++) 
+		//	console.debug( 'holiday: ' + new Date(holidays[i]));
+		$("#datepicker").datepicker('option', 'minDate', new Date(${year}, 0, 1));
+		$("#datepicker").datepicker('option', 'maxDate', new Date(${year}, 11, 31));
+		$("#datepicker").datepicker('refresh');
+
+	}
+	function submit(action, id) {
+			var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Sending data to server ...</div>').appendTo('body');
+			loading.dialog({
+				closeOnEscape: false,
+				draggable: false,
+				modal: true,
+				resizable: false,
+				open:function() {
+					$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+				} 
+			});
+			$('#form').attr('action', action);
+			$('#form').submit();
+	}
+</script>
+
+<style type="text/css">
+	#year {margin-left: 8em;}
+	#fcHolder {margin-left: 2em}
+	#syHolder {margin-left: 1.9em; margin-top:-0.8em;}
+</style>
+
+<form id="fundSetupForm" class="form" method="POST">
+</form>
+<div id="calHolder">
+<div id="datepicker"></div>
+<div class="buttons">
+	<input  type="button" id="save" value="Save" />
+	<input  type="button" id="reset" value="Reset" />
+	<input  type="button" id="swd" value="Set Days"/>
+	<input  type="button" id="backCalender" value="Back"/>
+</div>
+</div>
+<div id="list">
+	#{include 'FundSetups/viewDays.html' /}
+</div>
+
+<div id="dialog-confirm" title="Confirmation Save">
+	<p>Are you sure to continue save ? </p>
+</div>
+
+
+
+
+
+
+
+
+

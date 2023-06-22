@@ -1,0 +1,35 @@
+<p>
+	<label>Rounding Amount</label>
+</p>
+<p>
+	#{dropDownList id:'amountType', name:'prd.amountRoundType', label:'Type', options:roundingType, value:prd?.amountRoundType, readOnly:readOnly, required:true, width:'104px' /}
+	<span class="error">#{error 'Type Amount in tab Digit Parameter is' /}</span>
+</p>
+<p>
+	#{textBox id:'amountVal', label:'Value', name:'prd.amountRoundValue' ,value:prd?.amountRoundValue, width:'100px', readOnly:readOnly, required:true /} (Only 0-6)
+	<span class="error">#{error 'Value Amount in tab Digit Parameter is' /}</span>
+</p>
+<br />
+<p>
+	<label>Rounding Unit</label>
+</p>
+<p>
+	#{dropDownList id:'unitType', name:'prd.unitRoundType', label:'Type', options:roundingType, value:prd?.unitRoundType, readOnly:readOnly, required:true, width:'104px' /}
+	<span class="error">#{error 'Type Unit in tab Digit Parameter is' /}</span>
+</p>
+<p>
+	#{textBox id:'unitVal', label:'Value', name:'prd.unitRoundValue',value:prd?.unitRoundValue, width:'100px', readOnly:readOnly, required:true /} (Only 0-8)
+	<span class="error">#{error 'Value Unit in tab Digit Parameter is' /}</span>
+</p>
+<br />
+<p>
+	<label>Rounding Price</label>
+</p>
+<p>
+	#{dropDownList id:'priceType', name:'prd.priceRoundType', label:'Type', options:roundingType, value:prd?.priceRoundType, readOnly:readOnly , required:true, width:'104px' /}
+	<span class="error">#{error 'Type Price in tab Digit Parameter is' /}</span>
+</p>
+<p>
+	#{textBox id:'priceVal', label:'Value', name:'prd.priceRoundValue',value:prd?.priceRoundValue, width:'100px', readOnly:readOnly, required:true /}(Only 0-10)
+	<span class="error">#{error 'Value Price in tab Digit Parameter is' /}</span>
+</p>	

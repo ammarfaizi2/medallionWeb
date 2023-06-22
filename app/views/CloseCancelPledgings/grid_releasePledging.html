@@ -1,0 +1,30 @@
+<h3>Search results</h3>
+
+#{if plTransactions}
+<table id="gridReleasePledging" class="display">
+	<thead>
+		<tr>
+			<th>Transaction Key</th>
+			<th>Txn #</th>
+			<th>Customer Name</th>
+			<th>Reference Amount</th>
+			<th>Remarks</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:plTransactions, as:'plTransaction'}
+		<tr>
+			<td>${plTransaction?.transactionKey}</td>
+			<td>${plTransaction?.transactionKey}</td>
+			<td>${plTransaction?.customer?.customerName}</td>
+			<td>${plTransaction?.amount}</td>
+			<td>${plTransaction?.remarks}</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>
+
+#{/if}
+#{else}
+<div>No record found</div>
+#{/else}

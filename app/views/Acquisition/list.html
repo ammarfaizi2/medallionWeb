@@ -1,0 +1,88 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Acquisition Maintenance' /}
+#{set fixData: true /}
+#{set mode: mode /}
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+
+<script>
+	function setupTable() {
+		// method ini di gunakan untuk mengintrupt pembuatan data table
+	}
+</script>
+
+<div id="root">
+	<div id="accordion">
+		<h3><a href="#">Search Transaction</a></h3>
+		
+		<form id="searchForm" class="form">
+			#{hidden id:'query' /}
+			
+			<p id="pTransactionDateFrom">
+				#{textBox id:'transactionDateFrom', label:'Transaction Date', width:'100px', required:'true', class:'calendar' /} 
+				(${appProp.displayDateFormat})
+				<b>To</b>
+				#{textBox id:'transactionDateTo', width:'100px', required:'true', class:'calendar' /}
+				(${appProp.displayDateFormat})
+				<span id="transactionDateError" class="error"></span>
+			</p>
+			
+			<p>
+				#{textBox id:'customerCode', label:'Customer Code', width:'100px', class:'capitalize' /}
+				#{hidden id:'customerCodeKey'/}
+				#{button id:'customerCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'customerCodeDesc', readOnly:true, width:'200px' /}
+				<span id="customerCodeError" class="error"></span>
+			</p>
+			
+			<p>
+				#{textBox id:'securityType', width:'100px', label:'Security Type', class:'capitalize' /}
+				#{hidden id:'securityTypeKey'/}
+				#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'securityTypeDesc', readOnly:true, width:'200px' /}
+				<span id="securityTypeError" class="error"></span>
+			</p>
+			
+			<p>
+				#{textBox id:'securityCode', width:'100px', label:'Security Code', class:'capitalize' /}
+				#{hidden id:'securityCodeKey'/}
+				#{button id:'securityCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'securityCodeDesc', readOnly:true, width:'200px' /}
+				<span id="securityCodeError" class="error"></span>
+			</p>
+			
+			<div class="buttons">
+				<input id="search" type="button" value="Search" />				
+				<input id="reset" type="button" value="Reset" />					
+			</div>
+		</form>
+	</div>
+	
+	<p>&nbsp;</p>
+	
+	<div id="result" style="display:none">
+		<table id="tblAcquisition" class="display">
+			<thead>
+				<tr>
+					<th field="transactionDate|string|none|center|sort" width="110px">Transaction&nbsp;Date</th>
+					<th field="transactionNumber|string|none|left|sort">Transaction&nbsp;No</th>				
+					<th field="account.accountNo|string|none|left|sort">Account&nbsp;No</th>
+					<th field="account.name|string|none|left|sort">Account&nbsp;Name</th>				
+					<th field="security.securityId|string|none|left|sort">Security&nbsp;Code</th>
+					<th field="quantity|string|none|right|sort">Quantity</th>
+					<th field="acquisition|string|none|center|nosort">Acquisition&nbsp;Y/N</th>
+					<th field="status|string|none|center|nosort">Status</th>
+				</tr>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+	</div>	
+</div>
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'Acquisition/list.js' /}
+	$(document).ready(function() {
+		list($("#root"));
+	});
+</script>

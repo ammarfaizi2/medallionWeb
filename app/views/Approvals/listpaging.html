@@ -1,0 +1,52 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Approval Information' /}
+
+<style type="text/css">
+	.dataTables_filter{	display: none; }
+</style>
+
+<form id="approvalForm" class="form" method="POST" name="approval">
+	<div id="errorMessage" class="error" style="display: none;"></div>
+	<p>
+		#{dropDownList id:'activity', name:'param.activity', label:'Activity', value:param?.activity, readOnly:false, required:false, options:activities /}
+	</p>
+	<p>
+		#{textBox id:'referenceno', name:'param.referenceno', label:'Ref. No', value:param?.referenceno, readOnly:false, class:'capitalize', required:false, maxLength:100/}
+	</p>
+	<p>
+		#{textBox id:'batchno', name:'param.batchno', label:'Batch. No', value:param?.batchno, readOnly:false, class:'capitalize', required:false, maxLength:100/}
+	</p>
+	<p> 
+		#{textBox id:'description', name:'param.description', label:'Description', readOnly:false, value:param?.description, width:'300px', class:'capitalize' /}
+	</p>
+	<p> 
+		#{textBox id:'createdDate', name:'param.createdDate', class:'calendar', label:'Date', readOnly:false, value:param?.createdDate?.format(appProp.dateFormat), width:'100px' /}(${appProp.displayDateFormat})
+	</p>
+	 
+	<p class="buttons">
+		<input id="search" type="button" value="Search"/>
+		<input id="reset" type="button" value="Reset"/>
+	</p>
+		
+	<table id="tblApproval" class="display">
+		<thead>
+			<tr>
+				<th width="50px"  field="userId|string|none|center|nosort">User ID</th>
+				<th width="75px"  field="createdDate|string|none|center|nosort">Create Date</th>
+				<th width="150px" field="activity|string|none|left|nosort">Activity</th>			
+				<th width="50px"  field="batchNo|string|none|left|nosort">Batch No</th>
+				<th width="75px"  field="refKey|string|none|left|nosort">Ref No</th>
+				<th width="400px" field="description|string|none|left|nosort">Description</th>
+			</tr>
+		</thead>
+	</table>
+</form>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'Approvals/PagingApprovals.js' /}
+	$(document).ready(function() {
+		$('.buttons input:button').button();
+		PagingApprovals($("#main"), true);
+	});
+</script>

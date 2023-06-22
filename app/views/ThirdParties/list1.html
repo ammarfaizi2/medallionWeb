@@ -1,0 +1,103 @@
+#{extends 'templates/main.html' /}
+
+<script type="text/javascript">
+	//var table;
+	$(function() {
+		setupTable();		
+		$('.buttons button').button()
+		$('#new').click(function() {
+			var resume = true;
+			if (typeof doEntry == 'function') {
+				resume = doEntry();
+			}
+			if (resume) location.href='@{entry()}?group=${group}#{if pagetype}&pagetype=${pagetype}#{/}';
+		});
+		#{if canGoBack}
+			$('#back').click(function() {
+				location.href='@{group()}';
+			});
+		#{/if}
+		console.log('pagetype');
+		console.log('${pagetype}');
+	})
+	
+	function setupTable() {
+		var resume = true;
+		if (typeof doSetupTable == 'function') {
+			resume = doSetupTable();
+		}
+		if (resume)
+		var table = 
+			$('#list table').dataTable({
+				//aaSorting: [[1,'asc']],
+				aoColumnDefs: [ { bVisible:false, aTargets:[0] }, 
+				                { bSearchable: false, aTargets: [ 0 ] 
+							  } ],	
+				bJQueryUI:true,
+				sScrollX:'100%',												
+				bSort:false,
+				// buat scrollbar di datatables (grid)
+				//sScrollXInner: '110%',
+				bScrollCollapse: true,		
+				sPaginationType: 'full_numbers'
+			});
+		$('#list table tbody tr').die('click');
+		$('#list table tbody tr').live('click', function() {
+			var data = table.fnGetData(this);
+			var id = data[0];
+			var resume = true;
+			#{if mode=='view'}
+				if (typeof doView == 'function') {
+					resume = doView(data)
+				}
+				if (resume) view(id);
+			#{/if}
+			#{else}
+				if (typeof doEdit == 'function') {
+					resume = doEdit(data);
+				}
+				if (resume) edit(id);
+			#{/else}			
+		});
+	}
+	
+	function edit(id) {
+		#{if subList}
+			location.href='@{list()}/' + id; 
+		#{/if}
+		#{else}
+			location.href='@{edit()}/'+id + "#{if group}?group=${group}#{/}#{if param}${group?'&':'?'}param=${param}#{/}#{if pagetype}&pagetype=${pagetype}#{/}";
+		#{/else}
+	}		
+	function view(id) {
+		#{if subList}
+			location.href='@{list()}/' + id; 
+		#{/if}
+		#{else}
+			location.href='@{view()}/'+id + "#{if group}?group=${group}#{/}#{if param}${group?'&':'?'}param=${param}#{/}#{if pagetype}&pagetype=${pagetype}#{/}";
+		#{/else}
+	}
+	
+	
+</script>
+
+
+<h2>#{get 'pageTitle'}Set Page Title Here!#{/}</h2>
+
+#{if flash.error}
+    <p style="color:#c00">
+        ${flash.error}
+    </p>
+#{/if}
+
+<div id="list">
+	#{doLayout /}
+</div>
+<div class="buttons">
+#{ifnot ((mode == 'view') || fixData) }
+	<button id="new">New Data</button>
+#{/ifnot}
+#{if canGoBack}
+	<button id="back">Back</button>
+#{/if}
+</div>

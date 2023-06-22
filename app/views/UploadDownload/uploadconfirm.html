@@ -1,0 +1,154 @@
+#{extends 'templates/detail1.html' /}
+#{set pageTitle: ' ' /}
+#{set fixData: true /}
+#{set id: profile?.profileKey /}
+
+<div id="accordion">
+#{hidden id:'separatorCsv', name:'profile.separatorCsv', value:profile?.separatorCsv /}
+#{hidden id:'processDescription', name:'profile.processDescription', value:profile?.processDescription/}
+#{hidden id:'source', name:'profile.source', value:profile?.source/}
+
+	<h3>Upload Profile Entry</h3>
+		#{hidden id:'key', name:'profile.profileKey', value:profile?.profileKey/}
+		<div class="mainEntry">
+			<div class="leftEntry">
+		
+				<p>
+					#{textBox id:'name', name:'profile.name', value:profile?.name, label:'Profile ID', width:'150px', maxLength:50, size:50, required:'true', readOnly:true /}
+					<span class="error">#{error 'Profile ID' /}</span>
+				</p>		
+				<p>
+					#{textBox id:'description', name:'profile.description', value:profile?.description, label:'Profile Name', width:'200px', maxLength:100, size:100, required:'true', readOnly:true /}
+					<span class="error">#{error 'Profile Name' /}</span>
+				</p>
+				<p>
+					#{textBox id:'templete', name:'profile.templete', value:profileTemplate?.profileKey, displayValue:profileTemplate?.name,required:true, label:'Profile Ref', width:'150px', readOnly:true/}
+					#{button id:'groupTemplateHelp', value:'?', class:'small', readOnly:true /}
+					#{textBox id:'names', name:'', value:profileTemplate?.description, width:'250px', readOnly:true/}
+					<span class="error">#{error 'Profile Ref' /}</span>
+				</p>
+				
+				<p>
+					#{textBox id:'process', name:'profile.process', value:profile?.process, label:'Template', width:'150px', maxLength:50, size:50, readOnly:'true' /}
+					#{hidden name:'profile.actionType', value:'Upload'/}
+					<span class="error">#{error 'Action Type' /}</span>
+				</p>		
+				<p>
+					#{dropDownList id:'fileType', name:'profile.fileType', label:'File Type', value:profile?.fileType, options:fileTypeOptions, required:true, readOnly:true /}
+					<span class="error">#{error 'File Type' /}</span>
+				</p>
+				
+				<p>
+					#{textBox id:'filePrefix', name:'profile.filePrefix', value:profile?.filePrefix, label:'Prefix File Name', width:'200px', maxLength:100, size:100, required:'true', readOnly:true /}
+					<span class="error">#{error 'Prefix file name' /}</span>
+				</p>
+				<p>
+					#{dropDownList id:'separatorTxt', name:'profile.separatorTxt', label:'Separator', value:profile?.separatorTxt, options:inHead, required:true, readOnly:true /}
+					<span class="error">#{error 'Separator' /}</span>
+				</p>
+				<p>
+					
+					#{radioButton id:'include', name:'includeHeader', value:((profile?.includeHeader)?'true':'false'), label:'First Row is Header', options:operators, readOnly:true/}
+					#{hidden id:'includeHidden', name:'profile.includeHeader', value:((profile?.includeHeader)?'true':'false') /}
+				</p>
+				<p>
+					#{radioButton id:'status', name:'status', value:((profile?.status)?'true':'false'), label:'Active', options:operators, readOnly:true/}
+					#{hidden id:'statusHidden', name:'profile.status', value:((profile?.status)?'true':'false') /}
+					
+				</p>
+			</div>
+			<div class="rightEntry">This template is applied for:
+				<div class="innerdesc">${profileTemplate?.processDescription}</div>
+			</div>
+			<div class="divclear"></div>			
+		</div>
+		<br>
+		<p>
+			<h2>Field List Mapping:</h2>
+			<table id="tblMapping">
+				<thead>
+					<tr>
+						<th width="10px" class="ui-state-default"><b>No</b></th>
+						<th width="100px" class="ui-state-default"><b>Source&nbsp;Field</b></th>
+						<th width="150px" class="ui-state-default"><b>Target&nbsp;Field</b></th>
+						<th width="75px" class="ui-state-default"><b>Type&nbsp;Data</b></th>
+						<th width="100px" class="ui-state-default"><b>Format&nbsp;Data</b></th>
+						<th width="100px" class="ui-state-default"><b>Max&nbsp;Length</b></th>
+						<th width="100px" class="ui-state-default"><b>Overwrite&nbsp;Value</b></th>
+						<th width="100px" class="ui-state-default"><b>M/O</b></th>
+					</tr>	
+				</thead>
+				<tbody>
+					#{list profile.details, as:'detail'}
+						#{if detail?.sourceType == "FILE"}
+						<tr>
+							<td>
+								<input type="hidden" class="detailIdx" id="detailKey" name="pdetails[${detail_index-1}].profileDetailKey" value="${detail?.profileDetailKey}"></input>
+								<input style='width:20px;height:25px;' class="noSeq" type="text" name="pdetails[${detail_index-1}].noSeq" value="${detail?.noSeq}" readOnly></input>
+								<input style='width:50px;height:25px;display:none' class="systemField" type='checkbox' name='pdetails[${detail_index-1}].systemField' ${detail?.systemField ? 'checked' : ''}></input>
+							</td>
+							<td><input style='width:150px;height:25px' class="sourceField" type="text" name="pdetails[${detail_index-1}].sourceField" value="${detail?.sourceField}" readOnly></input></td>
+							<td>
+								<input style='width:150px;height:25px' class='tabletarget' id="targetIds[${detail_index-1}]" type="text" name="pdetails[${detail_index-1}].targetField" value='${detail?.targetField}' readOnly></input>
+							</td>
+							<td><input style='width:75px;height:25px' id="typeIds[${detail_index-1}]" class='typedatalist' type="text" name="pdetails[${detail_index-1}].dataType" value='${detail?.dataType}' readOnly></input></td>
+							<td><input style='width:100px;height:25px' id="formatIds[${detail_index-1}]" class="formatType formatdatalist" type="text" name="pdetails[${detail_index-1}].formatType" value='${detail?.formatType}' readOnly></input></td>
+							<td><input style='width:100px;height:25px' class="length" type="text" name="pdetails[${detail_index-1}].length" value="${detail?.length}" readOnly></input></td>
+							<td><input style='width:100px;height:25px' class="defaultValue" type="text" name="pdetails[${detail_index-1}].defaultValue" value='${detail?.defaultValue}' readOnly></input></td>
+							<td><input style='width:100px;height:25px;display:none' class="mo_option" type="text" name="pdetails[${detail_index-1}].mandatory" value='${detail?.mandatory}' readOnly></input>
+								<select disabled>
+									<option value="TRUE" #{if detail?.mandatory} selected #{/if}>MANDATORY</option>
+									<option value="FALSE" #{if !detail?.mandatory} selected #{/if}>OPTIONAL</option>
+								</select>
+							</td>
+						</tr>
+						#{/if}
+					#{/list}
+				</tbody>
+			</table>
+		</p>
+		<br>
+		<p>
+			<h2>Variable List Mapping:</h2>
+			<table id="tblAdditionalMapping">
+				<thead>
+					<tr>
+						<th width="10px" class="ui-state-default"><b>No</b></th>
+						<th width="150px" class="ui-state-default"><b>Target&nbsp;Field</b></th>
+						<th width="75px" class="ui-state-default"><b>Type&nbsp;Data</b></th>
+						<th width="100px" class="ui-state-default"><b>Format&nbsp;Data</b></th>
+						<th width="100px" class="ui-state-default"><b>Value</b></th>
+					</tr>
+				</thead>
+				<tbody>
+					#{list profile.details, as:'detail'}
+						#{if detail?.sourceType == "VARIABLE"}
+						<tr>
+							<td>
+								<input type="hidden" class="detailIdx" id="detailKey" name="pdetails[${detail_index-1}].profileDetailKey" value="${detail?.profileDetailKey}"></input>
+								<input style='width:20px;height:25px;' class="noSeq" type="text" name="pdetails[${detail_index-1}].noSeq" value="${detail?.noSeq}" readOnly></input>
+								<input style='width:50px;height:25px;display:none' class="systemField" type='checkbox' name='pdetails[${detail_index-1}].systemField' ${detail?.systemField ? 'checked' : ''}></input>
+								<input style='width:150px;height:25px;display:none' class="sourceField" type="text" name="pdetails[${detail_index-1}].sourceField" value="${detail?.sourceField}" ></input>							
+							</td>
+							<td>
+								<input style='width:150px;height:25px' class='additionaltarget' id="targetVarIds[${detail_index-1}]" type="text" name="pdetails[${detail_index-1}].targetField" value='${detail?.targetField}' readOnly></input>
+							</td>
+							<td><input style='width:75px;height:25px' id="typeVarIds[${detail_index-1}]" type="text" name="pdetails[${detail_index-1}].dataType" value='${detail?.dataType}' readOnly ></input></td>
+							<td><input style='width:100px;height:25px' id="formatVarIds[${detail_index-1}]" class="formatType formatvardatalist" type="text" name="pdetails[${detail_index-1}].formatType" value='${detail?.formatType}' readOnly></input></td>
+							<td>
+								<input style='width:150px;height:25px' class="defaultValue" type="text" name="pdetails[${detail_index-1}].defaultValue" value="${detail?.defaultValue}" readOnly></input>
+								<input type="hidden" name="pdetails[${detail_index-1}].length" value="100" ></input>
+								<input type="hidden" name="pdetails[${detail_index-1}].sourceType" value="${detail?.sourceType}" ></input>
+							</td>
+						</tr>
+						#{/if}
+					#{/list}
+				</tbody>				
+			</table>			
+		</p>
+</div>	
+
+<div id="result" style="display:none">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<div class="response"></div>
+</div>

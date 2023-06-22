@@ -1,0 +1,8 @@
+#{if _label}<label #{if _labelwidth}style="width:${_labelwidth}"#{/if}>${_label} #{if _required}<span class="req">*</span>#{/if}</label>#{/if}
+#{if _readOnly}
+<textarea #{if _id}id="${_id}"#{/if} #{if _width}style="width:${_width}"#{/if} #{if _class}class="${_class}"#{/if} #{if _rows}rows="${_rows}"#{/if} disabled="disabled">${_value}</textarea>
+<input #{if _id}id="h_${_id}"#{/if} #{if _name}name="${_name}"#{/if} type="hidden" value="${_value}" /> 
+#{/if}
+#{else}
+	<textarea #{if _id}id="${_id}"#{/if} #{if _name}name="${_name}"#{/if} #{if _width}style="width:${_width}"#{/if} #{if _maxLength}maxlength="${_maxLength}"#{/if} #{if _class}class="${_class}"#{/if}>${_value}</textarea>
+#{/else}

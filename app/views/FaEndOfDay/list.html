@@ -1,0 +1,68 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Posting Transaction' /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)||(mode=='view')) /}
+
+#{script 'lookups.js' /}
+
+
+<script type="text/javascript">
+	 function doEdit(data) {
+		return false;
+	} 
+</script> 
+
+#{if flash.error || errors}
+    <div class="error">
+    	Error when saving data!<br/>
+		<li>${flash.error}</li>
+		#{ifErrors}
+			#{errors}
+				 <li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}
+
+<form id="faEndOfDayForm" class="form" method="POST" name="faEndOfDay">
+	#{hidden id:'confirm', name:'eod.confirm',  value:eod?.confirm/}
+	#{hidden id:'confirmFaDailyNav', name:'eod.confirmFaDailyNav',  value:eod?.confirmFaDailyNav/}
+	#{hidden id:'confirmPendingTrans', name:'eod.confirmPendingTrans',  value:eod?.confirmPendingTrans/}
+	<p>&nbsp;</p>
+	<p>			
+		#{textBox id:'fundCode', name:'eod.faMaster.fundCode', label:'Fund Code', value:eod?.faMaster?.fundCode, width:'120px', readOnly:readOnly, class:'capitalize', required:true /}
+		#{hidden  id:'fundCodeKey', name:'eod.faMaster.fundKey', value:eod?.faMaster?.fundKey /}
+		#{button  id:'fundCodeHelp', value:'?', class:'small', readOnly:readOnly/}
+		#{textBox id:'fundCodeDesc',  name:'eod.faMaster.fundDescription', value:eod?.faMaster?.fundDescription, readOnly:true, width:'340px' /}
+		<span class="error">#{error 'Fund Code is' /}</span>
+	</p>
+	<p>&nbsp;</p>
+	<p>			
+		#{textBox id:'fromDate', name:'eod.fromDate', label:'Periode', value:eod?.fromDate?.format(appProp.dateFormat), class:'calendar', readOnly:readOnly, required:true/} (${appProp.displayDateFormat}) <b>&nbsp;To&nbsp;</b>
+		#{textBox id:'toDate', name:'eod.toDate', value:eod?.toDate?.format(appProp.dateFormat), class:'calendar', readOnly:readOnly, required:true/} (${appProp.displayDateFormat})
+		<span id="fromDateError" class="error"></span>
+		<span id="toDateError" class="error"></span>
+	</p>
+	<p>&nbsp;</p>
+	<div class="buttons">
+		#{button  id:'btnProcess', value:'Process', readOnly:false/} 
+		#{button  id:'btnReset', value:'Reset', readOnly:false/}
+	</div>
+	<p>&nbsp;</p>
+	<p>
+		<textarea id='log' rows="10" cols="125" readonly="readonly">
+#{list logs, as:'log'}${log}
+#{/list}
+		</textarea>
+	</p>
+</form>
+	
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'FaEndOfDay/FaEndOfDay.js' /}
+	$(document).ready(function() {
+		$('#new').remove();
+		$('.buttons input:button').button();
+		FaEndOfDay($("#faEndOfDayForm"));
+	});	
+</script>
+

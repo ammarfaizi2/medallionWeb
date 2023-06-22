@@ -1,0 +1,186 @@
+
+#{set readOnly:((mode!='edit' && mode!='entry')||confirming) /}
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+<script type="text/javascript">
+$(function() {
+	#{include 'RegistrySubscription/Util.js' /}
+	$('#buttonDelete').button();
+	$('#buttonDelete').insertAfter("#cancel");
+	
+	var message = "";
+	var closeDialog = function() {
+		$("#dialog-message").dialog('close');	
+	}
+	
+	/* $('#lookupSourceCode').lookup({
+		list:'@{Pick.lookups()}?group=${lookupReferenceItem?.lookupReference?.lookupGroupSource?.lookupGroup}',
+		//get:'@{Pick.lookup()}?group=${lookupReferenceItem?.lookupReference?.lookupGroupSource?.lookupGroup}',
+		get:{
+			url:'@{Pick.lookup()}?group=${lookupReferenceItem?.lookupReference?.lookupGroupSource?.lookupGroup}',
+			success: function(data) {
+				if (data) {
+					$("#lookupSourceCode").removeClass('fieldError');
+					$("#lookupSource").val(data.code);
+					$("#lookupSourceDesc").val(data.description);
+					$("#h_lookupSourceDesc").val(data.description);
+				}
+			},
+			error : function(data) {
+				$("#lookupSourceCode").addClass('fieldError');
+				$("#lookupSourceDesc").val('NOT FOUND');
+				$("#lookupSourceCode").val('');
+				$("#lookupSource").val('');
+				$("#h_lookupSourceDesc").val('');
+			}
+		},
+		key:$('#lookupSource'),
+		description:$('#lookupSourceDesc'),
+		help:$('#lookupSourceHelp'),
+		nextControl:$('#lookupTargetCode')
+	}); */
+	
+	$('#lookupSourceCode').dynapopup2({key:'lookupSource', help:'lookupSourceHelp', desc:'lookupSourceDesc'},'PICK_GN_LOOKUP', "${lookupReferenceItem?.lookupReference?.lookupGroupSource?.lookupGroup}", "lookupTargetCode", 
+			function(data){
+				if (data) {
+					$("#lookupSourceCode").removeClass('fieldError');
+					$("#lookupSource").val(data.code);
+					$("#lookupSourceDesc").val(data.description);
+					$("#h_lookupSourceDesc").val(data.description);
+				}
+			},
+			function(data){
+				$("#lookupSourceCode").addClass('fieldError');
+				$("#lookupSourceDesc").val('NOT FOUND');
+				$("#lookupSourceCode").val('');
+				$("#lookupSource").val('');
+				$("#h_lookupSourceDesc").val('');
+			}
+	);
+	/* $('#lookupTargetCode').lookup({
+		list:'@{Pick.lookups()}?group=${lookupReferenceItem?.lookupReference?.lookupGroupTarget?.lookupGroup}',
+		//get:'@{Pick.lookup()}?group=${lookupReferenceItem?.lookupReference?.lookupGroupTarget?.lookupGroup}',
+		get:{
+			url:'@{Pick.lookup()}?group=${lookupReferenceItem?.lookupReference?.lookupGroupTarget?.lookupGroup}',
+			success: function(data) {
+				if (data) {
+					$("#lookupTargetCode").removeClass('fieldError');
+					$("#lookupTarget").val(data.code);
+					$("#lookupTargetDesc").val(data.description);
+					$("#h_lookupTargetDesc").val(data.description);
+				}
+			},
+			error : function(data) {
+				$("#lookupTargetCode").addClass('fieldError');
+				$("#lookupTargetDesc").val('NOT FOUND');
+				$("#lookupTargetCode").val('');
+				$("#lookupTarget").val('');
+				$("#h_lookupTargetDesc").val('');
+			}
+		},
+		key:$('#lookupTarget'),
+		description:$('#lookupTargetDesc'),
+		help:$('#lookupTargetHelp')
+	}); */
+	
+	$('#lookupTargetCode').dynapopup2({key:'lookupTarget', help:'lookupTargetHelp', desc:'lookupTargetDesc'},'PICK_GN_LOOKUP', "${lookupReferenceItem?.lookupReference?.lookupGroupTarget?.lookupGroup}", "null", 
+			function(data){
+				if (data) {
+					$("#lookupTargetCode").removeClass('fieldError');
+					$("#lookupTarget").val(data.code);
+					$("#lookupTargetDesc").val(data.description);
+					$("#h_lookupTargetDesc").val(data.description);
+				}
+			},
+			function(data){
+				$("#lookupTargetCode").addClass('fieldError');
+				$("#lookupTargetDesc").val('NOT FOUND');
+				$("#lookupTargetCode").val('');
+				$("#lookupTarget").val('');
+				$("#h_lookupTargetDesc").val('');
+			}
+	);
+	
+	$('#lookupSourceCode').change(function(){
+		if ($('#lookupSourceCode').val() == "") {
+			$("#lookupSourceCode").val('');
+			$("#lookupSource").val('');
+			$("#lookupSourceDesc").val('');
+			$("#h_lookupSourceDesc").val('');
+		}
+	});
+	
+	$('#lookupTargetCode').change(function(){
+		if ($('#lookupTargetCode').val() == "") {
+			$("#lookupTargetCode").val('');
+			$("#lookupTarget").val('');
+			$("#lookupTargetDesc").val('');
+			$("#h_lookupTargetDesc").val('');
+		}
+	});
+	
+	$('#buttonDelete').click(function() {
+		message = "Are you sure want to delete lookup reference with source '${lookupReferenceItem?.lookupSource?.lookupCode}' ?"
+		var deleteReportMapping = function() {
+			$.post('@{delete()}/${lookupReferenceItem?.lookupReferenceItemKey}', function(data) {
+	    		checkRedirect(data);
+				if (data=='success') {
+					var backToList = function() { 
+						location.href='@{list()}#{if group}/${group}#{/}';
+					 }
+					message = "Success : Lookup Reference with source '${lookupReferenceItem?.lookupSource?.lookupCode}' is deleted";
+				} else {
+					message = "Error : Lookup Reference with source '${lookupReferenceItem?.lookupSource?.lookupCode}' is not deleted";
+				}
+				
+				messageAlertOk(message, "ui-icon ui-icon-circle-check", "Notification", backToList);
+				return false;
+			});
+			//$("#dialog-message").dialog("close");
+			return false;
+		}
+		messageAlertYesNo(message, "ui-icon ui-icon-notice", "Confirmation Message", deleteReportMapping, closeDialog);
+	});
+})
+</script>
+#{hidden id:'organizationId', name:'lookupReferenceItem.organization.organizationId', value:lookupReferenceItem?.organization?.organizationId /}
+#{hidden id:'lookupReferenceKey', name:'lookupReferenceItem.lookupReference.lookupReferenceKey', value:lookupReferenceItem?.lookupReference?.lookupReferenceKey /}
+#{hidden id:'lookupGroupSource', name:'lookupReferenceItem.lookupReference.lookupGroupSource.lookupGroup', value:lookupReferenceItem?.lookupReference?.lookupGroupSource?.lookupGroup /}
+#{hidden id:'lookupGroupTarget', name:'lookupReferenceItem.lookupReference.lookupGroupTarget.lookupGroup', value:lookupReferenceItem?.lookupReference?.lookupGroupTarget?.lookupGroup /}
+#{hidden id:'lookupReferenceItemKey', name:'lookupReferenceItem.lookupReferenceItemKey', value:lookupReferenceItem?.lookupReferenceItemKey /}
+
+<p>
+	#{textBox id:'lookupSourceCode', name:'lookupReferenceItem.lookupSource.lookupCode', label:'Source', value:lookupReferenceItem?.lookupSource?.lookupCode, class:'capitalize', readOnly:readOnly, width:'60px', required:true /}
+	#{hidden id:'lookupSource', name:'lookupReferenceItem.lookupSource.lookupId', value:lookupReferenceItem?.lookupSource?.lookupId /}
+	#{button id:'lookupSourceHelp', value:'?', class:'small', readOnly:readOnly /}	
+	#{textBox id:'lookupSourceDesc', name:'lookupReferenceItem.lookupSource.lookupDescription', value:lookupReferenceItem?.lookupSource?.lookupDescription, readOnly:true, width:'250px' /}
+	<span class="error">#{error 'Source is' /}</span>
+</p>
+<p>
+	#{textBox id:'lookupTargetCode', name:'lookupReferenceItem.lookupTarget.lookupCode', label:'Target', value:lookupReferenceItem?.lookupTarget?.lookupCode, readOnly:readOnly, width:'60px', class:'capitalize', required:true /}
+	#{hidden id:'lookupTarget', name:'lookupReferenceItem.lookupTarget.lookupId', value:lookupReferenceItem?.lookupTarget?.lookupId /}
+	#{button id:'lookupTargetHelp', value:'?', class:'small', readOnly:readOnly /}
+	#{textBox id:'lookupTargetDesc', name:'lookupReferenceItem.lookupTarget.lookupDescription', value:lookupReferenceItem?.lookupTarget?.lookupDescription, readOnly:true, width:'250px' /}
+	<span class="error">#{error 'Target is' /}</span>
+</p>
+
+#{ifnot confirming || mode == 'entry'}
+  #{if error == true}
+     <button class="buttons", id="buttonDelete", style="margin:5px;" disabled="disabled">Delete</button>
+  #{/if}
+  #{else}
+     <button class="buttons", id="buttonDelete", style="margin:5px;">Delete </button>
+  #{/else}
+#{/ifnot}
+
+
+
+
+
+
+
+
+
+
+
+

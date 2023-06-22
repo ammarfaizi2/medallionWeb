@@ -1,0 +1,80 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle : "Tools For Reconcile" /}
+#{script 'lookuppaging.js' /}
+#{script 'jquery.form.js' /}
+
+
+<form id="searchForm" class="form" class="form" method="POST" novalidate enctype="application/x-www-form-urlencoded">
+	<div id="recondDiv">
+		<div style="float:left; width:49%">
+			<fieldset>
+				<legend><b>EXTERNAL SOURCE</b></legend>
+				<p id="pHold">
+					#{hidden id:'processId', name:'param.processId' /}
+					#{radioButton id:'holdingType', name:'param.holdingType', label:'', options:recondOpt, readOnly:readOnly /}
+				</p>
+				<p></p>
+				<p>
+					#{fileUpload id:'file', name:'param.file', label:'File', required:true /}
+					<span id="fileError" class="error"></span>
+				</p>
+			</fieldset>
+		</div>
+		
+		<div style="float:right; width:49%">
+			<fieldset>
+				<legend><b>MEDALLION</b></legend>
+				<p>
+					#{textBox id:'medInp', value:'SUMMARY HOLDING', class:'capitalize', readOnly:true, width:'300px', maxLength:100 /}
+				</p>
+				<p>
+					#{textBox id:'holdingDate',name:'param.holdingDate', label:'Holding Date', class:'calendar', required:true, readOnly:readOnly /}
+					<span id="holdingDateError" class="error"></span>
+				</p>
+				<p>
+					#{textBox id:'depository', label:'Depository', class:'capitalize', width:'50px', required:true, readOnly:true /}
+					#{hidden id:'depositoryKey', name:'param.depositoryKey' /}
+					#{button id:'depositoryHelp',value:'?', class:'small', readOnly:readOnly /}
+					#{textBox id:'depositoryDesc', name:'', width:'150px', readOnly:true/}
+					&nbsp; <span id="depositoryError" class="error"></span>
+				</p>
+			</fieldset>
+		</div>
+	</div>
+	<br/>
+	<br/>
+	<div style="clear:both; padding-top:10px">
+		<input type="button" id="btnReconcile" value="Reconcile" />
+		<input type="button" id="btnReset" value="Reset" />
+	</div>
+	<div id="divDwn" style="display: block;padding-top: 1em; width: 300px;">
+		<table>
+			<tr>
+				<td>
+					<label id="downloadLabel" style="width:auto; padding-top:0px">Record Mismatch download</label> 
+					<a id="downloadLink" href="#" style="font-weight:bold">here</a>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<p id="pError" class="error" style="display:none; padding-top: 1em;">File format is not correct</p>
+</form>
+
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'ReconcileDownload/list.js' /}
+	$(document).ready(function() {
+		new RecondUpload($("#searchForm"));
+	});
+</script>
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,33 @@
+<h3>Search results</h3>
+
+#{if navs}
+	<table id="navTable" class="display">
+		<thead>
+			<tr>
+				<th>Fund Code</th>
+				<th>Fund Code</th>
+				<th>Date</th>
+				<th>Nav</th>
+				<th>Status</th>
+				<th>Active</th>
+			</tr>
+		</thead>
+		<tbody>
+		#{list navs, as:'nav'}
+			<tr>
+				<td>${nav?.concatId}</td>
+				<td>${nav?.id?.productCode}</td>
+				<td>${nav?.id?.navDate?.format('MM/dd/yyyy')}</td>
+				<td align="right" name="navAmtCell">${nav?.nav?.format('#,##0.##########')}</td>
+				<td>${nav?.recordStatus?.decodeStatus()}</td>
+				<td>${(nav?.isActive)? 'Yes':'No' }</td>
+			</tr>
+		#{/list}
+		</tbody>
+	</table>
+#{/if}
+#{else}
+	<div>No record found</div>
+#{/else}	
+
+

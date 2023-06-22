@@ -1,0 +1,72 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Approval Information' /}
+
+<script type="text/javascript">
+	var show = function(activity, key, taskId, url, operation, maintenanceLogKey, group, refKey, processDefinition) {
+		key = parseFloat(key);
+		maintenanceLogKey = parseFloat(maintenanceLogKey);
+		var refKeyTrim = refKey.substring(jQuery.trim(refKey).indexOf(':') + 1);
+		refKey = parseFloat(refKeyTrim);
+		var url = '${ctx}' + url + '?taskId=' + taskId + '&keyId=' + key + '&operation=' + operation + '&maintenanceLogKey=' + maintenanceLogKey + '&group=' + group + '&refKey=' + refKey + '&from=singleList' + '&processDefinition=' + processDefinition;
+		window.location.replace(url);
+		return false; 
+	}
+</script>
+
+<form id="approvalForm" class="form" method="POST" name="approval">
+	<p>
+		#{dropDownList id:'operator', name:'search.activity', label:'Activity', value:search?.activity, readOnly:false, required:false, options:activities /}
+	</p>
+	<p>
+		#{textBox id:'referenceno', name:'search.referenceno', label:'Ref. No', value:search?.referenceno, readOnly:false, class:'capitalize', required:false, maxLength:100/}
+	</p>
+	<p>
+		#{textBox id:'batchno', name:'search.batchno', label:'Batch. No', value:search?.batchno, readOnly:false, class:'capitalize', required:false, maxLength:100/}
+	</p>
+	<p> 
+		#{textBox id:'createdDate', name:'search.createdDate', class:'calendar', label:'Date', readOnly:false, value:search?.createdDate?.format(appProp.dateFormat), width:'100px' /}(${appProp.displayDateFormat})
+	</p>
+	<p class="buttons">
+		<input id="search" type="button" value="Search"/>
+		<input id="reset" type="button" value="Reset"/>
+	</p>
+	
+	<p>&nbsp;</p>
+	
+	<table id="tblApproval" class="display">
+		<thead>
+			<tr>
+			<th width="75px">Task ID</th>
+			<th width="75px">CreateDate</th>
+			<th width="150px">Activity</th>			
+			<th width="50px">Batch.No</th>
+			<th width="50px">Ref.No</th>
+			<th width="400px">Description</th>
+			</tr>
+		</thead>
+		
+		<tbody>
+			#{if approvals}
+				#{list items:approvals, as:'approval'}
+					<tr class="${approval_parity} selectable" onclick="show('${approval.activity}','${approval.key}','${approval.taskId}','${approval.url}', '${approval.operation}','${approval.maintenanceLogKey}','${approval.group}','${approval.refKey}','${approval.processDefinition}')">
+						<td>${approval.taskId}</td>
+						<td>${approval.createdDate}</td>
+						<td>${approval.activity}</td>
+						<td>${approval.batchNo}</td>
+						<td>${approval.refKey}</td>
+						<td>${approval.description}</td>
+					</tr>
+				#{/list}
+			#{/if}
+		</tbody>
+	</table>
+</form>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'Approvals/Approvals.js' /}
+	$(document).ready(function() {
+		$('.buttons input:button').button();
+		Approvals($("#main"));
+	});
+</script>

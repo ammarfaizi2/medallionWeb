@@ -1,0 +1,106 @@
+<form></form>
+<form id="sellingAgentForm" class="form">
+    <span id="errmsgNull" class="errmsg" ></span>
+	#{hidden id:'rowPosition' /}
+	#{hidden id:'saBankAccountKey' /}
+	#{hidden id:'oldSellingAgent' /}
+	#{hidden id:'oldPaymentType'/}
+	#{hidden id:'oldTargetAccountType'/}
+	#{hidden id:'oldAccountNo'/}
+	#{hidden id:'oldBankAccount'/}
+	#{hidden id:'oldCurrency'/}
+	#{hidden id:'oldBeneficiaryName'/}
+	#{hidden id:'oldBranch'/}
+	#{hidden id:'oldDescription'/}
+	
+    <p>
+        #{textBox id:'sellingAgentCode', width:'100px',  label:'Selling Agent', required:true, class:'capitalize', readOnly:readOnly, maxLength:50 /}
+        #{button id:'sellingAgentHelp', value:'?', class:'small', readOnly:readOnly /}
+        #{textBox id:'sellingAgentCodeDesc', readOnly:true, width:'200px' /}
+        #{hidden id:'sellingAgentKey' /}
+        <span id="sellingAgentCodeError" class="error"></span>
+    </p>
+    <p>
+        #{dropDownList id:'targetAccountType',  label:'Method', options:targetAccount, readOnly:readOnly, required:true, width:'140px', maxLength:30 /}
+        #{hidden id:'targetAccountTypeCode'/}
+        #{hidden id:'targetAccountTypeDescription'/}
+        <span id="targetAccountTypeError" class="error"></span>
+    </p>
+    <p id="idAccountNo">
+        #{textBox id:'accountNo', label:'Account No', required:true, readOnly:readOnly, disabled:'disabled', class:'capitalize', width:'100px', maxLength:50 /}
+        <span id="accountNoError" class="error"></span>
+    </p>
+	<p id="idBankAccountCode">
+        #{textBox id:'bankAccountCode', width:'100px', label:'Bank Code', required:true, class:'capitalize',disabled:'disabled', readOnly:readOnly, maxLength:18 /}
+        #{button id:'bankAccountCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+        #{textBox id:'bankAccountCodeDesc', width:'200px', readOnly:true /}
+        #{hidden id:'bankAccountCodeKey',  value:prd?.saBnAccounts?.bankCode?.thirdPartyKey /}
+        <span id="bankAccountCodeError" class="error"></span>
+    </p>
+     <p id="idBeneficiaryName">
+        #{textBox id:'beneficiaryName', label:'Beneficiary Name', required:true, class:'capitalize', readOnly:readOnly, disabled:'disabled', width:'260px', maxLength:100/}
+    	<span id="beneficiaryNameError" class="error"></span>
+    </p>
+     <p id="idCurrencyCode">
+        #{textBox id:'currencyCode', width:'100px',  label:'Currency', required:true, class:'capitalize', readOnly:readOnly, disabled:'disabled', maxLength:50 /}
+        #{button id:'currencyCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+        #{textBox id:'currencyCodeDesc', width:'200px', readOnly:true /}
+        <span id="currencyCodeError" class="error"></span>
+    </p>
+    <p>
+        #{dropDownList id:'transferCharge', label:'Transfer Charge', options:transferCharge, readOnly:readOnly, required:true, width:'140px' /}
+        #{hidden id:'transferChargeKey'/}
+        #{hidden id:'transferChargeCode'/}
+        #{hidden id:'transferChargeDescription'/}
+        <span id="transferChargeError" class="error"></span>
+    </p>
+	<p id="idBranch">
+        #{textBox id:'branch', label:'Branch', class:'capitalize', required:true, readOnly:readOnly, disabled:'disabled', width:'260px', maxLength:100 /}
+    	<span id="branchError" class="error"></span>
+    </p>
+    <p id="idDescription">
+        #{textBox id:'description', label:'Description', class:'capitalize', required:true, readOnly:readOnly, disabled:'disabled', width:'260px', maxLength:100 /}
+    	<span id="descriptionError" class="error"></span>
+    </p>
+</form>
+
+<script type="text/javascript">
+    $(function(){
+        $("#cancelSellingAgent").click(function() {
+
+			$("#dialogSellingAgent #sellingAgentCode").val("");
+			$("#dialogSellingAgent #sellingAgentCodeDesc").val("");
+			$("#dialogSellingAgent #sellingAgentForm span[id='sellingAgentCodeError']").html("");
+			
+			$("#dialogSellingAgent #paymentType").val("");
+			$("#dialogSellingAgent #sellingAgentForm span[id='paymentTypeError']").html("");
+			
+			$("#dialogSellingAgent #targetAccountType").val("");
+			$("#dialogSellingAgent #sellingAgentForm span[id='targetAccountTypeError']").html("");
+			
+			$("#dialogSellingAgent #accountNo").val("");
+			$("#dialogSellingAgent #sellingAgentForm span[id='accountNoError']").html("");
+			
+			$("#dialogSellingAgent #bankAccountCode").val("");
+			$("#dialogSellingAgent #bankAccountCodeDesc").val("");
+			$("#dialogSellingAgent #sellingAgentForm span[id='bankAccountCodeError']").html("");
+			
+			$("#dialogSellingAgent #currencyCode").val("");
+			$("#dialogSellingAgent #currencyCodeDesc").val("");
+			$("#dialogSellingAgent #sellingAgentForm span[id='currencyCodeError']").html("");
+			
+			$("#dialogSellingAgent #beneficiaryName").val("");		
+			$("#dialogSellingAgent #sellingAgentForm span[id='beneficiaryNameError']").html("");
+			
+			$("#dialogSellingAgent #description").val("");
+			
+			$("#dialogSellingAgent #branch").val("");
+			
+			$("#dialogSellingAgent #sellingAgentForm #rowPosition").val("");
+			
+            $("#dialogSellingAgent").dialog('close');
+            
+            return false;
+        });
+    });
+</script>

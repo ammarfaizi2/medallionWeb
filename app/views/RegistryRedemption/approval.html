@@ -1,0 +1,156 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Unit Redemption Approval' /}
+
+<script type="text/javascript">
+	$(function() {
+		// DECLARE CLASS BTN
+		$(".btn").button();
+		$(".btn").css("width", "100px");
+		//===============
+			
+		// DECLARE SOME ID VARIABLE	
+		$('#approve').button();
+		$('#reject').button();
+		//===============
+		
+		//$('#approve').insertBefore('#close');
+		//$('#reject').insertBefore('#close');
+		
+		/* var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Processing...</div>').appendTo('body');
+		loading.dialog({
+			closeOnEscape: false,
+			draggable: false,
+			modal: true,
+			resizable: false,
+			open:function() {
+				$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+			} 
+		});
+		loading.dialog('close'); */
+		
+		var backToWorkList = function() {
+			loading.dialog('open');
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			};
+		}
+		
+		// ACTION BUTTON APPROVE 
+		$('#approve').click(function() {
+			if( $("#needCorrection").attr("checked") == true || $("#needCorrection").attr("checked") == "true" ){
+				// no need to do anything, this should be unreachable
+			}else{
+				var action = "@{approve()}?keyId=${red?.tradeKey}&taskId=${taskId}&maintenanceLogKey=${maintenanceLogKey}";
+				loading.dialog('open');
+				$.post(action, $("#registryRedemptionForm").serialize(),function(data, status, xhr) {
+		    		checkRedirect(data);
+					loading.dialog('close');
+					if (data.status == 'success') {
+						//alert("Trade Id : '${red?.tradeKey}' is Approved");
+						messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+					} else {
+						/* if (data.code == "error.sentToFaInterface") {
+							//alert("Error when sent to FA Interface !");
+							messageAlertOk("Error when sent to FA Interface", "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+						} else {
+							//alert("Data Error");
+							messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+						} */
+						messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+					}
+				});
+			}
+		});
+		//===============
+		
+		// ACTION BUTTON REJECT
+		$('#reject').click(function() {
+			$("#remarksCorrectionError").html("");
+			
+			var nr=0;
+			if( $("#needCorrection").attr("checked") == true || $("#needCorrection").attr("checked") == "true"){
+				nr=1;
+			}
+			
+			if( nr == 1 && jQuery.trim( $("#remarksCorrection").val() ) == "" ){
+				$("#remarksCorrectionError").html("Required");
+				$("#remarksCorrectionError").show();
+				return;
+			}
+			
+			var action = "@{reject()}";
+			var postParam = { 
+						"keyId":"${red?.tradeKey}",
+						"taskId":"${taskId}",
+						"nr":nr,
+						"remarksCorrection":$("#remarksCorrection").val()
+					};
+			loading.dialog('open');
+			$.post(action, postParam, function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					//alert("Trade Id : '${red?.tradeKey}' is " + data);
+					messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+				} else {
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+				}
+			});
+		});
+		//===============
+		
+		// ACTION BUTTON CLOSE
+		$('#closeWorkflow').click(function() {
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			}
+		});
+		//===============
+		
+		// disable on need correction change
+		$("#needCorrection").change(function(){
+			if( $(this).attr("checked") == true || $(this).attr("checked") == "true"){
+				// disable approve button
+				$("#approve").attr("disabled", "disabled");
+				$("#approve").addClass("ui-state-disabled");
+				
+				// add required mark
+				$("#pRemarksCorrection label").append("<span class='req'>*</span>");
+			}else{
+				// enable approve button
+				$("#approve").removeAttr("disabled");
+				$("#approve").removeClass("ui-state-disabled");
+				$("#pRemarksCorrection label span").remove();
+			}
+		});
+// 		$("#needCorrection").change();
+			
+		// HIDE ALL CLASS BUTTON
+		$(".buttons").css("display","none");
+		//===============
+		
+		// HIDE DISPLAY INSIDE APPROVAL ACTIONS ID
+		$("#approval-actions").css("display","block");
+		//===============
+	});
+
+</script>
+
+<h2>Unit Redemption Approval</h2>
+<div id="detail">
+		#{include 'RegistryRedemption/detail.html' /}
+</div>	
+
+<div id="approval-actions">
+	#{hidden id:'taskId', name:'taskId', value:taskId /}
+	#{hidden id:'keyId', name:'keyId', value:keyId /}	
+	#{hidden id:'from', name:'from', value:from /}	
+	
+	<input type="button" id="approve" value="Approve" class="btn" />
+	<input type="button" id="reject" value="Reject" style="margin:5px;" class="btn"/>
+	<input type="button" id="closeWorkflow" value="Cancel" class="btn" />
+</div>

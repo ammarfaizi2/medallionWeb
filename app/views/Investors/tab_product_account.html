@@ -1,0 +1,57 @@
+<script type="text/javascript">
+	$(function() {
+		var tableInvBankAccount = 
+			$('#grid-invBank').dataTable({
+				aoColumnDefs: [ {bVisible:false,aTargets:[0]},
+				                {bSortable:false,aTargets:[1,2,3,4]}
+					          ],
+				bJQueryUI:true,
+				bAutoWidth: false,
+				bSort: false,
+				bFilter: true,
+				bInfo: false,
+				bJQueryUI:true,
+				bPaginate: false,
+				bSearch: false,
+				bLengthChange:false,
+				iDisplayLength:10
+			});
+	});
+</script>
+
+<div id="invBank">
+	<table id="grid-invBank" class="display">
+		<thead>
+			<tr>
+				<th></th>
+				<th width="170px">Account No</th>
+				<th width="170px">Fund Code</th>
+				<th width="300px">Selling Agent</th>
+				<th width="130px">Unit Balance</th>
+				<th>Active</th>
+			</tr>
+		</thead>
+		<tbody>
+		#{list customer?.rgInvestmentaccounts, as:'invAccount'}
+			<tr>
+				<td></td>
+				<td>
+					${invAccount?.accountNumber}
+				</td>
+				<td>
+					${invAccount?.rgProduct?.productCode}
+				</td>
+				<td>
+					${invAccount?.thirdPartyBySaCode?.thirdPartyCode}
+				</td>
+				<td align="right">
+					${invAccount?.unit?.format('##,##0.##')}
+				</td>
+				<td>					
+					${(invAccount.active)? 'Yes':'No' }
+				</td>
+			</tr>		
+		#{/list}
+		</tbody>
+	</table>			
+</div>

@@ -1,0 +1,28 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Deposit Templates' /}
+<script>
+$('#new').hide();
+function doEdit(data) {
+	edit(data[1]);
+}
+</script>
+<table class="display">
+	<thead>
+		<tr>
+			<th></th>			
+			<th>Security Type</th>
+			<th width="100px">Active</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:securityTypes, as:'securityType'}  		
+		<tr><td></td>
+			<td>${securityType?.securityType}</td>
+			<td>${(securityType?.isActive)? 'Yes':'No' }</td>		
+		</tr>
+	 #{/list}	
+     </tbody>
+</table>
+	
+
+

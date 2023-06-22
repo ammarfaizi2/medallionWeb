@@ -1,0 +1,98 @@
+#{extends 'templates/detail1.html' /}
+#{set pageTitle : "Run Download" /}
+#{script 'lookuppaging.js' /}
+
+<form id="searchForm" class="form">
+	<div id="runDownload">
+	#{hidden id:'gDate' /}
+		<p>
+			#{textBox id:'updProfile', label:'Profile ID', name:'param.updProfile.name', value:param?.updProfile?.name, class:'capitalize', readOnly:param.readOnly, width:'100px', required: true /}
+			#{hidden  id:'updProfileKey', name:'param.updProfile.profileKey', value:param?.updProfile?.profileKey /}
+			#{button  id:'updProfileHelp', value:'?', class:'small' , readOnly:param.readOnly /}
+			#{textBox id:'updProfileDesc', name:'param.updProfile.description', value:param?.updProfile?.description, readOnly:true, width:'200px' /}
+			<span id="updProfileError" class="error"></span>
+		</p>
+		<p>
+			#{checkBox id:'includeHeaderRow', label:'Include Header Row', name:'param.includeHeaderRow', value:param?.includeHeaderRow ? true : false, readOnly:true /}Yes
+		</p>
+		<p>
+			#{dropDownList id:'separator', name:'param.separator', label:'Separator', value:param?.separator, options:separatorOperators, required:false, readOnly:true /}
+		</p>
+		
+		<br>
+		
+		<div id="accordionFilter">
+			<h3><a href="#">Filter By</a></h3>
+			<div>
+				<p>
+					<table>
+						<thead></thead>
+						<tbody id="filterContainer"></tbody>
+					</table>
+				</p>
+			</div>	
+		</div>
+		
+		</br>
+	
+		<p>
+			<input type="button" id="populate" value="Populate" />
+			<input type="button" id="reset" value="Reset" />
+		</p>
+		
+		</br>
+		
+		<p>
+			<table id="tablePopulate" width="100%" style="display: none;">
+				<thead><tr></tr></thead>
+			</table>
+		</p>
+		
+		<p>
+			<table>
+				<tbody>
+					<tr>
+						<td valign="bottom">
+							<table border="1" id="result">
+								<tr>
+									<td><label>Batch No</label></td>
+									<td><input type="text" id="batchNo" value="0" class="smalldisabledtext" disabled="disabled" /></td>
+								</tr>
+								<tr>
+									<td><label>Total Rows</label></td>
+									<td><input type="text" id="totalRow" value="0" class="smalldisabledtext" disabled="disabled" /></td>
+								</tr>
+								<tr>
+									<td><label>Success</label></td>
+									<td><input type="text" id="totalSuccess" value="0" class="smalldisabledtext" disabled="disabled" /></td>
+								</tr>
+								<tr>
+									<td><label>Failed</label></td>
+									<td><input type="text" id="totalFail" value="0" class="smalldisabledtext" disabled="disabled" /></td>
+								</tr>
+							</table>
+						<td>
+						<td valign="bottom">
+							<a href="/generaldownload/processGenerateErrorFile" id="saveToCsv" style="display: none;">Save To CSV</a>
+						<td>
+						<td valign="bottom">&nbsp;</td>
+					</tr>
+					<tr><td valign="bottom" colspan="3">&nbsp;<td></tr>
+					<tr>
+						<td valign="bottom">#{dropDownList id:'output', name:'param.output', label:'Output Type', value:param?.output, options:outputTypes, required:true, readOnly:param.readOnly /}<td>
+						<td valign="bottom"><input id="generate" type="button" value="Generate"><td>
+						<td valign="bottom"><label id='downloadLink' style="display: none;">Download it <a id="downloadFile" href="#">here</a></label></td>
+					</tr>
+				</tbody>
+			</table>
+		</p>
+	</div>
+</form>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'GeneralDownload/RunDownload.js' /}
+	$(document).ready(function() {
+		new RunDownload($("#runDownload"));
+	});
+</script>

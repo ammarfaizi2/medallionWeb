@@ -1,0 +1,117 @@
+<p>
+	#{textBox id:'memberCode', name:'cust.biAccount.accountCode', label:'Member Code', value:cust?.biAccount?.accountCode, class:'capitalize', width:'200px',required:true,readOnly:readOnly, maxLength:50 /}
+	#{hidden id:'biAccountKey', name:'cust.biAccount.custodianAccountKey', value:cust?.biAccount?.custodianAccountKey /}
+	#{hidden id:'categoryBi', name:'cust.biAccount.accountCategory.lookupId', value:cust?.biAccount?.accountCategory?.lookupId /}
+	<span class="error">#{error 'Member Code in tab BI/BI-SSSS is' /}</span>	
+</p>
+<p>
+	#{textBox id:'agentCode', name:'cust.biAccount.accountAgentCode', label:'Agent Code', value:cust?.biAccount?.accountAgentCode, class:'capitalize', width:'200px',required:true,readOnly:readOnly, maxLength:50 /}
+	<span class="error">#{error 'Agent Code in tab BI/BI-SSSS is' /}</span>	
+</p>
+<p>
+	#{textBox id:'terminalCode', name:'cust.biAccount.accountTerminalCode', label:'Terminal Code', value:cust?.biAccount?.accountTerminalCode, class:'capitalize', width:'200px',required:true,readOnly:readOnly, maxLength:50 /}
+	<span class="error">#{error 'Terminal Code in tab BI/BI-SSSS is' /}</span>	
+</p>
+<br />
+<fieldSet>
+	<legend><b>For Debet Purpose</b></legend>
+	<div style="overflow-y:scroll;height:130px">
+	<table id="gridBankAccountDebetBi" class="display">
+		<thead>
+			<tr>
+				<th>Account No</th>
+				<th>Bank Name</th>
+				<th>Beneficiary Name</th>
+				<th>Currency</th>
+				<th>Branch</th>
+				<th>Used By</th>
+				<th>Action</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+		</tbody>
+	</table>
+	</div>
+	<div class="buttons">
+		<input type="button"  id="newDebetBi"  value="Add" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" #{if readOnly}disabled="disabled"#{/if}/>
+	</div>
+<!-- 	<p> -->
+<!-- 		#{textBox id:'coaCodeDb', name:'cust.biAccount.coaDebetBi.coaCode', label:'Coa Code', value:cust?.biAccount?.coaDebetBi?.coaCode, class:'capitalize', width:'100px',required:false,readOnly:readOnly, maxLength:50 /} -->
+<!-- 	</p> -->
+<!-- 	<p> -->
+<!-- 		#{textBox id:'coaNameDb', name:'cust.biAccount.coaDebetBi.coaName', label:'Coa Name', value:cust?.biAccount?.coaDebetBi?.coaName, class:'capitalize', width:'200px',required:false,readOnly:readOnly, maxLength:50 /} -->
+<!-- 	</p> -->
+	<!-- <p>
+		#{radioButton id:'debetTypeDb', name:'cust.biAccount.coaDebetBi.processType', value:((cust?.biAccount?.coaDebetBi?.processType)?cash:gl), label:'Debet Type', options:operators, readOnly:readOnly/}
+	</p> -->
+<!-- 	<p> -->
+<!-- 		<label>Debet Type</label> -->
+<!-- 		<input type='radio' id='radiodebetTypeDbCash' name='processTypeDebetBi' value='${cash}' /> -->
+<!-- 		Cash Account -->
+<!-- 		<input type='radio' id='radiodebetTypeDbGl' name='processTypeDebetBi' value='${gl}' /> -->
+<!-- 		GL Account -->
+		#{hidden id:'debetTypeDb', name:'cust.biAccount.coaDebetBi.processType' , value:cust?.biAccount?.coaDebetBi?.processType /}
+<!-- 	</p> -->
+</fieldSet>
+
+<br />
+
+<fieldSet>
+	<legend><b>For Credit Purpose</b></legend>
+	<div style="overflow-y:scroll;height:130px">
+	<table id="gridBankAccountCreditBi" class="display">
+		<thead>
+			<tr>
+				<th>Account No</th>
+				<th>Bank Name</th>
+				<th>Beneficiary Name</th>
+				<th>Currency</th>
+				<th>Branch</th>
+				<th>Used By</th>
+				<th>Action</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+		</tbody>
+	</table>
+	</div>
+	<div class="buttons">
+		<input type="button"  id="newCreditBi"  value="Add" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" #{if readOnly}disabled="disabled"#{/if}/>
+	</div>
+<!-- 	<p> -->
+<!-- 		#{textBox id:'coaCodeCb', name:'cust.biAccount.coaCreditBi.coaCode', label:'Coa Code', value:cust?.biAccount?.coaCreditBi?.coaCode, class:'capitalize', width:'100px',required:false,readOnly:readOnly, maxLength:50 /} -->
+<!-- 	</p> -->
+<!-- 	<p> -->
+<!-- 		#{textBox id:'coaNameCb', name:'cust.biAccount.coaCreditBi.coaName', label:'Coa Name', value:cust?.biAccount?.coaCreditBi?.coaName, class:'capitalize', width:'200px',required:false,readOnly:readOnly, maxLength:50 /} -->
+<!-- 	</p> -->
+	<!-- <p>
+		#{radioButton id:'debetTypeCb', name:'cust.biAccount.coaCreditBi.processType', value:((cust?.biAccount?.coaCreditBi?.processType)?cash:gl), label:'Debet Type', options:operators, readOnly:readOnly/}
+	</p> -->
+<!-- 	<p> -->
+<!-- 		<label>Credit Type</label> -->
+<!-- 		<input type='radio' id='radiodebetTypeCbCash' name='processTypeCreditBi' value='${cash}' /> -->
+<!-- 		Cash Account -->
+<!-- 		<input type='radio' id='radiodebetTypeCbGl' name='processTypeCreditBi' value='${gl}' /> -->
+<!-- 		GL Account -->
+		#{hidden id:'debetTypeCb', name:'cust.biAccount.coaCreditBi.processType' , value:cust?.biAccount?.coaCreditBi?.processType /}
+<!-- 	</p> -->
+</fieldSet>
+

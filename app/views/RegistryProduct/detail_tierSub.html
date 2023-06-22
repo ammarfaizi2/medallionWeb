@@ -1,0 +1,18 @@
+<form id="tierSubForm" class="form">
+	<!--
+	<p>
+		#{textBox id:'tierNumber', label:'Tier No', value:fee?.tierNumber, format:'#,##0.####', class:'numeric mask calculate', readOnly:true /}
+		#{hidden  id:'tierNumberStripped', name:'fee.tierNumber',  value:fee?.tierNumber /}
+	</p>
+	-->
+
+    <p>	
+        #{textBox id:'upperLimit', label:'Value',value:fee?.upperLimit, format:'#,##0.####', class:'numeric mask calculate', readOnly:readOnly /}
+        #{hidden  id:'upperLimitStripped', name:'fee.upperLimit',  value:fee?.upperLimit /}		
+    </p>
+
+    <p>
+        #{textBox id:'value', value:fee?.value,label:'Rate', format:'#,##0.####', class:'numeric mask calculate', readOnly:readOnly /}
+        #{hidden  id:'valueStripped', name:'fee.value',  value:fee?.value /}
+    </p>
+</form>

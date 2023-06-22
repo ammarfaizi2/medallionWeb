@@ -1,0 +1,34 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Fund Transfer' /}
+#{set fixData: true /}
+#{set mode: mode /}
+#{script 'lookups.js' /}
+
+<script>
+	function setupTable() {
+		// method ini di gunakan untuk mengintrupt pembuatan data table
+	}
+</script>
+
+<div id="root">
+	<div id="tabProcess" >
+		<ul>
+			<li><a id="placementTab" href="#placement">Placement</a></li>
+			<li><a id="settlementKseiTab" href="#settlementKsei">Settlement KSEI</a></li>
+			<li><a id="settlementBITab" href="#settlementBI">Settlement BI</a></li>
+			<li><a id="caDistTab" href="#caDist">CA Settlement</a></li>
+			<li><a id="rgPaymentTab" href="#rgPayment">RG Payment</a></li>
+		</ul>
+		<div id="placement"> #{include 'FundTransfer/Placement.html' /} </div>
+		<div id="settlementKsei"> #{include 'FundTransfer/SettlementKsei.html' /} </div>
+		<div id="settlementBI"> #{include 'FundTransfer/SettlementBi.html' /} </div>
+		<div id="caDist"> #{include 'FundTransfer/CaDist.html' /} </div>
+		<div id="rgPayment"> #{include 'FundTransfer/RgPayment.html' /} </div>
+	</div>
+</div>
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	$(document).ready(function() {
+		$("#tabProcess").tabs();
+	});
+</script>

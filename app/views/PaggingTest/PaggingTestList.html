@@ -1,0 +1,54 @@
+<html>
+	<head>
+		#{script 'jquery-1.6.1.min.js', characterset:'utf-8' /}
+	
+	    #{stylesheet 'jquery-ui.custom.css' /}
+	    #{script 'jquery-ui.js', characterset:'utf-8' /}
+	    
+	    #{stylesheet 'jquery.dataTables.css' /}
+	    #{script 'jquery.dataTables194.js', characterset:'utf-8' /}
+	    
+		#{script 'jquery.sizes.js', characterset:'utf-8' /}
+		#{script 'jlayout.grid.js', characterset:'utf-8' /}
+		#{script 'jlayout.flexgrid.js', characterset:'utf-8' /}
+		#{script 'jlayout.flow.js', characterset:'utf-8' /}
+		#{script 'jlayout.border.js', characterset:'utf-8' /}
+		#{script 'jquery.jlayout.js', characterset:'utf-8' /}
+		
+		#{stylesheet 'simianui.css' /}
+	</head>
+	
+	<body>
+		<div id="PaggingTestList" ajax="@{PaggingTest.metadataformlist()}"  layout="@{PaggingTest.layoutformlist()}" class="parent" >
+		</div>
+		<div id="PaggingTestEntry" ajax="@{PaggingTest.metadataformentry()}"  layout="@{PaggingTest.layoutformentry()}" class="parent" >
+		</div>
+	</body>
+</html>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+
+		#{include 'PaggingTest/ModelUtil.js' /}
+		#{include 'PaggingTest/ModelMap.js' /}
+		#{include 'PaggingTest/UIProp.js' /}
+		#{include 'PaggingTest/Layout.js' /}
+		#{include 'PaggingTest/ModelForm.js' /}						
+		#{include 'PaggingTest/Populate.js' /}
+		
+		var uilist = UIProp($("#PaggingTestList"));
+		ModelForm(Layout(uilist), uilist);
+		
+		var uientry = UIProp($("#PaggingTestEntry"));
+		ModelForm(Layout(uientry), uientry);
+		
+		$("#list_form_customer_new").click(function(){
+			window.location = '/PaggingTest/realentry';
+		});
+		
+		$("#list_form_customer_dialog").click(function(){
+			$("#PaggingTestEntry").dialog('open');
+			$('.ui-widget-overlay').css('height',$('body').height());
+		});
+	});
+</script>

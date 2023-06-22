@@ -1,0 +1,55 @@
+#{hidden id:'chargeItemKey' /}
+<table id="gridItem" class="display">
+	<thead>
+		<tr>
+			<!-- th>Key</th-->
+			<th>Charge Code</th>
+			<th>Security Class</th>
+			<th>Security Type</th>
+			<th>Security Id</th>
+			<th>Transaction Code</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list profile?.chargeItems, as:'item'}
+		<tr>
+			<!-- td>
+				${item?.chargeItemKey}				
+			</td-->	
+			<td>${item?.chargeMaster?.chargeCode}
+			</td>
+			<td class="capitalize">
+				${item?.securityClass?.lookupCode}		
+			</td>	
+			<td class="capitalize">
+				${item?.securityType?.securityType}		
+			</td>
+			<td class="capitalize">
+				${item?.security?.securityId}		
+			</td>
+			<td class="capitalize">
+				${item?.transactionTemplate?.transactionCode}		
+			</td>
+			<td>
+				#{hidden id:'itemChargeMasterCode', name:'items[' + (item_index-1) + '].chargeMaster.chargeCode', value:item?.chargeMaster?.chargeCode /}
+				#{hidden id:'itemChargeMasterKey', name:'items[' + (item_index-1) + '].chargeMaster.chargeKey', value:item?.chargeMaster?.chargeKey /}
+				#{hidden id:'itemChargeMasterDescription', name:'items[' + (item_index-1) + '].chargeMaster.description', value:item?.chargeMaster?.description /}
+				#{hidden id:'itemSecurityClass', name:'items[' + (item_index-1) + '].securityClass.lookupCode', value:item?.securityClass?.lookupCode /}
+				#{hidden id:'itemSecurityClassKey', name:'items[' + (item_index-1) + '].securityClass.lookupId', value:item?.securityClass?.lookupId /}
+				#{hidden id:'itemSecurityClassDesc', name:'items[' + (item_index-1) + '].securityClass.lookupDescription', value:item?.securityClass?.lookupDescription /}
+				#{hidden id:'itemSecurityType', name:'items[' + (item_index-1) + '].securityType.securityType', value:item?.securityType?.securityType /}
+				#{hidden id:'itemSecurityTypeDesc', name:'items[' + (item_index-1) + '].securityType.description', value:item?.securityType?.description /}
+				#{hidden id:'itemSecurityId', name:'items[' + (item_index-1) + '].security.securityId', value:item?.security?.securityId /}
+				#{hidden id:'itemSecurityIdKey', name:'items[' + (item_index-1) + '].security.securityKey', value:item?.security?.securityKey /}
+				#{hidden id:'itemSecurityIdDesc', name:'items[' + (item_index-1) + '].security.description', value:item?.security?.description /}
+				#{hidden id:'itemTransactionCode', name:'items[' + (item_index-1) + '].transactionTemplate.transactionCode', value:item?.transactionTemplate?.transactionCode /}
+				#{hidden id:'itemTransactionCodeKey', name:'items[' + (item_index-1) + '].transactionTemplate.transactionTemplateKey', value:item?.transactionTemplate?.transactionTemplateKey /}
+				#{hidden id:'itemTransactionCodeDesc', name:'items[' + (item_index-1) + '].transactionTemplate.description', value:item?.transactionTemplate?.description /}
+				#{hidden id:'chargeItemKey', name:'items[' + (item_index-1) + '].chargeItemKey', value:item?.chargeItemKey /}
+				<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} /></center>		
+			</td>	
+		</tr>
+	#{/list}
+	</tbody>
+</table>

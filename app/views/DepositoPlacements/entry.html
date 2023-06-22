@@ -1,0 +1,198 @@
+#{extends 'templates/main.html' /}
+#{set param: param /}
+
+<script type="text/javascript">
+	$(function() {
+		
+		var closeDialogMessage = function() {
+			$("#dialog-message").dialog("close");
+		}
+		var directToEntry = function() {
+			var url = "";
+			if ('${origin}' == '${cancelDepositoPlacementOriginated}') {
+				url = "@{CancelDepositoPlacements.entry()}";
+			} else if ('${origin}' == '${depositoPlacementOriginated}') {
+				url = "@{DepositoPlacements.entry()}";
+			}
+			return url;
+		}
+		
+		var directToList = function() {
+			var url = "";
+			if ('${origin}' == '${cancelDepositoPlacementOriginated}') {
+				url = "@{CancelDepositoPlacements.list()}";
+			} else if ('${origin}' == '${depositoPlacementOriginated}') {
+				url = "@{DepositoPlacements.list()}";
+			}
+			return url;
+		}
+		
+		var directToSave = function() {
+			var action = "";
+			if ('${origin}' == '${cancelDepositoPlacementOriginated}') {
+				action = "@{CancelDepositoPlacements.save()}?mode=${mode}";
+			} else if ('${origin}' == '${depositoPlacementOriginated}') {
+				action = "@{DepositoPlacements.save()}?mode=${mode}";
+			}
+			return action;
+		}
+		
+		var directToConfirm = function() {
+			var action = "";
+			if ('${origin}' == '${cancelDepositoPlacementOriginated}') {
+				action = "@{CancelDepositoPlacements.confirm()}?mode=${mode}";
+			} else if ('${origin}' == '${depositoPlacementOriginated}') {
+				action = "@{DepositoPlacements.confirm()}?mode=${mode}";
+			}
+			return action;
+		}
+		
+		var directToBack = function() {
+			var url = "";
+			if ('${origin}' == '${cancelDepositoPlacementOriginated}') {
+				url = "@{CancelDepositoPlacements.back()}?id=${deposito?.depositoKey}&param=${param}&mode=${mode}";
+			} else if ('${origin}' == '${depositoPlacementOriginated}') {
+				url = "@{DepositoPlacements.back()}?id=${deposito?.depositoKey}&param=${param}&mode=${mode}";
+			}
+			return url;
+		}
+		var backToEntry = function() {
+			loading.dialog('open');
+			location = "@{entry()}";
+		}
+		var backToList = function() {
+			loading.dialog('open');
+			location = "@{list()}";
+		}
+		
+		var continueCompliance = function() {
+			$("#dialog-message").dialog("close");
+			actionSave();
+		}
+		
+		var stopCompliance = function() {
+			$("#dialog-message").dialog("close");
+		}
+		
+		function checkCompliance(){
+			$.get("@{DepositoPlacements.checkComplianceSyariah()}?custodyAccountKey="+$("#accountKey").val()+"&securityKey="+$("#securityKey").val(), function(data) {
+				checkRedirect(data);
+				var res = data.valid;
+				var isNotCancel = $("#h_cancelPlacementDate").val()==null;
+				if(res=="0" && isNotCancel){
+					messageAlertYesNo("Security not allowed, do you want to continue ?", "ui-icon ui-icon-notice", "Confirmation Message",continueCompliance, stopCompliance);
+				}else{
+					actionSave();
+				}
+			});
+		}
+		
+		function actionSave(){
+			$(".cancel").remove();
+			var resume = true;
+			if(typeof doSave == 'function') {
+				resume = doSave();
+			} 
+			if (resume){
+			#{ifnot flash.error || errors}
+				if ('${origin}' == '${depositoPlacementOriginated}') {
+					var isReload = $("#isreload").val();
+					if (isReload == false || isReload == 'false') {
+						messageAlertOk("You must load Charge to be able to continue!", "ui-icon1 ui-icon-alert", "Warning Message", closeDialogMessage);
+						return false;
+					}
+				}
+			#{/ifnot}
+			
+			if ($('input').hasClass('fieldError') || $('select').hasClass('fieldError')){
+				return false;
+			}
+
+			var action = "@{save()}?mode=${mode}";
+			loading.dialog('open');
+			$('#depositoPlacementForm').attr('action', action);
+			$('#depositoPlacementForm').submit();
+			}
+		}
+		
+		// Action buttons 
+		$('#save').click(function() {
+			checkCompliance();	
+		});
+		
+		var nextProcess = function() {
+			$(".cancel").remove();
+			var action = "@{confirm()}?mode=${mode}";
+			loading.dialog('open');
+			$.post(action, $('#depositoPlacementForm').serialize(), function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					
+					if ('${mode}' == 'entry') {
+						messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Notification", backToEntry);
+					}
+					
+					if ('${mode}' == 'edit') {
+						messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Notification", backToList);
+					}
+					
+				} else {
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+				}
+			});
+		}
+		
+		$('#confirm').click(function() {
+			if ('${deposito?.holiday}'=='true'){
+				messageAlertYesNo("Maturity Date ["+$('#maturityDate').val()+"] is holiday, do you want to continue ?", "ui-icon ui-icon-notice", "Confirmation Message",nextProcess, closeDialogMessage);
+			} else {
+				nextProcess();
+			}
+		});
+		
+		$('#back').click(function() {
+			if ('${origin}' == '${depositoPlacementOriginated}') {
+				var isReload = $("#isreload").val();
+				location.href = "@{back()}?id=${deposito?.depositoKey}&param=${param}&mode=${mode}&isreload="+isReload+"";
+			} else {
+				location.href = "@{back()}?id=${deposito?.transactionKey}&param=${param}&mode=${mode}";
+			}
+		});
+		$('#clear').click(function() {
+			location.href="@{entry()}";			
+		});
+		if ('${mode}'=='edit'){
+			$('#clear').css('display', 'none');
+		}
+		$('#cancel').click(function(){
+			var vFrom = '${from}';
+			if (vFrom == '') {
+				location.href="@{list()}";
+			} else if (vFrom == '${depositoInquiryOriginated}') {
+				location.href="@{InquiryDeposito.view}?id=${deposito?.depositoKey}"
+			}
+			
+		});
+	
+	});	
+</script>
+
+<div id="detail">
+	#{include 'DepositoPlacements/detail.html' /}	
+</div>
+
+<div id="actions" class="buttons">
+	#{if confirming}
+		<input type="button" id="confirm" value="Confirm" />
+		<input type="button" id="back" value="Back" />
+	#{/if}
+	#{elseif ((mode == 'entry') || (mode == 'edit')) && (!confirming)}
+		<input type="button" id="save" value="Save" />
+		<input type="button" id="clear" value="Clear" />
+		<input type="button" id="cancel" value="Cancel"/>
+	#{/elseif}
+	#{else}
+		<input type="button" id="cancel" value="Close" />
+	#{/else}
+</div>

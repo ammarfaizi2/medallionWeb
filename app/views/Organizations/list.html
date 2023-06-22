@@ -1,0 +1,49 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Organization Maintenance' /}
+
+<script type="text/javascript">
+	function doEdit(data) {
+		if ((data[3] == "New") || (data[3] == "Updated")) {
+			view(data[0]);
+			return false;
+		} else {
+			return true;
+		}
+	}
+</script>
+
+<table class="display">
+	<thead>
+		<tr>
+			<th width="0"></th>
+			<th width="150px">Organization Id</th>
+			<th width="150px">Name</th>
+			<th width="50px">Status</th>
+			<th width="50px">Active</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:organizations, as:'organization'}
+		<tr>
+			<td>
+				${organization?.organizationId}
+			</td>
+			<td class="capitalize">
+				${organization?.organizationId}
+			</td>
+			<td>
+				${organization?.name}
+			</td>
+			<td>
+				${organization?.recordStatus?.decodeStatus()}
+			</td>
+			<td>
+				${(organization?.isActive) ? 'Yes' : 'No'}
+			</td>		
+		</tr>
+	#{/list}
+	</tbody>
+</table>
+	
+
+

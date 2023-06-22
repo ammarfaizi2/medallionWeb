@@ -1,0 +1,86 @@
+#{extends 'templates/main.html' /}
+#{set readOnly:((mode !='edit' && mode !='entry') || confirming) /}
+<script type="text/javascript">
+	$(function() {
+
+		$('#save').click(function(){
+			var resume = true;
+			if(typeof doSave == 'function') {
+				resume = doSave();
+			}
+			
+			if (resume){
+				var action = "@{save()}?mode=${mode}";
+				var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+				loading.dialog({
+					closeOnEscape: false,
+					draggable: false,
+					modal: true,
+					resizable: false,
+					open:function() {
+						$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+					} 
+				});
+				$('#masterPledgingForm').attr('action', action);
+				$('#masterPledgingForm').submit();
+			}
+		});
+
+		$('#confirm').click(function(){
+			var action = "@{confirm()}?mode=${mode}";
+			var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+			loading.dialog({
+				closeOnEscape: false,
+				draggable: false,
+				modal: true,
+				resizable: false,
+				open:function() {
+					$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+				} 
+			});
+			$.post(action, $('#masterPledgingForm').serialize(), function(data, status) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					var backToEntry = function() {
+						location = "@{entry()}";
+					}
+					messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Notification", backToEntry);
+					
+				} else {
+				//	alert("Failed saving data!");
+				var closeDialogMessage = function() {
+					$(this).dialog("close");
+				}
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+				}
+			});
+		});
+
+		$('#back').click(function(){
+			location.href = '@{back()}?mode=${mode}';
+		});
+
+		$('#clear').click(function(){
+			location.href = '@{entry()}';
+		});
+		
+	});
+</script>
+
+<h2>Pledging Transaction Entry</h2>
+
+<div id="detail">
+	#{include 'Pledgings/detail.html' /}	
+</div>
+
+<div id="actions" class="buttons">
+	#{if confirming}
+		<input type="button" id="confirm" value="Confirm" />
+		<input type="button" id="back" value="Back" />
+	#{/if}
+	#{else}
+		<input type="button" id="save" value="Save" />
+		<input type="button" id="clear" value="Clear" />
+	#{/else}
+</div>

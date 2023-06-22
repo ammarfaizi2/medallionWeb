@@ -1,0 +1,74 @@
+#{if mode == 'edit' || mode == 'entry' || aff?.status == 'O ' || aff?.status == 'N ' || aff?.status == 'U '}
+	#{set pageTitle: 'Compliance Rule Item' /}
+#{/if}
+#{else}
+	#{set pageTitle: 'Compliance Rule Item Approval' /}
+#{/else}
+
+#{set id:cpComplianceRule?.ruleId /}
+
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+
+#{script 'lookups.js' /}
+
+<style type="text/css">
+  .errmsg { color:red; }
+  #header {padding-top:8px;}
+</style>
+
+<!-- MAIN SCREEN -->
+<form id="cpruleitemform" class="form" method="POST" name="cpruleitem">
+#{hidden id:'dispatch', value:mode /}
+#{hidden id:'isReadOnly', name:'isReadOnly', value:readOnly /}
+#{hidden id:'status', name:'cpComplianceRule.status', value:cpComplianceRule?.status /}
+
+
+	#{hidden id:'ruleId', name:'cpComplianceRule.ruleId', value:cpComplianceRule?.ruleId /}
+	<p>			
+		#{textBox id:'ruleCode', name:'cpComplianceRule.ruleCode', label:'Rule Code', value:cpComplianceRule?.ruleCode, readOnly:((mode=='entry') ? confirming : true ),class:'capitalize', required:true, maxLength:50/}
+		<span id="ruleCodeErrorMsg" class="error">#{error 'Rule code is' /}</span>	
+	</p>	
+	
+	<p>
+		#{textArea id:'description', name:'cpComplianceRule.description', label:'Description', value:cpComplianceRule?.description, readOnly:readOnly, class:'capitalize', required:true, width:'318px', maxLength:'200' /}
+		<span id="descriptionErrorMsg" class="error">#{error 'Description is' /}</span>
+	</p>	
+	
+	<p>			
+		#{textBox id:'ruleType', name:'cpComplianceRule.ruleType.lookupCode', label:'Rule Type', value:cpComplianceRule?.ruleType?.lookupCode, readOnly:readOnly, required:true, class:'capitalize', width:'45px' /} 
+		#{hidden id:'ruleTypeKey', name:'cpComplianceRule.ruleType.lookupId', value:cpComplianceRule?.ruleType?.lookupId /}
+		#{button  id:'ruleTypeHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'ruleTypeDesc', name:'cpComplianceRule.ruleType.lookupDescription', value:cpComplianceRule?.ruleType?.lookupDescription, readOnly:true, width:'340px'/} 
+		<span id="ruleTypeErrorMsg" class="error">#{error 'Rule Type is' /}</span>
+	</p>
+
+	<p id="pOperator">
+		#{dropDownList id:'operator', name:'cpComplianceRule.operator', label:'Operator', value:cpComplianceRule?.operator, readOnly:readOnly, required:true, options:listOperator, width:'50px' /}
+		<span class="error">#{error 'Operator is' /}</span>
+	</p>
+	
+	<p id = "pValue">
+	#{textBox id:'value', name:'cpComplianceRule.value', label:'Value', value:cpComplianceRule?.value, readOnly:readOnly, required:true , class:'numericMaxLength'/}%
+		<span id="ruleValueErrorMsg" class="error">#{error 'Value is' /}</span>	
+	</p>
+
+	<p id = "pComparisonValue">
+		#{dropDownList id:'comparisonValue', name:'cpComplianceRule.comparisonValue.lookupId', label:'Comparison Value', value:cpComplianceRule?.comparisonValue?.lookupId, readOnly:readOnly, required:true, options:cpComparisonValue, width:'322px' /}
+		<span id="comparisonValueError" class="error">#{error 'Comparison Value is' /}</span>
+	</p>
+	
+	<p>
+		#{radioButton id:'isActive', name:'isActive', value:((cpComplianceRule?.active)?'true':'false'), label:'Active', options:yesNo, readOnly:readOnly /}
+		#{hidden id:'isActiveHidden', name:'cpComplianceRule.active', value:((cpComplianceRule?.active)?'true':'false') /}
+	</p>
+
+</form>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'ComplianceRulesMaster/CpRuleMaster.js' /}
+	$(document).ready(function() {
+		$('.buttons input:button').button();
+		CpRuleMaster($("#main"));
+	});
+</script>

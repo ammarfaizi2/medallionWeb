@@ -1,0 +1,34 @@
+<table id="grid" class="display">
+	<thead>
+		<tr>
+			<th width="50px">key</th>
+			<th width="320px">Description</th>
+			<th width="15px">Account No</th>
+			<th width="10px">Debit / Credit</th>
+			<th width="10px">Currency</th>
+			<th width="50px">Status</th>
+		</tr>
+	</thead>
+	<tbody>
+		#{list items:faCoaMasters, as:'faCoaMaster'}
+		<tr>
+			<td>${faCoaMaster.coaMasterKey}</td>
+			<td>
+				#{if faCoaMaster?.coaLevel > 0}
+					#{list 0..(faCoaMaster.coaLevel - 1)}
+						&nbsp;&nbsp;&nbsp;
+					#{/list}
+					    &#8970;__
+				#{/if}
+				${faCoaMaster.description}
+			</td>
+			<td align="center">${faCoaMaster.coaCode}</td>
+			<td align="center">${faCoaMaster.nature}</td>
+			<td align="center">${faCoaMaster.currency.currencyCode}</td>
+			<td>
+				Active
+			</td>
+		</tr>
+		#{/list}
+	</tbody>
+</table>

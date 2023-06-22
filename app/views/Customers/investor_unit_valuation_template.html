@@ -1,0 +1,232 @@
+<script type="text/javascript" language="javascript"  src="/public/javascripts/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" language="javascript"  src="/public/javascripts/jquery-ui-1.8.13.min.js"></script>
+<script type="text/javascript" language="javascript"  src="/public/javascripts/autoNumeric-1.7.1.js"></script>
+
+#{script 'date.format.js' /}
+
+<script type="text/javascript">	
+	$(document).ready(function() {
+		#{include 'RegistrySubscription/Util.js' /}
+		
+		// set digitParameter ===================================================================================================
+		var digitAmount = $("#digitAmount").val();
+		var digitUnit = $("#digitUnit").val();
+		var digitPrice = $("#digitPrice").val();
+		var typeAmount = $("#typeAmount").val();
+		var typeUnit = $("#typeUnit").val();
+		var typePrice = $("#typePrice").val();
+		formatAmount(digitAmount, typeAmount);
+		formatUnit(digitUnit, typeUnit);
+		formatPrice(digitPrice, typePrice);
+		// ======================================================================================================================
+			
+		// for date info ========================================================================================================
+		var dateFrom = $('#dateFrom').val();
+		var dateTo = $('#dateTo').val();
+		console.debug("dateFrom = " + dateFrom +  " dateTo = " + dateTo);
+		var current = new Date($('#currentDate').val());
+		var currentDate = new Date($('#currentDate').val());
+		current.setDate(1);
+		var begin = new Date(current);
+		$("#beginUnit").html(begin.format("dd-mmm-yyyy"));
+		$("#currentUnit").html(currentDate.format("dd-mmm-yyyy"));
+		if (($('#dateFrom').val() != '') && ($('#dateTo').val() != '')) {
+			$("#beginUnit").html(dateFrom);
+			$("#currentUnit").html(dateTo);
+		}
+		// ======================================================================================================================
+		
+		$('#printAction').button();
+		$('#printAction').click(function(){
+			$('#printAction').css('display', 'none');
+			window.print();
+		});
+	});
+	
+	// setting digit parameter and rounding for amount ==========================================================================
+	function formatAmount(digitAmount, typeAmount) {
+		$("td[name=amountCell]", $("#grid-investor-inquiry")).each(function() {
+			console.debug($('#amountRoundValue').val());
+			var amount = $(this).html();
+			$("#formatAmount").valueRnd(amount.toNumber(","), true, digitAmount, typeAmount);
+			$(this).html($("#formatAmount").val());
+		});
+		
+		$("td[name=amountCell]", $("#grid-unit-valuation")).each(function() {
+			console.debug($('#amountRoundValue').val());
+			var amount = $(this).html();
+			$("#formatAmount").valueRnd(amount.toNumber(","), true, digitAmount, typeAmount);
+			$(this).html($("#formatAmount").val());
+		});
+	}
+	// ==========================================================================================================================
+	
+	// setting digit parameter and rounding for unit ============================================================================
+	function formatUnit(digitUnit, typeUnit) {
+		$("td[name=unitCell]", $("#grid-investor-inquiry")).each(function() {
+			var unit = $(this).html();
+			$("#formatUnit").valueRnd(unit.toNumber(","), true, digitUnit, typeUnit);
+			$(this).html($("#formatUnit").val());
+		});
+		
+		$("td[name=unitCell]", $("#grid-unit-valuation")).each(function() {
+			var unit = $(this).html();
+			$("#formatUnit").valueRnd(unit.toNumber(","), true, digitUnit, typeUnit);
+			$(this).html($("#formatUnit").val());
+		});
+	}
+	// ==========================================================================================================================
+	
+	// setting digit parameter and rounding for price ===========================================================================
+	function formatPrice(digitPrice, typePrice) {
+		$("td[name=priceCell]", $("#grid-investor-inquiry")).each(function() {
+			var price = $(this).html();
+			$("#formatPrice").valueRnd(price.toNumber(","), true, digitPrice, typePrice);
+			$(this).html($("#formatPrice").val());
+		});
+		
+		$("td[name=priceCell]", $("#grid-unit-valuation")).each(function() {
+			var price = $(this).html();
+			$("#formatPrice").valueRnd(price.toNumber(","), true, digitPrice, typePrice);
+			$(this).html($("#formatPrice").val());
+		});
+	}
+	// ==========================================================================================================================
+</script>
+
+<style type="text/css">
+	#printAction { 
+		margin-top:5px; 
+		margin-left:15px;
+		width:100px;
+	}
+	
+	.infoHolder {
+		margin-top: -8px;	
+	}
+	
+	body { 
+        font-family: Arial;  
+        font-size: 14px;  
+        color: #000000;  
+  	}
+  	
+  	table {
+ 		font-size : 12px; 	
+  	}
+  	
+  	hr {
+  		margin-top:0;
+  		height:10;
+  		background-color:#CCCCCC;
+  		border-style: none;
+  	}
+  	
+  	@page {
+   		size: landscape;
+   	}
+  	
+	#myFooter, #myHeader {
+    	display: none;
+	}
+	
+	#label-2 {
+		margin-left:150px;
+	}
+	
+	#label-3 {
+		margin-left:150px;
+	}
+	
+	#label-4 {
+		margin-left:120px;
+	}
+	
+	#label-5 {
+		margin-left:200px;
+	}
+	
+	#label-6 {
+		margin-left:270px;
+	}
+	
+</style>
+  	
+</style>
+
+#{hidden id:'formatAmount'/}
+#{hidden id:'formatPrice'/}
+#{hidden id:'formatUnit'/}
+#{hidden id:'digitAmount', name:'inv.rgProduct.amountRoundValue', value:inv?.rgProduct?.amountRoundValue /}
+#{hidden id:'digitUnit', name:'inv.rgProduct.unitRoundValue', value:inv?.rgProduct?.unitRoundValue /}
+#{hidden id:'digitPrice', name:'inv.rgProduct.priceRoundValue', value:inv?.rgProduct?.priceRoundValue /}
+#{hidden id:'typeAmount', name:'inv.rgProduct.amountRoundType', value:inv?.rgProduct?.amountRoundType /}
+#{hidden id:'typeUnit', name:'inv.rgProduct.unitRoundType', value:inv?.rgProduct?.unitRoundType /}
+#{hidden id:'typePrice', name:'inv.rgProduct.priceRoundType', value:inv?.rgProduct?.priceRoundType /}
+#{hidden id:'currentDate', name:'currentDate', value:currentDate /}
+#{hidden id:'dateFrom', name:'dateFrom', value:dateFrom?.format('dd-MMM-yyyy') /}
+#{hidden id:'dateTo', name:'dateTo', value:dateTo?.format('dd-MMM-yyyy') /}
+	
+<title>Unit Valuation View</title>
+<html>
+	<body>
+		<div>
+			<img src="/public/images/logo.png">
+			<h2 align="center">Investor Unit Valuation</h2>
+			<h4 class="infoHolder" align="center"><span id ='beginUnit'></span> s/d <span id ='currentUnit'></span></h4>
+			<table id="grid-unit-valuation" width=100%>
+					<thead>
+						<tr bgcolor="#CCCCCC" height="20px">
+							 
+							<th width="60px">Date</th>
+							<th width="85px" >Unit</th>
+							<th width="85x">NAV / Unit</th>
+							<th width="70px">Amount</th>
+							<th width="200px">Cost</th>
+							<th width="200px">Unrealized</th>
+							<!-- 
+							<th colspan="6">
+								<label id="label-1">Date</label>
+								<label id="label-2">Unit</label>
+								<label id="label-3">Nav / Unit</label>
+								<label id="label-4">Amount</label>
+								<label id="label-5">Cost</label>
+								<label id="label-6">Unrealized</label>
+							</th>
+							-->
+						</tr>
+					</thead>
+					<tbody>
+					#{list unitValuations, as:'unitVal'}
+						<tr>
+							<td width="60px">
+								${unitVal?.id?.holdingDate?.format('MM/dd/yyyy')}
+							</td>
+							<td align="right" name="unitCell" width="85px">
+								${unitVal?.unit?.format('##,##0.########')}
+							</td>
+							<td align="right" name="priceCell" width="85x">
+								${unitVal?.navPrice?.format('##,##0.##########')}
+							</td>
+							<td align="right" name="amountCell" width="85x">
+								${unitVal?.amount?.format('##,##0.######')}
+							</td>
+							<td align="right" name="amountCell" width="200px">
+								${unitVal?.balanceAmount?.format('##,##0.######')}
+							</td>
+							<td align="right" name="amountCell" width="200px">
+								${unitVal?.unrealized?.format('##,##0.######')}
+							</td>
+						</tr>
+					#{/list}
+					</tbody>
+			</table>
+			<hr>
+		</div>
+	</body>
+	<footer>
+		<div>
+			<input type="button" id="printAction" value="Print" />
+		</div>
+	</footer>
+</html>

@@ -1,0 +1,72 @@
+<table id="gridChargeProfile1"  class="display">
+	<thead>
+		<tr>
+			<th>chargeKey</th>
+			<th>tieType</th>
+			<th >Charge Code</th>
+			<th >Description</th>
+			<th>chargeType</th>
+			<th>valueType</th>
+			<th></th>
+			<th></th>
+			<th >Security Class</th>
+			<th >Security Type</th>
+			<th >Transaction Code</th>
+			<th >Security Id</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+	 	#{list chargeProfile?.chargeItems, as:'item'}
+		<tr>
+			<td>${item?.chargeMaster?.chargeKey}</td>
+			<td>${item?.chargeMaster?.tieringType?.lookupId}</td>	
+			<td >${item?.chargeMaster?.chargeCode}</td>
+			<td >${item?.chargeMaster?.description}
+			</td>
+			<td>${item?.chargeMaster?.chargeType?.lookupId}</td>
+			<td>${item?.chargeMaster?.valueType?.lookupId}</td>
+			<td>${item?.chargeMaster?.chargeCategory?.lookupId}</td>
+			<td>${item?.chargeMaster?.invoiceCharge?.lookupId}</td>
+			<td class="capitalize">
+				#{if item?.securityClass?.lookupCode }
+					${item?.securityClass?.lookupCode}
+				#{/if}
+				#{else}
+				    *ALL
+				#{/else}		
+			</td>	
+			<td class="capitalize">
+				#{if item?.securityType?.securityType }
+					&nbsp;${item?.securityType?.securityType}
+				#{/if}
+				#{else}
+				    *ALL
+				#{/else}		
+			</td>
+			<td class="capitalize">
+				#{if item?.transactionTemplate?.transactionCode }
+					&nbsp;${item?.transactionTemplate?.transactionCode}		
+				#{/if}
+				#{else}
+				    *ALL
+				#{/else}	
+				
+			</td>
+			<td class="capitalize" >
+				#{if item?.security?.securityId }
+					&nbsp;${item?.security?.securityId}		
+				#{/if}
+				#{else}
+				    *ALL
+				#{/else}	
+				
+			</td>
+			<td>
+				${item?.chargeItemKey}
+			</td>
+		</tr>
+		#{/list}
+	</tbody>
+</table>
+

@@ -1,0 +1,599 @@
+#{set readOnly: ((mode != 'edit' && mode != 'entry') || confirming) /}
+#{set editOnly: ((mode == 'edit' || mode == 'entry') || confirming) /}
+#{set id:faTransaction?.transactionKey /}
+#{if flash.error}
+    <p style="color:#c00">
+        ${flash.error}
+    </p>
+#{/if}
+#{script 'date.js', characterset:'utf-8' /}
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+<script type="text/javascript">
+#{include 'RegistrySubscription/Util.js' /}
+$(function() {
+	Array.max = function( array ){
+		return Math.max.apply( Math, array );
+		};
+
+		// Function to get the Minimam value in Array
+		Array.min = function( array ){
+		return Math.min.apply( Math, array );
+		};
+		
+	var closeDialog = function() {
+		$("#dialog-message").dialog('close');	
+	}
+	
+	$('input.numericManualJournal').autoNumeric({ vMAx:'999999999999.', mDec:10});
+	
+	$('input.numericManualJournal').live('blur', function() {
+		var el = $(this);
+		var id = this.id;
+		var stripped = "#" + id + "Stripped";
+		if (el.val() == '') {
+			el.siblings(stripped).val('');
+			return;
+		}
+		el.siblings(stripped).val(el.autoNumericGet());
+	});
+	
+	$('#dummy').autoNumeric();
+	$('#totalDebet').autoNumeric();
+	$('#totalCredit').autoNumeric();
+	var data = new Object();
+	tabManualJournal(data);
+	totalDorc();
+	
+	$('#fundCode').dynapopup2({key:'fundKey', help:'fundHelp', desc:'fundDesc'}, 'PICK_FA_MASTER', '', 'name', function(data){
+		$('#fundCode').removeClass('fieldError');
+		$('#fundKey').val(data.code);
+		$('#fundDesc').val(data.description);
+		$('#h_fundDesc').val(data.description);
+	},function(data){
+		$('#fundCode').addClass('fieldError');
+		$('#fundCode').val('');
+		$('#fundKey').val('');
+		$('#fundDesc').val('NOT FOUND');
+		$('#h_fundDesc').val('');
+	});
+	
+	$('#journalTemplateCode').dynapopup2({key:'journalTemplateKey', help:'journalTemplateHelp', desc:'journalTemplateDesc'}, 'PICK_FA_JOURNAL_MASTER', '', 'name', function(data){	
+		var table = $('#listManualJournal #gridManualJournalDetail').dataTable();
+		table.fnAddData(data);
+		totalDorc();
+	});
+
+	$('.calendar').datepicker();
+	
+	$('#newManualJournaldetail').button();
+	$('#tabsManualJournalDetail').tabs();
+	$('#saveOverwiteCharge').button();
+	$('#cancelOverwiteCharge').button();
+	$('#addManualJournalDetail').button();
+	$('#cancelManualJournalDetail').button();
+	
+	
+	//detail Manual Journal Detail
+	$( "#detailForManualJournalDetails" ).dialog({
+		autoOpen:false,
+		modal:true,
+		heigth:'600px',
+		width:'455px',
+		resizable:false
+	});
+	
+	
+	$('#listManualJournal #gridManualJournalDetail tbody tr #deleteButton').live('click', function() {
+		if("${mode}"=="view")return false;
+		var row = $(this).parents('tr');
+		var rowNumber = tableManualJournalDetail.fnGetPosition(row[0]);
+		var deleteManualJournalDetail = function(){
+			tableManualJournalDetail.fnDeleteRow(rowNumber);
+			totalDorc();
+			reordering();
+			$("#dialog-message").dialog('close');
+		}
+		messageAlertYesNo("Are you sure to delete data ?", "ui-icon ui-icon-notice", "Confirmation Message", deleteManualJournalDetail, closeDialog);
+		return false;
+	});
+	
+	$('#addManualJournalDetail').die("click");
+	$('#addManualJournalDetail').live("click", function(){
+	   setTimeout(function() {
+		var table = $('#listManualJournal #gridManualJournalDetail').dataTable();
+		var coaMasterCode = $("#detailForManualJournalDetails #manualJournalDetailForm #coaCode").val();
+		var rowPosition = $("#detailForManualJournalDetails #manualJournalDetailForm #rowPosition").val();
+		saveManualJournalDetail();		
+		
+		function saveManualJournalDetail(){
+			if (($("#detailForManualJournalDetails #manualJournalDetailForm #coaCode").val() == "") || ($("#detailForManualJournalDetails #manualJournalDetailForm #position").val()=="") || ( $("#detailForManualJournalDetails #manualJournalDetailForm #amount").val()=="")){
+				$("#detailForManualJournalDetails #manualJournalDetailForm").find("span[id*='Error']").html("");
+				
+				if ($("#detailForManualJournalDetails #manualJournalDetailForm #coaCode").val()=="") {
+					$("#coaCodeError").html('Required').show();
+				} 
+				if ($("#detailForManualJournalDetails #manualJournalDetailForm #position").val()=="") {
+					$("#positionError").html('Required').show();
+				}
+				if ($("#detailForManualJournalDetails #manualJournalDetailForm #amount").val()=="") {
+					$("#amountError").html('Required').show();
+				}
+			} else {
+				var dataManualJournalDetails = table.fnGetData(parseFloat(rowPosition));
+				if (rowPosition != "") {
+					var found = false;
+					// CHECKED DUPLICATE ROW
+					var rows = table.fnGetNodes().length;
+					for (i = 0; i < rows; i++) {
+						var cells = table.fnGetData(i);
+							//if ((coaMasterCode == cells.tierMaximumRange) && (oldMax != newMax)) {
+							//	alert("Data Manual Journal Detail already Exist!");
+							//	found = true;
+							//	break;
+							//}
+					} 
+					if (!found) {
+						//alert($("#detailForManualJournalDetails #manualJournalDetailForm #amountStripped").val());
+						//table.fnUpdate(dataManualJournalDetails.detailKey = $("#detailForManualJournalDetails #manualJournalDetailForm #detailKey").val(),parseFloat(rowPosition),0);
+						table.fnUpdate(((dataManualJournalDetails.faCoaMaster.coaCode = $("#detailForManualJournalDetails #manualJournalDetailForm #coaCode").val()) && (dataManualJournalDetails.faCoaMaster.coaMasterKey = $("#detailForManualJournalDetails #manualJournalDetailForm #coaMasterKey").val())) ,parseFloat(rowPosition),0);
+						table.fnUpdate(dataManualJournalDetails.faCoaMaster.description = $("#detailForManualJournalDetails #manualJournalDetailForm #coaDescription").val(),parseFloat(rowPosition),1);
+						table.fnUpdate(dataManualJournalDetails.subLedger = $("#detailForManualJournalDetails #manualJournalDetailForm #subLedger").val(),parseFloat(rowPosition),2);
+						table.fnUpdate(dataManualJournalDetails.dorc = $("#detailForManualJournalDetails #manualJournalDetailForm #position").val(),parseFloat(rowPosition),3);
+						table.fnUpdate(dataManualJournalDetails.amount = $("#detailForManualJournalDetails #manualJournalDetailForm #amountStripped").val(),parseFloat(rowPosition),4);
+						table.fnUpdate(dataManualJournalDetails.amount = $("#detailForManualJournalDetails #manualJournalDetailForm #amountStripped").val(),parseFloat(rowPosition),5);
+						table.fnUpdate(dataManualJournalDetails.amount = $("#detailForManualJournalDetails #manualJournalDetailForm #amountStripped").val(),parseFloat(rowPosition),6);
+						//dataManualJournalDetails.faCoaMaster.coaMasterKey = $("#detailForManualJournalDetails #manualJournalDetailForm #coaMasterKey").val();
+						//dataManualJournalDetails.detailKey = $("#detailForManualJournalDetails #manualJournalDetailForm #detailKey").val();
+						totalDorc();
+						
+						$('#detailForManualJournalDetails').dialog('close');
+					}
+				} else {
+					var found = false;
+					// CHECKED DUPLICATE ROW
+					var rows = table.fnGetNodes().length;
+					for (i = 0; i < rows; i++) {
+						var cells = table.fnGetData(i);
+							//if ((coaMasterCode == cells.faCoaMaster.coaCode)) {
+							//	alert("Coa Code already Exist!");
+							//	found = true;
+							//	break;
+							//}	
+					} 
+					if (!found) {
+						var dataManualJournalDetail = new Object();
+						dataManualJournalDetail.faCoaMaster = new Object();
+						dataManualJournalDetail.faTransaction = new Object();
+						dataManualJournalDetail.faTransaction.transactionKey = $("#detailForManualJournalDetails #manualJournalDetailForm #transactionKey").val();
+						dataManualJournalDetail.faCoaMaster.coaMasterKey = $("#detailForManualJournalDetails #manualJournalDetailForm #coaMasterKey").val();
+						dataManualJournalDetail.faCoaMaster.coaCode = $("#detailForManualJournalDetails #manualJournalDetailForm #coaCode").val();
+						dataManualJournalDetail.faCoaMaster.description = $("#detailForManualJournalDetails #manualJournalDetailForm #coaDescription").val();
+						dataManualJournalDetail.subLedger= $("#detailForManualJournalDetails #manualJournalDetailForm #subLedger").val();
+						dataManualJournalDetail.dorc= $("#detailForManualJournalDetails #manualJournalDetailForm #position").val();
+						//alert($("#detailForManualJournalDetails #manualJournalDetailForm #position").val());
+						dataManualJournalDetail.amount = $("#detailForManualJournalDetails #manualJournalDetailForm #amountStripped").val();
+						dataManualJournalDetail.detailKey = $("#detailForManualJournalDetails #manualJournalDetailForm #detailKey").val();
+						table.fnAddData(dataManualJournalDetail);
+						totalDorc();
+						$('#detailForManualJournalDetails').dialog('close');
+					}
+					
+				}
+				
+				return false;		
+			}
+		}
+	   }, 500);
+	});
+	
+	//Button New Data for Manual Journal Detail
+	$('.buttons #newManualJournaldetail').click(function() {
+			selectedRow = null;
+			$("#detailForManualJournalDetails").dialog('open');
+			$('.ui-widget-overlay').css('height',$('body').height());
+			$("#detailForManualJournalDetails input:text").val(""); 
+			$("#detailForManualJournalDetails input:hidden").val(""); 
+			$("#detailForManualJournalDetails #position").val("");
+			$("#detailForManualJournalDetails #subLedger").val(""); 
+			$('#detailForManualJournalDetails #manualJournalDetailForm #coaCode').removeClass('fieldError');
+			$("#detailForManualJournalDetails #manualJournalDetailForm .errmsg").html("");
+			$("#detailForManualJournalDetails #manualJournalDetailForm").find("span[id*='Error']").html("");
+		
+		return false;
+	
+	});
+	
+	if ($.browser.msie){
+		$("#remarks[maxlength]").bind('input propertychange', function() {
+	        var maxLength = $(this).attr('maxlength');  
+	        if ($(this).val().length > maxLength) {  
+	            $(this).val($(this).val().substring(0, maxLength));  
+	        }  
+	    });
+		
+		$("#remarksCorrection[maxlength]").bind('input propertychange', function() {
+	        var maxLength = $(this).attr('maxlength');  
+	        if ($(this).val().length > maxLength) {  
+	            $(this).val($(this).val().substring(0, maxLength));  
+	        }  
+	    });
+	}
+	
+	if (('${from}' !== '') && ($('#remarksCorrection').val() != '')) {
+		$('#needCorrection').attr('checked', 'checked');
+	}
+	
+	$('#needCorrection').change(function(){
+		if ($('#needCorrection').is(':checked')) {
+			$('li[id=liRemarksCorrection] label span').html(' *');
+		} else {
+			$('li[id=liRemarksCorrection] label span').html('');
+		}
+	});
+});
+
+function tabManualJournal(data) {
+	var transactionDetails;
+	#{if '${transactionDetails}' != '' }
+		if(${transactionDetails.raw()} == null){
+			transactionDetails = new Array();
+		}else{
+			transactionDetails = ${transactionDetails.raw()};
+		}
+	#{/if}
+	#{if '${transactionDetails}' == '' }
+		transactionDetails = new Array();
+	#{/if}
+	
+	tableManualJournalDetail = 
+		$('#manualJournalForm #listManualJournal #gridManualJournalDetail').dataTable({
+			aaData: transactionDetails,
+			aoColumns: [ /*
+			             {
+							bVisible:false,
+							fnRender: function(obj) {
+							  	var controls;
+									controls = obj.aData.detailKey;
+									controls += '<input type="hidden" name="faTransactionDetails[' + obj.iDataRow + '].detailKey" value="' + obj.aData.detailKey + '" />';
+							  	return controls;
+							 }
+			 			 },
+			 			 */
+			             {
+			 				fnRender: function(obj) {
+							  	var controls;
+								controls = obj.aData.faCoaMaster.coaCode;
+								controls += '<input type="hidden" name="faTransactionDetails[' + obj.iDataRow + '].faCoaMaster.coaMasterKey" value="' + obj.aData.faCoaMaster.coaMasterKey + '" />';
+								controls += '<input type="hidden" name="faTransactionDetails[' + obj.iDataRow + '].faCoaMaster.coaCode" value="' + obj.aData.faCoaMaster.coaCode + '" />';
+							  	return controls;
+							 }
+						  }, 
+						  {
+							  fnRender: function(obj) {
+								  	var controls;
+									controls = obj.aData.faCoaMaster.description;
+									controls += '<input type="hidden" name="faTransactionDetails[' + obj.iDataRow + '].faCoaMaster.description" value="' + obj.aData.faCoaMaster.description + '" />';
+								  	return controls;
+							  }
+						  },	  
+						  {
+							  fnRender: function(obj) {
+								  	var controls;
+									controls = obj.aData.subLedger;
+									if(controls==null)
+										controls="";
+						 			controls += '<input type="hidden" name="faTransactionDetails[' + obj.iDataRow + '].subLedger" value="' + controls + '" />';
+								  	return controls;
+							  }
+						  },
+						  {
+							  fnRender: function(obj) {
+								  	var controls;
+									controls = obj.aData.dorc;
+									controls += '<input type="hidden" name="faTransactionDetails[' + obj.iDataRow + '].dorc" value="' + obj.aData.dorc + '" />';
+								  	return controls;
+							  }
+						  },
+						  {
+							  sClass: 'numeric',
+							  fnRender: function(obj) {
+								  var controls;
+								  if (obj.aData.dorc=='D') {
+									//controls =  $('#dummy').myAutoNumericGet(obj.aData.amount);
+									controls = $('#dummy').autoNumericSet( obj.aData.amount, {aPad:true,mDec:4}).val();
+								  	controls += '<input type="hidden" name="faTransactionDetails[' + obj.iDataRow + '].amount" value="' + obj.aData.amount + '" />';
+								  } else {
+									  controls= "";
+								  }
+								  return controls;
+							  }
+						  },
+						  {
+							  sClass: 'numeric',
+							  fnRender: function(obj) {
+								  var controls;
+								  if (obj.aData.dorc=='C') {
+									//controls =  $('#dummy').myAutoNumericGet(obj.aData.amount);
+									controls = $('#dummy').autoNumericSet( obj.aData.amount, {aPad:true,mDec:4}).val();
+								  	controls += '<input type="hidden" name="faTransactionDetails[' + obj.iDataRow + '].amount" value="' + obj.aData.amount + '" />';
+								  } else {
+									  controls= "";
+								  }
+								  return controls;
+							  }
+						  },
+						  
+						  {
+							fnRender: function(obj) {
+							 	var controls;
+							 	controls = '<center><input id="deleteButton" type="button" value="Delete" #{if readOnly}disabled="disabled"#{/if} /></center>';
+					 			controls += '<input type="hidden" name="faTransactionDetails[' + obj.iDataRow + '].faTransaction.transactionKey" value="' + obj.aData.faTransaction.transactionKey + '" />';
+					 			controls += '<input type="hidden" name="faTransactionDetails[' + obj.iDataRow + '].detailKey" value="' + obj.aData.detailKey + '" />';
+					 			return controls;
+						 	}
+						  }
+						  
+						],
+			aaSorting:[[1,'asc']],
+        	bAutoWidth: false,		
+        	bDestroy: true,
+        	bFilter: false,
+        	bInfo: false,
+        	//bRetrieve:true,
+        	//bServerSide: true,
+        	bJQueryUI: true,
+        	bPaginate: false,
+        	bSearch: false,
+        	bLengthChange: false,
+        	isDisplayLength:10                						
+	});
+	
+	$('#listManualJournal #gridManualJournalDetail ').removeAttr('style');
+	$('#listManualJournal #gridManualJournalDetail tbody tr td').die('click');
+	$('#listManualJournal #gridManualJournalDetail tbody tr td').live('click', function(){
+		
+		var txt = $(this).text();
+		if(txt == 'No data available in table')
+		{
+			return false;
+		}else{
+		var rowPos= $(this).parents('tr');
+		var rowPosNumber = tableManualJournalDetail.fnGetPosition(rowPos[0]);
+		var pos = tableManualJournalDetail.fnGetPosition(this);
+		cell = tableManualJournalDetail.fnGetData(this.parentNode);
+		if (pos[1] != 5) {
+			dataManualJournalDetail = tableManualJournalDetail.fnGetData(this.parentNode);
+			$('#detailForManualJournalDetails #manualJournalDetailForm #coaCode').removeClass('fieldError');
+			$("#detailForManualJournalDetails #manualJournalDetailForm .errmsg").html("");
+			$("#detailForManualJournalDetails #manualJournalDetailForm").find("span[id*='Error']").html("");
+			$("#detailForManualJournalDetails #manualJournalDetailForm #rowPosition").val(rowPosNumber);
+			$("#detailForManualJournalDetails #manualJournalDetailForm #transactionKey").val(dataManualJournalDetail.faTransaction.transactionKey);
+			$("#detailForManualJournalDetails #manualJournalDetailForm #coaMasterKey").val(dataManualJournalDetail.faCoaMaster.coaMasterKey);
+			$("#detailForManualJournalDetails #manualJournalDetailForm #coaCode").val(dataManualJournalDetail.faCoaMaster.coaCode);
+			$("#detailForManualJournalDetails #manualJournalDetailForm #coaDescription").val(dataManualJournalDetail.faCoaMaster.description);
+			$("#detailForManualJournalDetails #manualJournalDetailForm #subLedger").val(dataManualJournalDetail.subLedger);
+			$("#detailForManualJournalDetails #manualJournalDetailForm #position").val(dataManualJournalDetail.dorc);
+			//$("#detailForManualJournalDetails #manualJournalDetailForm #amount").myAutoNumericGet(dataManualJournalDetail.amount);
+			$("#detailForManualJournalDetails #manualJournalDetailForm #amount").autoNumericSet(dataManualJournalDetail.amount);
+			$("#detailForManualJournalDetails #manualJournalDetailForm #amountStripped").val(dataManualJournalDetail.amount);
+			$("#detailForManualJournalDetails").dialog('open');
+			$('.ui-widget-overlay').css('height',$('body').height());
+			
+		}
+	  }
+	});
+}
+
+function totalDorc() {
+	var manualJournalLength = tableManualJournalDetail.fnGetNodes().length;
+	var sumDebet = 0;
+	var sumCredit = 0;
+	var debet = 0;
+	var credit = 0;
+	var decAmountDebetArr = new Array();
+	var decAmountcreditArr = new Array();
+	
+	for (j = 0 ;j < manualJournalLength; j++ ) {
+		var datas = tableManualJournalDetail.fnGetData(j);
+		
+		debet = parseFloat($(datas[4]).val());
+		credit = parseFloat($(datas[5]).val());
+		
+		if ($(datas[4]).val() == undefined ) {
+			debet = 0 ;
+		}
+		if ($(datas[5]).val() == undefined ) {
+			credit = 0 ;
+		}	
+		sumDebet = sumDebet + debet;
+		sumCredit = sumCredit + credit;		
+	}
+	
+	for(var i = 0; i < manualJournalLength;i++){
+		var datas = tableManualJournalDetail.fnGetData(i);
+		if ($(datas[4]).val() == undefined ) {
+			decAmountDebetArr[i] = 0;
+		} else {
+			var debetSplit = $(datas[4]).val().split(".");
+			if (debetSplit.length > 1) {
+				decAmountDebetArr[i] = debetSplit[1].length;
+			} else {
+				decAmountDebetArr[i] = 0;
+			}	
+		}
+		if ($(datas[5]).val() == undefined ) {
+			decAmountcreditArr[i] = 0;
+		}	else {
+			var creditSplit = $(datas[5]).val().split(".");
+			if (creditSplit.length > 1) {
+				decAmountcreditArr[i] = creditSplit[1].length;
+			} else {
+				decAmountcreditArr[i] = 0;
+			}	
+		}	
+	}
+	
+	
+	if (manualJournalLength==0) {
+		$("#totalDebet").autoNumericSet(sumDebet, {aPad:true,mDec:0}).val();
+		$("#totalDebetStripped").val(sumDebet);
+		$("#totalCredit").autoNumericSet(sumCredit, {aPad:true,mDec:0}).val();
+		$("#totalCreditStripped").val(sumCredit);
+	} else {
+		$("#totalDebet").autoNumericSet(sumDebet, {aPad:true,mDec:4}).val();
+		$("#totalDebetStripped").val(sumDebet.toFixed(4));
+		$("#totalCredit").autoNumericSet(sumCredit, {aPad:true,mDec:4}).val();
+		$("#totalCreditStripped").val(sumCredit.toFixed(4));
+	}
+}
+
+function reordering() {
+	
+	var grid = $('#listManualJournal #gridManualJournalDetail tbody');
+	var trs = $("tr", grid);
+	
+	$.each(trs, function(idx, data){
+		var hiddens = $("[type=hidden]", $(this));
+		
+		$(hiddens).eq(0).attr("name", "faTransactionDetails["+idx+"].faCoaMaster.coaMasterKey");
+		$(hiddens).eq(1).attr("name", "faTransactionDetails["+idx+"].faCoaMaster.coaCode");
+		$(hiddens).eq(2).attr("name", "faTransactionDetails["+idx+"].faCoaMaster.description");
+		$(hiddens).eq(3).attr("name", "faTransactionDetails["+idx+"].subLedger");
+		$(hiddens).eq(4).attr("name", "faTransactionDetails["+idx+"].dorc");
+		$(hiddens).eq(5).attr("name", "faTransactionDetails["+idx+"].amount");
+		$(hiddens).eq(6).attr("name", "faTransactionDetails["+idx+"].faTransaction.transactionKey");
+		$(hiddens).eq(7).attr("name", "faTransactionDetails["+idx+"].detailKey");
+		
+	});
+}
+
+function doSave() {
+	/* var compareDebet = parseFloat($("#totalDebet").val());
+	var compareCredit = parseFloat($("#totalCredit").val()); */
+	
+	var compareDebet = $("#totalDebetStripped").val();
+	var compareCredit = $("#totalCreditStripped").val();
+	
+	if (compareDebet != compareCredit) {
+		$("#errmsgCompare").html('<b>* Total "Amount Debet" must be equal with Total "Amount Credit" !</b>').show();
+		return false;
+	}
+	return true;
+}
+
+
+</script>
+<style type="text/css">
+  textarea {resize: none; width:390px; height: 60px;}
+   #errmsgCompare { color:red; }
+   .numericManualJournal { text-align: right; }
+}
+</style>
+<form id="manualJournalForm" class="form" method="POST">
+<table>
+<tr>
+	<td>
+		<div id="profileMaster">
+		
+			#{hidden id:'rowNumber' /}
+			#{hidden id:'rowPosition' /}
+			#{hidden id:'mode', name:'mode', value:mode /}
+	
+			<ul>
+				<li>
+					#{textBox id:'transactionNo', label:'Transaction No', value:faTransaction?.transactionKey, width:'120px', readOnly:true /}
+					#{hidden id:'transactionKey', name:'faTransaction.transactionKey', value:faTransaction?.transactionKey /}
+				</li>
+				<li>
+					#{textBox id:'fundCode', name:'faTransaction.faMaster.fundCode', label:'Fund Code', value:faTransaction?.faMaster?.fundCode, required:true, class:'capitalize', width:'120px', maxLength:50, readOnly:readOnly /}
+					#{hidden id:'fundKey', name:'faTransaction.faMaster.fundKey', value:faTransaction?.faMaster?.fundKey /}
+					#{button id:'fundHelp', value:'?', class:'small', readOnly:readOnly /}
+					#{textBox id:'fundDesc', name:'faTransaction.faMaster.fundDescription', value:faTransaction?.faMaster?.fundDescription, class:'capitalize', readOnly:true, maxLength:100, width:'241.5px' /}
+					<span class="error">#{error 'Fund Code is' /}</span>
+				</li>
+				<li>
+					#{textBox id:'name', name:'faTransaction.name', label:'Name', value:faTransaction?.name, class:'capitalize', required:true, readOnly:readOnly , width:'120px', maxLength:50/}
+					<span class="error">#{error 'Name is' /}</span>
+				</li>
+				<li>
+					#{textBox id:'transactionDate', name:'faTransaction.transactionDate', label:'Journal Date', value:faTransaction?.transactionDate?.format(appProp.dateFormat), required:true,readOnly:readOnly,class:'calendar', maxLength:10 /} (${appProp.displayDateFormat})
+					<span id="transactionDateError" class="error">#{error 'Journal Date is' /}</span>
+				</li>
+				<li>			
+					#{textArea id:'remarks', name:'faTransaction.remarks', label:'Remarks', value:faTransaction?.remarks, class:'capitalize', readOnly:readOnly, width:'390px', maxLength:255 /}
+				</li>
+			</ul>
+		</div>
+	</td>
+	<td>
+		<div id="dvNeedCorrection">
+			<fieldset style="width: 350px;">
+			<ul>
+				<li>
+					#{checkBox id:'needCorrection', name:'needCorrection', label:'Need Correction', value:needCorrection, readOnly:editOnly, width:'100px' /}
+				</li>
+				<li id="liRemarksCorrection">
+					<label>Remarks <span class="req"> *</span></label>
+					#{textArea id:'remarksCorrection', name:'faTransaction.remarksCorrection', value:faTransaction?.remarksCorrection, class:'capitalize', width:'165px', maxLength:200, readOnly:editOnly /}
+					<span id="remarksCorrectionError" class="error">#{error 'Remarks Correction is' /}</span>
+				</li>
+			</ul>
+			</fieldset>
+		</div>
+	</td>
+</tr>
+</table>
+	#{hidden id:'journalTemplateCode', name:'faJournalMaster.id', value:faJournalMaster?.id /}
+	#{hidden id:'journalTemplateKey', name:'faJournalMaster.journalMasterKey', value:faJournalMaster?.journalMasterKey /}
+	#{button id:'journalTemplateHelp', value:'Load Template >>', readOnly:readOnly /}
+	#{hidden id:'journalTemplateDesc', name:'faJournalMaster.name', value:faJournalMaster?.name /}
+	
+<div class="divclear"></div>
+<br>
+<p> </p>
+<div id="tabsManualJournalDetail">
+	<ul>
+		<li><a href="#tabsManualJournalDetail-1">Manual Journal Details</a></li>
+	</ul>
+	<div class="pane" id="tabsManualJournalDetail-1">	
+		<div id="listManualJournal" style="overflow-y:scroll;height:220px">
+			#{include 'ManualJournals/grid_manual_journal_detail.html' /}
+		</div>
+		<hr style="border-color:#A6C9E2">
+			<div>
+					<span Style="margin-left: 37em;" ><b>Total</b></span>	
+					<span Style="margin-left: 4em;" ></span>	
+					#{textBox id:'totalDebet', class:'numeric' ,readOnly:true, width:'150px' /}
+					#{hidden id:'totalDebetStripped' /}
+					<span Style="margin-left: 1em;" ></span>
+					#{textBox id:'totalCredit', class:'numeric', readOnly:true, width:'150px' /}
+					#{hidden id:'totalCreditStripped' /}		
+			</div>
+			<hr style="border-color:#A6C9E2">	
+				<span id="errmsgCompare" Style="margin-left: 37em;" ></span>
+		<br/>
+		<div class="buttons">
+			#{ifnot confirming}
+				<button id="newManualJournaldetail" #{if readOnly}disabled="disabled"#{/if}>New Data</button>
+			#{/ifnot}
+		</div>	
+	</div>
+</div>
+<form></form>
+<div id="detailForManualJournalDetails" title="Manual Journal Details">
+	#{include 'ManualJournals/detail_manual_journal.html' /}
+	<div class="buttons">
+		#{if (((mode == "view"))||(confirming)) }
+			<button id="cancelManualJournalDetail">Close</button>				
+		#{/if}
+		#{else}
+			<!-- <button id="addManualJournalDetail">Save</button> di ubah jadi input krn bug di ie 8 yang search popup focus ke button ini-->
+			<input id="addManualJournalDetail" type="button" value="Save">
+			<button id="cancelManualJournalDetail">Cancel</button>
+		#{/else}
+		
+	</div>
+</div>
+</form>
+<input type="hidden" id="dummy" />

@@ -1,0 +1,180 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Cancel Switching' /}
+
+#{hidden id:'dataPaymentOnApproval' , value:dataPaymentOnApproval /}
+
+<script type="text/javascript">	
+	$(function() {
+		$("#saveCancellation").button();
+        $("#cancelCancellation").button();
+        $("#confirmCancellation").button();
+        $("#backCancellation").button();
+
+		if('${from}' == 'unitRegistry')
+		{
+			$("#close").button();
+			$('#ok').css('display', 'none');
+			$('#cancel').css('display', 'none');
+			$('#saveCancellation').css('display', 'none');
+            $('#cancelCancellation').css('display', 'none');
+
+			$('#close').click(function()
+			{
+				location = "@{InquiryUnitRegistry.list()}";
+			});
+		}
+		
+		var closeDialogMessage = function() {
+            $("#dialog-message").dialog("close");
+        }
+
+        var backToList = function() {
+            loading.dialog('open');
+            location = "@{RegistryCancelTrade.list()}";
+        }
+		
+        $("#remarkForCancel[maxlength]").bind('input propertychange', function() {
+			var maxLength = $(this).attr('maxlength');  
+	        if ($(this).val().length > maxLength) {  
+	            $(this).val($(this).val().substring(0, maxLength));  
+	        }  
+	    });
+        
+        $('#saveCancellation').click(function() {
+
+            if($('#messageError').val() != '')
+            {
+                messageAlertOk($('#messageError').val(), "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+                return false;
+            }
+            
+            console.log($("#paid").val());
+            var paid = $("#paid").val();
+            if(paid!='0' && paid!=''){
+            	messageAlertOk('Cannot cancel an already paid trade', "ui-icon1 ui-icon-circle-close", "Error Message",  closeDialogMessage);
+            	return false;	
+            }
+             
+           	if(($('#dataPaymentOnApproval').val() == '0')){
+        	    messageAlertOk('There is an unapproved payment for this trade on payment approval work list', "ui-icon1 ui-icon-circle-close", "Error Message",  closeDialogMessage);
+                return false;
+           	}
+             
+
+            /*------------------------------------- start cancel validation ---------------------------------------------------------*/
+            /* var cancelPostDate = new Date($("#cancelPostDateHidden").val()).getTime();
+            var cancelDate = new Date($("#cancelDateHidden").val()).getTime(); */
+            //var cancelPostDate = new Date($('#cancelPostDateHidden').datepicker('getDate')).getTime();
+    		//var cancelDate = new Date($('#cancelDateHidden').datepicker('getDate')).getTime();
+    		
+            var cancelPostDate = $("#cancelPostDateHidden").val();
+            var cancelDate = $("#cancelDateHidden").val();
+    			
+   			function process(date){
+			   var parts = date.split("/");
+			   return new Date(parts[2], parts[1] - 1, parts[0]);
+			}
+
+             if((cancelPostDate!="" || cancelPostDate !=null) && (cancelDate !="" || cancelDate !=null))
+            {
+                if (process(cancelPostDate) < process(cancelDate) )
+                {
+                    messageAlertOk('Cancel Date must be before than Cancel Post Date', "ui-icon1 ui-icon-circle-close", "Error Message",  closeDialogMessage);
+                    return false;
+                }
+            }
+
+            var postDate = $('#postDate').val();
+            
+            if((cancelPostDate!="" || cancelPostDate !=null) && (postDate!="" || postDate !=null))
+            {
+                if (process(cancelPostDate) < process(postDate) )
+                {
+                    messageAlertOk('Cancel Post Date must be later than Cancelled Transaction Post Date', "ui-icon1 ui-icon-circle-close", "Error Message",  closeDialogMessage);
+                    return false;
+                }
+            }
+            /*------------------------------------- end cancel validation ---------------------------------------------------------*/
+
+            if(($('#remarkForCancel').val() == '') || ($.trim($('#remarkForCancel').val()) == ''))
+            {
+                $('#remarkForCancelError').html("Required");
+            }
+            else
+            {
+                $('#remarkForCancelError').html("");
+
+                var action = '@{save()}?mode=${mode}&from=cancelSwitching&isNewRec=${isNewRec}#{if group}&group=${group}#{/}';
+                $('#registrySwitchForm').attr('action', action);
+                $('#registrySwitchForm').submit();
+                //alert("Your Cancel No is #${swt?.switchingKey}");
+            }
+        });
+
+		$('#cancelCancellation').click(function(){
+            location.href = '@{RegistryCancelTrade.list()}';
+            return false;
+        });
+        
+        $('#confirmCancellation').click(function() {
+            var action = "@{confirm()}?mode=${mode}&from=cancelSwitching&isNewRec=${isNewRec}#{if group}&group=${group}#{/}";
+            loading.dialog('open');
+
+            $.post(action, $('#registrySwitchForm').serialize(), function(data, status)
+            {
+	    		checkRedirect(data);
+                loading.dialog('close');
+                if (data.status == 'success') {
+                    messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Notification", backToList);
+                } else if (data.status == 'errorx') {
+                	messageAlertOk(data.errorx, "ui-icon1 ui-icon-circle-close", "Error Message", backToList);
+                } else {
+                    messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+                }
+            });
+            
+            return false;
+        });
+
+        $('#backCancellation').click(function()
+        {
+            location.href = '@{back()}?id=${swt?.switchingKey}&mode=${mode}&from=cancelSwitching';
+            return false;
+        });
+
+        $("#approval-actions").css("display","block");
+	});
+</script>
+#{if from == 'unitRegistry' }
+	<h2>Inquiry Unit Switching</h2>
+#{/if}
+#{else}
+	<h2>Cancel Switching</h2>
+#{/else}
+
+<div id="detail">
+    #{include 'RegistrySwitch/detail.html' /}
+</div>	
+
+<div id="approval-actions">	
+	#{hidden id:'taskId', name:'taskId', value:taskId /}
+	#{hidden id:'keyId', name:'keyId', value:keyId /}
+	#{hidden id:'from', name:'from', value:from /}
+	#{hidden id:'messageError', name:'messageError', value:messageError /}
+	#{hidden id:'paid', value:paid /}
+
+    <div id="actions" class="buttons">
+    #{if confirming}
+        <input type="button" id="confirmCancellation" value="Confirm" />
+        <input type="button" id="backCancellation" value="Back" />
+    #{/if}
+    #{else}
+        <input type="button" id="saveCancellation" value="Save" />
+        <input type="button" id="cancelCancellation" value="Cancel" />
+    #{/else}
+
+    #{if from == 'unitRegistry'}
+        <input type="button" id="close" value="Close" />
+    #{/if}
+    </div>
+</div>

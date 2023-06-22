@@ -1,0 +1,107 @@
+<table>
+    <tr>
+        <td valign="top">
+            <p> 
+                #{textBox id:'swiMinAmt', label:'Minimum Amount', value:prd?.swiMinAmt, format:'#,##0.####', class:'numeric', width:'181px', readOnly:readOnly, required:true /}
+                #{hidden  id:'swiMinAmtStripped', name:'prd.swiMinAmt', value:prd?.swiMinAmt /}
+                <span class="error">#{error 'Minimum Amount in tab Switching is' /}</span>
+            </p>
+
+            <p> 
+                <label>Maximum Amount<span id="spanSwiMaxAmt" class="req"> *</span></label>
+                #{textBox id:'swiMaxAmt', value:prd?.swiMaxAmt, format:'#,##0.####', class:'numeric maxValidate', width:'181px', readOnly:readOnly /}
+                #{hidden  id:'swiMaxAmtStripped', name:'prd.swiMaxAmt', value:prd?.swiMaxAmt /}
+                #{checkBox id:'isCheckedSwi', name:'prd.checkMaxSwi', value:prd?.checkMaxSwi, readOnly:readOnly /}Max
+                <span  id="isCheckedSwiError" class="error">#{error 'Maximum Amount in tab Switching is' /}</span>
+                <span id="errmsgMaxSwi" class="error"></span>
+            </p>
+
+            <p></p>
+
+            <fieldset style="width:520px; height:115px">
+                <legend><b>Switching Fee</b></legend>
+                
+                <p>
+                    #{textBox id:'swiTax', name:'prd.taxMasterBySwiTaxKey.taxCode', label:'Tax Code', value:prd?.taxMasterBySwiTaxKey?.taxCode, width:'120px', readOnly:readOnly, class:'capitalize', required:true /}
+                    #{hidden  id:'swiTaxKey', name:'prd.taxMasterBySwiTaxKey.taxKey', value:prd?.taxMasterBySwiTaxKey?.taxKey /}
+                    #{button  id:'swiTaxHelp',  value:'?', class:'small', readOnly:readOnly /}
+                    #{textBox id:'swiTaxDesc', name:'prd.taxMasterBySwiTaxKey.description', value:prd?.taxMasterBySwiTaxKey?.description, readOnly:true, width:'180px' /}
+                    <span class="error">#{error 'Tax Code in tab Switching is' /}</span>
+                </p>
+                
+                #{list prd?.swiFees, as:'fee'}
+                <p>
+                   #{textBox id:'valueSwi['+(fee_index-1)+']', label:'Default Fee (%)', name:'swiFeeTierValue', format:'#,##0.####', value:fee?.value, width:'140px', readOnly:readOnly, required:true /}
+                   #{hidden id:'valueSwi['+(fee_index-1)+']Stripped', name:'prd.swiFees['+(fee_index-1)+'].value', value:fee?.value /}
+                   (include tax)
+                   <span class="error">#{error 'Default Fee in tab Switching is' /}</span> 
+                </p>
+
+                <p>
+                   <label>Maximum Fee (%)<span id="spanSwiFeeTierMaxValue" class="req"> *</span></label>
+                   #{textBox id:'maxValueSwi['+(fee_index-1)+']', name:'swiFeeTierMaxValue', format:'#,##0.####', width:'140px', value:fee?.maxValue, readOnly:readOnly /}
+                   #{hidden id:'maxValueSwi['+(fee_index-1)+']Stripped', name:'prd.swiFees['+(fee_index-1)+'].maxValue', value:fee?.maxValue /}
+                   #{hidden id:'tierNumber['+(fee_index-1)+']Stripped', name:'prd.swiFees['+(fee_index-1)+'].tierNumber',  value:fee?.tierNumber /}
+                   #{hidden id:'upperLimit['+(fee_index-1)+']Stripped', name:'prd.swiFees['+(fee_index-1)+'].upperLimit',  value:fee?.upperLimit /}
+                   #{checkBox id:'isCheckedSwiMaxValue['+(fee_index-1)+']', name:'checkSwiFeeTierMaxValue['+(fee_index-1)+']', readOnly:readOnly, value: prd?.checkSwiFeeTierMaxValue /} Max
+                   #{hidden id:'isCheckedSwiMaxValue['+(fee_index-1)+']Stripped', name:'prd.checkSwiFeeTierMaxValue'/}
+                </p>
+                
+                <p><span id = "isCheckedSwiMaxFeeError" class="error">#{error 'Maximum Fee in tab Switching is' /}</span></p>
+                #{/list}
+
+            </fieldset>
+            
+            <fieldset style="width:520px; height:115px">
+                <legend><b>Switching Interface</b></legend>
+                <p>
+                	#{dropDownList id:'swiIntfTrfCharge', name:'prd.swiIntfTrfCharge.lookupId', label:'Transfer Charges' ,value:prd?.swiIntfTrfCharge?.lookupId , options:transferCharge, readOnly:readOnly, class:'empty' /}
+                </p>
+                <p>
+                	#{dropDownList id:'swiIntfAccessAccount', name:'prd.swiIntfAccessAccount.lookupId', label:'Access Account' ,value:prd?.swiIntfAccessAccount?.lookupId , options:accessAccount, readOnly:readOnly, class:'empty' /}
+                </p>
+                <p>
+                	#{dropDownList id:'swiIntfAmountType', name:'prd.swiIntfAmountType.lookupId', label:'Amount Type' ,value:prd?.swiIntfAmountType?.lookupId , options:amountType, readOnly:readOnly, class:'empty' /}
+                </p>
+            </fieldset>   
+        </td>
+        <td valign="top">
+            <fieldset style="width:345px; height:325px">
+                <legend><b>Switching Window</b></legend>
+                <p>
+                    #{radioButton id:'swiLock', name:'prd.swiLock', label:'Lock', options:operators, value:((prd?.swiLock)?'true':'false'), readOnly:readOnly, width:'44px' /}
+                </p>
+                <p>
+                    #{textBox id:'swiExceptionDate', name:'swiExceptionDate', value:'', class:'calendar invalidDateFormat', readOnly:readOnly, width:'80px' /}
+                    <input type="button" id="swiAddDate" value="Insert" #{if readOnly}disabled='disabled'#{/if}></input> (${appProp.displayDateFormat})
+                </p>
+                <p style="margin-left: 162px">
+                    <span id="swiExceptionDateError" class="error"></span>
+                </p>
+                <div class="tier-box-IE" style="overflow-y:scroll;max-height:240px">
+                    <table id="swiExceptionSpecificDate" class="display">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            #{list prd?.swiLockExceptions, as:'lockException'}
+                                <tr>
+                                    <td>${lockException?.id?.exceptionDate?.format(appProp.dateFormat)}</td>
+                                    <td del='true'>
+                                        <center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} exceDateType="SWITCHING" /></center>
+                                        #{hidden id:'exceptionDate'+(lockException_index-1), name:'prd.swiLockExceptions[' + (lockException_index-1) + '].id.exceptionDate', value:lockException?.id?.exceptionDate?.format(appProp.dateFormat) /}
+                                        #{hidden id:'productCode'+(lockException_index-1), name:'prd.swiLockExceptions[' + (lockException_index-1) + '].id.productCode', value:lockException?.id?.productCode /}
+                                        #{hidden id:'exceDateType'+(lockException_index-1), name:'prd.swiLockExceptions[' + (lockException_index-1) + '].id.type', value:lockException?.id?.type /}
+                                    </td>
+                                </tr>
+                            #{/list}
+                        </tbody>
+                    </table>
+                </div>
+            </fieldset>
+        </td>
+    </tr>
+</table>

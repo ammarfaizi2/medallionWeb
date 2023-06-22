@@ -1,0 +1,150 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: ' ' /}
+#{set fixData: true /}
+#{set mode: mode /}
+#{script 'lookups.js' /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+
+<div id="root">
+	<h3>Rollback MF</h3>
+	#{if flash.error || errors}
+	    <div class="error">
+	    	Error when saving data!<br/>
+			<li>${flash.error}</li>
+			#{ifErrors}
+				#{errors}
+					 <li>${error.key} ${error}</li>
+				#{/errors}
+			#{/ifErrors}
+	    </div>
+	#{/if}
+	<form id="rollbackMFForm" class="form">
+		#{hidden id:'mode', name:'mode', value:mode /}
+		#{hidden id:'dispatch', name:'param.dispatch', value:param?.dispatch /}
+		#{hidden id:'rollbackKey', name:'param.rollbackKey', value:param?.rollbackKey /}
+		
+		#{hidden id:'taskId', name:'taskId', value:taskId /}
+		#{hidden id:'maintenanceLog', name:'maintenanceLogKey', value:maintenanceLogKey /}
+		#{hidden id:'operation', name:'operation', value:operation /}
+		<div id="hiddenTag"></div>
+		
+		
+<!-- 		<span id="globalErr" class="error">#{error 'GlobalError' /}</span> -->
+		<p>
+			#{textBox id:'fundCode', name:'param.fund.fundCode', label:'Fund Code', value:param?.fund?.fundCode, width:'120px', readOnly:readOnly, class:'capitalize', required:true, dataold:param?.fund?.fundCode /}
+			#{hidden  id:'fundCodeKey', name:'param.fund.fundKey', value:param?.fund?.fundKey /}
+			#{button  id:'fundCodeHelp', value:'?', class:'small', readOnly:readOnly/}
+			#{textBox id:'fundCodeDesc',  name:'param.fund.fundDescription', value:param?.fund?.fundDescription , readOnly:true, width:'245px' /}
+			<span id="fundCodeErr" class="error">#{error 'Fund Code' /}</span>
+		</p>
+		<p>
+			#{textBox id:'currencyCode', name:'param.fund.currency.currencyCode', label:'Currency', value:param?.fund?.currency?.currencyCode, width:'120px', readOnly:true, class:'capitalize', dataold:param?.fund?.currency?.currencyCode /}
+			<span id="currencyErr" class="error">#{error 'Currency Code' /}</span>
+		</p>
+		<br>
+		<p>
+			<table>
+				<thead>
+					<tr>
+						<th>&nbsp;</th>
+						<th >Current Position</th>
+						<th>&nbsp;</th>
+						<th class="req">After Rollback</th>
+					</tr>
+				</thead>
+				<tbody id=table>
+					<tr>
+						<td><label>Date</label></td>
+						<td>#{textBox value:param?.current?.validDate?.format(appProp.dateFormat), width:'200px', readOnly:true, class:'capitalize' /}</td>
+						<td width="20%">&nbsp;</td>
+						<td>
+							#{textBox id:'rollbackDate', name:'param.rollback.validDate', value:param?.rollback?.validDate?.format(appProp.dateFormat), class:'calendar', readOnly:readOnly, required:true/}
+							<span id="rollbackDateErr" class="error">#{error 'Rollback Date' /}</span>
+						</td>
+					</tr>	
+					<tr>
+						<td><label>Status</label></td>
+						<td>#{textBox id:'currentStatus', name:'param.current.status', value:param?.current?.status, width:'200px', readOnly:true, class:'capitalize' /}</td>
+						<td width="20%">&nbsp;</td>
+						<td>#{textBox id:'rollbackStatus', name:'param.rollback.status', value:param?.rollback?.status, width:'200px', readOnly:true, class:'capitalize' /}</td>
+					</tr>
+					<tr>
+						<td><label>NAV</label></td>
+						<td>#{textBox value:param?.current?.netAssetValue, width:'200px', readOnly:true, class:'numeric' /}</td>
+						<td width="20%">&nbsp;</td>
+						<td>#{textBox value:param?.rollback?.netAssetValue, width:'200px', readOnly:true, class:'numeric' /}</td>
+					</tr>
+					<tr>
+						<td><label>Unit</label></td>
+						<td>#{textBox value:param?.current?.totalUnit, width:'200px', readOnly:true, class:'numeric' /}</td>
+						<td width="20%">&nbsp;</td>
+						<td>#{textBox value:param?.rollback?.totalUnit, width:'200px', readOnly:true, class:'numeric' /}</td>
+					</tr>
+					<tr>
+						<td><label>NAV/Unit</label></td>
+						<td>#{textBox value:param?.current?.navPerUnit, width:'200px', readOnly:true, class:'numeric' /}</td>
+						<td width="20%">&nbsp;</td>
+						<td>#{textBox value:param?.rollback?.navPerUnit, width:'200px', readOnly:true, class:'numeric' /}</td>
+					</tr>
+					<tr>
+						<td><label>Remarks</label></td>
+						<td>#{textArea id:'rollbackRemarks', name:'param.remarks', value:param?.remarks, width:'200px', maxLength:200, readOnly:readOnly, class:'capitalize' /}</td>
+						<td width="20%">&nbsp;</td>
+						<td>&nbsp;</td>
+					</tr>
+				</tbody>
+			</table>
+		</p>
+		<br>
+		<p>
+			<span class="req">This transactions need to be concerned</span>
+		</p>
+		<p>
+			<table>
+				<tbody>
+					<tr>
+						<td>#{checkBox readOnly:true, value:param?.subscription ? true : false /}</td>
+						<td><label>Subscription</label></td>
+						<td>#{checkBox readOnly:true, value:param?.dividend ? true : false/}</td>
+						<td><label>Dividend</label></td>
+					</tr>
+					<tr>
+						<td>#{checkBox readOnly:true, value:param?.redemtion ? true : false/}</td>
+						<td><label>Redemption</label></td>
+						<td>#{checkBox readOnly:true, value:param?.payment ? true : false/}</td>
+						<td><label>Payment</label></td>
+					</tr>
+					<tr>
+						<td>#{checkBox readOnly:true, value:param?.switching ? true : false/}</td>
+						<td><label>Switching</label></td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+					</tr>
+				</tbody>
+			</table>
+		</p>
+		<p>
+			<div class="buttons" id="buttonEntry">
+				<input id='save' type="button" value="Save" ></input>
+				<input id='reset' type="button" value="Reset" ></input>			
+			</div>
+		</p>
+		<p >
+			<div class="buttons" id="buttonConfirm">
+				<input id='confirm' type="button" value="Confirm" ></input>
+				<input id='back' type="button" value="Back" ></input>			
+			</div>
+		</p>		
+	</form>
+</div>	
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'PostingMFRollback/PostingMFRollback.js' /}
+	$(document).ready(function() {
+		$('input.numeric').each(function(e, i){ $(this).val(Number($(this).val()).fmtNumber(2)); });
+		$('.buttons input:button').button();
+		$("#rollbackDate").datepicker();
+		new PostingMFRollback($("#root"));
+	});
+</script>

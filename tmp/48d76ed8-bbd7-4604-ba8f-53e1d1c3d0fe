@@ -1,0 +1,589 @@
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.organization.organizationId"
+
+2FE3AD52-C618-484F-857E-A9D530EF716A
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.securityKey"
+
+4313
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.securityType.category"
+
+
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.securityCategory"
+
+
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.todayPlusOne"
+
+
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="checkIsExpire"
+
+
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="fairValueTrade"
+
+
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="amortizedTrade"
+
+
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="fairValueAFS"
+
+
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="amortizedAFS"
+
+
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="fairValueHTM"
+
+
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="amortizedHTM"
+
+
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.nextPaymentDate"
+
+16/11/2022
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.lastPaymentDate"
+
+16/08/2022
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="status"
+
+A 
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.securityType.isPrice"
+
+true
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.securityType.isDiscounted"
+
+true
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.securityType.priceUnit"
+
+0.01
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.securityType.hasInterest"
+
+true
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="isreload"
+
+true
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.securityType.securityType"
+
+SUKUK
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.securityType.description"
+
+SYARIAH CORPORATE BOND
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="securityClass"
+
+FI
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.securityType.securityClass.lookupCode"
+
+FI
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="securityClassDesc"
+
+FIX INCOME
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.securityType.securityClass.lookupDescription"
+
+FIX INCOME
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.securityId"
+
+SMPPGD02ACN2
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.description"
+
+SUKUK MUDHARABAH BERKELANJUTAN II PEGADAIAN TAHAP II TAHUN 2022 SERI A
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.syariah"
+
+true
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.apoloType.lookupCode"
+
+F0415020601
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.apoloType.lookupId"
+
+JENIS_EFEK-F0415020601
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.apoloType.lookupDescription"
+
+Sukuk Korporasi - Subordinasi
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.issuer.thirdPartyCode"
+
+PPGD
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.issuer.thirdPartyKey"
+
+88530
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.issuer.thirdPartyName"
+
+PEGADAIAN, PT
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.currency.currencyCode"
+
+IDR
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.currency.description"
+
+INDONESIAN RUPIAH
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.subSector.lookupCode"
+
+FINANCE
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.subSector.lookupId"
+
+SUB_SECTOR-FINANCE
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.subSector.lookupDescription"
+
+KEUANGAN
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.marketOfRisk.lookupCode"
+
+ID
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.marketOfRisk.lookupId"
+
+COUNTRY-ID
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.marketOfRisk.lookupDescription"
+
+INDONESIA
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.registrarCode.lookupCode"
+
+NA
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.registrarCode.lookupId"
+
+REGISTRAR-NA
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.registrarCode.lookupDescription"
+
+NOT AVAILABLE
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.isinCode"
+
+IDJ0000231A4
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="settlementDays"
+
+2
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.settlementDays"
+
+2
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.isExpire"
+
+false
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.isScript"
+
+false
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="isActive"
+
+true
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.isActive"
+
+true
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.issueDate"
+
+16/08/2022
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.maturityDate"
+
+26/08/2023
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.expiredDate"
+
+
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.accrualBase.lookupId"
+
+ACCRUAL_BASE-30
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.yearBase.lookupId"
+
+YEAR_BASE-366
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.isFraction"
+
+true
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="k"
+
+878000000000
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.fractionRatioSource"
+
+878000000000
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="fractionRatioTarget"
+
+8670344385
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.fractionRatioTarget"
+
+8670344385
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.frequency.lookupId"
+
+FREQUENCY-Q
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.firstCouponDate"
+
+16/11/2022
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="interestRate"
+
+3.95
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.interestRate"
+
+3.95
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.isFloatingRate"
+
+false
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.totalCoupon"
+
+4
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.depositoryCode.lookupId"
+
+DEPOSITORY_CODE-1
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.externalCode"
+
+SMPPGD02ACN2
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.externalType.lookupId"
+
+
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.checkTrade"
+
+true
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.checkAfs"
+
+false
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.checkHtm"
+
+true
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.valuationMethodTrade.lookupId"
+
+VALUATION_METHOD-FV
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.valuationMethodAFS.lookupId"
+
+
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.valuationMethodHTM.lookupId"
+
+VALUATION_METHOD-AM
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="marketPriceTrade"
+
+MARKET_PRICE-CL
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.marketPriceTrade.lookupId"
+
+MARKET_PRICE-CL
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="marketPriceAFS"
+
+
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.marketPriceAFS.lookupId"
+
+
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="marketPriceHTM"
+
+MARKET_PRICE-NA
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.marketPriceHTM.lookupId"
+
+MARKET_PRICE-NA
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="amortizationMethodTrade"
+
+
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.amortizationMethodTrade.lookupId"
+
+
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.amortizationMethodAFS.lookupId"
+
+
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="amortizationMethodAFS"
+
+
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="amortizationMethodHTM"
+
+AMORTIZATION_METHOD-EIR
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.amortizationMethodHTM.lookupId"
+
+AMORTIZATION_METHOD-EIR
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="minTrxQuantity"
+
+0
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.minTrxQuantity"
+
+0
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security?.parUnitValue"
+
+100
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.parUnitValue"
+
+100
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security?.listedShare"
+
+0
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="security.listedShare"
+
+0
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[1].lastPaymentDate"
+
+17/08/2022
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[1].nextPaymentDate"
+
+16/11/2022
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[1].fractionBase"
+
+878000000000
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[1].fraction"
+
+8670344385
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="interestRate[1]"
+
+3.95
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[1].interestRate"
+
+3.95
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[1].paymentDate"
+
+16/11/2022
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[1].paidInterest"
+
+
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[1].id.securityKey"
+
+4313
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[1].id.couponNo"
+
+1
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[1].paymentDate"
+
+16/11/2022
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[0].lastPaymentDate"
+
+17/11/2022
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[0].nextPaymentDate"
+
+16/02/2023
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[0].fractionBase"
+
+878000000000
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[0].fraction"
+
+8670344385
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="interestRate[0]"
+
+3.95
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[0].interestRate"
+
+3.95
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[0].paymentDate"
+
+16/02/2023
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[0].paidInterest"
+
+
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[0].id.securityKey"
+
+4313
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[0].id.couponNo"
+
+2
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[0].paymentDate"
+
+16/02/2023
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[2].lastPaymentDate"
+
+17/02/2023
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[2].nextPaymentDate"
+
+16/05/2023
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[2].fractionBase"
+
+878000000000
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[2].fraction"
+
+8670344385
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="interestRate[2]"
+
+3.95
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[2].interestRate"
+
+3.95
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[2].paymentDate"
+
+16/05/2023
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[2].paidInterest"
+
+
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[2].id.securityKey"
+
+4313
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[2].id.couponNo"
+
+3
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[2].paymentDate"
+
+16/05/2023
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[3].lastPaymentDate"
+
+17/05/2023
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[3].nextPaymentDate"
+
+16/08/2023
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[3].fractionBase"
+
+878000000000
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[3].fraction"
+
+8670344385
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="interestRate[3]"
+
+3.95
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[3].interestRate"
+
+3.95
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[3].paymentDate"
+
+16/08/2023
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[3].paidInterest"
+
+
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[3].id.securityKey"
+
+4313
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[3].id.couponNo"
+
+4
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="schedules[3].paymentDate"
+
+16/08/2023
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="udfs[0].value"
+
+
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="udfs[0].fieldName"
+
+RATING
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="udfs[0].displayType.lookupId"
+
+DISPLAY_TYPE-1
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="udfs[0].dataType.lookupId"
+
+DATA_TYPE-STR
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="udfs[0].label"
+
+RATING
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="udfs[0].lookupGroup.lookupGroup"
+
+
+-----------------------------129131390627172030512351010049
+Content-Disposition: form-data; name="udfs[0].sequence"
+
+1
+-----------------------------129131390627172030512351010049--

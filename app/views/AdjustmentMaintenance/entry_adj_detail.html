@@ -1,0 +1,86 @@
+<script type="text/javascript">
+	$(function(){
+		$('#cancelAdjustmentDetail').click(function() {
+			$("#detailForAdjustmentDetails").dialog('close');
+			return false;
+		})
+		
+		$('#currencyTxt').lookup({
+			list:'@{Pick.currencies()}',
+			get:{
+				url:'@{Pick.currency()}',
+				success: function(data) {
+					$('#currencyTxt').removeClass('fieldError');
+					$('#currencyTxt').val(data.code);
+					$('#currency').val(data.code);
+					$('#currencyDesc').val(data.description);
+					$('#h_currencyDesc').val(data.description);
+					
+				},
+				error: function(data) {
+					$('#currencyTxt').addClass('fieldError');
+					$('#currency').val('');
+					$('#currencyDesc').val('NOT FOUND');
+					$('#currencyTxt').val('');
+					$('#h_currencyDesc').val('');
+					
+				}
+			},
+			description:$('#currencyDesc'),
+			help:$('#currencyCodeHelp')
+		});
+		
+		$('#currencyTxt').change(function(){
+			if ($(this).val()==''){
+				$('#currencyTxt').val('');
+				$('#currencyeDesc').val('');
+				$('#currency').val('');
+				$('#h_currencyDesc').val('');
+			}
+		});
+		
+		$("#operator").change(function(){
+			//var opText = $("#operator option:selected").text().trim();
+			var opText = $("#operator option:selected").text();
+			//alert(opText)
+			$("#operatorSym").val(opText);
+		});
+		
+		/* $("#value").blur(function(){
+			var val= $("#value").val();
+			val = val.replace(/,/g,".");
+			$("#value").val(val);
+		}); */
+	});
+	
+</script>
+<style type="text/css">
+  .errmsg { color:red; }
+</style>
+
+<form id="adjustmentDetailForm" class="form">
+<span id="errmsgNull" class="errmsg" ></span>
+	<p>
+		#{hidden id:'rowPosition' /}
+		#{hidden id:'adjMasterCode', name:'gnAdjustmentDetail.gnAdjustmentMaster.code', value:gnAdjustmentDetail?.gnAdjustmentMaster?.code /}
+		#{hidden id:'adjustmentDetailKey', name:'gnAdjustmentDetail.adjustmentDetailKey', value:gnAdjustmentDetail?.adjustmentDetailKey /}
+	</p>
+	<p>
+	 	#{textBox id:'currencyTxt', name:'currencyCode', label:'Currency', value:gnAdjustmentDetail?.currency?.currencyCode, required:true, readOnly:readOnly, width:'55px', class:'capitalize all' /}
+		#{hidden id:'currency', name:'gnAdjustmentDetail.currency.currencyCode', value:gnAdjustmentDetail?.currency?.currencyCode /}
+		#{button id:'currencyCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'currencyDesc', name:'gnAdjustmentDetail.currency.description', value:gnAdjustmentDetail?.currency?.description, readOnly:true, width:'150px', class:'all' /}
+		<span class="error">#{error '' /}</span>
+	 	  
+		&nbsp; <span id="currencyError" class="error"></span>
+	</p>
+	<p>
+	 	#{dropDownList id:'operator', name:'gnAdjustmentDetail.operator.lookupId', label:'Operator', value:gnAdjustmentDetail?.operator?.lookupId, options:operatorType, required:true, width:'104px', readOnly:readOnly /}
+	 	#{hidden id:'operatorSym', name:'gnAdjustmentDetail.operator.lookupDescription', value:'gnAdjustmentDetail?.operator?.lookupDescription' /}
+		&nbsp; <span id="operatorError" class="error"></span>
+	</p>
+	<p>
+		#{textBox id:'value', name:'gnAdjustmentDetail.value', label:'Adjustment Value', value:gnAdjustmentDetail?.value, class:'numeric', width:'100px', required:true, readOnly:readOnly /}
+		&nbsp; <span id="valueError" class="error"></span>
+	</p>
+</form>

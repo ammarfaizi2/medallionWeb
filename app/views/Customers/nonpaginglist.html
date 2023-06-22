@@ -1,0 +1,54 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Customer Information' /}
+
+<div id="root">
+	<h3><a href="#">Search Customer</a></h3>
+
+	<form id="searchForm" class="form">
+		<input id="param" name="params.param" type="hidden" value="${param}"/> 
+		<p>
+			#{dropDownList id:'customerNoOperator', name:'params.customerNoOperator', label:'Customer No', options:stringOperators, value:params.customerNoOperator /}
+			#{textBox id:'customerSearchNo', name:'params.customerSearchNo', value:params.customerSearchNo, class:'capitalize' /}
+		</p>
+		<p>
+			#{dropDownList id:'customerNameOperator', name:'params.customerNameOperator', label:'Customer Name', options:stringOperators, value:params.customerNameOperator /}
+			#{textBox id:'customerSearchName', name:'params.customerSearchName', value:params.customerName, width:'350px', class:'capitalize' /}
+		</p>
+		<p>
+			#{dropDownList id:'contactNameOperator', name:'params.contactNoOperator', label:'Contact Person Name', options:stringOperators, value:params.contactNoOperator /}
+			#{textBox id:'customerSearchContactName', name:'params.customerSearchContactName', value:params.customerSearchContactName, width:'350px', class:'capitalize' /}
+		</p>
+		<p>
+			<div class="buttons">
+				<input type="button" id="search" value="Search" />				
+				<input type="button" id="reset" value="Reset" />
+			</div>
+		</p>
+	</form>
+</div>
+
+<div id="result" style="display:block">
+	<table id="tablecustomer" class="display">
+		<thead>
+			<tr>
+				<th width="20px" field="component|checkbox|none|center|nosort"><input type="checkbox"></th>
+				<th width="100px" field="customerNo|string|none|left|sort">Code1</th>
+				<th width="250px" field="customerName|string|none|left|sort">Name1</th>
+				<th width="80px" field="birthDate|date|date|center|sort">Birth Date1</th>
+				<th width="150px" field="identification1No|string|none|left|sort">Identification No1</th>
+				<th width="80px" field="recordStatus|string|decode|center|sort">Status1</th>
+				<th width="50px" field="isActive|boolean|yesno|center|sort">Active1</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+</div>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'Customers/NonPaging.js' /}
+	$(document).ready(function() {
+		NonPaging($("#root").add("#result"));
+	});
+</script>

@@ -1,0 +1,39 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Monitoring' /}
+
+#{if session.get("magicWord") != null}
+<a href="@{logoutMonitor()}" class="logout">Logout</a>	
+
+<div id="tabs" >
+	<ul>
+		<li><a href="#tabs-1">Query</a></li>
+		<li><a href="#tabs-2">Logs MedallionServer </a></li>
+		<li><a href="#tabs-3">Logs MedallionWeb</a></li>
+		<li><a href="#tabs-4">Logs MedallionScheduller</a></li>
+
+	</ul>
+	<br>
+	&nbsp;<span id ="overrideStatusError" class="error"></span>
+	<div class="pane" id="tabs-1">
+		#{include 'Monitoring/query.html' /}
+	</div>
+	<div class="pane" id="tabs-2">
+		#{include 'Monitoring/tab_log_medallion_server.html' /}
+	</div>
+	<div class="pane" id="tabs-3">
+		#{include 'Monitoring/tab_log_medallion_web.html' /}
+	</div>
+	<div class="pane" id="tabs-4">
+		#{include 'Monitoring/tab_log_medallion_scheduler.html' /}
+	</div>
+</div>
+#{/if}
+#{else}
+
+#{/else}
+
+<script type="text/javascript">
+	#{include 'Monitoring/monitoring.js' /}
+</script>
+
+

@@ -1,0 +1,171 @@
+#{extends 'templates/detail1.html' /}
+#{set pageTitle: ' ' /}
+#{set fixData: true /}
+#{set mode: mode /}
+#{script 'lookups.js' /}
+#{set readOnly: true /}
+#{set id: profile?.profileKey /}
+
+<div id="accordion">
+#{hidden id:'source', name:'profile.source', value:profile?.source /}
+
+#{hidden id:'separatorCsv', name:'profile.separatorCsv', value:profile?.separatorCsv /}
+
+	<h3>Download Profile Entry</h3>
+	<form id="downloadForm" class="form">
+	
+		<p>
+			#{textBox id:'name', name:'profile.name', value:profile?.name, label:'Profil Name', class:'capitalize', width:'150px', maxLength:50, size:50, required:'true', readOnly:readOnly /}
+			<span class="error">#{error 'Name' /}</span>
+		</p>
+		<p>
+			#{textBox id:'description', name:'profile.description', value:profile?.description, label:'Profil Description', class:'capitalize', width:'200px', maxLength:100, size:100, required:'true', readOnly:readOnly /}
+			<span class="error">#{error 'Description' /}</span>
+		</p>
+		
+		#{hidden id:'key', name:'profile.profileKey', value:profile?.profileKey/}
+		#{hidden id:'archiveList', name:'profile.archiveField', value:profile?.archiveField/}
+		<p>
+			#{if (profile?.profileKey == null)}
+				#{textBox id:'templete', name:'', label:'Profile Ref', width:'80px', readOnly:readOnly, required:'true'/}
+				#{hidden id:'templeteKey', name:'profile.templete', value:profile?.templete /}
+				#{button id:'groupTemplateHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'names', name:'', value:'', width:'250px', readOnly:readOnly/}
+				<span class="error">#{error 'Templete' /}</span>
+			#{/if}
+			#{if (profile?.profileKey != null)}
+				#{hidden id:'templete', name:'profile.templete', value:profile?.templete/}	
+			#{/if}
+		</p>
+		<p>
+			#{textBox id:'process', name:'profile.process', value:profile?.process, label:'Template', readOnly:readOnly /}
+			#{hidden name:'profile.actionType', value:'Download'/}
+			<span class="error">#{error 'Action Type' /}</span>
+		</p>
+			
+		<p>
+			#{dropDownList id:'separatorTxt', name:'profile.separatorTxt', label:'Separator', value:profile?.separatorTxt, options:inHead, required:true, readOnly:false, readOnly:readOnly /}
+		</p>
+		<p>
+			
+			#{radioButton id:'include', name:'profile.includeHeader', value:((profile?.includeHeader)?'true':'false'), label:'Include Header Row', options:operators, readOnly:readOnly/}
+		</p>
+		<p>
+			#{radioButton id:'status', name:'profile.status', value:((profile?.status)?'true':'false'), label:'Active', options:operators, readOnly:readOnly/}			
+		</p>
+		<p>
+			#{radioButton id:'archiveStatus', name:'profile.archiveStatus', value:((profile?.archiveStatus)?'true':'false'), label:'Archiving', options:operators, readOnly:readOnly/}			
+		</p>
+		<div id="divofarchive">
+			<div style="width:15em;float:left"><label>Archiving Field</label></div>
+			<div style="float:left" id="divoftext">
+				#{list listArchive, as:'archiveField'}
+					<div id="textline">
+						#{textBox id:'process', name:'archiveField[]', value:archiveField, readOnly:readOnly /}					
+					</div>
+				#{/list}
+			</div>
+			<div style="clear:both"></div>
+		</div>		
+		<br>
+		<p>
+			<table id="tblMapping">
+				<thead>
+					<tr>
+						<th width="10px" class="ui-state-default"><b>No</b></th>
+						<th width="100px" class="ui-state-default"><b>Source&nbsp;Field</b></th>
+						<th width="100px" class="ui-state-default"><b>Target&nbsp;Field</b></th>
+						<th width="75px" class="ui-state-default"><b>Type&nbsp;Data</b></th>
+						<th width="100px" class="ui-state-default"><b>Format&nbsp;Data</b></th>
+						<th width="100px" class="ui-state-default"><b>Overwrite&nbsp;Value</b></th>
+						<th width="100px" class="ui-state-default"><b>Length</b></th>
+					</tr>	
+				</thead>
+				<tbody>
+					#{list profile.details, as:'detail'}
+						<tr>
+							<td>
+								#{hidden id:"profileDetailKey_"+(detail_index-1), name:"pdetails["+(detail_index-1)+"].profileDetailKey", value:detail?.profileDetailKey /}
+								#{textBox id:"noseqIds["+(detail_index-1)+"]", class:"noSeq", name:"pdetails["+(detail_index-1)+"].noSeq", value:detail?.noSeq, readOnly:readOnly, style:"width:20px;height:25px;" /}							
+								#{hidden id:"systemField["+(detail_index-1)+"]", class:"systemField", name:"pdetails["+(detail_index-1)+"].systemField", value:detail?.systemField/}							
+								#{hidden id:"systemField["+(detail_index-1)+"]", class:"cdata", name:"pdetails["+(detail_index-1)+"].cdata", value:detail?.cdata/}
+							</td>
+							<td>
+								#{textBox id:"sourceFieldIds["+(detail_index-1)+"]", class:"sourceField", name:"pdetails["+(detail_index-1)+"].sourceField", value:detail?.sourceField, style:"width:150px;height:25px" , readOnly:readOnly/}							
+							</td>
+							<td>
+								#{textBox id:"targetFieldIds["+(detail_index-1)+"]", class:"targetField", name:"pdetails["+(detail_index-1)+"].targetField", value:detail?.targetField, style:"width:150px;height:25px" , readOnly:readOnly/}							
+							</td>
+							<td>
+								#{textBox id:"dataTypeIds["+(detail_index-1)+"]", class:"dataType", name:"pdetails["+(detail_index-1)+"].dataType", value:detail?.dataType, style:"width:75px;height:25px" , readOnly:readOnly/}							
+							</td>
+							<td>
+								#{textBox id:"formatTypeIds["+(detail_index-1)+"]", class:"formatType", name:"pdetails["+(detail_index-1)+"].formatType", value:detail?.formatType, style:"width:100px;height:25px" , readOnly:readOnly/}							
+							</td>
+							<td>
+								#{textBox id:"defaultValueIds["+(detail_index-1)+"]", class:"defaultValue", name:"pdetails["+(detail_index-1)+"].defaultValue", value:detail?.defaultValue, style:"100px;height:25px" , readOnly:readOnly/}							
+							</td>
+							<td>
+								#{textBox id:"lengthIds["+(detail_index-1)+"]", class:"length", name:"pdetails["+(detail_index-1)+"].length", value:detail?.length, style:"width:100px;height:25px" , readOnly:readOnly/}							
+							</td>
+						</tr>
+					#{/list}
+				</tbody>
+			</table>
+		</p>
+		<br>
+		<table id="tblFilter">
+				<thead>
+					<tr>
+						<th width="10px" class="ui-state-default"><b>No</b></th>
+						<th width="100px" class="ui-state-default"><b>Filter&nbsp;Field</b></th>
+						<th width="100px" class="ui-state-default"><b>Type</b></th>
+						<th width="75px" class="ui-state-default"><b>Default&nbsp;Operator</b></th>
+						<th width="100px" class="ui-state-default"><b>Default&nbsp;Value</b></th>
+					</tr>	
+				</thead>
+				<tbody>
+					#{list profile.filters, as:'filter'}
+						<tr>
+							<td>
+								#{textBox id:"filterSeqIds["+(filter_index-1)+"]", class:"noSeqFilter", name:"pfilters["+(filter_index-1)+"].noSeq", value:filter?.noSeq, style:"width:20px;height:25px;" , readOnly:readOnly/}
+								#{hidden id:"systemField["+(filter_index-1)+"]", class:"systemField", name:"pfilters["+(filter_index-1)+"].systemField", value:detail?.systemField/}							
+								#{hidden id:"systemField["+(filter_index-1)+"]", class:"cdata", name:"pfilters["+(filter_index-1)+"].cdata", value:detail?.cdata/}								
+							</td>
+							<td>
+								#{textBox id:"filterIds["+(filter_index-1)+"]", class:"filterField", name:"pfilters["+(filter_index-1)+"].fieldName", value:filter?.fieldName, style:"width:150px;height:25px;" , readOnly:readOnly/}
+							</td>
+							<td>
+								#{textBox style:"width:150px;height:25px;", id:"typeIds2["+(filter_index-1)+"]", class:"type", name:"pfilters["+(filter_index-1)+"].dataType", value:filter?.dataType , readOnly:readOnly/}
+							</td>
+							<td>
+								#{textBox style:"width:150px;height:25px;", id:"operatorIds["+(filter_index-1)+"]", class:"defaultOperator", name:"pfilters["+(filter_index-1)+"].defOperator.lookupDescription", value:filter?.defOperator?.lookupDescription , readOnly:readOnly/}
+								#{hidden id:"lookIdsIds["+(filter_index-1)+"]", name:"pfilters["+(filter_index-1)+"].defOperator.lookupId", value:filter?.defOperator?.lookupId/}
+							<td>
+								#{textBox style:"width:100px;height:25px;", id:"defaultValue2Ids["+(filter_index-1)+"]", class:"defaultValue", name:"pfilters["+(filter_index-1)+"].defValue", value:filter?.defValue , readOnly:readOnly/}
+							</td>
+						</tr>
+					#{/list}
+				</tbody>
+			</table>
+	</form>
+</div>	
+
+<div id="result" style="display:none">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<div class="response"></div>
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('.buttons input:button').button();
+		$('#btnMapping').button();
+		$('#btnPopulate').button();
+		$('#btnField').button();
+		$('#btnReset').button();
+	});
+	
+	function doCancel(){
+		location.href = '@{UploadDownload.list()}?action=Download';
+	}
+</script>

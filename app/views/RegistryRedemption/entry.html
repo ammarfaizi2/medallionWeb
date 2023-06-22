@@ -1,0 +1,119 @@
+#{extends 'templates/main.html' /}
+#{set readOnly:((mode !='edit' && mode !='entry') || confirming) /}
+#{set id:red?.tradeKey /}
+
+#{if flash.error || errors}
+    <div class="error">
+    	Error when saving data!<br/>
+    	#{if flash.error != null}
+			<li>${flash.error}</li>
+		#{/if}
+		#{ifErrors}
+			#{errors}
+				 <li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}
+
+<script type="text/javascript">
+	$(function() {
+		$('.buttons input:button').button();
+		/* var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+		loading.dialog({
+			closeOnEscape: false,
+			draggable: false,
+			modal: true,
+			resizable: false,
+			open:function() {
+				$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+			} 
+		});
+		loading.dialog('close'); */
+		
+		var closeDialogMessage = function() {
+			$("#dialog-message").dialog("close");
+		}
+		
+		var backToEntry = function() {
+			loading.dialog('open');
+			location = "@{entry()}";
+		}
+
+		// Action buttons
+		$('#save').click(function(){
+			var checkError = $("input").hasClass('fieldError');
+			var tradeDate = new Date($("#tradeDate").val());
+			var effectiveDate = $("#effectiveDate").val();
+
+			$("#tradeDateError").html("");
+			if (effectiveDate > tradeDate.getTime()) {
+				$("#tradeDateError").html("Trade date can't less than Effective Date Fund").show();
+				checkError = true;
+			}
+			
+			if (checkError) {
+				return false;
+			} 
+			
+			if ($("#trnSABranchCode").val() == "") {
+				$("#trnSABranch").val("");
+				$("#trnSABranchKey").val("");
+				$("#h_trnSABranchDesc").val("");
+			}
+			
+			var action = "@{save()}?mode=${mode}";
+			loading.dialog('open');
+			$('#registryRedemptionForm').attr('action', action);
+			$('#registryRedemptionForm').submit();
+		});
+
+		$('#confirm').click(function() {
+			var action = "@{confirm()}?mode=${mode}";
+			loading.dialog('open');
+			$.post(action, $('#registryRedemptionForm').serialize(), function(data, status) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					//alert("Your trade id is #" + data.tradeKey);
+					//location = "@{entry()}";
+					messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Notification", backToEntry);
+				} else {
+				//	alert("Failed saving data!");
+				//	alert(data.error);
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+				}
+			});
+		});
+	
+		$('#back').click(function() {
+			location.href = '@{back()}/${id}?mode=${mode}';
+			return false;
+		});
+
+		$('#clear').click(function() {
+			location.href = '@{entry()}';
+			
+		});
+		
+		$('#cancel').click(function() {
+			location.href = '@{search()}';			
+		});
+	});
+</script>
+<h2>Unit Redemption</h2>
+<div id="detail">
+	#{include 'RegistryRedemption/detail.html' /}	
+</div>
+<div id="actions" class="buttons">
+	#{if confirming}
+		<input type="button" id="confirm" value="Confirm" />
+		<input type="button" id="back" value="Back" />
+	#{/if}
+	#{else}
+		<input type="button" id="save" value="Save" />
+		<input type="button" id="clear" value="Clear" />
+		<input type="button" id="cancel" value="Cancel" />
+	#{/else}
+</div>
+	

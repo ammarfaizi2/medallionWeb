@@ -1,0 +1,370 @@
+#{extends 'templates/detail1.html' /}
+
+#{if param=='edit' && (mode =='edit' || mode =='view' || inv?.recordStatus == 'U ' || inv?.recordStatus == 'N ')}
+	#{set pageTitle: 'Product Account Edit' /}
+#{/if}
+#{else}
+	#{if param=='view' && mode =='view' }
+		#{set pageTitle: 'Product Account Inquiry' /}
+	#{/if}
+	#{else}
+		#{if mode =='view' && maintenanceLogKey != ''}
+			#{set pageTitle: 'Product Account Approval' /}
+		#{/if}
+		#{else}
+			#{set pageTitle: 'Product Account Register' /}
+		#{/else}
+	#{/else}
+#{/else}
+
+
+#{set id:inv?.accountNumber /}
+#{set customerKey: inv?.customer?.customerKey /}
+
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+
+<style type="text/css">
+  .errmsg { color:red; }
+</style>
+
+<!-- MAIN SCREEN -->
+<form id="registryInvestmentForm" class="form" method="POST" name="investment">
+	#{hidden id:'param', name:'param', value:param /}
+	#{hidden id:'divInvestorOpt', name:'inv.rgProduct.divInvestorOpt', value:inv?.rgProduct?.divInvestorOpt /}
+	
+	<div id="tabs">
+		<ul>
+			<li><a href="#tab-1">Primary</a></li>
+			<!-- <li><a href="#tab-2">Fund Model</a></li> -->
+			<!-- <li><a href="#tab-3">Bank Info</a></li> -->
+			<!-- <li><a href="#tab-4">Dividend Option</a></li> -->
+			<!-- <li><a href="#tab-5">Correspondence</a></li> -->
+		</ul>
+		<div class="pane" id="tab-1">
+			<p>			
+				#{textBox id:'customer', name:'inv.customer.customerNo', label:'Investor No', value:inv?.customer?.customerNo, width:'340px', required:false, readOnly:true, class:'capitalize'/}
+				#{hidden  id:'customerKey', name:'inv.customer.customerKey', value:inv?.customer?.customerKey /}
+				
+			</p>
+			<p>
+				#{textBox id:'customerDesc',  name:'inv.customer.customerName', label:'Investor Name', value:inv?.customer?.customerName, readOnly:true, width:'340px' /}
+			</p>
+			<!-- <p>			
+				#{textBox id:'branch', name:'inv.branch.branchNo', label:'Branch', value:inv?.branch?.branchNo, width:'120px', required:true, readOnly:readOnly, class:'capitalize'/}
+				#{hidden  id:'branchKey', name:'inv.branch.branchKey', value:inv?.branch?.branchKey /}
+				#{button  id:'branchHelp', value:'?', class:'small', readOnly:readOnly/}
+				#{textBox id:'branchDesc',  name:'inv.branch.name', value:inv?.branch?.name, readOnly:true, width:'340px' /}
+				&nbsp;<span id="branchError" class="error">#{error 'Branch is' /}</span>
+			</p> -->
+			<p>			
+				#{textBox id:'fundCode', name:'inv.rgProduct.productCode', label:'Fund Code', value:inv?.rgProduct?.productCode, width:'80px', required:true, readOnly:((mode=='entry') ? confirming : true ), class:'capitalize'/}
+				#{hidden  id:'fundCodeKey', value:inv?.rgProduct?.productCode /}
+				#{button  id:'fundCodeHelp', value:'?', class:'small', readOnly:((mode=='entry') ? confirming : true ) /}
+				#{textBox id:'fundCodeDesc',  name:'inv.rgProduct.name', value:inv?.rgProduct?.name, readOnly:true, width:'225px' /}
+				&nbsp;<span id="fundCodeError" class="error">#{error 'Fund Code is' /}</span>
+			</p>
+			<p>
+				#{textBox id:'currency', name:'currencyCode', value:inv?.rgProduct?.currency?.currencyCode, label:'Currency', readOnly:true, width:'150px' /}
+				#{hidden id:'currencyHidden', name:'inv.rgProduct.currency.currencyCode', value:inv?.rgProduct?.currency?.currencyCode /}
+			</p>
+			<p>			
+				#{textBox id:'accountNumber', name:'inv.accountNumber', label:'Account No', value:inv?.accountNumber, class:'capitalize', width:'150px', required:true, readOnly:true, maxLength:50 /}
+				&nbsp;<span id="accountNumberError" class="error">#{error 'Inv Acct No is' /}</span>	
+			</p>
+			<p>			
+				#{textBox id:'name', name:'inv.name', label:'Account Name', value:inv?.name, class:'capitalize', width:'340px', required:true, readOnly:readOnly, maxLength:50 /}
+				&nbsp;<span id="nameError" class="error">#{error 'Name is' /}</span>	
+			</p>
+			<p>
+				#{dropDownList id:'investorType', name:'inv.lookupByInvestorType.lookupId', label:'Account Type', options:taInvestorType, value:inv?.lookupByInvestorType?.lookupId, required:true, readOnly:readOnly, width:'150px' /}
+				&nbsp;<span id="investorTypeError" class="error">#{error 'Account Type is' /}</span>
+			</p>
+			<!-- <p>
+				#{dropDownList id:'costMethod', name:'inv.lookupByCostMethod.lookupId', label:'Cost Method', options:costMethodType, value:inv?.lookupByCostMethod?.lookupId , required:true, readOnly:readOnly, width:'124px' /}
+				&nbsp;<span id="costMethodError" class="error">#{error 'Cost Method is' /}</span>
+			</p> -->
+			<p>			
+				#{textBox id:'saCode', name:'inv.thirdPartyBySaCode.thirdPartyCode', label:'Selling Agent', value:inv?.thirdPartyBySaCode?.thirdPartyCode, width:'80px', required:true, readOnly:readOnly, class:'capitalize', dataold:inv?.thirdPartyBySaCode?.thirdPartyCode /}
+				#{hidden  id:'saCodeKey', name:'inv.thirdPartyBySaCode.thirdPartyKey', value:inv?.thirdPartyBySaCode?.thirdPartyKey/} 
+				#{button  id:'saCodeHelp',  value:'?', class:'small', readOnly:readOnly/}
+				#{textBox id:'saCodeDesc', name:'inv.thirdPartyBySaCode.thirdPartyName', value:inv?.thirdPartyBySaCode?.thirdPartyName, readOnly:true, width:'225px' /}
+				&nbsp;<span id="saCodeError" class="error">#{error 'SA Code is' /}</span>
+			</p>		
+			
+			<!-- <p>
+				#{textBox id:'openingSABranchCode', name:'inv.openingSABranch.thirdPartyCode', label:'Opening SA Branch', value:inv?.openingSABranch?.thirdPartyCode, class:'capitalize', readOnly:readOnly, width:'120px', required:true /}
+				#{hidden id:'openingSABranch', name:'inv.openingSABranch.thirdPartyKey', value:inv?.openingSABranch?.thirdPartyKey /}
+				#{hidden id:'openingSABranchKey', name:'inv.openingSABranchKey', value:inv?.openingSABranchKey /}
+				#{button id:'openingSABranchHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'openingSABranchDesc', name:'inv.openingSABranch.thirdPartyName', value:inv?.openingSABranch?.thirdPartyName, readOnly:true, width:'340px' /}
+				&nbsp;<span class="error">#{error 'Opening SA Branch is' /}</span>
+			</p> -->
+			
+			<p>			
+				#{textBox id:'cifWaperd', name:'inv.cifWaperd', label:'CIF APERD/IFUA', value:inv?.cifWaperd, class:'capitalize', width:'150px', required:true, readOnly:readOnly, maxLength:50/}
+				&nbsp;<span id="cifWaperdError" class="error">#{error 'CIF APERD is' /}</span>
+			</p>
+			<!-- <p>			
+				#{textBox id:'fmgrAcct', name:'inv.fmgrAcc', label:'Fund Manager Account', value:inv?.fmgrAcc, class:'capitalize', width:'120px', readOnly:readOnly, maxLength:50 /}
+			</p> -->
+			<!-- <p>			
+				#{textBox id:'jointDate', name:'inv.jointDate', label:'Joint Date', value:inv?.jointDate?.format(appProp.dateFormat), class:'calendar', readOnly:readOnly, required:true/} (${appProp.displayDateFormat})
+				&nbsp; <span id = "jointDateError"  class="error">#{error 'Joint Date is' /}</span>
+			</p> 
+			<p>			
+				#{textBox id:'inActiveDate', name:'inv.inActiveDate', label:'In Active Date', value:inv?.inActiveDate?.format(appProp.dateFormat), class:'calendar', readOnly:readOnly /} (${appProp.displayDateFormat})
+				&nbsp; <span id = "inActiveDateError"  class="error">#{error 'In Active Date is' /}</span>
+			</p>-->
+			<br />
+			<fieldset style="width: 500px">
+			<legend>Default Bank Account</legend>
+				<p>
+					#{textBox id:'bankAccount', name:'inv.bankAccount.accountNo', value:inv?.bankAccount?.accountNo, label:'Account No.', readOnly:readOnly, width:'150px', required:true /}
+					#{hidden id:'bankAccountKey', name:'inv.bankAccount.bankAccountKey', value:inv?.bankAccount?.bankAccountKey /}
+					#{button id:'bankAccountHelp', value:'?', class:'small', readOnly:readOnly /}
+					&nbsp;<span id="bankAccountError" class="error">#{error 'Account No is' /}</span>					
+				</p>
+				<p>
+					#{textBox id:'bankCode', name:'thirdPartyCode', value:inv?.bankAccount?.bankCode?.thirdPartyCode, readOnly:true, width:'150px', label:'Bank Code' /}
+					#{hidden id:'bankCodeHide', name:'inv.bankAccount.bankCode.thirdPartyCode', value:inv?.bankAccount?.bankCode?.thirdPartyCode /}
+					#{hidden id:'bankCodeKey', name:'inv.bankAccount.bankCode.thirdPartyKey', value:inv?.bankAccount?.bankCode?.thirdPartyKey /}
+					#{textBox id:'bankCodeDesc', name:'thirdPartyName', value:inv?.bankAccount?.bankCode?.thirdPartyName, readOnly:true, width:'150px' /}
+					#{hidden id:'bankCodeDescHide', name:'inv.bankAccount.bankCode.thirdPartyName', value:inv?.bankAccount?.bankCode?.thirdPartyName /}
+				</p>
+				<p>
+					#{textBox id:'bankAccountDesc', name:'bankAccountName', value:inv?.bankAccount?.name, readOnly:true, label:'Beneficiary Name', width:'308px' /}
+					#{hidden id:'bankAccountDescHide', name:'inv.bankAccount.name', value:inv?.bankAccount?.name /}
+				</p>
+				<p>
+					#{textBox id:'bankCurrency', name:'currencyCode', value:inv?.bankAccount?.currency?.currencyCode, label:'Currency', readOnly:true,width:'120px'  /}
+					#{hidden id:'bankCurrencyHide', name:'inv.bankAccount.currency.currencyCode', value:inv?.bankAccount?.currency?.currencyCode /}
+				</p>
+			</fieldset>
+			<br />
+			<p>
+				#{radioButton id:'active', name:'active', label:'Active',  value:((inv?.active)?'true':'false'), options:statusType, readOnly:readOnly /}
+				#{hidden id:'activeHidden', name:'inv.active', value:((inv?.active)?'true':'false') /}
+			</p>
+		</div>
+		<!-- <div class="pane" id="tab-2">
+		</div> -->
+		<!-- <div class="pane" id="tab-3">
+		
+			<p>
+				#{textBox id:'bankAccount', name:'inv.bankAccount.accountNo', label:'Default Bank Account', value:inv?.bankAccount?.accountNo, readOnly:readOnly, width:'120px'/}
+				#{hidden id:'bankAccountKey', name:'inv.bankAccount.bankAccountKey', value:inv?.bankAccount?.bankAccountKey /}
+				#{button id:'bankAccountHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'bankAccountDesc', name:'inv.bankAccount.name', value:inv?.bankAccount?.name, readOnly:true, width:'340px' /}
+			</p>
+			<p/>
+			<p>
+				#{textBox id:'bankAccountAdd', name:'inv.bankAccountAdd.accountNo', label:'Bank Account', value:inv?.bankAccountAdd?.accountNo, readOnly:readOnly, width:'120px'/}
+				#{hidden id:'bankAccountAddKey', name:'inv.bankAccountAdd.bankAccountKey', value:inv?.bankAccountAdd?.bankAccountKey /}
+				#{button id:'bankAccountAddHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'bankAccountAddDesc', name:'inv.bankAccountAdd.name', value:inv?.bankAccountAdd?.name, readOnly:true, width:'340px' /}
+				
+			</p>
+	   	
+	    <p>	
+	        #{hidden id:'bankAccount' /}
+	    	#{hidden id:'bankAccountKey', name:'inv.bankAccount.bankAccountKey', value:inv?.bankAccount?.bankAccountKey /}
+	    	#{button id:'btnBankAccountAdd', value:'Add', readOnly:readOnly /}
+	    	#{hidden id:'recordStatus', name:'inv.recordStatus', value:inv?.recordStatus /}
+	    	&nbsp;<span class="error"><b>* </b></span><span id="btnBankAccountAddError" class="error">#{error 'Bank Account is' /}</span>
+	    </p>
+	    <p>
+	    </p>
+			<p>
+				<div style="height:290px">
+					<div style="overflow-y:scroll;max-height:170px;">				
+						<table id="bankInfoTable" class="display">
+							<thead>
+								<tr>
+								 
+									<th>Action</th>
+									<th>Id</th>
+									<th>Account</th>
+									<th style="width:100px">Name</th>
+								
+									<th>Bank Account No</th>
+									<th>Name</th>
+									<th>Bank Code</th>
+									<th>Default</th>
+									<th>Action</th>
+								</tr>
+							</thead>
+							<tbody>
+								#{list inv?.listBankAccounts, as:'ba'}
+									<tr>
+										<td>
+											${ba?.accountNo}
+											#{hidden name:'inv.listBankAccounts['+(ba_index-1)+'].accountNo', value:ba?.accountNo, readOnly:true /}
+										</td>
+										<td>
+											${ba?.name}
+											#{hidden name:'inv.listBankAccounts['+(ba_index-1)+'].name', value:ba?.name, readOnly:true /}
+										</td>
+										<td>
+											${ba?.bankCode?.thirdPartyCode}
+											#{hidden name:'inv.listBankAccounts['+(ba_index-1)+'].bankCode.thirdPartyCode', value:ba?.bankCode?.thirdPartyCode, readOnly:true /}
+											#{hidden name:'inv.listBankAccounts['+(ba_index-1)+'].bankCode.thirdPartyKey', value:ba?.bankCode?.thirdPartyKey /}
+											#{hidden name:'inv.listBankAccounts['+(ba_index-1)+'].bankCode.thirdPartyName', value:ba?.bankCode?.thirdPartyName /}
+										</td>
+										<td>
+											<input type='radio' id='radioStatus${ba?.bankAccountKey}' name="bankStatus" value='${ba?.bankAccountKey}'  #{if readOnly}disabled="disabled"#{/if} />
+										</td>
+										<td>
+											
+											#{button sim='btnDelBankAcc', id:'btnDel'+ba?.bankAccountKey, value:'Delete',  readOnly:readOnly /}
+											#{hidden name:'inv.listBankAccounts['+(ba_index-1)+'].bankAccountKey', value:ba?.bankAccountKey /}
+										</td>	
+									</tr>
+								#{/list}
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</p>						
+		</div> -->
+		<!-- <div class="pane" id="tab-4">
+			#{include 'RegistryInvestment/tab_dividend_option.html' /}
+		</div> -->
+		<!-- <div class="pane" id="tab-5">
+			<div id="isZero">
+				<p>
+					#{dropDownList id:'billingAddress', name:'inv.billingAddress.contactKey', label:'Mail Address',  value:inv?.billingAddress?.contactKey , options:addressType, readOnly:readOnly, width:'120px' /}
+				</p>
+			</div>
+			<p>
+					#{radioButton id:'sendOption', name:'inv.isSendToEmail', value:((inv?.isSendToEmail)?'true':'false'),  label:'Send Option', options:sendOption, readOnly:readOnly /}
+					&nbsp;#{textBox id:'email', name:'inv.customer.email', value:inv?.customer?.email, width:'200px', readOnly:true /}
+			</p>
+	
+		<p>
+			<label>Send Option</label>
+			<input type="radio" value="true" name="inv.isSendToEmail" #{if (inv.isSendToEmail == true)} checked="checked"#{/if} id="radioScript1">Postal <br>
+			<label style="width: 15.4em"> </label><input  type="radio" value="false" name="inv.isSendToEmail" #{if (inv.isSendToEmail == false)} checked="checked"#{/if} id="radioScript2">Email
+		</p>
+		
+				
+	
+		</div> -->
+	</div>	
+</form>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/jshashtable-2.1.js' /}
+	#{include 'RegistrySubscription/Util.js' /}
+	/* #{include 'RegistryInvestment/TableBankInfo.js' /} */	
+	#{include 'RegistryInvestment/Investment.js' /}
+	$(document).ready(function() {
+		$('#save').button();
+		$('#cancel').button();
+		Investment($("#main"));
+	});
+	
+	function doSave() {
+		/* var radios = $("[type=radio]", $('#bankInfoTable').tbody());
+		var found = false;
+		var length = $('#bankInfoTable').tbody().children().length;
+		var checkError = $('input').hasClass('fieldError');
+		if (checkError) {
+			return false;
+		} else {
+			if ((length > 0) && (radios.html() != null) ) {
+				$.each(radios, function(i, data){
+					if(($("input[name='bankStatus']").is(":checked"))) {
+						found = true;
+						return false;
+					}
+					//console.debug($("input[name='bankStatus']").is(":checked"));
+				});
+			} else {
+				found = true;
+			}
+			
+			if (found) {
+				submit('@{save()}?mode=${mode}#{if group}&group=${group}#{/}')	
+			} else {
+				$("#btnBankAccountAddError").html("* Default Bank Account is Required").show();
+				$('#tabs').tabs("select", "3");
+			}
+			
+			return false;
+		} */
+		submit('@{save()}?mode=${mode}#{if group}&group=${group}#{/}#{if isPartial}&isPartial=${isPartial}#{/}&status=${status}');
+		//return ;
+	}
+	
+	function doCancel() {
+		#{if param == null && mode == 'entry'}
+			location.href='@{Investors.list()}?mode=view'+ '&param=register-invt-acct';
+			return false;
+		#{/if}			
+		#{else}
+			#{if mode == 'edit'}
+				location.href='@{list()}#{if mode}?mode=edit#{/}&param=edit';
+			#{/if}
+				#{elseif mode == 'entry'}
+				location.href='@{Investors.list()}?mode=view'+ '&param=register-invt-acct';
+			#{/elseif}
+			#{else}
+				return true;
+			#{/else}
+		#{/else}
+	};
+	
+	function doBack() {
+		location.href='@{back()}?id=${inv?.accountNumber}&mode=${mode}&customerKey=${customerKey}#{if group}&group=${group}#{/}&param=${param}&status=${status}';
+		return false;
+	};
+	
+	function doClose() {
+		history.back();
+	};
+	
+	// Problem,,
+	
+	function doConfirm() {
+		if ('${mode}' == 'entry') {
+			submit('@{RegistryInvestment.confirm()}/'+ $('#accountNumber').val()+'?mode=entry'+ '&param=register-invt-acct'+'&status=${status}');
+			return false;
+		} else {
+			return true;
+		}
+		//alert("mode ? " + ${mode});
+		//if ('${mode}' == 'entry') {
+		//	$.ajax({
+		//	  	url: submit('@{RegistryInvestment.confirm()}/'+ $('#accountNumber').val()+'?mode=entry'+ '&param=register-invt-acct&isNewRec=${isNewRec}'),
+		//	 	success: function() {
+		//			location.href='@{Customers.list()}?mode=view&param=register-invt-acct'; 
+		//	  	}
+		//	});
+		//} else {
+		//	return true;
+		//}		
+	};
+</script>
+
+#{if param != null}
+	<div class="buttons">
+		#{if mode == 'view'}
+			<button id="close">Close</button>
+		#{/if}
+		#{else}
+			#{if confirming}
+				<button id="confirm">Confirm</button>
+				<button id="back">Back</button>
+			#{/if}
+			#{else}	
+				<!-- <button id="save">Save</button> -->
+				<input type="button" id="save" value="Save">
+				<input type="button" id="cancel" value="Cancel">
+				<!-- <button id="cancel">Cancel</button> -->
+			#{/else}
+		#{/else}
+	</div>
+#{/if}

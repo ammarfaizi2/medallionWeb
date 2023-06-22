@@ -1,0 +1,605 @@
+#{extends 'templates/detail1.html' /}
+#{if mode == 'edit' || mode == 'entry' || mode == 'view'}
+	#{set pageTitle: 'Transaction Template Maintenance' /}
+#{/if}
+#{if taskId != null}
+	#{set pageTitle: 'Transaction Template Approval' /}
+#{/if}
+#{set id: transactionTemplate?.transactionTemplateKey /}
+
+#{set readOnly:((mode!='edit' && mode!='entry')||confirming) /}
+
+#{script 'date.format.js' /}
+#{script 'lookups.js' /}
+
+
+<script type="text/javascript">
+	$(function(){
+
+/* 		if ($("input[name='transactionTemplate.defPrematch']").val() == 'true') {
+			$("input[name='defPrematch']:checked").val('true');
+			$("input[name='transactionTemplate.defPrematch']").val('true');
+		} else {
+			$("input[name='defPrematch']:checked").val('false');
+			$("input[name='transactionTemplate.defPrematch']").val('false');
+		}
+ */ 		
+		if (('${mode}'=='entry') || (('${mode}'=='edit') && (('${transactionTemplate?.recordStatus?.decodeStatus()}' == 'Reject') || ($("#status").val() == 'R' )))) {
+			$('input[name=isActive]').attr("disabled", "disabled");
+		}
+		
+	 	if ($('#transactionCategory').val() != 'TRANSACTION_CATEGORY-S') {
+			$('#paymentDiv').hide();
+		} else if ($('#transactionCategory').val() == 'TRANSACTION_CATEGORY-S') {
+			$('#paymentDiv').show();
+		}
+ 
+		$('input[name=isActive]').change(function(){
+			$("input[name='transactionTemplate.isActive']").val($("input[name='isActive']:checked").val());
+		});
+		
+		$('input[name=defPrematch]').change(function(){
+			$("input[name='transactionTemplate.defPrematch']").val($("input[name='defPrematch']:checked").val());
+		});
+		
+		$('input[name=defaultCorebanking]').change(function(){
+			$("input[name='transactionTemplate.defaultCorebanking']").val($("input[name='defaultCorebanking']:checked").val());
+		});
+		
+		if ($('#transactionCategory').val() == 'TRANSACTION_CATEGORY-S' || $('#transactionCategory').val() == 'TRANSACTION_CATEGORY-C' || $('#transactionCategory').val() == '') {
+			$("#usedBy").attr('disabled', 'disabled');
+		} 
+		
+		adjustUsedBy();
+		if ((('${mode}'=='edit')) || ('${confirming}'=='true')) {
+				adjustDefaultPrematch();
+		} else {
+ 			$('input[name=defPrematch]').attr("disabled", "disabled");
+			
+			if ($('#transactionCategory').val() == 'TRANSACTION_CATEGORY-T' && $('#usedBy').val() == 'USED_BY-1' && !($('#settlementTransaction').val() == '') && (!$("input[name='transactionTemplate.defPrematch']").val()=='false')) {
+				adjustDefaultPrematch();
+			}
+ 			
+			if ($('#transactionCategory').val() == 'TRANSACTION_CATEGORY-T' && $('#usedBy').val() == 'USED_BY-1' && !($('#settlementTransaction').val() == '')) {
+				$("input[name='transactionTemplate.defPrematch']").val($("input[name='defPrematch']:checked").val());
+				$('input[name=defPrematch]').removeAttr("disabled");
+				//alert("defPrematch = " +$("input[name='transactionTemplate.defPrematch']").val());
+			}
+			
+			if (($('#transactionCategory').val() != 'TRANSACTION_CATEGORY-T')|| ($('#transactionCategory').val() != '')) {
+				$("p[id=pUsedBy] label span").html("");
+			}
+
+ 		}
+		
+		if ($("#checkTransactionTemplate").val()== 'true') {
+			$("#settlementTransaction").attr('disabled', 'disabled');
+			$//("#cancelTransaction").attr('disabled', 'disabled');
+			$("#portfolioTransaction").attr('disabled', 'disabled');
+			$("#cashTransaction").attr('disabled', 'disabled');
+		}
+		
+		if ('${mode}'!='view'){
+			if ($("#transactionCategory").val() == 'TRANSACTION_CATEGORY-S') {		
+				$("#settlementTransactionHelp").attr('disabled', 'disabled');
+				//$("#cancelTransactionHelp").attr('disabled', false);
+				$(".cancel").attr('disabled', false);
+				//$("#cancelTransaction").attr('disabled', false);
+				$(".settlement").attr('disabled', 'disabled');
+				$("#settlementTransactionDesc").val("");
+				//$("#cancelTransactionDesc").val("");
+			} else {
+				if ($("#transactionCategory").val() == 'TRANSACTION_CATEGORY-C') {
+					$("#settlementTransactionHelp").attr('disabled', false);
+					//$("#cancelTransactionHelp").attr('disabled', 'disabled');
+					$(".settlement").attr('disabled', false);
+					$(".cancel").attr('disabled', 'disabled');
+					//$("#cancelTransaction").attr('disabled', 'disabled');
+					$("#settlementTransactionDesc").val("");
+					//$("#cancelTransactionDesc").val("");
+					$("#portfolioTransactionDesc").val("");
+					$("#cashTransactionDesc").val("");
+				}
+			}
+		}
+		
+		// security type only cash ==============================================================================================
+		$('#securityTypeCash').lookup({
+			list:'@{Pick.securityTypes()}',
+			//get:'@{Pick.securityType()}',
+			get:{
+				url:'@{Pick.securityTypeWithCash()}',
+				success: function(data) {
+					if (data) {
+						$('#securityTypeCash').removeClass('fieldError');
+						$('#securityTypeCash').val(data.code);
+						$('#securityTypeDescCash').val(data.description);
+						$('#h_securityTypeDescCash').val(data.description);
+					}	
+				},
+				error: function(data) {
+					$('#securityTypeCash').addClass('fieldError');
+					$('#securityTypeDescCash').val('NOT FOUND');
+					//$('#securityType').val(data.code);
+					$('#securityTypeCash').val('');
+					$('#h_securityTypeDescCash').val('');
+				}
+			},
+			filter:'CASH',
+			description:$('#securityTypeDescCash'),
+			help:$('#securityTypeHelpCash')
+		});
+		// ======================================================================================================================
+		
+		// security type without cash ===========================================================================================
+		$('#securityType').lookup({
+			list:'@{Pick.securityTypes()}',
+			//get:'@{Pick.securityType()}',
+			get:{
+				url:'@{Pick.securityType()}',
+				success: function(data) {
+					if (data) {
+						
+						$('#securityType').removeClass('fieldError');
+						$('#securityType').val(data.code);
+						$('#securityTypeDesc').val(data.description);
+						$('#h_securityTypeDesc').val(data.description);
+						
+						if ($('#securityType').val() == "CASH") {
+							$('#securityType').addClass('fieldError');
+							$('#securityTypeDesc').val('NOT FOUND');
+							$('#securityType').val('');
+							$('#h_securityTypeDesc').val('');
+						}
+					}	
+				},
+				error: function(data) {
+					$('#securityType').addClass('fieldError');
+					$('#securityTypeDesc').val('NOT FOUND');
+					//$('#securityType').val(data.code);
+					$('#securityType').val('');
+					$('#h_securityTypeDesc').val('');
+				}
+			},
+			filter:'$buySellAndCATemplate',
+			description:$('#securityTypeDesc'),
+			help:$('#securityTypeHelp')
+		});
+		// ======================================================================================================================
+		
+		// settlement transaction lookup ========================================================================================
+		$('#settlementTransaction').lookup({
+			list:'@{Pick.transactionTemplates()}',
+			get:{
+				url:'@{Pick.transactionTemplate()}',
+				success: function(data) {
+					if (data) {
+						$('#settlementTransaction').removeClass('fieldError');
+						$('#settlementTransactionKey').val(data.code);
+						$('#settlementTransactionDesc').val(data.description);
+						$('#h_settlementTransactionDesc').val(data.description);
+					}
+					adjustDefaultPrematch();	
+				},
+				error: function(data) {
+					$('#settlementTransaction').addClass('fieldError');
+					$('#settlementTransactionDesc').val('NOT FOUND');
+					$('#settlementTransaction').val('');
+					$('#settlementTransactionKey').val('');
+					$('#h_settlementTransactionDesc').val('');
+					adjustDefaultPrematch();
+				}
+			},
+			filter:'$settlement',
+			key:$('#settlementTransactionKey'),
+			description:$('#settlementTransactionDesc'),
+			help:$('#settlementTransactionHelp')
+		});
+		// ======================================================================================================================
+		
+		// cancel transaction lookup ============================================================================================	
+		/* $('#cancelTransaction').lookup({
+			list:'@{Pick.transactionTemplates()}',
+			get:{
+				url:'@{Pick.transactionTemplate()}',
+				success: function(data) {
+					if (data) {
+						$('#cancelTransaction').removeClass('fieldError');
+						$('#cancelTransactionKey').val(data.code);
+						$('#cancelTransactionDesc').val(data.description);
+						$('#h_cancelTransactionDesc').val(data.description);
+					}	
+				},
+				error: function(data) {
+					$('#cancelTransaction').addClass('fieldError');
+					$('#cancelTransactionDesc').val('NOT FOUND');
+					$('#cancelTransaction').val('');
+					$('#cancelTransactionKey').val('');
+					$('#h_cancelTransactionDesc').val('');
+				}
+			},
+			filter :'$cancel',
+			key:$('#cancelTransactionKey'),
+			description:$('#cancelTransactionDesc'),
+			help:$('#cancelTransactionHelp'),
+		}); */
+		// ======================================================================================================================
+		
+		// portofolio transaction lookup ========================================================================================
+		$('#portfolioTransaction').lookup({
+			list:'@{Pick.transactionMasters()}',
+			get:{
+				url:'@{Pick.transactionMaster()}',
+				success: function(data) {
+					if (data) {
+						$('#portfolioTransaction').removeClass('fieldError');
+						$('#portfolioTransactionKey').val(data.code);
+						$('#portfolioTransactionDesc').val(data.description);
+						$('#h_portfolioTransactionDesc').val(data.description);
+					}	
+				},
+				error: function(data) {
+					$('#portfolioTransaction').addClass('fieldError');
+					$('#portfolioTransactionDesc').val('NOT FOUND');
+					//$('#securityType').val(data.code);
+					$('#portfolioTransaction').val('');
+					$('#portfolioTransactionKey').val('');
+					$('#h_portfolioTransactionDesc').val('');
+				}
+			},
+			description:$('#portfolioTransactionDesc'),
+			key:$('#portfolioTransactionKey'),
+			help:$('#portfolioTransactionHelp')
+		});
+		// ======================================================================================================================
+		
+		// cash transaction lookup ==============================================================================================
+		$('#cashTransaction').lookup({
+			list:'@{Pick.bankTransactionMasters()}',
+			//get:'@{Pick.bankTransactionMaster()}',
+			get:{
+				url:'@{Pick.bankTransactionMaster()}',
+				success: function(data) {
+					if (data) {
+						$('#cashTransaction').removeClass('fieldError');
+						$('#cashTransactionKey').val(data.code);
+						$('#cashTransactionDesc').val(data.description);
+						$('#h_cashTransactionDesc').val(data.description);
+					}	
+				},
+				error: function(data) {
+					$('#cashTransaction').addClass('fieldError');
+					$('#cashTransactionDesc').val('NOT FOUND');
+					$('#cashTransaction').val('');
+					$('#cashTransactionKey').val('');
+					$('#h_cashTransactionDesc').val('');
+				}
+			},
+			description:$('#cashTransactionDesc'),
+			key:$('#cashTransactionKey'),
+			help:$('#cashTransactionHelp')
+		});
+		// ======================================================================================================================
+		
+		// transactionCategory event ============================================================================================
+		$("#transactionCategory").change(function() {
+			console.log('transactionCategory');
+			console.log($("#transactionCategory").val());
+			if ($("#transactionCategory").val() == 'TRANSACTION_CATEGORY-T') {
+				$("#settlementTransactionHelp").attr('disabled', false);
+				//$("#cancelTransactionHelp").attr('disabled', false);
+				$("#portfolioTransactionHelp").attr('disabled', false);
+				$("#cashTransactionHelp").attr('disabled', false);
+				$(".settlement").attr('disabled', false);
+				$(".cancel").attr('disabled', false);
+			} else {		
+				$("#settlementTransactionHelp").attr('disabled', 'disabled');
+				//$("#cancelTransactionHelp").attr('disabled', false);
+				$(".cancel").attr('disabled', false);
+				//$("#cancelTransaction").attr('disabled', false);
+				$("#settlementTransaction").val("");
+				//$("#cancelTransaction").val("");
+				$("#settlementTransactionDesc").val("");
+				//$("#cancelTransactionDesc").val("");
+				$(".settlement").attr('disabled', 'disabled');
+				$(".settlement").val("");
+				if ($("#transactionCategory").val() == 'TRANSACTION_CATEGORY-C') {
+					//$("#cancelTransactionHelp").attr('disabled', 'disabled');
+					$("#portfolioTransaction").val("");
+					$("#cashTransaction").val("");
+					$("#portfolioTransactionDesc").val("");
+					$("#cashTransactionDesc").val("");
+					//$(".cancel").attr('disabled', 'disabled');
+					//$("#cancelTransaction").attr('disabled', 'disabled');
+					$(".cancel").val("");
+					$("#settlementTransactionHelp").attr('disabled', false);
+					$(".settlement").attr('disabled', false);
+				} else {
+					$("#portfolioTransactionHelp").attr('disabled', false);
+					$("#cashTransactionHelp").attr('disabled', false);
+					$(".cancel").attr('disabled', false);
+					//$("#cancelTransaction").attr('disabled', false);
+				}
+			}
+			
+			if ($('#transactionCategory').val() != 'TRANSACTION_CATEGORY-S') {
+				//$("#paymentDiv").css("display", "none");
+				//$('#paymentDiv').hide();
+// 				$('#defaultPayment').val('');
+				$('input[name=defaultCorebanking]').val(false);
+				$("input[name='transactionTemplate.defaultCorebanking']").val(false);
+// 				$('#defaultPayment').attr('disabled', 'disabled');
+				$('input[name=defaultCorebanking]').attr("disabled", "disabled");
+			} else if ($('#transactionCategory').val() == 'TRANSACTION_CATEGORY-S') {
+				//$('#paymentDiv').show();
+// 				$('#defaultPayment').removeAttr('disabled');
+				$('input[name=defaultCorebanking]').removeAttr('disabled');
+			}
+			
+			adjustTransactionCategory();
+		});
+		// ======================================================================================================================
+		
+		// usedBy event =========================================================================================================
+		$("#usedBy").change(function(){
+			
+			adjustUsedBy();
+			adjustDefaultPrematch();
+			$("#securityTypeCash").val("");
+			$("#securityTypeDescCash").val("");
+			$("#h_securityTypeDescCash").val("");
+			
+			$("#securityType").val("");
+			$("#securityTypeDesc").val("");
+			$("#h_securityTypeDesc").val("");
+			
+			
+			
+		});
+		// ======================================================================================================================
+			
+		// settlement transaction event =========================================================================================
+		$('#settlementTransaction').change(function(){
+			if ($('#settlementTransaction').val() == "") {
+				$('#settlementTransaction').val("");
+				$('#settlementTransactionKey').val("");
+				$('#settlementTransactionDesc').val("");
+				$('#h_settlementTransactionDesc').val("");
+			}
+			adjustDefaultPrematch(); 
+		});
+		// ======================================================================================================================
+		
+		// cancel settlement event ==============================================================================================	
+		/* $('#cancelTransaction').change(function(){
+			if ($('#cancelTransaction').val() == "") {
+				$('#cancelTransaction').val("");
+				$('#cancelTransactionKey').val("");
+				$('#cancelTransactionDesc').val("");
+				$('#h_cancelTransactionDesc').val("");
+			} 
+		}); */
+		// ======================================================================================================================
+		
+		// portfolio transaction event ==========================================================================================
+		$('#portfolioTransaction').change(function(){
+			if ($('#portfolioTransaction').val() == "") {
+				$('#portfolioTransaction').val("");
+				$('#portfolioTransactionKey').val("");
+				$('#portfolioTransactionDesc').val("");
+				$('#h_portfolioTransactionDesc').val("");
+			} 
+		});
+		// ======================================================================================================================
+		
+		// cash transaction event ===============================================================================================
+		$('#cashTransaction').change(function(){
+			if ($('#cashTransaction').val() == "") {
+				$('#cashTransaction').val("");
+				$('#cashTransactionKey').val("");
+				$('#cashTransactionDesc').val("");
+				$('#h_cashTransactionDesc').val("");
+			} 
+		});
+		// ======================================================================================================================
+			
+		// security type cash event =============================================================================================
+		$('#securityTypeCash').change(function(){
+			if ($('#securityTypeCash').val() == "") {
+				$('#securityTypeCash').val("");
+				$('#securityTypeDescCash').val("");
+				$('#h_securityTypeDescCash').val("");
+			} 
+		});
+		// ======================================================================================================================
+			
+		// security type event ==================================================================================================
+		$('#securityType').change(function(){
+			if ($('#securityType').val() == "") {
+				$('#securityType').val("");
+				$('#securityTypeDesc').val("");
+				$('#h_securityTypeDesc').val("");
+			} 
+		});
+		// ======================================================================================================================
+		
+	});
+	
+	// function transaction category ============================================================================================
+	function adjustTransactionCategory() {
+		var select_transactionCategory;
+		select_transactionCategory = $('#transactionCategory').val();
+		if (/TRANSACTION_CATEGORY-T/i.test(select_transactionCategory)) {
+			$("p[id=pUsedBy] label span").html(" *");
+			$("#usedBy").attr('disabled', false);
+			$("#usedBy").val("");
+		} else {
+			$("p[id=pUsedBy] label span").html("");
+			$("#usedBy").attr('disabled', 'disabled');
+			$("#usedBy").val("");
+		}
+		adjustDefaultPrematch();
+	}
+	// ==========================================================================================================================
+	
+	// function usedBy ==========================================================================================================
+	function adjustUsedBy() {
+		var select_usedBy;
+		select_usedBy = $("#usedBy").val();
+		if ((/USED_BY-2/i.test(select_usedBy)) || (/USED_BY-4/i.test(select_usedBy))) {
+			//console.debug(select_usedBy);
+			$("p.untransaction").css("display", "none");
+			$("p.transaction_only").css("display", "block");
+			//$("#securityTypeCash").val("");
+			//$("#securityTypeDescCash").val("");
+			//$("#h_securityTypeDescCash").val("");
+		} else {
+			//console.debug(select_usedBy);
+			$("p.transaction_only").css("display", "none");
+			$("p.untransaction").css("display", "block");
+			//$("#securityType").val("");
+			//$("#securityTypeDesc").val("");
+			//$("#h_securityTypeDesc").val("");
+		}
+		//adjustDefaultPrematch();
+	}
+	// ==========================================================================================================================
+	
+	// function doSave ==========================================================================================================
+	function doSave(){
+		//alert("dosave");
+		if ($("#usedBy").val() == 'USED_BY-2' || $("#usedBy").val() == 'USED_BY-4') {
+			//alert("1. security type cash = " + $("#securityTypeCash").val());
+			$("#securityType").remove();
+			$("#h_securityType").remove();
+			$("#securityTypeDesc").remove();
+			$("#h_securityTypeDesc").remove();
+			return true;
+		} else {
+			//alert("1. security type = " + $("#securityType").val());
+			$("#securityTypeCash").remove();
+			$("#h_securityTypeCash").remove();
+			$("#securityTypeDescCash").remove();
+			$("#h_securityTypeDescCash").remove();
+			return true;
+		}
+	}
+	// ==========================================================================================================================
+	
+	// function doConfirm =======================================================================================================
+	function doConfirm(){
+		if ($("#usedBy").val() == 'USED_BY-2' || $("#usedBy").val() == 'USED_BY-4') {
+			//alert("2. security type cash = " + $("#securityTypeCash").val());
+			$("#securityType").remove();
+			$("#h_securityType").remove();
+			$("#securityTypeDesc").remove();
+			$("#h_securityTypeDesc").remove();
+			return true;
+		} else {
+			//alert("2. security type = " + $("#securityType").val());
+			$("#securityTypeCash").remove();
+			$("#h_securityTypeCash").remove();
+			$("#securityTypeDescCash").remove();
+			$("#h_securityTypeDescCash").remove();
+			return true;
+		}
+	}
+	// ==========================================================================================================================
+	
+	function adjustDefaultPrematch(){
+		if ($('#transactionCategory').val() == 'TRANSACTION_CATEGORY-T' && $('#usedBy').val() == 'USED_BY-1' && !($('#settlementTransaction').val() == '')) {
+			//$('input[id=defPrematch1]')[0].checked="checked";
+			$('#defPrematch1').attr("checked");
+ 			//$("input[name='transactionTemplate.defPrematch']").val($("input[name='defPrematch']:checked").val());
+ 			$('#defPrematchHidden').val(true);
+			$('input[name=defPrematch]').removeAttr("disabled");
+			//alert("defPrematch = " +$("input[name='transactionTemplate.defPrematch']").val());
+		}
+		else {
+			$('#defPrematch2').attr("checked");
+			$('#defPrematchHidden').val(false);
+ 			//$("input[name='transactionTemplate.defPrematch']").val($("input[name='defPrematch']:checked").val());
+			$('input[name=defPrematch]').attr("disabled", "disabled");
+		}
+	}
+	
+</script>
+
+	#{hidden id:'transactionTemplateKey', name:'transactionTemplate.transactionTemplateKey', value:transactionTemplate?.transactionTemplateKey /}
+	#{hidden id:'organizationId', name:'transactionTemplate.organization.organizationId', value:transactionTemplate?.organization?.organizationId /}
+	#{hidden id:'checkTransactionTemplate', name:'checkTransactionTemplate', value:checkTransactionTemplate /}
+	#{hidden id:'usedByHidden' /}
+	#{hidden id:'status', name:'status', value:status /}
+	<p>
+		#{textBox id:'transactionCode', name:'transactionTemplate.transactionCode', label:'Transaction Code', value:transactionTemplate?.transactionCode, class:'capitalize', required:true, readOnly:((mode=='entry') ? confirming : true ), width:'85px', maxLength:50 /}
+		<span class="error">#{error 'Transaction Code is' /}</span>
+	</p>
+	<p>	
+		#{textBox id:'description', name:'transactionTemplate.description',label:'Description', value:transactionTemplate?.description, class:'capitalize', required:true, width:'449px', readOnly:readOnly, maxLength:100  /}
+		<span class="error">#{error 'Description is' /}</span>
+	</p>
+	<p>	
+		#{dropDownList id:'transactionCategory', name:'transactionTemplate.transactionCategory.lookupId', label:'Transaction Category', options:categories, value:transactionTemplate?.transactionCategory?.lookupId, required:true, readOnly:readOnly, width:'163px' /}
+		<span class="error">#{error 'Transaction Category is' /}</span>		
+	</p>
+	<p id="pUsedBy">	
+		#{dropDownList id:'usedBy', name:'transactionTemplate.usedBy.lookupId', label:'Used By', options:usedBy, value:transactionTemplate?.usedBy?.lookupId, required:true, readOnly:readOnly, width:'163px' /}
+		<span class="error">#{error 'Used By is' /}</span>		
+	</p>
+	<p class="transaction_only">
+		#{textBox id:'securityTypeCash', name:'transactionTemplate.securityType.securityType', label:'Security Type', value: transactionTemplate?.securityType?.securityType, class:'capitalize', required:true, readOnly:readOnly, width:'85px' /}
+		#{button id:'securityTypeHelpCash', value:'?', class:'small', readOnly:readOnly  /}
+		#{textBox id:'securityTypeDescCash', name:'transactionTemplate.securityType.description', value:transactionTemplate?.securityType?.description, readOnly:true, width:'330px' /}
+		<span class="error">#{error 'Security Type is' /}</span>
+	</p>
+	<p class="untransaction">
+		#{textBox id:'securityType', name:'transactionTemplate.securityType.securityType', label:'Security Type', value: transactionTemplate?.securityType?.securityType, class:'capitalize', required:true, readOnly:readOnly, width:'85px' /}
+		#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:readOnly  /}
+		#{textBox id:'securityTypeDesc', name:'transactionTemplate.securityType.description', value:transactionTemplate?.securityType?.description, readOnly:true, width:'330px' /}
+		<span class="error">#{error 'Security Type is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'settlementTransaction', name:'transactionTemplate.settlementTransaction.transactionCode', label:'Settlement Txn', value:transactionTemplate?.settlementTransaction?.transactionCode, class:'capitalize settlement', readOnly:readOnly, width:'85px' /}
+		#{button id:'settlementTransactionHelp', value:'?', class:'small', readOnly:readOnly/}
+		#{textBox id:'settlementTransactionDesc', name:'transactionTemplate.settlementTransaction.description', value:transactionTemplate?.settlementTransaction?.description, readOnly:true, width:'330px' /}
+		#{hidden id:'settlementTransactionKey', name:'transactionTemplate.settlementTransaction.transactionTemplateKey', value:transactionTemplate?.settlementTransaction?.transactionTemplateKey, class:'settlement' /}
+		<span class="error">#{error 'transactionTemplate.settlementTransaction' /}</span>
+	</p>
+	<!-- <p>
+		#{textBox id:'cancelTransaction', name:'transactionTemplate.cancelTransaction.transactionCode', label:'Cancel Txn', value:transactionTemplate?.cancelTransaction?.transactionCode, class:'capitalize settlement', readOnly:readOnly, width:'85px' /}
+		#{button id:'cancelTransactionHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'cancelTransactionDesc', name:'transactionTemplate.cancelTransaction.description', value:transactionTemplate?.cancelTransaction?.description, readOnly:true, width:'330px' /}
+		#{hidden id:'cancelTransactionKey', name:'transactionTemplate.cancelTransaction.transactionTemplateKey', value:transactionTemplate?.cancelTransaction?.transactionTemplateKey, class:'settlement' /}
+		<span class="error">#{error 'transactionTemplate.cancelTransaction' /}</span>
+	</p> -->
+	<p>
+		#{radioButton id:'isCancel', name:'transactionTemplate.cancel', value:((transactionTemplate?.cancel)?'true':'false'), label:'Cancel Txn', options:operators, readOnly:readOnly /}
+	</p>
+	<p>
+		#{textBox id:'portfolioTransaction', name:'transactionTemplate.portfolioTransaction.custodyTransactionCode', label:'Portfolio Transaction', value:transactionTemplate?.portfolioTransaction?.custodyTransactionCode, class:'capitalize cancel', readOnly:readOnly, width:'85px' /}
+		#{button id:'portfolioTransactionHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'portfolioTransactionDesc', name:'transactionTemplate.portfolioTransaction.transactionDescription', value:transactionTemplate?.portfolioTransaction?.transactionDescription, readOnly:true, width:'330px' /}
+		#{hidden id:'portfolioTransactionKey', name:'transactionTemplate.portfolioTransaction.transactionMasterKey', value:transactionTemplate?.portfolioTransaction?.transactionMasterKey, class:'cancel' /}
+		<span class="error">#{error 'user.userId' /}</span>	
+	</p>
+	<p>
+		#{textBox id:'cashTransaction', name:'transactionTemplate.cashTransaction.bankTransactionCode', label:'Cash Transaction', value:transactionTemplate?.cashTransaction?.bankTransactionCode, class:'capitalize cancel', readOnly:readOnly, width:'85px' /}
+		#{button id:'cashTransactionHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'cashTransactionDesc', name:'transactionTemplate.cashTransaction.transactionDescription', value:transactionTemplate?.cashTransaction?.transactionDescription, readOnly:true, width:'330px' /}
+		#{hidden id:'cashTransactionKey', name:'transactionTemplate.cashTransaction.transactionMasterKey', value:transactionTemplate?.cashTransaction?.transactionMasterKey, class:'cancel' /}
+		<span class="error">#{error 'user.userId' /}</span>
+	</p>
+	<p>
+		#{radioButton id:'defaultCorebanking', name:'defaultCorebanking', value:((transactionTemplate?.defaultCorebanking)?'true':'false'), label:'Default Corebanking', options:operators, readOnly:readOnly /}
+		#{hidden id:'defaultCorebankingHidden', name:'transactionTemplate.defaultCorebanking', value:((transactionTemplate?.defaultCorebanking)?'true':'false') /}
+	</p>
+	<p>
+		#{radioButton id:'defPrematch', name:'defPrematch', value:((transactionTemplate?.defPrematch)?'true':'false'), label:'Default for Prematch', options:operators, readOnly:readOnly /}
+		#{hidden id:'defPrematchHidden', name:'transactionTemplate.defPrematch', value:((transactionTemplate?.defPrematch)?'true':'false') /}
+	</p>
+	<p>
+		#{radioButton id:'isActive', name:'isActive', value:((transactionTemplate?.isActive)?'true':'false'), label:'Active', options:operators, readOnly:readOnly /}
+		#{hidden id:'isActiveHidden', name:'transactionTemplate.isActive', value:((transactionTemplate?.isActive)?'true':'false') /}
+	</p>
+		
+	

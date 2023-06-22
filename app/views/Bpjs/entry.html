@@ -1,0 +1,102 @@
+#{extends 'templates/main.html' /}
+
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+#{script 'jquery.rc4.js' /}
+
+#{set pageTitle: 'BPJS Maintenance' /}
+#{set id:bpjs?.bpjsKey /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{if flash.error}
+    <p style="color: red;">
+        ${flash.error}
+    </p>
+#{/if}
+<script type="text/javascript">
+	function doSave() {
+		return false;
+	}
+</script>
+
+<div id='root'>
+	<form id="bpjsForm" class="form" method="POST">
+		#{hidden id:'bpjsKey', name:'bpjs.bpjsKey', value:bpjs?.bpjsKey /}
+		#{hidden id:'json', value:bpjs?.json /}
+		#{hidden id:'mode', value:mode /}
+		<span id='errorGlobal' class="error">#{error 'ErrroGlobal' /}</span>
+		
+		<p>
+			<label style="width: 200px;">Price&nbsp;Reference&nbsp;[OBLIGASI]&nbsp;<span class='req'>*</span></label>
+			#{textBox id:'obligasiPriceGroup', name:'bpjs.priceObligasi.lookupCode', value:bpjs?.priceObligasi?.lookupCode, required:true, readOnly:readOnly, class:"capitalize", width:'100px' /}
+			#{hidden id:'obligasiPriceGroupId', name:'bpjs.priceObligasi.lookupId', value:bpjs?.priceObligasi?.lookupId /}
+			#{button id:'obligasiPriceGroupHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'obligasiPriceGroupName', name:'bpjs.priceObligasi.lookupDescription', value:bpjs?.priceObligasi?.lookupDescription, readOnly:true, width:'222px' /}
+			<span id='obligasiPriceGroupErr' class="error">#{error 'Obligasi Price is' /}</span>
+		</p>
+		<p>
+			<label style="width: 200px;">Price&nbsp;Reference&nbsp;[SAHAM]&nbsp;<span class='req'>*</span></label>
+			#{textBox id:'sahamPriceGroup', name:'bpjs.priceSaham.lookupCode', value:bpjs?.priceSaham?.lookupCode, required:true, readOnly:readOnly, class:"capitalize", width:'100px' /}
+			#{hidden id:'sahamPriceGroupId', name:'bpjs.priceSaham.lookupId', value:bpjs?.priceSaham?.lookupId /}
+			#{button id:'sahamPriceGroupHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'sahamPriceGroupName', name:'bpjs.priceSaham.lookupDescription', value:bpjs?.priceSaham?.lookupDescription, readOnly:true, width:'222px' /}
+			<span id='sahamPriceGroupErr' class="error">#{error 'Saham Price is' /}</span>
+		</p>
+		
+		</br>
+		
+		<fieldset>
+			<legend><b>Customer</b></legend>
+			<div>
+				</br>
+				<table id="tblCustomer" class="display">
+					<thead>
+						<tr>
+							<th width="200px">Customer Code</th>
+							<th>Name</th>
+							<th width="100px">Action</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+			
+			</br>
+			
+			#{button id:'addCustomer', value:'Add', readOnly:readOnly /} 			
+		</fieldset>
+		</br>
+		<div id='divEntry' style="display: none">
+			#{button id:'btnSave', value:'Save' /}
+			#{button id:'btnCancel', value:'Cancel' /}
+		</div>
+		<div id='divConfirm' style="display: none">
+			#{button id:'btnConfirm', value:'Confirm' /}
+			#{button id:'btnBack', value:'Back' /}
+		</div>
+	</form>
+	
+	<div id='dlgEntry' title="Customer" style="display: none">
+		<form class="form">
+			#{hidden id:'rowPosition' /}
+			#{hidden id:'bpjsDetailKey' , name:'bpjsDetail.bpjsDetailKey', value:bpjsDetail?.bpjsDetailKey /}
+			<span id="dialogErr" class="error"></span>
+			</br>
+			</br>
+			<p id='pEntry'>
+				#{textBox id:'customerNo', label:'Customer', required:true, readOnly:readOnly, class:"capitalize", width:'130px' /}
+				#{button id:'customerHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{hidden id:'customerKey' /}
+				#{textBox id:'customerName', readOnly:true, width:'200px' /}
+				<span id="customerNoErr" class="error"></span>
+			</p>
+		</form>
+	</div>
+	
+</div>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'Bpjs/entry.js' /}
+	$(document).ready(function() {
+		entry($("#root"));
+	});
+</script>

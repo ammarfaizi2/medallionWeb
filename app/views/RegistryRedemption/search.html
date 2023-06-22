@@ -1,0 +1,83 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: "Search Transaction" /}
+#{script 'lookuppaging.js' /}
+
+#{if flash.error || errors}
+    <div class="error">
+    	Error when saving data!<br/>
+		<li>${flash.error}</li>
+		#{ifErrors}
+			#{errors}
+				 <li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}
+
+<div id="root">
+	<h3><a href="#">Search Transaction</a></h3>
+	<form class="form" id="formsearch">
+	<input id="fundKey" name="param.fundKey" type="hidden"/> 
+	#{hidden id:'query', name:'params.query', value:params?.query /} 
+
+	<p id="pTransactionDateFrom">
+		#{textBox id:'transactionDateFrom', name:'param.transactionDateFrom', label:'Transaction date', value:param?.transactionDateFrom?.format(appProp.dateFormat), class:'calendar', readOnly:readOnly /}(${appProp.displayDateFormat})
+		<span class="error" id="transactionDateFromError"></span>
+		to
+		#{textBox id:'transactionDateTo', name:'param.transactionDateTo', label:'', value:param?.transactionDateTo?.format(appProp.dateFormat), class:'calendar', readOnly:readOnly, required:true /} (${appProp.displayDateFormat})
+		<span class="error" id="transactionDateToError"></span>
+	</p>
+	<p>
+		#{textBox id:'fundCode', name:'param.fundCode', label:'Fund Code', value:param?.fundCode, width:'120px', readOnly:false, class:'capitalize', maxLength:50/}
+		#{button  id:'fundCodeHelp', value:'?', class:'small', readOnly:false/}
+		#{textBox id:'fundCodeDesc', value:param?.fundCode, readOnly:true, width:'340px' /}
+	</p>
+	<p>
+		#{textBox id:'investorNo', name:'param.investorNo', label:'Investor No', value:param?.investorNo, width:'120px', readOnly:false, class:'capitalize', maxLength:50/}
+		#{button  id:'investorNoHelp', value:'?', class:'small', readOnly:false/}
+		#{textBox id:'investorNoDesc', value:param?.investorNo, readOnly:true, width:'340px' /}
+	</p>
+	<p>
+		#{dropDownList id:'transactionNoOperator', name:'param.transactionNoOperator', label:'Transaction No', options:stringOperators, removeEmpty:'true', value:param?.transactionNoOperator /}
+		#{textBox id:'transactionNo', name:'param.transactionNo', value:param?.transactionNo, readOnly:readOnly, class:"numericnosep"/}	
+	</p>
+	<p>
+		<div class="buttons">
+			<input type="button" id="search" value="Search" />				
+			<input type="button" id="reset" value="Reset" />					
+		</div>
+	</p>
+</form>
+</div>
+	
+<div id="result" style="display:none">
+	<table id="tableTrade" class="display">
+		<thead>
+			<tr>
+				<th width="100px" field="tradeDate|date|date|left|sort">Transaction Date</th>
+				<th width="100px" field="tradeKey|string|none|left|sort">Transaction #</th>
+				<th width="100px" field="rgProduct.productCode|string|none|left|sort">Fund Code</th>
+				<th width="100px" field="rgInvestmentaccount.accountNumber|string|none|left|sort">Account No</th>
+				<th width="100px" field="rgInvestmentaccount.name|string|none|left|sort">Account Name</th>
+				<th width="100px" field="netAmount|number|none|right|sort">Net Amount</th>
+				<th width="100px" field="price|number|none|right|sort">Price</th>
+				<th width="100px" field="unit|number|none|right|sort">Unit</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+</div>	
+<div id="buttonnew">
+		<div class="buttons">
+			<input type="button" id="newdata" value="New Data" />
+		</div>
+</div>
+#{script 'lookups.js' /}
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'RegistryRedemption/TradePaging.js' /}
+	$(function() {
+		TradePaging($("#root").add("#result").add("#buttonnew"));
+	});
+</script>

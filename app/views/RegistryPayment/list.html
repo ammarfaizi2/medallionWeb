@@ -1,0 +1,128 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'TA - Payment Entry' /}
+#{script 'lookups.js' /}
+
+<div id="accordion">
+    <h3><a href="#">TA - Payment Entry</a></h3>
+
+    <form id="searchForm" class="form" method="post">
+        #{hidden id:'selected', name:'param.selected', value:param?.selected /}
+        #{hidden id:'selectedNominal', name:'param.selectedNominal', value:param?.selectedNominal /}
+        #{hidden id:'selectedInvestorBankAccountKey', name:'param.selectedInvestorBankAccountKey', value:param?.selectedInvestorBankAccountKey /}
+        #{hidden id:'selectedInvestorAccountNo', name:'param.selectedInvestorBankAccountNo', value:param?.selectedInvestorAccountNo /}
+        #{hidden id:'selectedInvestorThirdPartyCode', name:'param.selectedInvestorThirdPartyCode', value:param?.selectedInvestorThirdPartyCode /}
+        #{hidden id:'selectedProductBankAccountKey', name:'param.selectedProductBankAccountKey', value:param?.selectedProductBankAccountKey /}
+        #{hidden id:'selectedProductAccountNo', name:'param.selectedProductAccountNo', value:param?.selectedProductAccountNo /}
+        #{hidden id:'selectedProductThirdPartyCode', name:'param.selectedProductThirdPartyCode', value:param?.selectedProductThirdPartyCode /}
+        #{hidden id:'dispatch', name:'param.dispatch', value:param?.dispatch /}
+        #{hidden id:'readOnly', name:'param.readOnly', value:param?.readOnly /}
+        #{hidden id:'query', name:'param.query', value:param?.query /}
+        #{hidden id:'totalPaidAmount', name:'param.totalPaidAmount', value:param?.totalPaidAmount /}
+        
+        #{hidden id:'selectedProductThirdPartyCodeChange', name:'param.selectedProductThirdPartyCodeChange', value:param?.selectedProductThirdPartyCodeChange /}
+        #{hidden id:'selectedInvestorThirdPartyCodeChange', name:'param.selectedInvestorThirdPartyCodeChange', value:param?.selectedInvestorThirdPartyCodeChange /}
+        
+        
+        
+        
+        #{hidden id:'selectedbankCodeChange', name:'param.selectedbankCodeChange', value:param?.selectedbankCodeChange /}
+        #{hidden id:'selectedbankCodeNameChange', name:'param.selectedbankCodeNameChange', value:param?.selectedbankCodeNameChange /}
+        
+        
+       <span id="globalError" class="error"></span>
+
+        <p>
+           #{textBox id:'paymentNo', name:'param.paymentKey', label:'Payment No', value:param?.paymentKey, width:'120px', readOnly:true /}
+        </p>
+
+        <p>
+            #{textBox id:'fundCode', name:'param.rgProduct.productCode', label:'Fund Code', value:param?.rgProduct?.productCode, width:'120px', readOnly:param.readOnly, class:'capitalize', required:true /}
+            #{hidden id:'fundCodeKey', name:'productCode', value:param?.rgProduct?.productCode /}
+            #{button id:'fundCodeHelp', value:'?', class:'small', readOnly:param.readOnly /}
+            #{textBox id:'fundCodeDesc',  name:'param.rgProduct.name', value:param?.rgProduct?.name, readOnly:true, width:'230px' /}
+            <span class="error" id="fundCodeError"></span>
+        </p>
+    
+        <p>
+            #{textBox id:'paymentDate', name:'param.paymentDate', label:'Payment Date', value:param?.paymentDate?.format(appProp.dateFormat), class:'calendar', readOnly:true /} (${appProp.displayDateFormat})
+        </p>
+    
+        <p>
+            #{dropDownList id:'type', name:'param.type', label:'Transaction Type', options:listType, value:param?.type, readOnly:param.readOnly, required:true, width:'185px' /}
+        </p>
+	    <p>
+			#{dropDownList id:'transferMethod', name:'param.transferMethod.lookupId', label:'Fund Transfer Method', value:param?.transferMethod?.lookupId, options:transferMethods, required:true, class:'dropdown', readOnly:param.readOnly /}
+			<span id="transferMethodError" class="error">#{error 'Transfer Method is' /}</span>
+		</p>
+        <p id="pFilterBy">
+            #{dropDownList id:'filterBy', name:'param.filterBy', label:'Search By', value:param?.filterBy, readOnly:param.readOnly, options:filterBy, required:true, width:'124px' /}
+            #{textBox id:'filterByNo', name:'param.filterByNo', value:param?.filterByNo, readOnly:param.readOnly, width:'175px', class:'numberOnly'/}
+            <span class="error" id="filterByNoError"></span>
+        </p>
+    
+        <p>
+           #{textArea id:'remarks', label:'Remarks', name:'param.remarks', value:param?.remarks, width:'300px', maxLength:100, readOnly:param.readOnly, class:'capitalize' /}
+        </p>
+
+        <p>
+            <div class="buttons">
+                <input type="button" id="populate" value="Populate" />
+            </div>
+        </p>
+    </form>
+</div>
+
+<p>&nbsp;</p>
+
+<div id="result">
+    <table id="tblTransaction" class="display">
+        <thead>
+            <tr>
+                <th width="1px" align="left" field="component|checkbox|none|center|nosort"><input id="selectAll" type="checkbox" ></th>
+                <th width="50px" field="paymentDate|date|date|center|sort">Payment Date</th>
+                <th width="50px" field="tradeKey|string|none|center|sort">Transaction #</th>
+                <th width="50px" field="rgInvestmentaccount.accountNumber|string|none|left|sort">Account No</th>
+                <th width="100px" field="rgInvestmentaccount.name|string|none|left|sort">Account Name</th>
+                <th width="50px" field="tradeDate|date|date|center|sort">Transaction Date</th>
+                <th width="80px" field="amount|number|decimal0|right|nosort">Payment Amount</th>
+                <th width="80px" field="bankAccount.accountNo|string|none|left|sort">Bank Account #</th>
+                <th width="80px" field="bankAccount.bankCode.thirdPartyCode|string|none|left|sort">Bank Code</th>
+                <th width="80px" field="bankAccount.customer.customerName|string|none|left|sort">Beneficiary Name</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <p>
+        <span style="margin-left: 38em;" ><b>Total Amount</b></span>
+        #{textBox id:'totPayment', class:'numeric', value:param?.totalPaidAmount?.format('#,##0.####'), readOnly:true, width:'190px' /}
+    </p>
+
+    <div id="popupDetail" class="form" title="TA - Payment Entry">
+        #{include 'RegistryPayment/tradeDetailDialog.html' /}
+    </div>
+
+    <p id="buttonEntry">
+        <input type="button" id="save" value="Save" />
+        <input type="button" id="reset" value="Reset" />
+    </p>
+    <p id="buttonSave">
+        <input type="button" id="confirm" value="Confirm" />
+        <input type="button" id="back" value="Back" />
+    </p>
+    <p id="buttonConfirm">
+        <input type="button" id="close" value="Close" />
+    </p>
+</div>
+
+<script type="text/javascript">
+    #{include 'RegistrySubscription/Util.js' /}
+    #{include 'RegistryPayment/registryPaymentList.js' /}
+    $(document).ready(function() {
+    	if($("#transferMethod").val()==""){
+    		$("#transferMethod").val('${viaInterface}');
+    	}
+        Payment($("#accordion").add("#result"));
+    });
+</script>

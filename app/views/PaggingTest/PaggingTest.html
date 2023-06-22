@@ -1,0 +1,40 @@
+<html>
+	<head>
+		#{script 'jquery-1.6.1.min.js', characterset:'utf-8' /}
+	
+	    #{stylesheet 'jquery-ui.custom.css' /}
+	    #{script 'jquery-ui.js', characterset:'utf-8' /}
+	    
+	    #{stylesheet 'jquery.dataTables.css' /}
+	    #{script 'jquery.dataTables194.js', characterset:'utf-8' /}
+	</head>
+	
+	<body id="PaggingTest" ajax="@{PaggingTest.form()}">
+		<div id="DialogTest1" ajax="@{PaggingTest.formdialog()}" title="entry"></div>
+		<div id="AccordionTest1" ajax="@{PaggingTest.formaccordion()}" title="accordion"></div>
+	</body>
+</html>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		#{include 'PaggingTest/Autocomplete.js' /}
+		#{include 'PaggingTest/Populate.js' /}
+		#{include 'PaggingTest/Select.js' /}
+		#{include 'PaggingTest/Button.js' /}
+		#{include 'PaggingTest/Radio.js' /}
+		#{include 'PaggingTest/Checkbox.js' /}
+		#{include 'PaggingTest/Textarea.js' /}
+		#{include 'PaggingTest/InputLookup.js' /}
+		#{include 'PaggingTest/Input.js' /}
+		#{include 'PaggingTest/Table.js' /}
+		#{include 'PaggingTest/Lookup.js' /}
+		#{include 'PaggingTest/Form.js' /}
+		#{include 'PaggingTest/Dialog.js' /}
+		#{include 'PaggingTest/Datepicker.js' /}
+		#{include 'PaggingTest/Accordion.js' /}		
+		#{include 'PaggingTest/Callback.js' /}
+		Form($("#PaggingTest"), Callback());
+		Dialog($("#DialogTest1"), Callback());
+		Accordion($("#AccordionTest1"), Callback());
+	});
+</script>

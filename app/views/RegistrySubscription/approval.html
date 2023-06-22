@@ -1,0 +1,170 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Subscription Approval' /}
+
+<script type="text/javascript">
+	$(function() {
+		// DECLARE CLASS BTN
+		$(".btn").button();
+		$(".btn").css("width", "100px");
+		//===============
+			
+		// DECLARE SOME ID VARIABLE	
+		$('#approve').button();
+		$('#reject').button();
+		//===============
+		
+		//$('#approve').insertBefore('#close');
+		//$('#reject').insertBefore('#close');
+		
+		/* var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Processing...</div>').appendTo('body');
+		loading.dialog({
+			closeOnEscape: false,
+			draggable: false,
+			modal: true,
+			resizable: false,
+			open:function() {
+				$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+			} 
+		});
+		loading.dialog('close'); */
+		
+		function validateRemarkCorrection() {
+			if ($('#needCorrection').is(':checked')) {
+				if (($('#remarksCorrection').val() == '') || ($('#remarksCorrection').val() == null)) {
+					$('#remarksCorrectionError').html('Required');
+				} else {
+					$('#remarksCorrectionError').html('');
+					return true;
+				}
+				return false;
+			}
+			return true;
+		}
+		
+		var backToWorkList = function() {
+			loading.dialog('open');
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			};
+		}
+		
+		// ACTION BUTTON APPROVE 
+		$('#approve').click(function() {
+			var action = "@{approve()}?keyId=${sub?.tradeKey}&taskId=${taskId}&maintenanceLogKey=${maintenanceLogKey}&operation=${operation}";
+			loading.dialog('open');
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					//alert("Trade Id : '${sub?.tradeKey}' is Approved");
+					messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+				} else {
+					/* if (data.code == "error.subscription.netAmount.below.subInitMinAmt") {
+						//alert("Transaction Amount Below The Minimum Initial Subscription Amount");
+						messageAlertOk("Transaction Amount Below The Minimum Initial Subscription Amount", "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+					} else if (data.code == "error.sentToFaInterface") {
+						//alert("Error when sent to FA Interface !");
+						messageAlertOk("Error when sent to FA Interface", "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+					} else if ((data.error != "error.subscription.netAmount.below.subInitMinAmt") && (data.error != "error.sentToFaInterface")) {
+						messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+					} else { */
+						//alert("Data Error");
+					//	messageAlertOk("Data Error", "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+						messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+					//}
+				}
+			});			
+		});
+		//===============
+		
+		// ACTION BUTTON REJECT
+		$('#reject').click(function() {
+			var resultValidateCorrection = validateRemarkCorrection();
+			if (!resultValidateCorrection) {
+				return;
+			}
+			
+			var action = "@{reject()}?keyId=${sub?.tradeKey}&taskId=${taskId}&maintenanceLogKey=${maintenanceLogKey}&operation=${operation}";
+			var postData = {
+					"correction": $('#remarksCorrection').val()
+				};
+			loading.dialog('open');
+			$.post(action, postData, function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					//alert("Trade Id : '${sub?.tradeKey}' is Rejected");
+					messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+				} else {
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+				}
+			});
+		});
+		//===============
+		
+		// ACTION BUTTON CLOSE
+		$('#closeWorkflow').click(function() {
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			}
+		});
+		//===============
+		
+		// HIDE ALL CLASS BUTTON
+		$(".buttons").css("display","none");
+		//===============
+		
+		// HIDE DISPLAY INSIDE APPROVAL ACTIONS ID
+		$("#approval-actions").css("display","block");
+		//===============
+		
+		
+		if ($('#remarksCorrection').val() != '') {
+			$("input[name='needCorrection']:checked").val(true);
+			$('#approve').button({disabled: true});
+			$('p[id=pRemarksCorrection] label span').html(' *');
+			$('#remarksCorrection').removeAttr('disabled');
+		} else {
+			$("input[name='needCorrection']:checked").val(false);
+			$('#approve').button({disabled: false});
+			$('p[id=pRemarksCorrection] label span').html('');
+			$('#remarksCorrection').attr('disabled', 'disabled');
+		}
+
+		$('input[name=needCorrection]').die("change");
+		$('input[name=needCorrection]').live("change", function(){
+			if ($('input[name=needCorrection]').is(':checked')){
+				$('#approve').button({disabled: true});
+				$('p[id=pRemarksCorrection] label span').html(' *');
+				$('#remarksCorrection').removeAttr('disabled');
+			} else {
+				$('#approve').button({disabled: false});
+				$('p[id=pRemarksCorrection] label span').html('');
+				$('#remarksCorrection').val('');
+				$('#remarksCorrection').attr('disabled', 'disabled');
+			}
+			
+		});
+	});
+
+</script>
+
+<div id="detail">
+	<form id="form" class="form">
+		#{include 'RegistrySubscription/detail.html' /}
+	</form>
+</div>	
+
+<div id="approval-actions">
+	#{hidden id:'taskId', name:'taskId', value:taskId /}
+	#{hidden id:'keyId', name:'keyId', value:keyId /}
+	#{hidden id:'from', name:'from', value:from /}	
+	
+	<input type="button" id="approve" value="Approve" class="btn" />
+	<input type="button" id="reject" value="Reject" style="margin:5px;" class="btn"/>
+	<input type="button" id="closeWorkflow" value="Cancel" class="btn" />
+</div>

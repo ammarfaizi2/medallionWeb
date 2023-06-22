@@ -1,0 +1,34 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle:'Report Mapping Maintenance' /}
+#{set canGoBack: true /}
+#{set group: group /}
+
+<table id="grid" class="display">
+
+	<thead>
+		<tr>
+			<th>Key</th>
+			<th>ID</th>
+			<th>Label</th>
+			<th>Group</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:faReportMappings, as:'faReportMapping'}
+		<tr>
+			<td>
+				${faReportMapping?.reportKey}
+			</td>
+			<td>
+				${faReportMapping?.reportLabelId}
+			</td>
+			<td>
+				${faReportMapping?.reportLabel}
+			</td>
+			<td>
+				${faReportMapping?.reportGroup?.lookupDescription}
+			</td>
+		</tr>
+	#{/list}	
+	</tbody>
+</table>

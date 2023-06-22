@@ -1,0 +1,45 @@
+#{extends 'templates/main.html' /}
+
+<form id="processKYC" class="form" name="processKYC">
+	#{hidden name:'PROCESSMARK', value:params?.PROCESSMARK/}
+	#{hidden name:'param.sessionTag', value:param?.sessionTag/}
+	#{hidden name:'param.processMark', value:param?.processMark/}
+	
+	#{hidden id:'post', name:'post', value:"post"/}
+	#{hidden id:'key', name:'param.paramKey', value:param?.paramKey /}
+	<p>
+		#{textBox id:'processDate', name:'processDate', label:'Process Date', value:processDate?.format( appProp?.dateFormat ), class:'calendar', readOnly:false, required:true/} ${appProp.displayDateFormat}
+		<span id="processDateError" class="error">#{error 'Process Date' /}</span>
+	</p>
+	<p>&nbsp;</p>	
+	<div class="buttons">
+		#{button  id:'btnProcess', value:'Process', readOnly:false, class:'ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only'/} 
+		#{button  id:'btnReset', value:'Reset', readOnly:false, class:'ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only', type:"Reset"/}
+	</div>
+	<p>
+		<textarea id='log' rows="3" cols="60" readonly="readonly">#{list logs, as:'log'}${log}#{/list}</textarea>
+		<span id="reportFile" >
+		#{if reportFile }
+			<br/>
+			Success generating report. Download it <a href="@{Kyc.reportDownload()}/${reportFile}">here</a>
+		#{/if}
+		</span>
+	</p>
+</form>
+<script type="text/javascript">
+$(document).ready(function(){
+	
+	$( "#btnProcess" ).click(function(){
+		if( $("#processDateError").html() === "" ){			
+			//$("#processKYC").submit();
+			$("#processKYC").attr('action', 'process');
+			$("#processKYC").submit();
+		}
+	});
+	$( "#btnReset" ).click(function(){
+		window.location.href="@{process()}";
+	});
+	
+	
+});
+</script>

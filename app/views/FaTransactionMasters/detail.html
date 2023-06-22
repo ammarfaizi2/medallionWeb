@@ -1,0 +1,44 @@
+#{extends 'templates/detail1.html' /}
+#{set pageTitle: 'FA Transaction Master Maintenance' /}
+#{set id: faTransactionMaster?.transactionMasterKey /}
+#{set mode: mode /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{script 'lookups.js' /}
+
+<script type="text/javascript">    
+	
+	$(function() {
+		if (('${mode}'=='entry') || (('${mode}'=='edit') &&(('${faTransactionMaster?.recordStatus?.decodeStatus()}'=='Reject')|| ($("#status").val() == 'R' )))) {
+			$('input[name=isActive]').attr("disabled", "disabled");
+		}
+		$("input[name='isActive']").change(function() {
+			$("input[name='faTransactionMaster.isActive']").val($("input[name='isActive']:checked").val());
+		});
+	});
+	
+	
+</script>
+
+<style type="text/css">
+  #errmsg { color:red; }
+</style>
+
+#{hidden id:'transactionMasterKey', name:'faTransactionMaster.transactionMasterKey', value:faTransactionMaster?.transactionMasterKey /}
+#{hidden id:'organizationId', name:'faTransactionMaster.organization.organizationId', value:faTransactionMaster?.organization?.organizationId /}
+#{hidden id:'status', name:'status', value:status /}
+<p>			
+	#{textBox id:'transactionCode', name:'faTransactionMaster.transactionCode', label:'Transaction Code', value:faTransactionMaster?.transactionCode, class:'capitalize', required:true, readOnly:((mode=='entry') ? confirming : true ), width:'85px' , maxLength:50 /}
+	<span class="error">#{error 'Transaction Code is' /}</span>
+</p>
+<p>			
+	#{textBox id:'transactionDescription', name:'faTransactionMaster.transactionDescription', label:'Description', value:faTransactionMaster?.transactionDescription, class:'capitalize', required:true, readOnly:readOnly, width:'250px', maxLength:100 /}
+	<span class="error">#{error 'Description is' /}</span>
+</p>
+<p>	
+	#{dropDownList id:'instructionType', name:'faTransactionMaster.instructionType.lookupId', label:'Instruction Type', options:instructionTypes, value:faTransactionMaster?.instructionType?.lookupId, required:true, removeEmpty:true, readOnly:readOnly /}		
+	<span class="error">#{error 'Instruction Type is' /}</span>
+</p>
+<p>
+	#{radioButton id:'isActive', name:'isActive', value:((faTransactionMaster?.isActive)?'true':'false'), label:'Active', options:operators, readOnly:readOnly /}
+	#{hidden id:'isActiveHidden', name:'faTransactionMaster.isActive', value:((faTransactionMaster?.isActive)?'true':'false') /}
+</p>

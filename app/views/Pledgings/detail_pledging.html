@@ -1,0 +1,144 @@
+<form id="pledgingForm" class="form">
+	#{hidden id:'rowPosition'/}
+	#{hidden id:'oldPortoKey' /}
+	#{hidden id:'newPortoKey' /}
+	#{hidden id:'transactionDetailKey', name:'pledgingDetail.transactionDetailKey', value:pledgingDetail?.transactionDetailKey /}
+	#{hidden id:'accountType', name:'pledgingDetail.accountType.lookupId', value:'ACCOUNT_TYPE_PLD-1' /}
+		<!--
+		<p>
+			#{dropDownList id:'accountType', name:'pledgingDetail.accountType.lookupId', value:pledgingDetail?.accountType?.lookupId, label:'Account Type', options:accountTypePld, readOnly:readOnly/}
+			#{hidden id:'accountTypeDesc', name:'pledging.accountType.lookupDescription', value:pledgingDetail?.accountType?.lookupDescription /}
+		</p>
+		-->
+		<br>
+		<b><span id="errDetailPledGlobal" class="error"></span></b>
+		<div id="divTypeCustody">
+			<fieldset id="typeCustody" >
+			<legend>Type Custody</legend>
+			<p>
+				#{textBox id:'accountNo', name:'pledgingDetail.account.accountNo', label:'Account No', value:pledgingDetail?.account?.accountNo, readOnly:readOnly,  required:true, width:'100px' , class:'capitalize' /}
+				#{hidden id:'accountKey', name:'pledgingDetail.account.custodyAccountKey', value:pledgingDetail?.account?.custodyAccountKey /}
+				#{button id:'accountHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'accountDesc', name:'pledgingDetail.account.name', value:pledgingDetail?.account?.name, readOnly:true, width:'350px' /}
+				<span id="accountNoError" class="error"></span>
+			</p>
+			<p>
+				#{textBox id:'securityType', name:'pledgingDetail.security.securityType.securityType', label:'Security Type', value:pledgingDetail?.security?.securityType?.securityType, readOnly:readOnly, required:true, width:'100px' , class:'capitalize' /}
+				#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'securityTypeDesc', name:'pledgingDetail.security.securityType.description', value:pledgingDetail?.security?.securityType?.description, readOnly:true, width:'350px' /}
+				<span id="securityTypeError" class="error"></span>
+			</p>
+			<p>
+				#{textBox id:'securityCode', name:'pledgingDetail.security.securityId', label:'Security Code', value:pledgingDetail?.security?.securityId, readOnly:readOnly, required:true, width:'100px' , class:'capitalize' /}
+				#{hidden id:'securityKey', name:'pledgingDetail.security.securityKey', value:pledgingDetail?.security?.securityKey /}
+				#{button id:'securityHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'securityDesc', name:'pledgingDetail.security.description', value:pledgingDetail?.securityType?.description, readOnly:true,  required:true, width:'350px' /}
+				<span id="securityCodeError" class="error"></span>
+			</p>
+			<p>
+				#{dropDownList id:'classification', name:'pledgingDetail.classification.lookupId', label:'Classification', value:pledgingDetail?.classification?.lookupId, options:classifications, required:true, readOnly:readOnly, width:'143px'/}
+				<span id="classificationError" class="error">#{error 'Classification is' /}</span>
+			</p>
+			<p>
+				#{textBox id:'portfolioNo', label:'Holding Ref.', name:'pledgingDetail.holdingRefs', value:pledgingDetail?.holdingRefs, readOnly:readOnly,  required:true, width:'100px' , class:'capitalize' /}
+				#{hidden id:'portfolioNoKey', name:'pledgingDetail.portfolio.portfolioKey', value:pledgingDetail?.portfolio?.portfolioKey /}
+				#{button id:'portfolioNoHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'portfolioQuantity', value:pledgingDetail?.portoQuantity, format:'#,##0.####', readOnly:true, width:'350px' /}
+				#{hidden id:'portfolioQuantityStripped', name:'pledgingDetail.portoQuantity', value:pledgingDetail?.portoQuantity /}
+				<span id="portfolioNoError" class="error"></span>
+			</p>
+			<p>
+				#{textBox id:'availableQty', label:'Available Qty', value:pledgingDetail?.availableQuantity,format:'#,##0.####', readOnly:true, width:'108px',class:'numeric' /}
+				#{hidden id:'availableQtyStripped',  name:'pledgingDetail.availableQuantity', value:pledgingDetail?.availableQuantity /}
+			</p>
+			<p>
+				#{textBox id:'pledgingQty', label:'Qty To Block', value:pledgingDetail?.amount, format:'#,##0.####',readOnly:readOnly, width:'108px', required:true, class:'numeric' /}
+				#{hidden id:'pledgingQtyStripped', name:'pledgingDetail.amount', value:pledgingDetail?.amount /}
+				<span id="pledgingQtyError" class="error"></span>
+			</p>
+			<!--
+			<p>
+				#{textBox id:'portoQty',  label:'Porto Qty', value:pledgingDetail?.portoQuantity, format:'#,##0.####', readOnly:true, width:'108px', class:'numeric' /}
+				#{hidden id:'portoQtyStripped', name:'pledgingDetail.portoQuantity', value:pledgingDetail?.portoQuantity /}
+			</p>
+			-->
+			</fieldset>
+		</div>
+		
+		<!-- <div id="divTypeBank" style="display: none;">
+			<fieldset id="typeBank">
+			<legend>Type Bank</legend>
+			<p>
+				#{textBox id:'accountBankNo', name:'pledgingDetail.account.accountNo', label:'Account No', value:pledgingDetail?.account?.accountNo, readOnly:readOnly,  required:true, width:'100px' , class:'capitalize' /}
+				#{hidden id:'accountBankKey', name:'pledgingDetail.account.custodyAccountKey', value:pledgingDetail?.account?.custodyAccountKey /}
+				#{button id:'accountBankHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'accountBankDesc', name:'pledgingDetail.account.name', value:pledgingDetail?.account?.name, readOnly:true, width:'350px' /}
+				<span id="accountNoError" class="error"></span>
+			</p>
+			<p>
+				#{textBox id:'bankCode', name:'', value:'', label:'Bank Code', readOnly:true, required:true /}
+			</p>
+			<p>
+				#{textBox id:'bankName', name:'', value:'', label:'Bank Name', readOnly:true, required:true /}
+			</p>
+			<p>
+				#{textBox id:'pledgingAmt', name:'', value:'', label:'Pledging Amount', format:'#,##0.####', readOnly:readOnly, class:'numeric' /}
+			</p>
+			<p>
+				#{textBox id:'balance',  label:'Balance', value:'', format:'#,##0.####', readOnly:true, width:'108px', class:'numeric' /}
+				#{hidden id:'balanceStripped', name:'', value:'' /}
+			</p>
+			<p>
+				#{textBox id:'availableBalance', label:'Available Balance', value:'', format:'#,##0.####', readOnly:true, width:'108px',class:'numeric' /}
+				#{hidden id:'availableBalanceStripped',  name:'', value:'' /}
+			</p>
+			</fieldset>
+		</div>
+		
+		<div id="divTypeInvestment" style="display: none;">
+			<fieldset id="typeInvestment">
+			<legend>Type Investment</legend>
+			<p>
+				#{textBox id:'accountInvNo', name:'pledgingDetail.account.accountNo', label:'Account No', value:pledgingDetail?.account?.accountNo, readOnly:readOnly,  required:true, width:'100px' , class:'capitalize' /}
+				#{hidden id:'accountInvKey', name:'pledgingDetail.account.custodyAccountKey', value:pledgingDetail?.account?.custodyAccountKey /}
+				#{button id:'accountInvHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'accountInvDesc', name:'pledgingDetail.account.name', value:pledgingDetail?.account?.name, readOnly:true, width:'350px' /}
+				<span id="accountNoError" class="error"></span>
+			</p>
+			<p>
+				#{textBox id:'fundCode', name:'', value:'', label:'Fund Code', readOnly:true, required:true /}
+			</p>
+			<p>
+				#{textBox id:'fundName', name:'', value:'', label:'Fund Name', readOnly:true, required:true, class:'capitalize' /}
+			</p>
+			<p>
+				#{textBox id:'pledgingUnit', name:'', value:'', label:'Pledging Unit', format:'#,##0.####', readOnly:readOnly, class:'numeric' /}
+			</p>
+			<p>
+				#{textBox id:'unitBalance',  label:'Unit Balance', value:'', format:'#,##0.####', readOnly:true, width:'108px', class:'numeric' /}
+				#{hidden id:'unitBalanceStripped', name:'', value:'' /}
+			</p>
+			<p>
+				#{textBox id:'availableUnit', label:'Available Unit', value:'', format:'#,##0.####', readOnly:true, width:'108px',class:'numeric' /}
+				#{hidden id:'availableUnitStripped',  name:'', value:'' /}
+			</p>
+			</fieldset>
+		</div> -->
+		<!--
+		
+		
+		<p>
+			#{textBox id:'portoQty', name:'pledging.portoQty', label:'Porto Qty', value:'', readOnly:true, width:'150px' /}
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			#{textBox id:'totalBlockedQty', name:'pledging.totalBlockedQty', label:'Total Blocked Qty', value:'', readOnly:true, width:'150px' /}
+		</p>
+		<p>
+			#{dropDownList id:'action', name:'pledging.accountType.lookupId', value:'', label:'Action', options:action, readOnly:readOnly, width:'108px' /}
+		</p>
+		<p>
+			#{textBox id:'blockQty', name:'pledging.blockQty', label:'Block Qty', value:'', readOnly:readOnly, width:'108px' /}
+		</p>
+		<p>
+			#{textBox id:'remarksDetail', name:'pledging.remarks', label:'Remarks',value:'', readOnly:readOnly, width:'300px' /}
+		</p> -->
+</form>

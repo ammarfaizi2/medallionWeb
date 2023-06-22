@@ -1,0 +1,73 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Subscription' /}
+#{script 'lookups.js', characterset:'utf-8' /}
+#{script 'lookuppaging.js' /}
+
+<style type="text/css">
+  .error { color:red; }
+</style>
+
+<div id="root">
+	<h3><a href="#">Search Transaction</a></h3>
+		<form id="searchForm" class="form">
+			<input id="param" name="params.param" type="hidden" value="${param}"/> 
+			#{hidden id:'query', name:'params.query', value:params?.query /} 
+			<p id="pTransactionDateFrom">
+				#{textBox id:'transactionDateFrom', name:'params.rgTradeSearchTransactionDateFrom', label:'Transaction Date', value:params?.rgTradeSearchTransactionDateFrom?.format(appProp.dateFormat), width:'85px', class:'calendar' /} (${appProp.displayDateFormat})
+				<span id="transactionDateFromError" class="error"></span><b>To</b>
+				#{textBox id:'transactionDateTo', name:'params.rgTradeSearchTransactionDateTo', value:params?.rgTradeSearchTransactionDateTo?.format(appProp.dateFormat), class:'calendar'  /} (${appProp.displayDateFormat})
+				<span id="transactionDateToError" class="error"></span>
+			</p>
+			<p>		
+				#{textBox id:'searchFundCode', name:'params.rgTradeSearchFundKey', label:'Fund Code', value:params?.rgTradeSearchFundKey, width:'120px', readOnly:readOnly, class:'capitalize' /}
+				#{button  id:'searchFundCodeHelp', value:'?', class:'small', readOnly:readOnly/}
+				#{textBox id:'searchFundCodeDesc', name:'sub.rgProduct.name', value:sub?.rgProduct?.name, readOnly:true, width:'340px' /}
+				<span id="errmsgSearchFundCode" class="error"></span>
+			</p>
+			<p>		
+				#{textBox id:'searchInvtAcct', name:'params.rgTradeSearchInvestorAcct', label:'Investor No', value:params?.rgTradeSearchInvestorAcct, width:'120px', readOnly:readOnly, class:'capitalize' /}
+				#{button  id:'searchInvtAcctHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'searchInvtAcctDesc', name:'sub.rgInvestmentaccount.name', value:sub?.rgInvestmentaccount?.name, readOnly:true, width:'340px' /}
+				<span class="error">#{error 'Investment Acct is' /}</span>
+			</p>
+			<p>
+				#{dropDownList id:'TransactionNoOperator', name:'params.TransactionNoOperator', label:'Transaction No', options:stringOperators, removeEmpty:'true', value:params?.TransactionNoOperator /}
+				#{textBox id:'transactionSearchNoOperator', name:'params.transactionSearchNoOperator', value:params?.transactionSearchNoOperator, class:'numericnosep' /}
+			</p>
+			<p>
+				<div class="buttons">
+					<input type="button" id="search" value="Show" />				
+					<input type="button" id="reset" value="Reset" />
+				</div>
+			</p>
+		</form>
+</div>
+<br />
+<div id="result" style="display:none">
+	<table id="tableSubscription" class="display">
+		<thead>
+			<tr>
+				<th width="90px" field="tradeDate|date|date|center|sort">Transaction Date</th>
+				<th width="90px" field="tradeKey|string|none|left|sort">Transaction No</th>
+				<th width="80px" field="rgProduct.productCode|string|none|left|sort">Fund Code</th>
+				<th width="80px" field="rgInvestmentaccount.accountNumber|string|none|left|sort">Account No</th>
+				<th width="80px" field="rgInvestmentaccount.name|string|none|left|sort">Account Name</th>
+				<th width="80px" field="netAmount|number|decimal4|right|sort">Net Amount</th>
+				<th width="80px" field="price|number|decimal4|right|nosort">Price</th>
+				<th width="80px" field="unit|number|decimal4|right|sort">Unit</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+</div>
+<div class="buttons">
+	<input type="button" id="newDataSubscription" value="New Data" />	
+</div>
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'RegistrySubscription/SubscriptionPaging.js' /}
+	$(document).ready(function() {
+		Paging($("#root").add("#result"));
+	});
+</script>

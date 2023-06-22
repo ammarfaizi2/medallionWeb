@@ -1,0 +1,81 @@
+<script type="text/javascript">
+$(document).ready(function(){
+	
+	// This is the hack for IE
+	if ($.browser.msie) {
+	  $('#notInList').click(function() {
+	    this.blur();
+	    this.focus();
+	  });
+	}
+
+ });
+ 
+function doView(data){
+	//location.href='@{view()}/'+data[0] + "#{if group}?group=${group}#{/}#{if param}&param=${param}#{/}";
+	location.href='@{view()}?id='+data[0]+'&param=${param}';
+}
+function doEdit(data) {
+	if ((data[5] == "New") || (data[5] == "Updated")) {
+		//view(data[0]);
+		//location.href='@{view()}/'+data[0] + "#{if group}?group=${group}#{/}#{if param}&param=${param}#{/}";
+		location.href='@{view()}?id='+data[0]+'&param=${param}';
+		return false;
+	} else {
+		//location.href='@{edit()}/'+data[0] + "#{if group}?group=${group}#{/}#{if param}&param=${param}#{/}";
+		location.href='@{edit()}?id='+data[0]+'&param=${param}';
+	}
+}
+
+</script>
+
+<h3>Search results</h3>
+
+#{if customers}
+<table id="grid" class="display">
+	<thead>
+		<tr>		
+			<th>Customer Key</th>
+			<th width="100px">Code</th>
+			<th width="250px">Name</th>
+			<th width="80px">Birth Date</th>
+			<th width="150px">Identification No</th>
+			<th width="80px">Status</th>
+			<th width="50px">Active</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:customers, as:'customer'}
+		<tr>
+			<td>
+				${customer.customerKey}
+			</td>
+			<td>
+				${customer.customerNo}
+			</td>
+			<td>
+				${customer.customerName}
+			</td>
+			<td>
+				${customer.birthDate?.format(appProp.dateFormat)}
+			</td>
+			<td>
+				${customer.identification1No}
+			</td>
+			<td>
+				${customer?.recordStatus?.decodeStatus()}
+			</td>
+			<td>
+				${(customer?.isActive) ? 'Yes' : 'No'}
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>
+
+		
+
+#{/if}
+#{else}
+<div>No record found</div>
+#{/else}

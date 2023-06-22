@@ -1,0 +1,128 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Registy Cancel Payment Approval' /}
+
+<script type="text/javascript">
+function doEdit(data) {
+	return false;
+}
+	$(function() {
+		$('#btnProcess').css('display', 'none');
+		$('#dlgBtnOk').css('display', 'none');
+		$('#dlgBtnCancel').css('display', 'none');
+		$('#btnNext').css('display', 'none');
+		
+		// DECLARE CLASS BTN
+		$(".btn").button();
+		$(".btn").css("width", "100px");
+		//===============
+			
+		// DECLARE SOME ID VARIABLE	
+		$('#approve').button();
+		$('#reject').button();
+		//===============
+		
+		//$('#approve').insertBefore('#close');
+		//$('#reject').insertBefore('#close');
+		
+		/* var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Processing...</div>').appendTo('body');
+		loading.dialog({
+			closeOnEscape: false,
+			draggable: false,
+			modal: true,
+			resizable: false,
+			open:function() {
+				$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+			} 
+		});
+		loading.dialog('close'); */
+		
+		var backToWorkList = function() {
+			loading.dialog('open');
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			};
+		}
+		
+		// ACTION BUTTON APPROVE 
+		$('#approve').click(function() {
+			var action = "@{approve()}?taskId=${taskId}&maintenanceLogKey=${maintenanceLogKey}&operation=${operation}";
+			loading.dialog('open');
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					//alert("Payment Id : '${pay?.paymentKey}' is Cancelled");
+					messageAlertOk("Payment ID '${pay?.paymentKey}' is Cancelled", "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+				} else {
+					if (data.code == "error.sentToFaInterface") {
+						//alert("Error when sent to FA Interface !");
+						messageAlertOk("Error when sent to FA Interface", "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+					} else {
+						//alert("Data Error");
+						messageAlertOk("Data Error", "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+					}
+				}
+			});			
+		}); 
+		//===============
+		
+		// ACTION BUTTON REJECT
+		$('#reject').click(function() {
+			var action = "@{reject()}?taskId=${taskId}&maintenanceLogKey=${maintenanceLogKey}&operation=${operation}";
+			loading.dialog('open');
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					//alert("Cancel Payment for Id '${pay?.paymentKey} is rejected");
+					messageAlertOk("Cancel Payment for ID '${pay?.paymentKey}' is Rejected", "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+				}else{
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+				}
+			});
+		}); 
+		//===============
+		
+		// ACTION BUTTON CLOSE
+		$('#closeWorkflow').click(function() {
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			}
+		});
+		//===============
+		
+		// HIDE ALL CLASS BUTTON
+//		$(".buttons").css("display","none");
+		//===============
+		
+		// HIDE DISPLAY INSIDE APPROVAL ACTIONS ID
+		$("#approval-actions").css("display","block");
+		//===============
+	});
+
+</script>
+
+<div id="detail">
+	<form id="registryCancelPaymentForm" class="form">
+		#{include 'RegistryCancelPayment/list_approval.html' /}
+	</form>
+</div>	
+
+<div id="approval-actions">
+	#{hidden id:'taskId', name:'taskId', value:taskId /}
+	#{hidden id:'maintenanceLogKey', name:'maintenanceLogKey', value:maintenanceLogKey /}
+	#{hidden id:'operation', name:'operation', value:operation /}
+	#{hidden id:'keyId', name:'keyId', value:keyId /}	
+	#{hidden id:'from', name:'from', value:from /}
+	#{hidden id:'digitAmount', name:'pay.rgProduct.amountRoundValue', value:pay?.rgProduct?.amountRoundValue /}
+	#{hidden id:'typeAmount', name:'pay.rgProduct.amountRoundType', value:pay?.rgProduct?.amountRoundType /}
+	
+	
+	<input type="button" id="approve" value="Approve" class="btn" />
+	<input type="button" id="reject" value="Reject" style="margin:5px;" class="btn"/>
+	<input type="button" id="closeWorkflow" value="Cancel" class="btn" />
+</div>

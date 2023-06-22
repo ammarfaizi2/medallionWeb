@@ -1,0 +1,95 @@
+#{extends 'templates/main.html' /}
+
+<script type="text/javascript">
+	$(function() {
+		// DECLARE CLASS BTN
+		$(".btn").button();
+		$(".btn").css("width", "100px");
+		//===============
+			
+		// DECLARE SOME ID VARIABLE	
+		$('#approve').button();
+		$('#reject').button();
+		//===============
+		
+		//$('#approve').insertBefore('#close');
+		//$('#reject').insertBefore('#close');
+		
+		var backToWorkList = function() {
+			loading.dialog('open');
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			};
+		}
+		
+		// ACTION BUTTON APPROVE 
+		$('#approve').click(function() {
+			var action = "@{approve()}?keyId=${transaction?.transactionKey}&taskId=${taskId}";
+			loading.dialog('open');
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					messageAlertOk("Settlement No : '${transaction?.settlementNumber}' is Cancelled", "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+				} else{
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+				}
+			});	
+		});
+		//===============
+		
+		// ACTION BUTTON REJECT
+		$('#reject').click(function() {
+			var action = "@{reject()}?keyId=${transaction?.transactionKey}&taskId=${taskId}";
+			loading.dialog('open');
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					messageAlertOk("Settlement No : '${transaction?.settlementNumber}' is Rejected", "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+				}else{
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+				}
+			});
+		});
+		//===============
+		
+		// ACTION BUTTON CLOSE
+		$('#closeWorkflow').click(function() {
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			}
+		});
+		//===============
+		
+		// HIDE ALL CLASS BUTTON
+		$(".buttons").css("display","none");
+		//===============
+		
+		// HIDE DISPLAY INSIDE APPROVAL ACTIONS ID
+		$("#approval-actions").css("display","block");
+		//===============
+	});
+
+</script>
+
+<div id="detail">
+	<h2>Cancel Transaction Settlement Approval</h2>
+	<form id="form" class="form">
+		#{include 'Transactions/detail.html' /}
+	</form>
+</div>	
+
+<div id="approval-actions">
+	#{hidden id:'taskId', name:'taskId', value:taskId /}
+	#{hidden id:'keyId', name:'keyId', value:keyId /}
+	#{hidden id:'from', name:'from', value:from /}	
+	
+	<input type="button" id="approve" value="Approve" class="btn" />
+	<input type="button" id="reject" value="Reject" style="margin:5px;" class="btn"/>
+	<input type="button" id="closeWorkflow" value="Cancel" class="btn" />
+</div>

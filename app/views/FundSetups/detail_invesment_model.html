@@ -1,0 +1,132 @@
+<script type="text/javascript">
+		
+	$(function(){
+		
+		$('.btn').button();
+		$('.btn').css('width', '100px');
+		
+		// HIDE BUTTON SAVE & CANCEL ON ANNOUNCEMENT DETAIL WHEN VIEW MODE
+		#{if mode == 'view' || confirming}
+			$('#addInvestmentModel').css("display","none");
+			$('#cancelInvestmentModel').css("display","none");
+		#{/if}
+		#{else}
+			$('#closeInvestmentModel').css("display","none");
+		#{/else}
+		
+		
+		$("#minimum").blur(function(){
+			var el = $(this);
+			el.removeClass('fieldError');
+			$("#maximum").removeClass('fieldError');
+			$("#errmsgMin").html("");
+			$("#errmsgCompare").html("");
+			var min= parseFloat($("#minimumStripped").val());
+			var max=  parseFloat($("#maximumStripped").val());
+			//$("#detailInvestmentModel #investmentModelForm #minimum").autoNumericSet( dataInvst.min, {aPad:true,mDec:2}).val();
+			
+			if ((min > max) && (max != "")) {
+				$("#maximum").addClass('fieldError');
+				$("#errmsgCompare").html("Maximum must be greater or equal Minimum !").show();
+			} 
+			
+		})
+		
+		$("#maximum").blur(function(){
+			var el = $(this);
+			el.removeClass('fieldError');
+			$("#errmsgMax").html("");
+			$("#errmsgCompare").html("");
+			var max=  parseFloat($("#maximumStripped").val());
+			var min=  parseFloat($("#minimumStripped").val());
+			
+			if ((max < min) && (min != "")) {
+				el.addClass('fieldError');
+				$("#errmsgCompare").html("Maximum must be greater or equal Minimum !").show();
+			} 
+		})
+		
+		// BUTTON CANCEL ACTION
+		$('#cancelInvestmentModel').click(function() {
+			$("#detailInvestmentModel").dialog('close');
+		});
+		
+		// BUTTON CLOSE ACTION
+		$('#closeInvestmentModel').click(function() {
+			$("#detailInvestmentModel").dialog('close');
+		});
+		
+		// SECURITY CLASS LOOKUP
+		$('#investmentModelForm #securityClassCode').lookup({
+			list:'@{Pick.lookups()}?group=SECURITY_CLASS',
+			get:{
+				url:'@{Pick.lookup()}?group=SECURITY_CLASS',
+				success: function(data) {
+				if (data) {
+						$('#investmentModelForm #securityClassCode').removeClass('fieldError');
+						$('#investmentModelForm #securityClass').val(data.code);
+						$('#investmentModelForm #securityClassDesc').val(data.description);
+						$('#investmentModelForm #h_securityClassDesc').val(data.description);
+					}	
+				},
+				error: function(data) {
+					$('#investmentModelForm #securityClassCode').addClass('fieldError');
+					$('#investmentModelForm #securityClassDesc').val('NOT FOUND');
+					$('#investmentModelForm #securityClassCode').val('');
+					$('#investmentModelForm #securityClass').val('');
+					$('#investmentModelForm #h_securityClassDesc').val('');
+				}
+			},
+			key:$('#investmentModelForm #securityClass'),
+			description:$('#investmentModelForm #securityClassDesc'),
+			help:$('#investmentModelForm #securityClassHelp'),
+			nextControl:$('#investmentModelForm #minimum')			
+		});
+		
+		$('#investmentModelForm #securityClassCode').change(function(){
+			if ($('#investmentModelForm #securityClassCode').val() == "") {
+				$('#investmentModelForm #securityClassCode').val("");
+				$('#investmentModelForm #securityClass').val("");
+				$('#investmentModelForm #securityClassDesc').val("");
+				$('#investmentModelForm #h_securityClassDesc').val("");
+			}
+		});
+		
+	});
+
+</script>
+<style type="text/css">
+  .errmsg { color:red; }
+</style>
+
+<form id="investmentModelForm" class="form">
+	#{hidden id:'investmentModelKey', name:'faInvestmentModel.investmentModelKey', value:faInvestmentModel?.investmentModelKey /}
+	#{hidden id:'fundKey', name:'faInvestmentModel.faMaster.fundKey', value:faInvestmentModel?.faMaster?.fundKey /}
+	#{hidden id:'rowPosition' /}
+	<div>
+		<span id="errmsgNull" class = "errmsg"></span><span id="errmsgExist" class = "errmsg"></span>
+		<p>
+			#{textBox id:'securityClassCode', name:'faInvestmentModel.securityClass.lookupCode', label:'Security Class', value:faInvestmentModel?.securityClass?.lookupCode, required:true, class:'capitalize', readOnly:readOnly, width:'100' /}
+			#{hidden id:'securityClass', name:'faInvestmentModel.securityClass.lookupId', value:faInvestmentModel?.securityClass?.lookupId /}
+			#{button id:'securityClassHelp', value:'?', class:'small', readOnly:readOnly  /}
+			#{textBox id:'securityClassDesc', name:'faInvestmentModel.securityClass.lookupDescription', value:faInvestmentModel?.securityClass?.lookupDescription, readOnly:true, width:'300px' /}
+		</p>		
+		<p>
+			#{textBox id:'minimum', name:'minimum', label:'Minimum', format:'###.####' ,value:faInvestmentModel?.min, required:true, readOnly:readOnly, width:'100', maxLength:4, class:'percent'/} %
+			#{hidden id:'minimumStripped', name:'faInvestmentModel.min', value:faInvestmentModel?.min /} 
+			&nbsp;<span id="errmsgMin" class = "errmsg"></span>
+		</p>
+		<p>
+			#{textBox id:'maximum', name:'maximum', label:'Maximum',format:'###.####' , value:faInvestmentModel?.max, required:true, readOnly:readOnly, width:'100', maxLength:4, class:'percent' /} %
+			#{hidden id:'maximumStripped', name:'faInvestmentModel.max', value:faInvestmentModel?.max /} 
+			&nbsp;<span id="errmsgMax" class = "errmsg"></span><span id="errmsgCompare" class = "errmsg"></span>
+		</p>
+		<br />
+		<p>
+			#{button id:'addInvestmentModel', value:'Save', class:'btn' /}
+			#{button id:'cancelInvestmentModel', value:'Cancel', class:'btn' /}
+			#{button id:'closeInvestmentModel', value:'Close', class:'btn' /}		
+		</p>
+	</div>
+</form>
+<input type="hidden" id="dummy" />

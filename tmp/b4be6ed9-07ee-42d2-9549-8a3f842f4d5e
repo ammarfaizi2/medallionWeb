@@ -1,0 +1,1625 @@
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.source"
+
+table(F_VW_TRX_PORTO('@CUSTOMER_NO','@OPERATOR1','@SECURITY_TYPE','@OPERATOR2','@SECURITY_ID','@OPERATOR3','@TYPE','@OPERATOR4','@STATUS','@OPERATOR5','@DATEFROM','@OPERATOR5','@DATETO','@OPERATOR7'))
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.profileKey"
+
+861
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.systemTemplete"
+
+0
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.archiveField"
+
+
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.archiveStatus"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[0].filterKey"
+
+1210
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[0].noSeq"
+
+0
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[0].fieldName"
+
+CUSTOMER_NO
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[0].dataType"
+
+STRING
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[0].defValue"
+
+ALL
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[0].defOperator.lookupId"
+
+OPERATOR_FILTER-EQ
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[0].lookupView"
+
+PICK_DWN_CUSTOMER
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[0].lookupDisplay"
+
+DISPLAY_TYPE-PICK
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[0].required"
+
+true
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[1].filterKey"
+
+1204
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[1].noSeq"
+
+1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[1].fieldName"
+
+SECURITY_TYPE
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[1].dataType"
+
+STRING
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[1].defValue"
+
+ALL
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[1].defOperator.lookupId"
+
+OPERATOR_FILTER-EQ
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[1].lookupView"
+
+PICK_DWN_SEC_TYPE_NON_DEPOSIT
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[1].lookupDisplay"
+
+DISPLAY_TYPE-PICK
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[1].required"
+
+true
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[2].filterKey"
+
+1205
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[2].noSeq"
+
+2
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[2].fieldName"
+
+SECURITY_ID
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[2].dataType"
+
+STRING
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[2].defValue"
+
+ALL
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[2].defOperator.lookupId"
+
+OPERATOR_FILTER-EQ
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[2].lookupView"
+
+PICK_DWN_SEC_NON_DEPOSIT
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[2].lookupDisplay"
+
+DISPLAY_TYPE-PICK
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[2].required"
+
+true
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[3].filterKey"
+
+1206
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[3].noSeq"
+
+3
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[3].fieldName"
+
+TYPE
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[3].dataType"
+
+STRING
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[3].defValue"
+
+2
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[3].defOperator.lookupId"
+
+OPERATOR_FILTER-EQ
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[3].lookupView"
+
+PICK_DWN_TYPE_TRANSACTION
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[3].lookupDisplay"
+
+DISPLAY_TYPE-SELECT
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[3].required"
+
+true
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[4].filterKey"
+
+1207
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[4].noSeq"
+
+4
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[4].fieldName"
+
+STATUS
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[4].dataType"
+
+STRING
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[4].defValue"
+
+A,S
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[4].defOperator.lookupId"
+
+OPERATOR_FILTER-INN
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[4].lookupView"
+
+
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[4].lookupDisplay"
+
+DISPLAY_TYPE-HIDDEN
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[4].required"
+
+true
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[5].filterKey"
+
+1208
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[5].noSeq"
+
+5
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[5].fieldName"
+
+DATE_FROM
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[5].dataType"
+
+DATE
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[5].defValue"
+
+
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[5].defOperator.lookupId"
+
+OPERATOR_FILTER-GTE
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[5].lookupView"
+
+
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[5].lookupDisplay"
+
+DISPLAY_TYPE-DATE
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[5].required"
+
+true
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[6].filterKey"
+
+1209
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[6].noSeq"
+
+6
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[6].fieldName"
+
+DATE_TO
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[6].dataType"
+
+DATE
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[6].defValue"
+
+
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[6].defOperator.lookupId"
+
+OPERATOR_FILTER-LTE
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[6].lookupView"
+
+
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[6].lookupDisplay"
+
+DISPLAY_TYPE-DATE
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.filters[6].required"
+
+true
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.name"
+
+AML_TRANSACTIONLIST
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.description"
+
+AML TRANSACTION LIST
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.templete"
+
+668
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.process"
+
+Download
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.actionType"
+
+Download
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.includeHeader"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.separator.lookupId"
+
+FILE_SEPARATOR-COMMA
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.fileType"
+
+csv
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profile.status"
+
+true
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[0].profileDetailKey"
+
+47332
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[0].systemField"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[0].noSeq"
+
+0
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[0].defaultValue"
+
+
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[0].targetField"
+
+TRANSACTIONID
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[0].sourceField"
+
+TRANSACTION_NUMBER
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[0].dataType.lookupId"
+
+DATA_TYPE-STR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[0].dataType.lookupDescription"
+
+CHAR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[0].formatType.lookupId"
+
+FORMAT_TYPE-STR-1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[0].formatType.lookupDescription"
+
+N/A
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[0].mandatory"
+
+1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[0].length"
+
+50
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[0].mappingRequired"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[1].profileDetailKey"
+
+47333
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[1].systemField"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[1].noSeq"
+
+1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[1].defaultValue"
+
+
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[1].targetField"
+
+REFERENCENO
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[1].sourceField"
+
+TRANSACTION_NUMBER
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[1].dataType.lookupId"
+
+DATA_TYPE-STR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[1].dataType.lookupDescription"
+
+CHAR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[1].formatType.lookupId"
+
+FORMAT_TYPE-STR-1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[1].formatType.lookupDescription"
+
+N/A
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[1].mandatory"
+
+1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[1].length"
+
+50
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[1].mappingRequired"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[2].profileDetailKey"
+
+47334
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[2].systemField"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[2].noSeq"
+
+2
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[2].defaultValue"
+
+
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[2].targetField"
+
+TRANSACTIONTYPE
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[2].sourceField"
+
+TRANSACTION_CODE
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[2].dataType.lookupId"
+
+DATA_TYPE-STR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[2].dataType.lookupDescription"
+
+CHAR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[2].formatType.lookupId"
+
+FORMAT_TYPE-STR-1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[2].formatType.lookupDescription"
+
+N/A
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[2].mandatory"
+
+1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[2].length"
+
+100
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[2].mappingRequired"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[3].profileDetailKey"
+
+47335
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[3].systemField"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[3].noSeq"
+
+3
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[3].defaultValue"
+
+
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[3].targetField"
+
+AMOUNT
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[3].sourceField"
+
+SETTLEMENT_AMOUNT
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[3].dataType.lookupId"
+
+DATA_TYPE-NUM
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[3].dataType.lookupDescription"
+
+NUMBER
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[3].formatType.lookupId"
+
+FORMAT_TYPE-NUM-0
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[3].formatType.lookupDescription"
+
+###0
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[3].mandatory"
+
+1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[3].length"
+
+50
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[3].mappingRequired"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[4].profileDetailKey"
+
+47336
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[4].systemField"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[4].noSeq"
+
+4
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[4].defaultValue"
+
+
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[4].targetField"
+
+ACCOUNT_NO
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[4].sourceField"
+
+ACCOUNT_NO
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[4].dataType.lookupId"
+
+DATA_TYPE-STR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[4].dataType.lookupDescription"
+
+CHAR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[4].formatType.lookupId"
+
+FORMAT_TYPE-STR-1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[4].formatType.lookupDescription"
+
+N/A
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[4].mandatory"
+
+1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[4].length"
+
+50
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[4].mappingRequired"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[5].profileDetailKey"
+
+47337
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[5].systemField"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[5].noSeq"
+
+5
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[5].defaultValue"
+
+
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[5].targetField"
+
+TRANSACTION_DATE
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[5].sourceField"
+
+TRANSACTION_DATE
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[5].dataType.lookupId"
+
+DATA_TYPE-DAT
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[5].dataType.lookupDescription"
+
+DATE
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[5].formatType.lookupId"
+
+FORMAT_TYPE-DAT-1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[5].formatType.lookupDescription"
+
+YYYYMMDD
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[5].mandatory"
+
+1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[5].length"
+
+8
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[5].mappingRequired"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[6].profileDetailKey"
+
+47338
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[6].systemField"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[6].noSeq"
+
+6
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[6].defaultValue"
+
+
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[6].targetField"
+
+TRANSACTION_TIME
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[6].sourceField"
+
+RESERVED
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[6].dataType.lookupId"
+
+DATA_TYPE-STR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[6].dataType.lookupDescription"
+
+CHAR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[6].formatType.lookupId"
+
+FORMAT_TYPE-STR-1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[6].formatType.lookupDescription"
+
+N/A
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[6].mandatory"
+
+0
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[6].length"
+
+8
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[6].mappingRequired"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[7].profileDetailKey"
+
+47339
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[7].systemField"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[7].noSeq"
+
+7
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[7].defaultValue"
+
+
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[7].targetField"
+
+DEBITKREDIT
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[7].sourceField"
+
+CUSTODY_TRANSACTION_CODE
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[7].dataType.lookupId"
+
+DATA_TYPE-STR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[7].dataType.lookupDescription"
+
+CHAR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[7].formatType.lookupId"
+
+FORMAT_TYPE-STR-1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[7].formatType.lookupDescription"
+
+N/A
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[7].mandatory"
+
+1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[7].length"
+
+50
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="mappingCode[0].mappingKey"
+
+36466
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="mappingCode[0].fromCode"
+
+DFOP
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="mappingCode[0].toCode"
+
+1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="mappingCode[0].profileDetail.noSeq"
+
+7
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="mappingCode[0].profileDetail.profileDetailKey"
+
+47339
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="mappingCode[1].mappingKey"
+
+36465
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="mappingCode[1].fromCode"
+
+RFOP
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="mappingCode[1].toCode"
+
+0
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="mappingCode[1].profileDetail.noSeq"
+
+7
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="mappingCode[1].profileDetail.profileDetailKey"
+
+47339
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="mappingCode[2].mappingKey"
+
+36463
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="mappingCode[2].fromCode"
+
+RVP
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="mappingCode[2].toCode"
+
+0
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="mappingCode[2].profileDetail.noSeq"
+
+7
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="mappingCode[2].profileDetail.profileDetailKey"
+
+47339
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="mappingCode[3].mappingKey"
+
+36464
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="mappingCode[3].fromCode"
+
+DVP
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="mappingCode[3].toCode"
+
+1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="mappingCode[3].profileDetail.noSeq"
+
+7
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="mappingCode[3].profileDetail.profileDetailKey"
+
+47339
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[7].mappingRequired"
+
+true
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[8].profileDetailKey"
+
+47340
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[8].systemField"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[8].noSeq"
+
+8
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[8].defaultValue"
+
+B158
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[8].targetField"
+
+BRANCHCODE
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[8].sourceField"
+
+RESERVED
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[8].dataType.lookupId"
+
+DATA_TYPE-STR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[8].dataType.lookupDescription"
+
+CHAR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[8].formatType.lookupId"
+
+FORMAT_TYPE-STR-1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[8].formatType.lookupDescription"
+
+N/A
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[8].mandatory"
+
+0
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[8].length"
+
+8
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="mappingCode[4].fromCode"
+
+1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="mappingCode[4].toCode"
+
+1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="mappingCode[4].profileDetail.noSeq"
+
+8
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="mappingCode[4].profileDetail.profileDetailKey"
+
+47340
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[8].mappingRequired"
+
+true
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[9].profileDetailKey"
+
+47341
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[9].systemField"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[9].noSeq"
+
+9
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[9].defaultValue"
+
+
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[9].targetField"
+
+KETERANGAN
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[9].sourceField"
+
+REMARKS
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[9].dataType.lookupId"
+
+DATA_TYPE-STR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[9].dataType.lookupDescription"
+
+CHAR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[9].formatType.lookupId"
+
+FORMAT_TYPE-STR-1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[9].formatType.lookupDescription"
+
+N/A
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[9].mandatory"
+
+0
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[9].length"
+
+200
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[9].mappingRequired"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[10].profileDetailKey"
+
+47342
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[10].systemField"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[10].noSeq"
+
+10
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[10].defaultValue"
+
+
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[10].targetField"
+
+CURRENCYCODE
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[10].sourceField"
+
+CURRENCY_CODE
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[10].dataType.lookupId"
+
+DATA_TYPE-STR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[10].dataType.lookupDescription"
+
+CHAR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[10].formatType.lookupId"
+
+FORMAT_TYPE-STR-1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[10].formatType.lookupDescription"
+
+N/A
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[10].mandatory"
+
+0
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[10].length"
+
+3
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[10].mappingRequired"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[11].profileDetailKey"
+
+47343
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[11].systemField"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[11].noSeq"
+
+11
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[11].defaultValue"
+
+
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[11].targetField"
+
+ORIAMOUNT
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[11].sourceField"
+
+SETTLEMENT_AMOUNT
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[11].dataType.lookupId"
+
+DATA_TYPE-NUM
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[11].dataType.lookupDescription"
+
+NUMBER
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[11].formatType.lookupId"
+
+FORMAT_TYPE-NUM-1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[11].formatType.lookupDescription"
+
+###0.0
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[11].mandatory"
+
+1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[11].length"
+
+50
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[11].mappingRequired"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[12].profileDetailKey"
+
+47344
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[12].systemField"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[12].noSeq"
+
+12
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[12].defaultValue"
+
+INDONESIA
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[12].targetField"
+
+COUNTRY
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[12].sourceField"
+
+RESERVED
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[12].dataType.lookupId"
+
+DATA_TYPE-STR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[12].dataType.lookupDescription"
+
+CHAR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[12].formatType.lookupId"
+
+FORMAT_TYPE-STR-1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[12].formatType.lookupDescription"
+
+N/A
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[12].mandatory"
+
+0
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[12].length"
+
+50
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="mappingCode[5].mappingKey"
+
+36467
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="mappingCode[5].fromCode"
+
+1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="mappingCode[5].toCode"
+
+1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="mappingCode[5].profileDetail.noSeq"
+
+12
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="mappingCode[5].profileDetail.profileDetailKey"
+
+47344
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[12].mappingRequired"
+
+true
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[13].profileDetailKey"
+
+47345
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[13].systemField"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[13].noSeq"
+
+13
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[13].defaultValue"
+
+
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[13].targetField"
+
+TELLERID
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[13].sourceField"
+
+RESERVED
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[13].dataType.lookupId"
+
+DATA_TYPE-STR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[13].dataType.lookupDescription"
+
+CHAR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[13].formatType.lookupId"
+
+FORMAT_TYPE-STR-1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[13].formatType.lookupDescription"
+
+N/A
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[13].mandatory"
+
+0
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[13].length"
+
+50
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[13].mappingRequired"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[14].profileDetailKey"
+
+47346
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[14].systemField"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[14].noSeq"
+
+14
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[14].defaultValue"
+
+
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[14].targetField"
+
+CHANNELID
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[14].sourceField"
+
+RESERVED
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[14].dataType.lookupId"
+
+DATA_TYPE-STR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[14].dataType.lookupDescription"
+
+CHAR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[14].formatType.lookupId"
+
+FORMAT_TYPE-STR-1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[14].formatType.lookupDescription"
+
+N/A
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[14].mandatory"
+
+0
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[14].length"
+
+50
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[14].mappingRequired"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[15].profileDetailKey"
+
+47347
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[15].systemField"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[15].noSeq"
+
+15
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[15].defaultValue"
+
+
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[15].targetField"
+
+OTORIZATOR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[15].sourceField"
+
+APPROVED_BY
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[15].dataType.lookupId"
+
+DATA_TYPE-STR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[15].dataType.lookupDescription"
+
+CHAR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[15].formatType.lookupId"
+
+FORMAT_TYPE-STR-1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[15].formatType.lookupDescription"
+
+N/A
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[15].mandatory"
+
+0
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[15].length"
+
+50
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[15].mappingRequired"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[16].profileDetailKey"
+
+47348
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[16].systemField"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[16].noSeq"
+
+16
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[16].defaultValue"
+
+
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[16].targetField"
+
+LATE_DEPOSIT
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[16].sourceField"
+
+RESERVED
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[16].dataType.lookupId"
+
+DATA_TYPE-STR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[16].dataType.lookupDescription"
+
+CHAR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[16].formatType.lookupId"
+
+FORMAT_TYPE-STR-1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[16].formatType.lookupDescription"
+
+N/A
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[16].mandatory"
+
+0
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[16].length"
+
+50
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[16].mappingRequired"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[17].profileDetailKey"
+
+47349
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[17].systemField"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[17].noSeq"
+
+17
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[17].defaultValue"
+
+
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[17].targetField"
+
+POSTING DATE
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[17].sourceField"
+
+RESERVED
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[17].dataType.lookupId"
+
+DATA_TYPE-STR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[17].dataType.lookupDescription"
+
+CHAR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[17].formatType.lookupId"
+
+FORMAT_TYPE-STR-1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[17].formatType.lookupDescription"
+
+N/A
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[17].mandatory"
+
+0
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[17].length"
+
+50
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[17].mappingRequired"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[18].profileDetailKey"
+
+47350
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[18].systemField"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[18].noSeq"
+
+18
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[18].defaultValue"
+
+
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[18].targetField"
+
+FUND TYPE
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[18].sourceField"
+
+SECURITY_TYPE
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[18].dataType.lookupId"
+
+DATA_TYPE-STR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[18].dataType.lookupDescription"
+
+CHAR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[18].formatType.lookupId"
+
+FORMAT_TYPE-STR-1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[18].formatType.lookupDescription"
+
+N/A
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[18].mandatory"
+
+0
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[18].length"
+
+5
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[18].mappingRequired"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[19].profileDetailKey"
+
+47351
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[19].systemField"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[19].noSeq"
+
+19
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[19].defaultValue"
+
+
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[19].targetField"
+
+TRANSACTION LOCATION
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[19].sourceField"
+
+RESERVED
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[19].dataType.lookupId"
+
+DATA_TYPE-STR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[19].dataType.lookupDescription"
+
+CHAR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[19].formatType.lookupId"
+
+FORMAT_TYPE-STR-1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[19].formatType.lookupDescription"
+
+N/A
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[19].mandatory"
+
+0
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[19].length"
+
+50
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[19].mappingRequired"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[20].profileDetailKey"
+
+47352
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[20].systemField"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[20].noSeq"
+
+20
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[20].defaultValue"
+
+
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[20].targetField"
+
+SETTLEMENTDATE
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[20].sourceField"
+
+SETTLED_DATE
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[20].dataType.lookupId"
+
+DATA_TYPE-DAT
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[20].dataType.lookupDescription"
+
+DATE
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[20].formatType.lookupId"
+
+FORMAT_TYPE-DAT-1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[20].formatType.lookupDescription"
+
+YYYYMMDD
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[20].mandatory"
+
+1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[20].length"
+
+8
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[20].mappingRequired"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[21].profileDetailKey"
+
+47353
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[21].systemField"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[21].noSeq"
+
+21
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[21].defaultValue"
+
+
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[21].targetField"
+
+SETTLEMENTTIME
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[21].sourceField"
+
+SETTLEMENT_TIME
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[21].dataType.lookupId"
+
+DATA_TYPE-NUM
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[21].dataType.lookupDescription"
+
+NUMBER
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[21].formatType.lookupId"
+
+FORMAT_TYPE-NUM-1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[21].formatType.lookupDescription"
+
+###0.0
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[21].mandatory"
+
+1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[21].length"
+
+8
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[21].mappingRequired"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[22].profileDetailKey"
+
+47354
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[22].systemField"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[22].noSeq"
+
+22
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[22].defaultValue"
+
+
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[22].targetField"
+
+INSTRUMENT CODE
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[22].sourceField"
+
+SECURITY_ID
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[22].dataType.lookupId"
+
+DATA_TYPE-STR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[22].dataType.lookupDescription"
+
+CHAR
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[22].formatType.lookupId"
+
+FORMAT_TYPE-STR-1
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[22].formatType.lookupDescription"
+
+N/A
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[22].mandatory"
+
+0
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[22].length"
+
+50
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="pdetails[22].mappingRequired"
+
+false
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ
+Content-Disposition: form-data; name="profileDetailTable_length"
+
+10
+------WebKitFormBoundaryLERSsJPAcbOKZcnQ--

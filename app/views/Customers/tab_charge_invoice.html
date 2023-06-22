@@ -1,0 +1,283 @@
+<script type="text/javascript">
+$(function(){
+	if ('${mode}'=='entry'){
+		$('#flagChangeBankAccount').disabled();
+	}
+	
+	if (!$('#flagChangeBankAccount').is(':checked')){
+		$('#bankAccountInvoice').disabled();
+		$('#bankAccountInvoiceHelp').disabled();
+		$('p[id="pBankAccInvoice"] label span').html('');
+		/* $('#currencyInvoice').disabled();
+		$('#currencyInvoiceHelp').disabled(); */
+	}
+	
+	$('#flagChangeBankAccount').change(function(){
+		if (!$('#flagChangeBankAccount').is(':checked')){
+			$('#bankAccountInvoice').val($('#oriBankAccountInvoice').val());
+			$('#bankAccountInvoiceKey').val($('#oriBankAccountInvoiceKey').val());
+			$('#bankAccountInvoiceDesc').val($('#oriBankAccountInvoiceDesc').val());
+			$('#currencyInvoice').val($('#oriCurrencyInvoice').val());
+			$('#currencyInvoiceId').val($('#oriCurrencyInvoice').val());
+			$('#currencyInvoiceDesc').val($('#oriCurrencyInvoiceDesc').val());
+			
+			$('#bankAccountInvoice').disabled();
+			$('#bankAccountInvoiceHelp').disabled();
+			$('#bankAccountInvoice').removeClass('fieldError');
+			$('#currInvoiceError').html('');
+			$('p[id="pBankAccInvoice"] label span').html('');
+			/* $('#currencyInvoice').disabled();
+			$('#currencyInvoiceHelp').disabled(); */
+		} else {
+			$('#bankAccountInvoice').enabled();
+			$('#bankAccountInvoiceHelp').enabled();
+			$('p[id="pBankAccInvoice"] label span').html(' *');
+			/* $('#currencyInvoice').enabled();
+			$('#currencyInvoiceHelp').enabled(); */
+		}	
+	});
+	
+	
+	$('#bankAccountInvoice').change(function(){
+		if ($(this).val()==''){
+			$('#bankAccountInvoiceKey').val('');
+			$('#bankAccountInvoiceDesc').val('');
+			$('#bankAccountInvoiceHide').val('');
+			$('#h_bankAccountInvoice').val('');
+			$('#h_bankAccountInvoiceDesc').val('');
+			$('#currencyInvoice').val('');
+			$('#h_currencyInvoice').val('');
+			$('#currencyInvoiceId').val('');
+			$('#currencyInvoiceDesc').val('');
+			$('#h_currencyInvoiceDesc').val('');
+		}
+	});
+	
+	$('#bankAccountInvoice').lookup({
+		list:'@{Pick.bankAccounts()}?by=customer&domain=CUSTOMER',
+		get:{
+			url:'@{Pick.bankAccountForSettlementAccountPick()}?domain=CUSTOMER',
+			success: function(data) {
+				$('#bankAccountInvoice').removeClass('fieldError');
+				$('#bankAccountInvoice').val(data.bankAccountNo);
+				$('#bankAccountInvoiceKey').val(data.code);
+				$('#bankAccountInvoiceHide').val(data.bankAccountNo);
+				$('#bankAccountInvoiceDesc').val(data.description);
+				$('#h_bankAccountInvoiceDesc').val(data.description);
+				$('#currencyInvoice').val(data.currency.currencyCode);
+				$('#currencyInvoiceId').val(data.currency.currencyCode);
+				$('#currencyInvoiceDesc').val(data.currency.description);
+				$('#h_currencyInvoiceDesc').val(data.currency.description);
+				if (data.currency.currencyCode != $('#currencyCode').val()){
+					$('#currInvoiceError').html('Bank Account for invoicing should be in '+$('#currencyCode').val());
+					return false;
+				} else {
+					$('#currInvoiceError').html('');
+					
+				}
+			},
+			error: function() {
+				$('#bankAccountInvoice').addClass('fieldError');
+				$('#bankAccountInvoiceKey').val('');
+				$('#bankAccountInvoice').val('');
+				$('#bankAccountInvoiceDesc').val('NOT FOUND');
+				$('#h_bankAccountInvoiceDesc').val('');
+			}	
+		},
+		filter: $('#customerKey'),	
+		help:$('#bankAccountInvoiceHelp')
+	});
+	
+	$('#currencyInvoice').lookup({
+		list:'@{Pick.currencies()}',
+		get:{
+			url:'@{Pick.currency()}',
+			success: function(data) {
+				if (data.code != $('#currencyCode').val()){
+					$('#currencyInvoice').addClass('fieldError');
+					$('#currInvoiceError').html('Bank Account for invoicing should be in '+$('#currencyCode').val());
+					return false;
+				} else {
+					$('#currencyInvoice').removeClass('fieldError');
+					$('#currInvoiceError').html('');
+				}
+				$('#currencyInvoice').removeClass('fieldError');
+				$('#currencyInvoiceId').val(data.code);
+				$('#currencyInvoiceDesc').val(data.description);
+				$('#h_currencyInvoiceDesc').val(data.description);
+				
+			},
+			error: function(data) {
+				$('#currencyInvoice').addClass('fieldError');
+				$('#currencyInvoiceDesc').val('NOT FOUND');
+				$('#currencyInvoice').val('');
+				$('#h_currencyInvoiceDesc').val('');
+				
+			}
+		},
+		description:$('#currencyInvoiceDesc'),
+		help:$('#currencyInvoiceHelp')
+	});
+	
+	
+	var exchangeRateRef = 'EXCHANGE_RATE_REF';
+	$('#exchangeRateRefCode').change(function(){
+		if ($('#exchangeRateRefCode').val() === ""){
+			$('#exchangeRateRef').val("");
+			$('#exchangeRateRefDesc').val("");
+			$('#h_exchangeRateRefDesc').val("");
+		}
+	});
+	
+	$('#exchangeRateRefCode').lookup({
+		list:'@{Pick.lookups()}?group='+exchangeRateRef,
+		get:{
+			url:'@{Pick.lookup()}?group='+exchangeRateRef,
+			success: function(data) {
+				if (data) {
+					/* console.log("data = "+data);
+					console.log("data.code = "+data.code);
+					console.log("data.lookupCode = "+data.lookupCode);
+					console.log("data.lookupDescription = "+data.lookupDescription); */
+					$('#exchangeRateRefCode').removeClass('fieldError');
+					$('#exchangeRateRefCode').val(data.lookupCode);
+					$('#exchangeRateRef').val(data.lookupCode);
+					$('#exchangeRateRefDesc').val(data.description);
+					$('#h_exchangeRateRefDesc').val(data.description);
+				}
+			},
+			error : function(data) {
+				$('#exchangeRateRefCode').addClass('fieldError');
+				$('#exchangeRateRefDesc').val('NOT FOUND');
+				$('#exchangeRateRefCode').val('');
+				$('#exchangeRateRef').val('');
+				$('#h_exchangeRateRefDesc').val('');
+			}
+		},
+		key:$('#exchangeRateRef'),
+		description:$('#exchangeRateRefDesc'),
+		help:$('#exchangeRateRefHelp')
+	});
+	
+	if($("#exchangeRateRefCode").val()==''){
+		$("#exchangeRateRefCode").val('${custExchangeRate}').change().blur();
+	}else{
+		$("#exchangeRateRefCode").change().blur();
+	}
+	
+	var paymentMethod = 'PAYMENT_METHOD';
+	$('#paymentMethodCode').change(function(){
+		if ($('#paymentMethodCode').val() === ""){
+			$('#paymentMethod').val("");
+			$('#paymentMethodDesc').val("");
+			$('#h_paymentMethodDesc').val("");
+		}
+	});
+	
+	$('#paymentMethodCode').lookup({
+		list:'@{Pick.lookups()}?group='+paymentMethod,
+		get:{
+			url:'@{Pick.lookup()}?group='+paymentMethod,
+			success: function(data) {
+				if (data) {
+					/* console.log("data = "+data);
+					console.log("data.code = "+data.code);
+					console.log("data.lookupCode = "+data.lookupCode);
+					console.log("data.lookupDescription = "+data.lookupDescription); */
+					$('#paymentMethodCode').removeClass('fieldError');
+					$('#paymentMethodCode').val(data.lookupCode);
+					$('#paymentMethod').val(data.lookupCode);
+					$('#paymentMethodDesc').val(data.description);
+					$('#h_paymentMethodDesc').val(data.description);
+				}
+			},
+			error : function(data) {
+				$('#paymentMethodCode').addClass('fieldError');
+				$('#paymentMethodDesc').val('NOT FOUND');
+				$('#paymentMethodCode').val('');
+				$('#paymentMethod').val('');
+				$('#h_paymentMethodDesc').val('');
+			}
+		},
+		key:$('#paymentMethod'),
+		description:$('#paymentMethodDesc'),
+		help:$('#paymentMethodHelp')
+	});
+	
+	if($("#paymentMethodCode").val()==''){
+		$("#paymentMethodCode").val('${custExchangeRate}').change().blur();
+	}else{
+		$("#paymentMethodCode").change().blur();
+	}
+});
+</script>
+<p>
+	#{checkBox id:'flagChangeBankAccount', name:'customer.flagChangeBankAccount', value:customer?.flagChangeBankAccount , readOnly:readOnly/}
+	<label>Change</label>
+</p>
+<p id="pBankAccInvoice">
+	#{hidden id:'oriBankAccountInvoice', name:'customer.oriBankAccountInvoice.accountNo', value:customer?.oriBankAccountInvoice?.accountNo /}
+	#{hidden id:'oriBankAccountInvoiceKey', name:'customer.oriBankAccountInvoice.bankAccountKey', value:customer?.oriBankAccountInvoice?.bankAccountKey /}
+	#{hidden id:'oriBankAccountInvoiceDesc', name:'customer.oriBankAccountInvoice.name', value:customer?.oriBankAccountInvoice?.name /}
+	
+	#{textBox id:'bankAccountInvoice', name:'accountNo', label:'Bank Account', value:customer?.bankAccountInvoice?.accountNo, class:'capitalize', required:true, readOnly:readOnly, width:'80px' /}
+	#{hidden id:'bankAccountInvoiceHide', name:'customer.bankAccountInvoice.accountNo', value:customer?.bankAccountInvoice?.accountNo /}
+	#{hidden id:'bankAccountInvoiceKey', name:'customer.bankAccountInvoice.bankAccountKey', value:customer?.bankAccountInvoice?.bankAccountKey /}
+	#{button id:'bankAccountInvoiceHelp', value:'?', class:'small', readOnly:readOnly /}	
+	#{textBox id:'bankAccountInvoiceDesc', name:'customer.bankAccountInvoice.name', value:customer?.bankAccountInvoice?.name, readOnly:true, width:'216px' /}
+	<span class="error">#{error 'Bank Account in tab Charge Invoice is' /}</span>
+</p>
+<p>
+	#{hidden id:'oriCurrencyInvoice', name:'customer.oriBankAccountInvoice.currency.currencyCode', value:customer?.oriBankAccountInvoice?.currency?.currencyCode /}
+	#{hidden id:'oriCurrencyInvoiceDesc', name:'customer.oriBankAccountInvoice.currency.description', value:customer?.oriBankAccountInvoice?.currency?.description /}
+
+	#{textBox id:'currencyInvoice', name:'currencyCode', label:'Currency', value:customer?.bankAccountInvoice?.currency?.currencyCode, class:'capitalize', required:false, readOnly:true, width:'80px' /}
+	#{hidden id:'currencyInvoiceId', name:'customer.bankAccountInvoice.currency.currencyCode', value:customer?.bankAccountInvoice?.currency?.currencyCode /}
+	#{button id:'currencyInvoiceHelp', value:'?', class:'small', readOnly:true /}	
+	#{textBox id:'currencyInvoiceDesc', name:'customer.bankAccountInvoice.currency.description', value:customer?.bankAccountInvoice?.currency?.description, readOnly:true, width:'216px' /}
+	<span class="error" id="currInvoiceError"></span>
+</p>
+<br />
+<div style="overflow-y:scroll;height:130px">
+<table id="gridChargeInvoice" class="display">
+	<thead>
+		<tr>
+			<th width="150px">Charge Group</th>
+			<!-- <th width="100px">Tax</th> -->
+			<th width="100px">Min Charge</th>
+			<th width="100px">Max Charge</th>
+			<th width="80px">Action</th>
+		</tr>
+	</thead>
+	<tbody>
+	 	#{list customer?.customerCharges, as:'customerCharge'}
+		<tr>			
+			<td>${customerCharge?.invoiceCharge?.lookupDescription}</td>
+			<!-- <td>${customerCharge?.taxMaster?.taxCode}</td> -->
+			<td>${customerCharge?.minimumValue}</td>
+			<td>
+				#{if customerCharge?.maximumValue}
+					${customerCharge?.maximumValue}
+				#{/if}
+				#{else}
+					*MAX
+				#{/else}
+			</td>
+			<td>
+				#{hidden id:'customerChargeKeyX', name:'customerCharges[' + (customerCharge_index-1) + '].customerChargeKey', value:customerCharge?.customerChargeKey /}
+				#{hidden id:'customerKeyX', name:'customerCharges[' + (customerCharge_index-1) + '].customer.customerKey', value:customerCharge?.customer?.customerKey /}
+				#{hidden id:'chargeGroupX', name:'customerCharges[' + (customerCharge_index-1) + '].invoiceCharge.lookupId', value:customerCharge?.invoiceCharge?.lookupId /}
+				#{hidden id:'chargeGroupDescX', name:'customerCharges[' + (customerCharge_index-1) + '].invoiceCharge.lookupDescription', value:customerCharge?.invoiceCharge?.lookupDescription /}
+				#{hidden id:'minChargeX', name:'customerCharges[' + (customerCharge_index-1) + '].minimumValue', value:customerCharge?.minimumValue /}
+				#{hidden id:'maxChargeX', name:'customerCharges[' + (customerCharge_index-1) + '].maximumValue', value:customerCharge?.maximumValue /}
+				#{hidden id:'taxCode', name:'customerCharges[' + (customerCharge_index-1) + '].taxMaster.taxCode', value:customerCharge?.taxMaster?.taxCode /}
+				<!-- #{hidden id:'taxKey', name:'customerCharges[' + (customerCharge_index-1) + '].taxMaster.taxKey', value:customerCharge?.taxMaster?.taxKey /} -->
+				#{hidden id:'taxName', name:'customerCharges[' + (customerCharge_index-1) + '].taxMaster.description', value:customerCharge?.taxMaster?.description /}
+				<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} /></center>
+			</td>
+		</tr>
+		#{/list}
+	</tbody>
+</table>
+</div>
+

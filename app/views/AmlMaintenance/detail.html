@@ -1,0 +1,119 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: ' ' /}
+#{set id:amlCustomer?.amlKey /}
+#{set mode: mode /}
+#{set readOnly:(((mode!='edit') && (mode!='entry') && (param!='edit'))||(confirming) || ((mode == 'view') && (param=='edit'))) || ((isInterfaceDone) && (param!='edit')) || ((mode=='edit') && (param=='entry') && isReadOnly) /}
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+
+
+#{script 'external/Util.js' /}
+#{if flash.error || errors}
+    <div class="error">
+    	<b>Error when saving data!</b><br/><br/>
+    	#{if flash.error}
+<li>${flash.error}</li>
+		#{/if}
+		#{ifErrors}
+			#{errors}
+<li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}
+<script type="text/javascript">	
+	$(function() {
+		#{include 'RegistrySubscription/Util.js' /}
+		#{include 'AmlMaintenance/addressPick.js' /} 
+		#{include 'AmlMaintenance/contact.js' /} 
+		#{include 'AmlMaintenance/amlCustomer.js' /} 
+	});
+	
+</script>
+
+<style type="text/css">
+  .errorMessage { color:red; }
+</style>
+
+<form id="customerForm" class="form" accept-charset="utf-8" encType="multipart/form-data" method="POST">
+	#{hidden id:'param', name:'param', value:param /}
+	#{hidden id:'status', name:'status', value:status /}
+	#{hidden id:'currentDate', name:'currentDate', value:currentDate, class:'calendar' /}
+	#{hidden id:'dummy' /}
+	#{hidden id:'amlKey', value:amlCustomer.amlKey /}
+	#{hidden id:'custRetailFlagHidden', value:amlCustomer.custRetailFlag /}
+	#{hidden id:'amlStatus', value:amlCustomer?.amlStatus /}
+	#{hidden id:'apiStatus', value:amlCustomer?.apiStatus?.lookupId /}
+	#{hidden id:'recordStatus', name:amlCustomer.recordStatus ,value:amlCustomer?.recordStatus /}
+	#{hidden id:'isBO' /}
+	<h2>AML Key: ${amlCustomer?.amlId}-${amlCustomer?.customerName}</h2>
+	<div id="tabs"> 
+		<ul>
+			<li><a href="#tabs-1">Main</a></li>
+		</ul>
+		<div class="pane" id="tabs-1">
+			<br />
+			#{include 'AmlMaintenance/tab_primary.html' /}	
+		</div>
+	</div>
+	
+	<b><span id="customerMessageErrorGlobal" class="req"></span></b>
+	#{if param}
+		<div class="buttons">
+			#{if ( ((mode != 'view') && (param == 'edit')) || ((param == 'entry') && (mode == 'edit') && (!isInterfaceDone) && (!isReadOnly)) )}
+				#{if confirming}
+					<input type="button" id="confirm" value="Confirm" />
+					<input type="button" id="back" value="Back" />
+				#{/if}
+				#{else}	
+					<input type="button" id="save" value="Save" />
+					<input type="button" id="mainCancel" value="Cancel" />
+				#{/else}
+			#{/if}
+			#{else}
+				<input type="button" id="backCustBankInvt" value="Close" />
+			#{/else}
+		</div>
+	#{/if}
+	#{if ( ((param == "") && (mode == 'entry')))}
+		<div class="buttons">
+			#{if confirming}
+				<input type="button" id="confirm" value="Confirm" />
+				<input type="button" id="back" value="Back" />
+			#{/if}
+			#{else}
+				<input type="button" id="save" value="Save" />
+				<input type="button" id="mainCancel" value="Cancel" />
+			#{/else}
+		</div>
+	#{/if}
+    <form></form>
+	<div id="detailContact" title="Detail Contact">
+			#{include 'AmlMaintenance/detail_contact.html' /}
+		<div class="buttons">
+			<input type="button" id="saveConCorp" value="Save" />
+			<input type="button" id="cancelConCorp" value="Cancel" />
+			<input type="button" id="closeConCorp" value="Close" />
+		</div>
+	</div>
+    <form></form>
+	<div id="interfaceAml" title="Interface To Aml">
+			#{include 'AmlMaintenance/interface_aml.html' /}
+		<div class="buttons">
+			<input type="button" id="saveInterface" value="Save" />
+		</div>
+	</div>
+</form>
+
+<div id="dialog-message-1" title="Message Confirmation">
+	<p>
+	<span class="ui-icon ui-icon-notice" style="float:left; margin:0 7px 50px 0;"></span>
+	Are you sure to delete data ? </p>
+</div>
+
+<div id="dialog-message-2" title="Message Confirmation">
+	<p>
+	<span class="ui-icon ui-icon-notice" style="float:left; margin:0 7px 50px 0;"></span>
+	Are you sure to inactive data ? </p>
+</div>
+

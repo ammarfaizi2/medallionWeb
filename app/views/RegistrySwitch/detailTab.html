@@ -1,0 +1,149 @@
+<table id="switchTableDetail">
+    <tr>
+        <td valign="top">
+            <fieldset style="height:280px;width:430px;">
+                <legend><strong>Switch Out</strong></legend>
+                <p>
+                    #{radioButton id:'outType', name:'liquidation', label:'Redemption Type', options:redemptionOperators, value:((swt?.out?.liquidation)? 'true':'false'), readOnly:readOnly /}
+                    #{hidden id:'liquidation', name:'swt.out.liquidation', value:swt?.out?.liquidation /}
+                </p>
+
+                <p>
+                    #{textBox id:'outAvailableUnit', name:'availableUnit', label:'Available Unit', format:'#,##0.########', class:'numeric', width:'190px', readOnly:true /}
+                    #{hidden id:'outAvailableUnitStripped', name:'swt.out.availabelUnit', value:swt?.out?.availabelUnit /}
+                    <span class="error">#{error 'Available Unit in tab Detail (Switch Out) is' /}</span>
+                </p>
+
+                <p>
+                    #{dropDownList id:'outTradeBy', name:'outTradeBy', label:'Redeem By', options:outTradeBy, value:swt?.out?.tradeBy?.lookupId, readOnly:readOnly, required:true /}
+                    #{hidden id:'outTradeByHidden', name:'swt.out.tradeBy.lookupId', value:swt?.out?.tradeBy?.lookupId /}
+                </p>
+
+                <div id="OUTBYUNIT">
+                    <p id="pOutUnit">
+	                    #{textBox id:'outUnit', label:'Unit', format:'#,##0.###############', class:'rgNumeric', value:swt?.out?.unit, width:'190px', readOnly:true, required:true/}
+	                    #{hidden id:'outUnitStripped', name:'swt.out.unit', value:swt?.out?.unit /}
+	                    <span class="error">#{error 'Unit in tab Detail (Switch Out) is' /}</span>
+	                </p>
+	
+	                <p id="pOutPrice">
+	                    #{textBox id:'outPrice', label:'Price', format:'#,##0.###############', class:'rgNumeric', value:swt?.out?.price, width:'190px', readOnly:true /}
+	                    #{hidden id:'outPriceStripped', name:'swt.out.price', value:swt?.out?.price /}
+	                    <span id="errOutPrice" class="error"></span>
+	                </p>
+                </div>
+
+                <div id="OUTBYAMOUNT">
+	                <p id="pOutAmount">
+		                #{textBox id:'outNetAmt', label:'Amount', format:'#,##0.######', class:'rgNumeric', value:swt?.out?.netAmount, width:'190px', readOnly:readOnly, required:true /}
+		                #{hidden id:'outNetAmtStripped', name:'swt.out.netAmount', value:swt?.out?.netAmount /}
+		                <span class="error">#{error 'Amount in tab Detail (Switch Out) is' /}</span>
+		            </p>
+                </div>
+
+                <p>
+                    <label>Switching Fee<span class="req">*</span></label>
+                    <input type="radio" name="outFeeBy" value="outFeeBy1" id="outFeeBy1" ${ ( (outFeeBy.equals("outFeeBy1") || swt?.out?.feePct > 0) ? "checked" : "" ) } ${(readOnly ? "disabled" : "")} />
+                    #{textBox id:'outFeePct', value:swt?.out?.feePct, format:'#,##0.####', class:'percent', width:'70px', readOnly:readOnly /} <span id="percent">%</span>
+	                #{hidden id:'outFeePctStripped', name:'swt.out.feePct', value:swt?.out?.feePct /}
+	                #{hidden name:'swt.out.feePercent', value:swt?.out?.feePercent /}
+                </p>
+
+                <p>
+                    <label></label>
+                    <input type="radio" name="outFeeBy" value="outFeeBy2" id="outFeeBy2" ${ ( (outFeeBy.equals("outFeeBy2") || swt?.out?.feePct <= 0) ? "checked" : "" ) } ${(readOnly ? "disabled" : "")}/>
+                    #{textBox id:'outFeeAmt', value:swt?.out?.feeAmt, format:'#,##0.######', class:'rgNumeric', width:'167px', readOnly:readOnly /}
+                    #{hidden id:'outFeeAmtStripped', name:'swt.out.feeAmt', value:swt?.out?.feeAmt /}
+                    <span class="error">#{error 'Switching Fee in tab Detail (Switch Out) is' /}</span>
+                </p>
+
+                <p>
+                    #{textBox id:'outOtherAmt', format:'#,##0.######', label:"Other Fee Amount", class:'rgNumeric', value:swt?.out?.otherAmt, width:'190px', readOnly:readOnly /}
+                    #{hidden id:'outOtherAmtStripped', name:"swt.out.otherAmt", value:swt?.out?.otherAmt /}
+                    <span class="error">#{error 'Other Fee Amount in tab Detail (Switch Out) is' /}</span>
+                </p>
+
+                <p>
+                    #{textBox id:'outTotFeeAmt', label:'Total Fee Amount', format:'#,##0.######', class:'numeric', value:swt?.out?.totFeeAmt, width:'190px', readOnly:true /}
+                    #{hidden id:'outTotFeeAmtStripped', name:'swt.out.totFeeAmt', value:swt?.out?.totFeeAmt /}
+                    <span class="error">#{error 'Total Fee Amount in tab Detail (Switch Out) is' /}</span>
+                </p>
+
+                <p>
+                    #{textBox id:'outPayAmt', label:'Payment Amount', format:'#,##0.######', class:'rgNumeric', value:swt?.out?.paymentAmount, width:'190px', readOnly:true /}
+                    #{hidden id:'outPayAmtStripped', name:'swt.out.paymentAmount', value:swt?.out?.paymentAmount /}
+                    <span class="error">#{error 'Payment Amount in tab Detail (Switch Out) is' /}</span>
+                </p>
+            </fieldset>
+        </td>
+        <td valign="top">
+            <fieldset style="height:280px;width:430px;">
+                <legend><strong>Switch In</strong></legend>
+                <p>
+                    #{radioButton id:'inType', name:'firstSubscribe', label:'Subscription Type', options:subscriptionSwitchOperators, value:((swt?.in?.firstSubscribe == true)? 'true':'false'), readOnly:readOnly /}
+                    #{hidden id:'firstSubscribe', name:'swt.in.firstSubscribe', value:swt?.in?.firstSubscribe /}
+                </p>
+
+                <p>
+                    #{dropDownList id:'inTradeBy', name:'inTradeBy', label:'Subscribe By', options:inTradeBy, value:swt?.in?.tradeBy?.lookupId, readOnly:readOnly, required:true /}
+                    #{hidden id:'inTradeByHidden', name:'swt.in.tradeBy.lookupId', value:swt?.in?.tradeBy?.lookupId /}
+                </p>
+
+                <div id="INBYGROSS">
+	                <p id="pInAmount">
+	                    #{textBox id:'inAmt', label:'Gross Amount', value:swt?.in?.amount, format:'#,##0.##########', class:'rgNumeric', width:'190px', readOnly:readOnly, required:true /}
+	                    #{hidden  id:'inAmtStripped', name:'swt.in.amount', value:swt?.in?.amount /}
+	                    <span id="inAmtError" class="error">#{error 'Gross Amount in tab Detail (Switch In) is' /}</span>
+	                </p>
+                </div>
+
+                <p>
+	                <label><b>Switching Fee</b><span class="req"> *</span></label>
+	                <input type='radio' id='subscriptionFee1' value='subscriptionFeePct' name='subscriptionFee' #{if readOnly}disabled="disabled"#{/if} />
+	                #{textBox id:'inFeePct', value:swt?.in?.feePct, format:'#,##0.####', class:'percent', width:'70px', readOnly:readOnly /} <span id="percent">%</span>
+                    #{hidden id:'inFeePctStripped', name:'swt.in.feePct', value:swt?.in?.feePct /}
+                    #{hidden id:'inSwtFee', name:'swt.in.feePercent', value:swt?.in?.feePercent /}
+	            </p>
+
+	            <p>
+	                <label></label>
+	                <input type='radio' id='subscriptionFee2' value='subscriptionFeeAmt' name='subscriptionFee' #{if readOnly}disabled="disabled"#{/if} />
+                    #{textBox id:'inFeeAmt', value:swt?.in?.feeAmt, format:'#,##0.######', class:'rgNumeric', width:'167px', readOnly:readOnly /}
+	                #{hidden id:'inFeeAmtStripped', name:'swt.in.feeAmt', value:swt?.in?.feeAmt /}
+	                <span class="error">#{error 'Switching Fee in tab Detail (Switch In) is' /}</span>
+	            </p>
+
+                <p>
+                    #{textBox id:'inOtherAmt', label:'Other Fee Amount', format:'#,##0.##########', class:'rgNumeric', value:swt?.in?.otherAmt, width:'190px', readOnly:readOnly, required:true /}
+	                #{hidden id:'inOtherAmtStripped', name:'swt.in.otherAmt', value:swt?.in?.otherAmt /}
+	                <span class="error">#{error 'Other Fee Amount in tab Detail (Switch In) is' /}</span>
+	            </p>
+
+	            <p>
+	                #{textBox id:'inTotFeeAmt', label:'Total Fee Amount', format:'#,##0.##########', class:'numeric', value:swt?.in?.totFeeAmt, width:'190px', readOnly:true/}
+	                #{hidden id:'inTotFeeAmtStripped', name:'swt.in.totFeeAmt', value:swt?.in?.totFeeAmt /}
+	                <span class="error">#{error 'Total Fee Amount in tab Detail (Switch In) is' /}</span>
+	            </p>
+
+                <div id="INBYNET">
+	                <p id="pInNetAmount">
+	                    #{textBox id:'inNetAmt', label:'Net Amount', format:'#,##0.##########', class:'rgNumeric', value:swt?.in?.netAmount, width:'190px', readOnly:readOnly, required:true /}
+	                    #{hidden id:'inNetAmtStripped', name:'swt.in.netAmount', value:swt?.in?.netAmount /}
+	                    <span class="error">#{error 'Net Amount in tab Detail (Switch In) is' /}</span>
+	                </p>
+                </div>
+
+                <p>
+                    #{textBox id:'inPrice', label:'Price', format:'#,##0.##########', class:'rgNumeric', value:swt?.in?.price, width:'190px', readOnly:true /}
+                    #{hidden id:'inPriceStripped', name:'swt.in.price', value:swt?.in?.price /}
+                    <span id="errInPrice" class="error"></span>
+                </p>
+
+	            <p>
+	                #{textBox id:'inUnit', label:'Unit', format:'#,##0.##########', class:'numeric', value:swt?.in?.unit, width:'190px', readOnly:true /}
+	                #{hidden id:'inUnitStripped', name:'swt.in.unit', value:swt?.in?.unit /}
+	            </p>
+            </fieldset>
+        </td>
+    </tr>
+</table>

@@ -1,0 +1,79 @@
+#{extends 'templates/main.html' /}
+
+<script type="text/javascript">
+	$(function() {
+		$('.buttons input:button').button();
+	
+		var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Processing...</div>').appendTo('body');
+		loading.dialog({
+			closeOnEscape: false,
+			draggable: false,
+			modal: true,
+			resizable: false,
+			open:function() {
+				$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+			} 
+		});
+		loading.dialog('close');
+		
+		var backToWorkList = function() {
+			loading.dialog('open');
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			};
+		}
+		
+		$('#approve').click(function() {
+			var action = "@{approve()}?keyId=${cancelPledging?.transactionKey}&taskId=${taskId}";
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+				if (data.status == 'success') {
+					loading.dialog('close');
+					messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+				} else {
+					loading.dialog('close');
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+				}
+			});			
+		});
+		
+		// ACTION BUTTON REJECT
+		$('#reject').click(function() {
+			var action = "@{reject()}?keyId=${cancelPledging?.transactionKey}&taskId=${taskId}";
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+				if (data.status == 'success') {
+					loading.dialog('close');
+					messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+				} else {
+					loading.dialog('close');
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+				}
+			});
+		});
+
+		$('#closeWorkflow').click(function() {
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			}
+		});
+	});
+</script>
+<h2>Release Pledging Transaction Approval</h2>
+<div id="detail">
+	#{include 'CloseCancelPledgings/detail.html' /}
+</div>
+
+#{hidden id:'from', name:'from', value:from /}	
+
+<div id="actions" class="buttons">
+
+	<input type="button" id="approve" value="Approve" />
+	<input type="button" id="reject" value="Reject" />
+	<input type="button" id="closeWorkflow" value="Cancel" />			
+
+</div>

@@ -1,0 +1,57 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'AML Information' /}
+
+<div id="root">
+	<h3><a href="#">Search AML</a></h3>
+
+	<form id="searchForm" class="form">
+		<input id="param" name="params.param" type="hidden" value="${param}"/> 
+		#{hidden id:'query', name:'params.query', value:params?.query /}
+		<p>
+			#{dropDownList id:'amlKeyOperator', name:'params.amlKeyOperator', label:'AML Key', options:stringOperators, value:params.amlKeyOperator /}
+			#{textBox id:'amlSearchKey', name:'params.amlSearchKey', value:params.amlSearchKey, class:'capitalize' /}
+		</p>
+		<p>
+			#{dropDownList id:'customerNameOperator', name:'params.customerNameOperator', label:'AML Name', options:stringOperators, value:params.customerNameOperator /}
+			#{textBox id:'customerSearchName', name:'params.customerSearchName', value:params.customerName, width:'350px', class:'capitalize' /}
+		</p>
+		<p>
+			<div class="buttons">
+				<input type="button" id="search" value="Search" />				
+				<input type="button" id="reset" value="Reset" />
+			</div>
+		</p>
+	</form>
+</div>
+<br />
+<div id="result" style="display:none">
+	<table id="tableAmlCustomer" class="display">
+		<thead>
+			<tr>
+				<th width="100px" field="amlKey|number|none|left|sort">AML Key</th>
+				<th width="250px" field="customerName|string|none|left|sort">Name</th>
+				<th width="80px" field="birthDate|date|date|center|sort">Birth Date</th>
+				<th width="150px" field="identificationNo|string|none|left|sort">Identification No</th>
+				<th width="80px" field="status|string|none|center|sort">Status</th>
+				<th width="50px" field="isActive|boolean|yesno|center|sort">Active</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+	
+	#{if param == 'dedupe'}
+	<div id="buttonNotInList" class="buttons">
+		<label><input type="checkbox" id="notInList"/> Not in the list</label>&nbsp;
+		<input type="button" id="newDataCust" value="New Data" />	
+	</div>
+	#{/if}	
+</div>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'AmlMaintenance/AmlMaintenancePaging.js' /}
+	$(document).ready(function() {
+		Paging($("#root").add("#result"));
+	});
+</script>

@@ -1,0 +1,69 @@
+#{set pageTitle:'KYC Configuration'/}
+
+#{extends 'templates/detail1.html' /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+
+
+<form id="configurationKYC" class="form" method="POST" name="configurationKYC">
+	#{hidden id:'paramKey', name:'kycParam.paramKey', value:kycParam?.paramKey /}
+	#{hidden id:'organizationId', name:'kycParam.organization.organizationId', value:kycParam?.organization?.organizationId /}
+	<p>
+		#{radioButton name:'kycParam.renewalAlertMethod', options:renewalOperators, label:'Renewal Alert Method', value:(kycParam?.renewalAlertMethod ? "true" : "false"), readOnly:readOnly, blocking:true/}
+		#{textBox id:'maximumLastUpdate', name:'kycParam.maximumLastUpdate', value:kycParam?.maximumLastUpdate, width:"30px", maxLength:2, readOnly:(readOnly ? readOnly : (kycParam?.renewalAlertMethod ? true : false)), required:true/} months		
+	</p>
+	<p>
+		#{textBox id:'idExpired', name:'kycParam.idExpired', label:'ID Expired(T+n)', value:kycParam?.idExpired, width:"30px", maxLength:3, readOnly:readOnly, required:true/}days
+		<span class="error">#{error 'ID Expired' /}</span>
+	</p>
+	<p>
+		#{checkBox id:'alertByEmail', name:'kycParam.alertByEmail', label:'Alert by Email', value:(kycParam?.alertByEmail ? true : false), readOnly:readOnly/} Yes
+	</p>
+	<p>
+		#{textBox id:'emailTo', name:'kycParam.emailTo', label:'Email To', value:(kycParam?.alertByEmail ? kycParam?.emailTo : ""), readOnly:(readOnly ? readOnly : (kycParam?.alertByEmail ? false : true)), required:(kycParam?.alertByEmail ? true : false), maxLength:50/}
+		<span>ex: sample@email.com</span>
+		<span class="error">#{error 'Email To' /}</span>
+	</p>	
+</form>
+
+<script language="javascript">
+	function doCancel(){		
+		location.href='@{Kyc.edit()}';
+		return false;
+	}
+	
+	$(document).ready(function(){
+		
+		$( "#cancel span" ).html("Reset");
+		$('#maximumLastUpdate').autoNumeric({vMax:'99', vMin:'0', mDec:0});
+		$('#idExpired').autoNumeric({vMax:'99', vMin:'-99', mDec:0});
+		
+		// check value of renewal alert method
+		$("input[name=kycParam.renewalAlertMethod]").click(function(){
+		    var currVal_ = $(this).val();
+		    if( currVal_ === true || currVal_ === "true" ){
+		    	$( "#maximumLastUpdate" ).disabled();
+		    	$( "#maximumLastUpdate" ).val("");
+		    }else{
+		    	$( "#maximumLastUpdate" ).enabled();
+		    	$( "#maximumLastUpdate" ).val("0");
+		    }
+		});
+				
+		// check value of alert by email
+		$( "#alertByEmail" ).click(function(){
+			var checkedVal_ = $(this).attr("checked");
+		    if( checkedVal_ === true || checkedVal_ === "true" ){
+		    	// none
+		    	$( "#emailTo" ).enabled();
+		    	if( $( "#emailTo" ).parent().find("span.req")[0] === undefined){
+			    	$( "#emailTo" ).parent().find("label").append("<span class=\"req\">*</span>");
+		    	}
+		    	$( "#emailTo" ).parent().find("span.req").show();
+		    }else{
+		    	$( "#emailTo" ).val("");
+		    	$( "#emailTo" ).disabled();
+		    	$( "#emailTo" ).parent().find("span.req").hide();
+		    }
+		});
+	});
+</script>

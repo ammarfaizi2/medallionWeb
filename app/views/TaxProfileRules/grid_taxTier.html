@@ -1,0 +1,58 @@
+
+<table id="gridTaxTier" class="display">
+	<thead>
+		<tr>
+			<!-- <th>Key</th> -->
+			<th>Amount</th>
+			<th>Amount(&lt=)</th>
+			<th>Tax Code</th>
+			<th width="50">Rate(%)</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list txProfRuleInt?.txProfRuleIntDetails, as:'taxTier'}
+		<tr>
+			<!-- <td>
+				${taxTier?.taxTierKey}
+			</td> -->
+			<td>
+				${taxTier?.amount}
+			</td>
+			<td>
+				#{if taxTier?.amount}
+				${taxTier?.amount}
+				#{/if}
+				#{else}
+				MAX
+				#{/else}
+										
+			</td>
+			<td>
+				${taxTier?.taxMaster?.taxCode}
+										
+			</td>
+			<td >
+				${taxTier?.rate}
+			</td>
+			<td>
+			
+			#{hidden id:'taxProfileCodeIntDetail', name:'txProfRuleIntDetails[' + (taxTier_index-1) + '].id.taxProfileCode', value:taxTier?.id?.taxProfileCode /}
+			#{hidden id:'securityTypeCodeIntDetail', name:'txProfRuleIntDetails[' + (taxTier_index-1) + '].id.securityTypeCode', value:taxTier?.id?.securityTypeCode /}
+			#{hidden id:'tieringTypeCodeIntDetail', name:'txProfRuleIntDetails[' + (taxTier_index-1) + '].id.tieringTypeCode', value:taxTier?.id?.tieringTypeCode /}
+			#{hidden id:'effectiveDateFromCodeIntDetail', name:'txProfRuleIntDetails[' + (taxTier_index-1) + '].id.effectiveDateFromCode', value:taxTier?.id?.effectiveDateFromCode /}
+			#{hidden id:'effectiveDateToCodeIntDetail', name:'txProfRuleIntDetails[' + (taxTier_index-1) + '].id.effectiveDateToCode', value:taxTier?.id?.effectiveDateToCode /}
+			#{hidden id:'taxKeyCodeIntDetail', name:'txProfRuleIntDetails[' + (taxTier_index-1) + '].id.taxKey', value:taxTier?.id?.taxKey /}
+			
+			#{hidden id:'amount', name:'txProfRuleIntDetails[' + (taxTier_index-1) + '].amount', value:taxTier?.amount /}
+			#{hidden id:'taxCode', name:'txProfRuleIntDetails[' + (taxTier_index-1) + '].taxMaster.taxCode', value:taxTier?.taxMaster?.taxCode /}
+			#{hidden id:'taxKey', name:'txProfRuleIntDetails[' + (taxTier_index-1) + '].taxMaster.taxKey', value:taxTier?.taxMaster?.taxKey /}
+			#{hidden id:'taxDesc', name:'txProfRuleIntDetails[' + (taxTier_index-1) + '].taxMaster.description', value:taxTier?.taxMaster?.description /}
+			#{hidden id:'rate', name:'txProfRuleIntDetails[' + (taxTier_index-1) + '].rate', value:taxTier?.rate /}
+			#{hidden id:'taxTierKey', name:'txProfRuleIntDetails[' + (taxTier_index-1) + '].taxTierKey', value:taxTier?.taxTierKey /}
+			<center><input type="button" value="Delete" id="deleteButtonTier" #{if readOnly}disabled="disabled"#{/if}/></center>
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>

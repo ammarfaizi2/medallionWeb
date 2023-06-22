@@ -1,0 +1,88 @@
+<script type="text/javascript"> 
+
+$(function(){
+ 	$('#saveSpecSecType').button();
+	$('#cancelSpecSecType').button();
+	$('#closeSpecSecType').button(); 	
+
+	$('#securityTypeCode').lookup({
+		list:'@{Pick.securityTypesWithPrice()}',
+		get: {
+			url:'@{Pick.securityTypeWithPrice()}',
+			success: function(data) {
+				$('#securityTypeCode').removeClass('fieldError');
+				$('#securityTypeCode').val(data.code);
+				$('#securityTypeDesc').val(data.description);
+				$('#h_securityTypeDesc').val(data.description);
+			},
+			error: function() {
+				$('#securityTypeCode').addClass('fieldError');
+				$('#securityTypeCode').val('');
+				$('#securityTypeDesc').val('NOT FOUND');
+				$('#h_securityTypeDesc').val('');
+			}						
+		},
+		description:$('#securityTypeDesc'),
+		help:$('#securityTypeHelp')
+	}); 
+	
+	$('#groupCode').lookup({
+		list:'@{Pick.lookups()}?group=SECURITY_PRICE_GROUP',
+		get:{
+			url:'@{Pick.lookup()}?group=SECURITY_PRICE_GROUP',
+			success: function(data){
+				$('#groupCode').removeClass('fieldError');
+				$('#groupCodeId').val(data.code);
+				$('#groupCodeName').val(data.description);
+				$('#h_groupCodeName').val(data.description);
+			},
+			error: function(data){
+				$('#groupCode').addClass('fieldError');
+				$('#groupCodeId').val('');
+				$('#groupCode').val('');
+				$('#groupCodeName').val('NOT FOUND');
+				$('#h_groupCodeName').val('');
+			}
+		},
+		description:$('#groupCodeName'),
+		help:$('#groupCodeHelp')
+	});
+	
+	$('#securityTypeCode').change(function(){
+		$('#newSecurityTypeCode').val($('#securityTypeCode').val());
+	});
+	
+	$('#groupCode').change(function(){
+		$('#newGroupCode').val($('#groupCode').val());
+	});
+});
+
+</script>
+<!-- <form></form> -->
+<form id="specSecTypeForm" class="form">
+#{hidden id:'rowPosition' /}
+#{hidden id:'oldSecurityTypeCode' /}
+#{hidden id:'newSecurityTypeCode' /}
+#{hidden id:'oldGroupCode' /}
+#{hidden id:'newGroupCode' /}
+
+#{hidden id:'accountKey' , name:'priceGroupSetup.id.custodyAccountKey', value:priceGroupSetup?.id?.custodyAccountKey /}
+#{hidden id:'secType' , name:'priceGroupSetup.id.securityType', value:priceGroupSetup?.id?.securityType /}
+#{hidden id:'secPriceGroup' , name:'priceGroupSetup.id.securityPriceGroup', value:priceGroupSetup?.id?.securityPriceGroup /}
+	<p>
+		#{textBox id:'securityTypeCode', name:'priceGroupSetup.securityType.securityType', label:'Security Type', value:securityType?.securityType, required:true, readOnly:readOnly, class:"capitalize", width:'100px' /}
+		#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'securityTypeDesc', name:'securityType.description', value:securityType?.description, readOnly:true, width:'200px' /}
+		<span id="errSecTypeCode" class="error"></span>
+	</p>
+	<p>
+		#{textBox id:'groupCode', name:'priceGroupSetup.lookupSecurityPriceGroup.lookupCode', label:'Group Code', value:priceGroupSetup?.lookupSecurityPriceGroup?.lookupCode, required:true, readOnly:readOnly, class:"capitalize", width:'100px' /}
+		#{button id:'groupCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{hidden id:'groupCodeId', name:'priceGroupSetup.lookupSecurityPriceGroup.lookupId', value:priceGroupSetup?.lookupSecurityPriceGroup?.lookupId /}
+		#{textBox id:'groupCodeName', name:'priceGroupSetup.lookupSecurityPriceGroup.lookupDescription', value:priceGroupSetup?.lookupSecurityPriceGroup?.lookupDescription, readOnly:true, width:'200px' /}
+		<span id="errGroupCode" class="error"></span>
+	</p>
+	<span id="errDupSecType" class="error"></span>
+</form>
+
+			

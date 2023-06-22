@@ -1,0 +1,149 @@
+#{extends 'templates/main.html' /}
+
+<script type="text/javascript">
+	$(function() {
+		$(".btn").button();
+		$(".btn").css('width', '100');
+		
+		var backToWorkList = function() {
+			loading.dialog('open');
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			};
+		}
+		
+		var backToSettlementEntry = function() {
+			loading.dialog('open');
+			location = "@{Transactions.caSettlementEntry()}";
+		}
+		
+		var closeDialogMessage = function() {
+			$("#dialog-message").dialog('close');
+		}
+		
+		$('#approve').click(function() {
+			var action = "@{approve()}?keyId=${entitlement?.entitlementKey}&taskId=${taskId}";
+			loading.dialog('open');
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+					//alert("Entitlement No ${entitlement?.entitlementKey} is Approved");
+				} else {
+					if (data.code == "error.transaction.security.securityType") {
+						//alert("Security Type on Security must equal with Security Type on Transaction Template");
+						messageAlertOk("Security Type on Security must equal with Security Type on Transaction Template", "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+					} else if (data.code == "error.transaction.postingDate") {
+						//alert("Ex Date must equal with Application Date");
+						messageAlertOk("Ex Date must equal with Application Date", "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+					} else if (data.code == "error.transaction.transactionDate.gt.applicationDate.currentBusinessDate") {
+						//alert("Ex Date must equal with Application Date");
+						messageAlertOk("Ex Date must equal with Application Date", "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+					} else {
+						//alert("Data Error");
+						messageAlertOk("Data Error", "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+					}
+				}
+			});			
+		});
+		
+		$('#reject').click(function() {
+			var action = "@{reject()}?keyId=${entitlement?.entitlementKey}&taskId=${taskId}";
+			loading.dialog('open');
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					//alert("Entitlement No ${entitlement?.entitlementKey} is " + data);
+					messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+				}else{
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+				}
+			});
+		});
+		
+		$('#back').click(function() {
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			}
+		});
+		
+		$('#backsettle').click(function() {
+			location = "@{Transactions.caSettlementEntry()}";
+		});
+		$('#settle').click(function() {
+			var transactionKeys = [${keyId}];
+			var action = "@{Transactions.confirmBatch()}?transactionKeys=" + transactionKeys + "&from=${from}";
+			loading.dialog('open');
+			/* var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+			loading.dialog({
+				closeOnEscape: false,
+				draggable: false,
+				modal: true,
+				resizable: false,
+				open:function() {
+					$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+				} 
+			}); */
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Notification", backToSettlementEntry);
+					//alert(data.message);
+					//location = "@{Transactions.caSettlementEntry()}";
+				} else {
+					loading.dialog('close');
+					//alert(data.error);
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+				}
+			});			
+		});
+		
+		//$(".buttons").css("display","none");
+		//$("#approval-actions").css("display","block");
+	});
+
+</script>
+
+#{if from == 'corporateaction-settlement'}
+	<h2>Corporate Action Settlement Entry</h2>
+#{/if}
+#{else}
+	<h2>Entitlement Maintenance Approval</h2>
+#{/else}
+<div id="detail">
+	<form id="form" class="form">
+		#{include 'Entitlements/master_detail.html' /}
+	</form>
+</div>	
+
+<div id="approval-actions">
+	#{hidden id:'taskId', name:'taskId', value:taskId /}
+	#{hidden id:'keyId', name:'keyId', value:keyId /}
+	#{hidden id:'from', name:'from', value:from /}
+
+	#{if from == 'corporateaction-settlement'}
+		#{button id:'settle',name:'settle', value:'Settle', class:'btn'/}
+		#{button id:'backsettle',name:'backsettle', value:'Back', class:'btn'/}
+	#{/if}
+	#{else}
+		#{button id:'approve',name:'approve', value:'Approve', class:'btn'/}
+		#{button id:'reject',name:'reject', value:'Reject', class:'btn' /}
+		#{button id:'back',name:'back', value:'Cancel', class:'btn' /}
+	#{/else}
+	<!--
+	<br/>
+	<input type="button" id="approve" value="Approve" />
+	<input type="button" id="reject" value="Reject" />
+	<input type="button" id="back" value="Back" />			
+	-->
+</div>
+  
+
+

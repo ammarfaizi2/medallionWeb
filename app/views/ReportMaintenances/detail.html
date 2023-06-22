@@ -1,0 +1,31 @@
+#{extends 'templates/detail1.html' /}
+#{set pageTitle: 'Report Maintenance' /}
+#{set id:report?.reportKey /}
+
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{script 'lookups.js' /}
+
+<script type="text/javascript">
+	$(function() {			
+	})
+</script>
+
+#{hidden id:'reportKey', name:'report.reportKey', value:report?.reportKey /}
+
+<p>
+	#{textBox id:'seqNo', name:'report.sequenceNo', label:'Sequence No', value:report?.sequenceNo, readOnly:readOnly, width:'80px', required:true /}
+	<span class="error">#{error 'report.sequenceNo' /}</span>
+</p>
+<p>
+	#{textBox id:'reportGroup', name:'report.reportGroup', label:'Group', value:report?.reportGroup , width:'200px', required:true, readOnly:readOnly /}
+	<span class="error">#{error 'report.reportGroup' /}</span>
+</p>
+<p>
+	#{textBox id:'reportName', name:'report.reportName', label:'Name', value:report?.reportName, required:true, readOnly:readOnly, width:'350px'  /}
+	<span class="error">#{error 'report.reportName' /}</span>
+</p>
+<p>
+	#{textBox id:'url', name:'report.reportUrl', value:report?.reportUrl, label:'URL', required:true, readOnly:readOnly , width:'350px'/}
+	<span class="error">#{error 'report.reportUrl' /}</span>
+</p>
+

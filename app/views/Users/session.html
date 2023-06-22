@@ -1,0 +1,38 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Session List' /}
+
+<div id="root">
+	<h3>Session List </h3>
+	<form id="sessionForm" class="form">
+		<p>
+			<table id="tableSession">
+				<thead pk="logKey">
+					<th width="50px" field="component|checkbox|none|center|nosort"><input id="chkAll" type="checkbox"></th>
+					<th width="200px" field="sessionId|string|none|left|nosort" align="left">Session ID</th>
+					<th width="100px" field="userId|string|none|left|nosort" align="left">User ID</th>
+					<th width="150px" field="username|string|none|left|nosort" align="left">User Name</th>
+					<th width="100px" field="remoteAddress|string|none|left|nosort" align="left">Remote Address</th>
+					<th width="150px" field="logintimestr|string|none|center|nosort" align="center">Login at</th>
+					<th width="50px" field="idletime|string|none|center|nosort" align="center">Idle time</th>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</p>
+		<p>
+			<div class="buttons">
+				<input id='btnRemove' type="button" id="remove" value="Delete" ></input>
+				<input id='btnRefresh' type="button" id="refresh" value="Refresh" ></input>			
+			</div>
+		</p>
+	</form>
+</div>	
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'Users/Session.js' /}
+	$(document).ready(function() {
+		$('.buttons input:button').button();
+		Session($("#root"));
+	});
+</script>

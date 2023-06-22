@@ -1,0 +1,178 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Corporate Action Settlement Entry' /}
+#{script 'forms.js' /}
+#{script 'date.js', characterset:'utf-8' /}
+#{script 'lookups.js' /}
+#{script 'transaction.js' /}
+
+<script type="text/javascript">
+$(function() {
+	$('.buttons input:button').button();
+	$('.calendar').datepicker();
+	
+	// Search section
+	$('#accordion').accordion({
+		collapsible: true
+	});
+
+	$('#distributionDateSearch').datepicker();
+	
+	$('#distributionDateSearch').val('${newDate}');
+	$('.buttons button:first').button({
+		icons: {
+			primary: 'ui-icon-search'
+		}
+	}).next().button();	
+
+	$('#search').click(function() {
+		if ($('#distributionDateSearch').val()==''){
+			$('#distributionDateSearchError').html('Required');
+			return false;
+		} 
+		
+		if ($('#distributionDateSearch').hasClass('fieldError')){
+			return false;
+		}
+		search();
+	});
+	// end of Search
+	$('#reset').click(function() {
+			location.href="@{caSettlementEntry()}";
+	});
+
+	var search = function() {
+		$('#result .loading').show();
+		$('#result .response').hide();
+		$('#result').show();
+		$.get('@{searchCaSettlement()}', $('#searchForm').serialize(), function(data) {
+			checkRedirect(data);
+			$('#result .response').html(data);
+			$('#result .loading').hide();
+			$('#result .response').show();
+			setupTable();
+		});
+	};
+	
+	//======== securityType start
+		$('#securityTypeCode').change(function() {
+		if ($('#securityTypeCode').val() == "") {
+			$('#securityTypeCode').val("");
+			$('#securityTypeKey').val("");
+			$('#securityTypeDesc').val("");
+			$('#h_securityTypeCode').val("");
+			
+			$('#securityId').val("");
+			$('#securityKey').val("");
+			$('#securityDesc').val("");
+			$('#h_securityDesc').val("");
+		}
+	});
+	
+	$('#securityTypeCode').lookup({
+		list:'@{Pick.securityTypes()}',
+		get:{
+			url:'@{Pick.securityType()}',
+			success: function(data){
+				$('#securityTypeCode').removeClass('fieldError');
+				$('#securityTypeKey').val(data.code);
+				$('#securityTypeDesc').val(data.description);
+				$('#h_securityTypeCode').val(data.code);
+				
+				$('#securityId').val("");
+				$('#securityKey').val("");
+				$('#securityDesc').val("");
+				$('#h_securityDesc').val("");
+			},
+			error: function(data){
+				$('#securityTypeCode').addClass('fieldError');
+				$('#securityTypeCode').val('');
+				$('#securityTypeKey').val('');
+				$('#securityTypeDesc').val('NOT FOUND');
+				$('#h_securityTypeCode').val('');
+			}
+		},
+		description:$('#securityTypeCodeDesc'),
+		help:$('#securityTypeHelp')
+	});
+	//======== securityType end
+	
+	//======== securityId start
+	$('#securityId').change(function() {
+		if ($('#securityId').val() == "") {
+			$('#securityId').val("");
+			$('#securityKey').val("");
+			$('#securityDesc').val("");
+			$('#h_securityDesc').val("");
+		}
+	});
+
+	$('#securityId').lookup({
+		list:'@{Pick.securities()}',
+		get:{
+			url:'@{Pick.security()}',
+			success: function(data){
+				$('#securityId').removeClass('fieldError');
+				$('#securityKey').val(data.code);
+				$('#securityDesc').val(data.description);
+				$('#h_securityId').val(data.code);
+			},
+			error: function(data){
+				$('#securityId').addClass('fieldError');
+				$('#securityId').val('');
+				$('#securityKey').val('');
+				$('#securityDesc').val('NOT FOUND');
+				$('#h_securityId').val('');
+			}
+		},
+		filter : $('#securityTypeCode'),
+		description:$('#securityDesc'),
+		help:$('#securityHelp')
+	});
+	//======== securityId end
+
+});	
+
+</script>
+
+<!-- <h2>Corporate Action Settlement Entry</h2> -->
+<div id="accordion">
+	<h3><a href="#">Search Corporate Action</a></h3>
+	<form id="searchForm" class="form">
+	<p>
+		#{textBox id:'entitlementNo', name:'params.entitlementNo', value:params?.entitlementNo, label:'Entitlement No', class:'capitalize', readOnly:readOnly, width:'100px', class:'numberOnly' /}
+	</p>
+	<p>
+		#{textBox id:'announcementCode', name:'params.announcementCode', value:params?.announcementCode, label:'Announcement Code', class:'capitalize', readOnly:readOnly, width:'100px' /}
+	</p>
+	<p>
+		#{textBox id:'securityTypeCode', name:'params.securityType', label:'Security Type', class:'capitalize',readOnly:readOnly, width:'100px' /}
+		#{hidden id:'securityTypeKey', name:'params.transactionTemplateKey' /}
+		#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'securityTypeDesc', name:'params.securityTypeDescription', readOnly:true, width:'300px' /}
+	</p>
+	<p>
+		#{textBox id:'securityId', name:'params.securityId', label:'Security Code', value:params?.securityId, class:'capitalize', readOnly:readOnly, width:'100px' /}
+		#{hidden id:'securityKey', name:'params.securityKey' /}
+		#{button id:'securityHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'securityDesc', name:'params.securityDescription', readOnly:true, width:'300px' /}
+		<span id="errmsgSec"></span>
+		<span class="error">#{error 'Security Code is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'distributionDateSearch', name:'params.distributionDateSearch', label:'Distribution Date', required:true, value:params?.distributionDateSearch?.format(appProp.dateFormat), width:'85px', class:'calendar' /} (${appProp.displayDateFormat})
+		<span id="distributionDateSearchError" class="error"></span>
+	</p>
+	<p>
+		<div class="buttons">
+			<input type="button" id="search" value="Search" />				
+			<input type="button" id="reset" value="Reset" />					
+		</div>
+	</p>
+</form>
+</div>	
+
+<div id="result" style="display:none">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<div class="response"></div>
+</div>
+

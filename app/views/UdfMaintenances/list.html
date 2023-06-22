@@ -1,0 +1,57 @@
+#{extends 'templates/list1.html' /}
+#{if group == 'UDF_CATEGORY-C'}
+	#{set groupNew : 'CUSTOMER' /}
+	#{set pageTitle: 'Customer UDF Maintenance' /}
+#{/if}
+#{if group == 'UDF_CATEGORY-T'}
+	#{set groupNew : 'TRANSACTION' /}
+	#{set pageTitle: 'Transaction UDF Maintenance' /}
+#{/if}
+#{if group == 'UDF_CATEGORY-S'}
+	#{set groupNew : 'SECURITY' /}
+	#{set pageTitle: 'Security UDF Maintenance' /}
+#{/if}
+
+<script type="text/javascript">
+
+	function doEdit(data) {
+		if ((data[5] == "New") || (data[5] == "Updated")) {
+			view(data[0]);
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+</script>
+<table class="display">
+	<thead>
+		<tr>
+			<th></th>
+			<th width="50px">Sequence</th>			
+			<th width="150">Field Name</th>
+			<th width="150">Data Type</th>
+			<th width="150">Display Type</th>
+			<th width="50px">Status</th>
+			<th width="50px">Active</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:udfMasters, as:'udfMaster'}  
+			<tr>
+				<td>${udfMaster?.udfMasterKey}</td>
+				<td>${udfMaster?.sequence}</td>
+				<td>${udfMaster?.fieldName}</td>
+				<td class="capitalize">${udfMaster?.dataType?.lookupDescription}</td>
+				<td class="capitalize">${udfMaster?.displayType?.lookupDescription}</td>
+				<td>${udfMaster?.recordStatus?.decodeStatus()}</td>
+				<td>
+				 	${udfMaster?.isActive ? 'Yes':'No'}
+				</td>
+			</tr>
+	 #{/list}	
+     </tbody>
+</table>
+	
+
+

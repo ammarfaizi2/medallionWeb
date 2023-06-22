@@ -1,0 +1,57 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Publish MF' /}
+
+<div id="root">
+	<h3>Publish MF</h3>
+	<form id="publishMFForm" class="form">
+		#{hidden name:'PROCESSMARK', value:params?.PROCESSMARK/}
+		#{hidden name:'param.sessionTag', value:param?.sessionTag/}
+		#{hidden name:'param.processMark', value:param?.processMark/}
+		
+		<label>Date</label> #{textBox id:'appDate', name:'param.appDate', value:param?.appDate?.format(appProp.dateFormat), readOnly:true, class:'calendar' /}
+		<p>&nbsp;</p>
+		<p>
+			<table id="tablePublishMF">
+				<thead pk="logKey">
+					<th width="50px" field="component|checkbox|none|center|nosort"><input id="chkAll" type="checkbox"></th>
+					<th width="150px" field="fundCode|string|none|left|sortdasc">Fund Code</th>
+					<th width="250px" field="fundDescription|string|none|left|sort">Fund Name</th>
+					<th width="100px" field="validDate|date|date|center|sort">Date</th>
+					<th width="150px" field="status|string|none|center|sort">Status</th>
+					<th width="100px" field="published|boolean|yesno|center|sort">Publish To Media</th>
+					<th width="200px" field="netAssetValue|number|decimal2|right|sort">NAV</th>
+					<th width="200px" field="totalUnit|number|decimal4|right|sort">Unit</th>
+					<th width="200px" field="navPerUnit|number|decimal4|right|sort">NAV/Unit</th>
+					<!-- 
+					<th width="200px" field="processDate|date|date|right|sort">A</th>
+					<th width="200px" field="lastPosted|date|date|right|sort">B</th>
+					<th width="200px" field="lastPublished|date|date|right|sort">C</th>
+					 -->
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</p>
+		<p>
+			<div class="buttons">
+				<input id='btnProcessAjax' type="button" value="Process"></input>
+				<input id='btnProcess' type="button" id="process" value="Process" ></input>
+				<input id='btnReset' type="button" id="reset" value="Reset" ></input>			
+			</div>
+		</p>
+<textarea id='log' rows="10" cols="125" readonly="readonly">
+#{list logs, as:'log'}${log}
+#{/list}
+</textarea>
+		</p>
+	</form>
+</div>	
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'PublishMF/PublishMF.js' /}
+	$(document).ready(function() {
+		$('.buttons input:button').button();
+		PublishMF($("#root"));
+	});
+</script>

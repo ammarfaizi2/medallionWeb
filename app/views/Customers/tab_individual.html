@@ -1,0 +1,495 @@
+<script type="text/javascript">	
+$(function() {
+	var MARITAL_STATUS_MARRIED = '${maritalStatusMarried}';
+	$('#accordionIdentification').accordion({
+		collapsible: false,
+		autoHeight: false 
+	});
+
+	if (('${fromApproval}') && ('${fromInquiry}'!='fromInquiry')) adjustCountry();
+
+	$('#taxIdIndi').lookup({
+		list:'@{Pick.lookupByUdfs()}?group=TAX_ID',
+		get:{
+			url:'@{Pick.lookupByUdf()}?group=TAX_ID',
+			success: function(data) {
+				$('#taxIdIndi').removeClass('fieldError');
+				$('#taxIdIndiKey').val(data.code);
+				$('#taxIdIndiDesc').val(data.description);
+				$('#h_taxIdIndiDesc').val(data.description);
+				$('#supplementDocReq').val(data.isRequired);
+				
+//				adjustSupplementDocReq();
+				
+			},
+			error: function(data) {
+				$('#taxIdIndi').addClass('fieldError');
+				$('#taxIdIndiDesc').val('NOT FOUND');
+				$('#taxIdIndi').val('');
+				$('#taxIdIndiKey').val('');
+				$('#h_taxIdIndiDesc').val('');
+				
+			}
+		},
+		filter:['${lookupCustType}', 'I'],
+		description:$('#taxIdIndiDesc'),
+		help:$('#taxIdIndiHelp')
+	});
+	
+	$('#taxIdIndi').change(function(){
+		if ($(this).val()==''){
+			$('#taxIdIndi').val('');
+			$('#taxIdIndiDesc').val('');
+			$('#taxIdIndi').val('');
+			$('#taxIdIndiKey').val('');
+			$('#h_taxIdIndiDesc').val('');
+		}			
+	});
+	
+	$('#citizenShipCountryCode').change(function(){
+		if ($(this).val() == "") {
+			$('#identificationType1').val("");
+			$('#identificationType1Hide').val("");
+		}	
+	});
+	
+	
+	/* $('#citizenShipCountryCode').lookup({
+		list:'@{Pick.lookups()}?group=COUNTRY',
+		get:{
+			url:'@{Pick.lookup()}?group=COUNTRY',
+			success: function(data) {
+				if (data) {
+					$('#citizenShipCountryCode').removeClass('fieldError');
+					$('#citizenShipCountry').val(data.code);
+					$('#citizenShipCountryDesc').val(data.description);
+					$('#h_citizenShipCountryDesc').val(data.description);
+					
+					$('#birthPlaceState').val('');
+					$('#birthPlaceStateDesc').val('');
+					$('#birthPlaceStateId').val('');
+					$('#birthPlaceState').val('');
+					$('#h_birthPlaceStateDesc').val('');
+					
+					$('#birthPlaceArea').val('');
+					$('#birthPlaceAreaDesc').val('');
+					$('#birthPlaceAreaId').val('');
+					$('#birthPlaceArea').val('');
+					$('#h_birthPlaceAreaDesc').val('');
+					adjustCountry();
+					
+				}	
+			},
+			error: function(data) {
+				$('#citizenShipCountryCode').addClass('fieldError');
+				$('#citizenShipCountryDesc').val('NOT FOUND');
+				$('#citizenShipCountryCode').val('');
+				$('#citizenShipCountry').val('');
+				$('#h_citizenShipCountryDesc').val('');
+				
+				$('#identificationType1').attr("disabled", false);
+				$('#identificationType1').val("");
+			}
+		},
+		//filter: {'key':'3','value':$('#nationality')},
+		key:$('#citizenShipCountry'),
+		description:$('#citizenShipCountryDesc'),
+		help:$('#citizenShipCountryHelp'),
+		nextControl:$('#birthPlace')
+	}); */
+	
+	var stateFilter ="";
+	if($('#citizenShipCountryCode').val() != ""){
+		stateFilter = "STATE";
+	}
+	state(stateFilter);
+	
+	var areaFilter ="";
+	if($('#birthPlaceState').val() != ""){
+		areaFilter = "AREA";
+	}
+	area(areaFilter);
+	
+	$('#citizenShipCountryCode').dynapopup2({key:'citizenShipCountry', help:'citizenShipCountryHelp', desc:'citizenShipCountryDesc'},'PICK_GN_LOOKUP', "COUNTRY", "birthPlace", 
+			function(data){
+				if (data) {
+					$('#citizenShipCountryCode').removeClass('fieldError');
+					$('#citizenShipCountry').val(data.code);
+					$('#citizenShipCountryDesc').val(data.description);
+					$('#h_citizenShipCountryDesc').val(data.description);
+					
+					$('#birthPlaceState').val('');
+					$('#birthPlaceStateDesc').val('');
+					$('#birthPlaceStateId').val('');
+					$('#birthPlaceState').val('');
+					$('#h_birthPlaceStateDesc').val('');
+					
+					$('#birthPlaceArea').val('');
+					$('#birthPlaceAreaDesc').val('');
+					$('#birthPlaceAreaId').val('');
+					$('#birthPlaceArea').val('');
+					$('#h_birthPlaceAreaDesc').val('');
+					adjustCountry();
+					state("STATE");
+					area("");
+				}
+			},
+			function(data){
+				$('#citizenShipCountryCode').addClass('fieldError');
+				$('#citizenShipCountryDesc').val('NOT FOUND');
+				$('#citizenShipCountryCode').val('');
+				$('#citizenShipCountry').val('');
+				$('#h_citizenShipCountryDesc').val('');
+				
+				$('#identificationType1').attr("disabled", false);
+				$('#identificationType1').val("");
+			}
+	);
+	
+	$('#citizenShipCountryCode').change(function() {
+		if ($('#citizenShipCountryCode').val() == "") {
+			$('#citizenShipCountryCode').val("");
+			$('#citizenShipCountry').val("");
+			$('#citizenShipCountryDesc').val("");
+			$('#h_citizenShipCountryDesc').val("");
+			
+			$('#birthPlaceState').val('');
+			$('#birthPlaceStateDesc').val('');
+			$('#birthPlaceStateId').val('');
+			$('#birthPlaceState').val('');
+			$('#h_birthPlaceStateDesc').val('');
+			
+			$('#birthPlaceArea').val('');
+			$('#birthPlaceAreaDesc').val('');
+			$('#birthPlaceAreaId').val('');
+			$('#birthPlaceArea').val('');
+			$('#h_birthPlaceAreaDesc').val('');
+			state("");
+			area("");
+		}
+		adjustCountry();
+	});
+	
+	function state(data) {
+	 $('#birthPlaceState').lookup({
+		list:'@{Pick.lookups()}?group='+data,
+		get:{
+			url:'@{Pick.lookup()}?group='+data,
+			success: function(data) {
+				if (data) {
+					$('#birthPlaceState').removeClass('fieldError');
+					$('#birthPlaceStateId').val(data.code);
+					$('#birthPlaceStateDesc').val(data.description);
+					$('#h_birthPlaceStateDesc').val(data.description);
+					
+					$('#birthPlaceArea').val('');
+					$('#birthPlaceAreaDesc').val('');
+					$('#birthPlaceAreaId').val('');
+					$('#birthPlaceArea').val('');
+					$('#h_birthPlaceAreaDesc').val('');
+					area("AREA");
+					
+				}	
+			},
+			error: function(data) {
+				$('#birthPlaceState').addClass('fieldError');
+				$('#birthPlaceStateDesc').val('NOT FOUND');
+				$('#birthPlaceStateId').val('');
+				$('#birthPlaceState').val('');
+				$('#h_birthPlaceStateDesc').val('');
+				
+			}
+		},
+		filter:{'key':'1','value':$('#citizenShipCountry')},
+		description:$('#birthPlaceStateDesc'),
+		help:$('#birthPlaceStateHelp')
+	}); 
+	}
+	
+	/* $('#birthPlaceState').dynapopup2({key:'citizenShipCountry', help:'birthPlaceStateHelp', desc:'birthPlaceStateDesc'},'PICK_GN_LOOKUP', "STATE", "null", 
+			function(data){
+				if (data) {
+					$('#birthPlaceState').removeClass('fieldError');
+					$('#birthPlaceStateId').val(data.code);
+					$('#birthPlaceStateDesc').val(data.description);
+					$('#h_birthPlaceStateDesc').val(data.description);
+					
+					$('#birthPlaceArea').val('');
+					$('#birthPlaceAreaDesc').val('');
+					$('#birthPlaceAreaId').val('');
+					$('#birthPlaceArea').val('');
+					$('#h_birthPlaceAreaDesc').val('');
+				}
+			},
+			function(){
+				$('#birthPlaceState').addClass('fieldError');
+				$('#birthPlaceStateDesc').val('NOT FOUND');
+				$('#birthPlaceStateId').val('');
+				$('#birthPlaceState').val('');
+				$('#h_birthPlaceStateDesc').val('');
+			}
+	); */
+	
+	$('#birthPlaceState').change(function(){
+		if ($(this).val()==''){
+			$('#birthPlaceState').val('');
+			$('#birthPlaceStateDesc').val('');
+			$('#birthPlaceStateId').val('');
+			$('#birthPlaceState').val('');
+			$('#h_birthPlaceStateDesc').val('');
+			
+			$('#birthPlaceArea').val('');
+			$('#birthPlaceAreaDesc').val('');
+			$('#birthPlaceAreaId').val('');
+			$('#birthPlaceArea').val('');
+			$('#h_birthPlaceAreaDesc').val('');
+			area("AREA");
+		}
+	});
+	
+	function area(data) {
+		$('#birthPlaceArea').lookup({
+		list:'@{Pick.lookups()}?group='+data,
+		get:{
+			url:'@{Pick.lookup()}?group='+data,
+			success: function(data) {
+				if (data) {
+					$('#birthPlaceArea').removeClass('fieldError');
+					$('#birthPlaceAreaId').val(data.code);
+					$('#birthPlaceAreaDesc').val(data.description);
+					$('#h_birthPlaceAreaDesc').val(data.description);
+					
+				}	
+			},
+			error: function(data) {
+				$('#birthPlaceArea').addClass('fieldError');
+				$('#birthPlaceAreaDesc').val('NOT FOUND');
+				$('#birthPlaceAreaId').val('');
+				$('#birthPlaceArea').val('');
+				$('#h_birthPlaceAreaDesc').val('');
+				
+			}
+		},
+		filter:{'key':'2','value':$('#birthPlaceStateId')},
+		description:$('#birthPlaceAreaDesc'),
+		help:$('#birthPlaceAreaHelp')
+	});
+	}
+	
+	$('#birthPlaceArea').change(function(){
+		if ($(this).val()==''){
+			$('#birthPlaceArea').val('');
+			$('#birthPlaceAreaDesc').val('');
+			$('#birthPlaceAreaId').val('');
+			$('#birthPlaceArea').val('');
+			$('#h_birthPlaceAreaDesc').val('');
+		}
+	});
+	
+	/*$("p[id=spouseNameLi] label span").html("");
+	if ($('#maritalStatus').val() == MARITAL_STATUS_MARRIED) {
+		$("p[id=spouseNameLi] label span").html("*");
+	}
+	$('#maritalStatus').change(function() {
+		if ($('#maritalStatus').val() == MARITAL_STATUS_MARRIED) {
+			$("p[id=spouseNameLi] label span").html("*");
+		} else {
+			$("p[id=spouseNameLi] label span").html("");
+		}
+	});*/
+	
+	$('#maritalStatus').change(function(){
+		if($('#maritalStatus').val()==MARITAL_STATUS_MARRIED){
+			$("p[id=spouseNameLi] label span").html("*");
+			$("#spouseName").attr('readonly',false);
+			$("#spouseName").attr('disabled',false);
+		}else{
+			$("#spouseName").val('').attr('readonly',true);
+			$("#spouseName").attr('disabled','disabled');
+			$("p[id=spouseNameLi] label span").html("");
+		}
+	});
+	
+	if('${mode}' == 'edit' || '${mode}' == 'entry') $('#maritalStatus').change();
+	
+	if(('${confirming}') || ('${mode}'=='view')) {
+		if($('#maritalStatus').val()!= MARITAL_STATUS_MARRIED){
+			$("p[id=spouseNameLi] label span").html("");
+		}
+	}
+	
+	$('#occupation').change(function(){
+		adjustOtherIndividual();
+	});
+	
+	$('#educationBackground').change(function(){
+		adjustOtherIndividual();
+	});
+	adjustOtherIndividual();
+});
+	function adjustCountry() {
+		if ($('#citizenShipCountryCode').val() == "") {
+			$('#identificationType1').attr("disabled", false);
+			/* $('#identificationType1').val("");
+			$('#identificationType1Hide').val(""); */
+		} else if ($('#citizenShipCountryCode').val() != "ID") {
+			$('#identificationType2').attr("disabled", "disabled");
+			$('#identificationType2').val('${idPassport}');
+			$('#identificationType2Hide').val($('#identificationType2').val());
+			$('#identificationType1').attr("disabled", false);
+			$("label:contains('Identification 2')").html("Identification 2 <span class='req'>*</span>");
+			$("label:contains('Identification 1')").html("Identification 1");
+			//$('#identificationType1').val(""); // #7528
+			//$('#identificationType1Hide').val("");  // #7528
+			//$('#identificationType1').val('${idPassport}');
+			//$('#identificationType1Hide').val($('#identificationType1').val());
+		} else {
+			$('#identificationType1').attr("disabled", "disabled");
+			$('#identificationType1').val('${idKtp}');
+			$('#identificationType1Hide').val($('#identificationType1').val());
+			$('#identificationType2').attr("disabled", false);
+			$("label:contains('Identification 1')").html("Identification 1 <span class='req'>*</span>");
+			$("label:contains('Identification 2')").html("Identification 2");
+			//$('#identificationType2').val(""); // #7528
+			//$('#identificationType2Hide').val(""); // #7528
+		}
+	}
+	
+function adjustOtherIndividual(){
+	
+	if ($('#occupation').val()!='${enterpreneuerOccupation}'){
+		$('p[id=enterpreneuerOccupationMandatory] label span').html('');
+	}
+	
+	if ($('#occupation').val()=='${enterpreneuerOccupation}'){
+		$('p[id=enterpreneuerOccupationMandatory] label span').html(' *');
+	}
+	
+	if ($('#occupation').val()=='${otherOccupation}'){
+		if((('${mode}'=='entry')&&(!'${confirming}'))||(('${mode}'=='edit')&&(!'${confirming}'))){
+			$('#occupationOther').enabled();
+		}
+		$('p[id=otherOccupationMandatory] label span').html(' *');
+	}
+	
+	if ($('#occupation').val()!='${otherOccupation}'){
+		$('#occupationOther').disabled();
+		if (!'${confirming}'){
+			$('#occupationOther').val('');
+		}
+		$('p[id=otherOccupationMandatory] label span').html('');
+	}
+	
+	if ($('#educationBackground').val()=='${otherEducation}'){
+		if((('${mode}'=='entry')&&(!'${confirming}'))||(('${mode}'=='edit')&&(!'${confirming}'))){
+			$('#educationBackgroundOther').enabled();
+		}
+		$('p[id=otherEducationalMandatory] label span').html(' *');
+	}
+	
+	if ($('#educationBackground').val()!='${otherEducation}'){
+		$('#educationBackgroundOther').disabled();
+		if (!'${confirming}'){
+			$('#educationBackgroundOther').val('');
+		}
+		$('p[id=otherEducationalMandatory] label span').html('');
+	}
+}
+</script>
+
+<div class="individual_only">
+	<p>			
+			#{textBox id:'taxIdIndi', name:'customer.taxId.lookupCode', label:'Tax ID', value:customer?.taxId?.lookupCode, required:true, readOnly:readOnly, width:'80px', class:'capitalize individual' /}
+			#{hidden id:'taxIdIndiKey', name:'customer.taxId.lookupId', value:customer?.taxId?.lookupId, class:'individual' /}
+			#{button id:'taxIdIndiHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'taxIdIndiDesc', name:'customer.taxId.lookupDescription', value:customer?.taxId?.lookupDescription, readOnly:true, width:'216px', class:'individual' /}
+			<span class="error">#{error 'Tax ID in tab Individual is' /}</span>
+		</p>
+		<p>
+			#{textBox id:'citizenShipCountryCode', name:'customer.nationality.lookupCode', label:'Nationality', value:customer?.nationality?.lookupCode, class:'capitalize individual', required:true, readOnly:readOnly, width:'80px' /}
+			#{hidden id:'citizenShipCountry', name:'customer.nationality.lookupId', value:customer?.nationality?.lookupId, class:'individual'/}
+			#{button id:'citizenShipCountryHelp', value:'?', class:'small', readOnly:readOnly /}	
+			#{textBox id:'citizenShipCountryDesc', name:'customer.nationality.lookupDescription', value:customer?.nationality?.lookupDescription, readOnly:true, width:'216px', class:'individual' /}
+			<span class="error">#{error 'Nationality in tab Individual is' /}</span>
+		</p>
+		<p atr="mandatoryDirect" style="display: none;">
+			#{textBox id:'birthPlaceState', name:'customer.birthPlace.lookupCode', label:'Place Of Birth (State)', value:customer?.birthPlace?.lookupCode, required:true, readOnly:readOnly, width:'80px', maxLength:100, class:'individual capitalize' /}
+			#{hidden id:'birthPlaceStateId', name:'customer.birthPlace.lookupId', value:customer?.birthPlace?.lookupId , class:'individual' /}
+			#{button id:'birthPlaceStateHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'birthPlaceStateDesc', name:'customer.birthPlace.lookupDescription', value:customer?.birthPlace?.lookupDescription, readOnly:true, width:'216px', class:'individual' /}
+			<span class="error">#{error 'Place Of Birth (State) in tab Individual is' /}</span>
+		</p>
+		<p atr="mandatoryDirect" style="display: none;">
+			<label style="margin-left: 97px">(Area)<span class="req"> *</span></label>
+			<span style="margin-left: -97px">#{textBox id:'birthPlaceArea', name:'customer.birthArea.lookupCode', value:customer?.birthArea?.lookupCode, required:true, readOnly:readOnly, width:'80px', maxLength:100, class:'individual capitalize' /}
+			#{hidden id:'birthPlaceAreaId', name:'customer.birthArea.lookupId', value:customer?.birthArea?.lookupId, class:'individual' /}
+			#{button id:'birthPlaceAreaHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'birthPlaceAreaDesc', name:'customer.birthArea.lookupDescription', value:customer?.birthArea?.lookupDescription, readOnly:true, width:'216px', class:'individual' /}
+			<span class="error">#{error 'Place Of Birth (Area) in tab Individual is' /}</span>
+			</span>
+		</p>
+		<p atr="mandatoryDirect">
+			#{textBox id:'birthPlace', name:'customer.birthPlaceOther', label:'Place of Birth', value:customer?.birthPlaceOther, required:true, readOnly:readOnly, width:'300px', maxLength:100, class:'individual capitalize' /}
+			<span class="error">#{error 'Place of Birth is' /}</span>
+		</p>
+		<p atr="mandatoryDirect">			
+			#{textBox id:'birthDate', name:'customer.birthDate', label:'Date Of Birth', value:customer?.birthDate?.format(appProp.dateFormat), class:'calendar individual', required:true, readOnly:readOnly, maxLength:10 /}(${appProp.displayDateFormat})
+			<span id="birthDateError" class="error">#{error 'Date Of Birth in tab Individual is' /}</span>
+		</p>
+		<p>
+			#{dropDownList id:'religion', name:'customer.religion.lookupId', label:'Religion', value:customer?.religion?.lookupId, options:religion, readOnly:readOnly, width:'168px', class:'individual', required:false /}
+			<span class="error">#{error 'Religion in tab Individual is' /}</span>
+		</p>
+		<p atr="mandatoryDirect">
+			#{dropDownList id:'gender', name:'customer.gender.lookupId', label:'Gender', options:gender, value:customer?.gender?.lookupId, readOnly:readOnly, width:'100px', class:'individual', required:true /}
+			<span class="error">#{error 'Gender in tab Individual is' /}</span>
+		</p>
+		<p atr="mandatoryDirect">
+			#{dropDownList id:'maritalStatus', name:'customer.maritalStatus.lookupId', label:'Marital Status', value:customer?.maritalStatus?.lookupId, options:maritalStatus, required:true, readOnly:readOnly, width:'100px', class:'individual capitalize'/}
+			<span class="error">#{error 'Marital Status in tab Individual is' /}</span>
+		</p>
+		<p id="spouseNameLi">
+			#{textBox id:'spouseName', name:'customer.spouseName', label:'Spouse Name', value:customer?.spouseName, readOnly:readOnly, width:'164px', maxLength:100, class:'individual capitalize specialField', required:true /}
+			<span class="error">#{error 'Spouse Name in tab Individual is' /}</span>
+		</p>
+		<p atr="mandatoryDirect">
+			<label>Mother's Maiden Name<span class="req"> *</span></label>
+			#{textBox id:'motherName', name:'customer.motherName', value:customer?.motherName, readOnly:readOnly, width:'164px', maxLength:100, class:'individual capitalize specialField' /}
+			<span class="error">#{error 'Mother Maiden Name in tab Individual is' /}</span>
+		</p>
+		<p>	
+			#{textBox id:'heirName', name:'customer.heirName', label:'Heir Name / Relation', value:customer?.heirName, readOnly:readOnly, width:'164px', maxLength:100, class:'individual capitalize specialField' /}&nbsp;<b>/</b>&nbsp;
+			#{textBox id:'heirRelation', name:'customer.heirRelation', value:customer?.heirRelation, readOnly:readOnly, width:'108px', maxLength:50, class:'individual capitalize specialField' /}
+		</p>	
+		<p atr="mandatoryDirect">
+			#{dropDownList id:'educationBackground', name:'customer.educationBackground.lookupId', label:'Education Background', value:customer?.educationBackground?.lookupId, options:education, required:true, readOnly:readOnly, width:'168px', class:'individual' /}
+			<span class="error">#{error 'Education Background in tab Individual is' /}</span>
+		</p>
+		<p id="otherEducationalMandatory">
+			<label style="margin-left: 80px">(Others)<span class="req"> *</span></label>
+			<span style="margin-left: -80px">
+			#{textBox id:'educationBackgroundOther', name:'customer.educationBackgroundOthers', value:customer?.educationBackgroundOthers, readOnly:readOnly, width:'300px', maxLength:100, class:'individual capitalize specialField' /}
+			<span class="error">#{error 'Education Background (Others) in tab Individual is' /}</span>
+			</span>
+		</p>
+		<p atr="mandatoryDirect">
+			#{dropDownList id:'occupation', name:'customer.occupation.lookupId', label:'Occupation', value:customer?.occupation?.lookupId, options:occupation, readOnly:readOnly, width:'168px', class:'individual', required:true /}
+			<span class="error">#{error 'Occupation in tab Individual is' /}</span>
+		</p>
+		<p id="otherOccupationMandatory">
+			<label style="margin-left: 80px">(Others)<span class="req"> *</span></label>
+			<span style="margin-left: -80px">
+			#{textBox id:'occupationOther', name:'customer.occupationOthers', value:customer?.occupationOthers, readOnly:readOnly, width:'300px', maxLength:100, class:'individual capitalize specialField' /}
+			<span class="error">#{error 'Occupation (Others) in tab Individual is' /}</span>
+			</span>
+		</p>
+		<p id="enterpreneuerOccupationMandatory">
+			#{textBox id:'occupationDescription', name:'customer.occupationDescription', label:'Nature Business For The Enterpreneuer', value:customer?.occupationDescription, readOnly:readOnly, width:'300px', maxLength:100, class:'individual capitalize', required:true /}
+			<span class="error"></span>
+			<font style="color:red;">#{error 'Nature Business For The Enterpreneuer in tab Individual is' /}</font>
+		</p>
+		<p atr="mandatoryDirect">
+			#{dropDownList id:'incomePerAnnumInd', name:'customer.annualIncomeRange.lookupId', label:'Income per Annum', value:customer?.annualIncomeRange?.lookupId, options:incomeInd, readOnly:readOnly, width:'200px', required:true, class:'individual' /}
+			<span class="error">#{error 'Income per Annum in tab Individual is' /}</span>
+		</p>		
+</div>

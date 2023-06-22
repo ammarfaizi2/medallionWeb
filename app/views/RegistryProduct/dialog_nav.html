@@ -1,0 +1,41 @@
+<form></form>
+<form id="navMinForm" class="form">
+    <span id="errmsgNull" class="errmsg"></span>
+	#{hidden id:'rowPosition' /}
+	#{hidden id:'minnavKey', name:'nav.minnavKey', value:nav?.minnavKey /}
+
+    <p id="effectNav">
+        #{textBox id:'effectiveTo', name:'nav.effectiveTo', label:'Effective To', value:nav?.effectiveTo?.format(appProp.dateFormat), class:'calendar invalidDateFormat', readOnly:readOnly, width:'80px' , required:true/} (${appProp.displayDateFormat})
+        #{hidden  id:'isMaxRow', name:'isMaxRow' /}
+    </p>
+
+    <p><span id="effectiveToError" class="error"></span></p>
+
+    <p><span id="errMsgNav" class="error"></span></p>
+
+    <p>
+        #{textBox id:'maxCounter', value:nav?.maxCounter, label:'Max. Counter', readOnly:readOnly, width:'50px', required:true /}
+        #{hidden  id:'maxCounterStripped', name:'nav.maxCounter',  value:nav?.maxCounter /}
+        &nbsp; <span id="maxCounterError" class="error"></span>
+    </p>
+</form>
+
+<script type="text/javascript">
+//buat ganti focus dari focus calender ke focus ke maxCounter
+//     $("#dialogNavMin #navMinForm #effectiveTo").datepicker("option", "disabled", true);
+//     $("#dialogNavMin #navMinForm #effectiveTo").datepicker('disable');
+// 	$("#maxCounter").focus(function(){
+// 	    $("#dialogNavMin #navMinForm #effectiveTo").datepicker('enable');
+// 	});
+    $(function() {
+        $("#cancelNavDialog").click(function() {
+        	$("#dialogNavMin #navMinForm #effectiveTo").removeClass('fieldError');
+            $("#dialogNavMin #navMinForm #maxCounterError").removeClass('fieldError');
+        	$("#dialogNavMin #navMinForm #effectiveToError").html("");
+        	$("#dialogNavMin #navMinForm #errMsgNav").html("");
+        	$("#dialogNavMin #navMinForm #maxCounterError").html("");
+            $("#dialogNavMin").dialog('close');
+            return false;
+        });
+    });
+</script>

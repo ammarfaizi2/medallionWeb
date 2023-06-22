@@ -1,0 +1,100 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'TA - Cancel Transaction Approval' /}
+
+<script type="text/javascript">
+    $(function() {
+        // DECLARE CLASS BTN
+        $(".btn").button();
+        $(".btn").css("width", "100px");
+        //===============
+        
+        // DECLARE SOME ID VARIABLE
+        $('#approve').button();
+        $('#reject').button();
+        
+        var backToWorkList = function() {
+            loading.dialog('open');
+            if ($("#from").val() == 'listBatch') {
+                location = "@{Approvals.listbatch()}";
+            } else {
+                location = "@{Approvals.list()}";
+            };
+        }
+        
+        // ACTION BUTTON APPROVE 
+        $('#approve').click(function() {
+            var action = "@{approveCancelSwitching()}?keyId=${swt?.switchingKey}&taskId=${taskId}";
+            loading.dialog('open');
+            $.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+                loading.dialog('close');
+                if (data.status == 'success') {
+                    //alert("Trade Id : '${rg?.tradeKey}' is Cancelled");
+                    messageAlertOk("Switching ID : '${swt?.switchingKey}' is Cancelled", "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+                } else {
+                    if (data.code == "error.sentToFaInterface") {
+                        //alert("Error when sent to FA Interface !");
+                        messageAlertOk("Error when sent to FA Interface", "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+                    } else {
+                        //alert("Data Error");
+                        messageAlertOk("Data Error", "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+                    }
+                }
+            }); 
+        });
+        //===============
+        
+        // ACTION BUTTON REJECT
+        $('#reject').click(function() {
+            var action = "@{rejectCancelSwitching()}?keyId=${swt?.switchingKey}&taskId=${taskId}";
+            loading.dialog('open');
+            $.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+                loading.dialog('close');
+                if (data.status == 'success') {
+                    //alert("Cancel for Trade Id : '${rg?.tradeKey}' is Rejected");
+                    messageAlertOk("Cancel for Switching ID : '${swt?.switchingKey}' is Rejected", "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+                }else{
+                	messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+                }
+            });
+        });
+        //===============
+        
+        // ACTION BUTTON CLOSE  
+        $('#closeWorkflow').click(function() {
+            if ($("#from").val() == 'listBatch') {
+                location = "@{Approvals.listbatch()}";
+            } else {
+                location = "@{Approvals.list()}";
+            }
+        });
+        //===============
+        
+        // HIDE ALL CLASS BUTTON    
+        $(".buttons").css("display","none");
+        //===============
+            
+        // HIDE PROPERTY INSIDE APPROVAL ACTIONS ID 
+        $("#approval-actions").css("display","block");
+        //===============
+    });
+
+</script>
+
+<div id="detail">
+    <form id="form" class="form">
+        #{include 'RegistrySwitch/detail.html' /}
+    </form>
+</div>  
+
+<input type="button" id="approve" value="Approve" class="btn" />
+<input type="button" id="reject" value="Reject" style="margin:5px;" class="btn"/>   
+<input type="button" id="closeWorkflow" value="Cancel" class="btn" />   
+    
+<span id="approval-actions">
+    #{hidden id:'taskId', name:'taskId', value:taskId /}
+    #{hidden id:'maintenanceLogKey', name:'maintenanceLogKey', value:maintenanceLogKey /}
+    #{hidden id:'operation', name:'operation', value:operation /}
+    #{hidden id:'from', name:'from', value:from /}  
+</span>

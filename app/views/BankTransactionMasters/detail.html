@@ -1,0 +1,51 @@
+#{extends 'templates/detail1.html' /}
+
+#{if mode == 'edit' || mode == 'entry' || mode == 'view'}
+	#{set pageTitle: 'Bank Transaction Master Maintenance' /}
+#{/if}
+#{if taskId != null}
+	#{set pageTitle: 'Bank Transaction Master Approval' /}
+#{/if}
+
+#{set id: bankTransactionMaster?.transactionMasterKey /}
+
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{script 'lookups.js' /}
+
+<script type="text/javascript">
+	
+	$(function() {	
+		
+		if (('${mode}'=='entry') || (('${mode}'=='edit') && (('${bankTransactionMaster?.recordStatus?.decodeStatus()}' == 'Reject') || ($("#status").val() == 'R' )))) {
+			$('input[name=isActive]').attr("disabled", "disabled");
+		}
+		
+		$('input[name=isActive]').change(function(){
+			$("input[name='bankTransactionMaster.isActive']").val($("input[name='isActive']:checked").val());
+		});
+		
+	});
+	
+</script>
+
+<div>
+	#{hidden name:'bankTransactionMaster.organization.organizationId', value:bankTransactionMaster?.organization?.organizationId /}
+	#{hidden id:'bankTransactionMasterKey', name:'bankTransactionMaster.transactionMasterKey', value:bankTransactionMaster?.transactionMasterKey /}
+	#{hidden id:'status', name:'status', value:status /}
+	<p>      
+		#{textBox id:'bankTransactionCode', name:'bankTransactionMaster.bankTransactionCode', label:'Transaction Code', value:bankTransactionMaster?.bankTransactionCode, class:'capitalize', width:'150px', required:true, readOnly:((mode=='entry') ? confirming :true ), maxLength:50 /}
+		<span class="error">#{error 'Transaction Code is' /}</span>
+	</p>
+	<p>			
+		#{textBox id:'description', name:'bankTransactionMaster.transactionDescription', label:'Description', width:'300px', value:bankTransactionMaster?.transactionDescription, class:'capitalize', required:true, readOnly:readOnly, maxLength:100 /}
+		<span class="error">#{error 'Description is' /}</span>
+	</p>
+	<p>	
+		#{dropDownList id:'transactionType', name:'bankTransactionMaster.transactionType.lookupId', label:'Transaction Type', options:transactionTypes, value:bankTransactionMaster?.transactionType?.lookupId, required:true, readOnly:readOnly /}		
+		<span class="error">#{error 'Transaction Type is' /}</span>
+	</p>
+	<p>
+		#{radioButton id:'isActive', name:'isActive', value:((bankTransactionMaster?.isActive)?'true':'false'), label:'Active', options:operators, readOnly:readOnly /}
+		#{hidden id:'isActiveHidden', name:'bankTransactionMaster.isActive', value:((bankTransactionMaster?.isActive)?'true':'false') /}
+	</p>
+</div>

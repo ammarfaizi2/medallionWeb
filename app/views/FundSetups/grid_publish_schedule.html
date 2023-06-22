@@ -1,0 +1,23 @@
+<table id="gridPublishSchedule" class="display">
+	<thead>
+		<tr>
+			<th>Publish Date</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list faMaster?.faPublishSchedules, as:'publishSchedule'}
+		<tr>
+			
+			<td>
+				${publishSchedule?.id?.publishDate}
+			</td>
+			<td>
+				#{textBox name:'listPublishSchedule[' + (publishSchedule_index-1) + '].id.publishDate', value:publishSchedule?.id?.publishDate /}
+				#{hidden name:'listPublishSchedule[' + (publishSchedule_index-1) + '].faMaster.fundKey', value:listPublishSchedule?.faMaster?.fundKey /}
+				<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled="disabled"#{/if}/></center>
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>

@@ -1,0 +1,253 @@
+#{set id:fa?.fundActionKey /}
+
+#{set readOnly:(((mode!='edit')&&(mode!='entry')) || (confirming) || (calculated == true)) /}
+
+#{set readOnlyCalculated:(((mode!='edit')&&(mode!='entry')) || (confirming)) || (calculated == true) /}
+#{script 'date.format.js' /}
+#{script 'lookups.js' /}
+
+	<!-- <style type="text/css">
+		.tableIn { margin-left:-1px; }
+	  	#productCode { margin-left:500px; }
+	 	#divType { margin-left:50px; } 
+	</style> -->
+	
+<!--[if IE 8]>
+	<style type="text/css">
+	  .errmsg { color:red; }
+	  #roundValue { text-align: right;}
+	  .tableIn { margin-left:-1px; }
+	  #ratio { margin-left:3.7em; }
+	  #productCode { margin-left:2px; }
+	  #divType { margin-left:2px; }
+	</style>
+<![endif]-->
+
+<!--[if IE 7]>
+	<style type="text/css">
+	  .errmsg { color:red; }
+	  #roundValue { text-align: right; margin-left:-4px;}
+	  .tableIn { margin-left:-1px; }
+	  #ratio { margin-left:2.9em; }
+	  #amount { margin-left:-4px; }
+	  #taxCode { margin-left:-4px; }
+	  #productCode { margin-left:2px; }
+	  #divType { margin-left:2px; }
+	</style>
+<![endif]-->
+
+<style>
+.numAmount { text-align: right; }
+</style>
+
+<!-- MAIN SCREEN -->
+
+	<!-- TAB SCREEN -->
+	<div id="fundActionTab">
+		<ul>
+			<li><a href="#tab-1">Master</a></li>
+			<li><a href="#tab-2">Dividen Detail</a></li>
+		</ul>
+		<div class="pane" id="tab-1">
+		<form id="registryFundActionForm" class="form" method="POST" name="fundAction">
+			#{hidden id:'dispatch', value:mode/}
+			#{hidden id:'type'/}
+			#{hidden id:'calculated', name:'calculated', value:false /}
+			#{hidden id:'isReadOnly', value:readOnly/}
+			#{hidden id:'formatAmount'/}
+			#{hidden id:'dummy'/}
+			#{hidden id:'dummy1'/}
+			#{hidden id:'formatUnit'/}
+			#{hidden id:'formatPrice'/}
+			#{hidden id:'rgTradeTemp', name:'fa.rgTradeTemp', value:fa?.rgTradeTemp /}
+			#{hidden id:'amountRoundValue', name:'fa.rgProduct.amountRoundValue', value:fa?.rgProduct?.amountRoundValue /}
+			#{hidden id:'amountRoundType', name:'fa.rgProduct.amountRoundType', value:fa?.rgProduct?.amountRoundType /}
+			#{hidden id:'unitRoundValue', name:'fa.rgProduct.unitRoundValue', value:fa?.rgProduct?.unitRoundValue /}
+			#{hidden id:'unitRoundType', name:'fa.rgProduct.unitRoundType', value:fa?.rgProduct?.unitRoundType /}
+			#{hidden id:'priceRoundValue', name:'fa.rgProduct.priceRoundValue', value:fa?.rgProduct?.priceRoundValue /}
+			#{hidden id:'priceRoundType', name:'fa.rgProduct.priceRoundType', value:fa?.rgProduct?.priceRoundType /}
+			#{hidden id:'calculate' /}
+			#{hidden id:'divLock', name:'fa.rgProduct.divLock', value:fa?.rgProduct?.divLock /}
+			#{hidden id:'effectiveDate', name:'fa.rgProduct.effectiveDate', value:fa?.rgProduct?.effectiveDate?.format(appProp.dateFormat)/}
+			#{hidden id:'cashPct', name:'fa.rgProduct.divIopByCashPct', value:fa?.rgProduct?.divIopByCashPct /}
+			#{hidden id:'reinvestmentPct', name:'fa.rgProduct.divIopByReinvestmentPct', value:fa?.rgProduct?.divIopByReinvestmentPct /}
+			#{hidden id:'redeemPct', name:'fa.rgProduct.divIopByRedeemPct', value:fa?.rgProduct?.divIopByRedeemPct /}
+			#{hidden id:'liquidDate', name:'fa.rgProduct.liquidDate', value:fa?.rgProduct?.liquidDate?.format(appProp.dateFormat) /}
+			#{hidden id:'taxCode', name:'fa.taxMaster.taxCode',  value:fa?.taxMaster?.taxCode /}
+			#{hidden  id:'taxKey', name:'fa.taxMaster.taxKey', value:fa?.taxMaster?.taxKey/}
+			#{hidden  id:'amount', name:'fa.amount', value:fa?.amount/}
+			<!-- === FOR CANCEL === -->
+			#{hidden name:'rg.tradeKey', value:rg?.tradeKey/}
+			#{hidden name:'rg.rgProduct.productCode', value:rg?.rgProduct?.productCode/}
+			#{hidden name:'fa.type', value:fa?.type/}
+			#{hidden name:'rg.redemRefKey', value:rg?.redemRefKey/}
+			#{hidden id:'currentBusinessDate', name:'fa.currentBusinessDate', value:fa?.currentBusinessDate?.format(appProp.dateFormat), class:'calendar' /}
+			#{hidden id:'totNetAmtDiv',name:'fa.totNetAmtDiv', value:fa?.totNetAmtDiv /}
+			#{hidden id:'fixNav',name:'fa.rgProduct.fixnav', value:fa?.rgProduct?.fixnav /}
+			#{hidden id:'fixNavPrice',name:'fa.rgProduct.fixNavPrice', value:fa?.rgProduct?.fixNavPrice /}
+			<!-- ============== -->
+			<p>
+				#{textBox id:'fundActionKey', name:'fa.fundActionKey', label:'Dividend No',width:'120px', value:fa?.fundActionKey,class:'master', readOnly:true /}
+				#{if from == 'unitRegistry'}
+			        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				&nbsp;&nbsp;#{textBox id:'statusTrans', label:'Status', value:fa?.status, width:'120px', readOnly:true /}
+			    #{/if}
+			</p>
+			<p>	
+				<label style="margin-right: -2px">Fund Code<span class="req"> *</span></label>		
+				#{textBox id:'productCode', name:'fa.rgProduct.productCode', value:fa?.rgProduct?.productCode, width:'120px',  class:'capitalize master', readOnly:readOnly,required:false /}
+				#{hidden  id:'productCodeKey', value:fa?.rgProduct?.productCode /}
+				#{button  id:'productCodeHelp', value:'?', class:'small master', readOnly:readOnly/}
+				#{textBox id:'productCodeDesc',  name:'fa.rgProduct.name', value:fa?.rgProduct?.name, readOnly:true, width:'340px' /}
+				<span id="productCodeError" class="error">#{error 'Fund Code is' /}</span>
+			</p>
+			<p>
+				#{textBox id:'currency', name:'fa.rgProduct.currency.currencyCode', label:'Currency',class:'numeric master',width:'120px', value:fa?.rgProduct?.currency?.currencyCode, readOnly:true /}
+			</p>
+			<table>
+			<tr>
+				<td>
+				<p>
+					<label style="margin-right: -2px">Dividend Type<span class="req"> *</span></label>
+					#{dropDownList id:'divType', name:'fa.divType', options:dividendType, value:fa?.divType , readOnly:readOnly, required:true, width:'125px', class:'master' /}
+					<span id="divTypeError" class="error">#{error 'Dividend Type is' /}</span>
+				</p>
+				<p>
+					#{textBox id:'cumDate', name:'fa.cumDate', label:'Cum Date', value:fa?.cumDate?.format(appProp.dateFormat), class:'calendar master', readOnly:readOnly, required:true,width:'120px' /} (${appProp.displayDateFormat})
+					<span id="cumDateError" class="error">#{error 'Cum Date is' /}</span>
+				</p>
+				<p>			
+					#{textBox id:'divDate', name:'fa.divDate', label:'Ex Date', value:fa?.divDate?.format(appProp.dateFormat),width:'120px', class:'calendar master', readOnly:readOnly, required:true /} (${appProp.displayDateFormat})
+					<span id="divDateError" class="error">#{error 'Dividend Date is' /}</span>
+				</p>
+				<p id="navDateP">
+					#{textBox id:'navDate', name:'fa.navDate', label:'NAV Date', value:fa?.navDate?.format(appProp.dateFormat), class:'calendar master', readOnly:readOnly, required:true,width:'120px' /} (${appProp.displayDateFormat})
+					<span id="navDateError" class="error">#{error 'NAV Date is' /}</span>
+				</p>
+				<p id="postDateP">
+					#{textBox id:'postDate', name:'fa.postDate', label:'Posting Date', value:fa?.postDate?.format(appProp.dateFormat), class:'calendar master', readOnly:readOnly, required:true,width:'120px' /} (${appProp.displayDateFormat})
+					<span id="postDateError" class="error">#{error 'Post Date is' /}</span>
+				</p>
+				<p id="paymentDateP">
+					#{textBox id:'paymentDate', name:'fa.paymentDate', label:'Payment Date', value:fa?.paymentDate?.format(appProp.dateFormat), class:'calendar master', readOnly:readOnly,width:'120px', required:true /} (${appProp.displayDateFormat})
+					<span id="paymentDateError" class="error">#{error 'Payment Date is' /}</span>
+				</p>
+				</td>
+				<td valign="top">
+				<p class=forCancelFundAction style="display: none; margin-left: 100px"> 
+					#{hidden id:'cancelDate', label:'Cancel Date', value:fa?.cancelTradeDate?.format(appProp.dateFormat), class:'calendar validateDateFormat',  width:'80px', readOnly:readOnly , required:true /}
+					#{hidden id:'cancelDateHidden', name:'fa.cancelTradeDate', value:fa?.cancelTradeDate?.format(appProp.dateFormat) /}
+					#{hidden id:'cancelPostDate', label:'Cancel Post Date', value:fa?.cancelPostDate?.format(appProp.dateFormat), class:'calendar validateDateFormat',  width:'80px', readOnly:readOnly,required:true  /}
+					#{hidden id:'cancelPostDateHidden', name:'fa.cancelPostDate', value:fa?.cancelPostDate?.format(appProp.dateFormat) /}
+				
+					#{textArea id:'remarkForCancel', name:'cancelRemark', label:'Remarks Cancellation', value:fa?.cancelRemark, class:'capitalize',  width:'200px', maxLength:200,readOnly:readOnly,rows:'5', required:true /}
+					#{hidden id:'remarkForCancelHidden', name:'fa.cancelRemark', value:fa?.cancelRemark /}
+					<span id="remarkForCancelError" class="error"></span>
+				</p>
+				</td>
+			</tr>
+			</table>
+			
+			<p>
+			<br />
+			<fieldSet>
+				<p>
+				#{textBox id:'totalUnit', label:'Total Unit', value:fa?.totalUnit, format:'#,##0.########', class:'numeric', width:'120px', readOnly:true, required:true /}
+				#{hidden  id:'totalUnitStripped', name:'fa.totalUnit', value:fa?.totalUnit /}
+				<span id="totalUnitError" class="error">#{error 'Total Unit is' /}</span>
+				</p>
+				<p>
+					<label id="priceLbl" >Price<span class="req"> *</span></label>
+					#{textBox id:'price', format:'#,##0.##########', class:'numeric', value:fa?.price, width:'120px', readOnly:true /}
+					#{hidden id:'priceStripped', name:'fa.price', value:div?.price /}
+					<span id="priceError" class="error">#{error 'Price is' /}</span>
+				</p>
+				<p>
+					#{dropDownList id:'divBy', name:'fa.inputBy', options:dividenBy,label:'Calculation By', value:fa?.inputBy, readOnly:readOnly, width:'120px', class:'master',required:true /}
+					<span id="divByError" class="error">#{error 'Dividend By is' /}</span>
+				</p>
+				<p class=amountUnit style="display: none">
+					#{textBox id:'unitAmount', label:'Amount', value:fa?.unitAmount, format:'#,##0.############', class:'numAmount master', width:'120px', readOnly:readOnly,required:true /}
+					#{hidden  id:'unitAmountStripped', name:'fa.unitAmount', value:fa?.unitAmount /}
+					<span id="unitAmountError" class="error">#{error 'Amount is' /}</span>
+				</p>
+				<p class=totalAmount style="display: none">
+					#{textBox id:'totAmount', label:'Total Amount', value:fa?.totAmount, format:'#,##0.########', class:'numeric master', width:'120px', readOnly:readOnly,required:true /}
+					#{hidden  id:'totAmountStripped', name:'fa.totAmount', value:fa?.totAmount /}
+					<span id="totalAmountError" class="error">#{error 'Total Amount is' /}</span>
+				</p>
+				<p class=factor style="display: none">
+					#{textBox id:'factorAmount', label:'Factor',name:'fa.factorAmount', value:fa?.factorAmount, class:'onlyNumber master', width:'120px', readOnly:readOnly,required:true /}
+					<span>%</span>
+					<!-- #{hidden  id:'factorAmountStripped', name:'fa.factorAmount', value:fa?.factorAmount /}
+					 --><span id="factorAmountError" class="error">#{error 'Factor is' /}</span>
+				</p>
+				
+				<p class=roundTotAmount style="display: none">
+					#{dropDownList id:'roundType', name:'fa.roundType', label:'Rounding Type', options:roundingType, value:fa?.roundType , readOnly:readOnly, width:'119px', class:'master',required:true /}
+					<span id="roundTypeError" class="error">#{error 'Rounding Type is' /}</span>
+				</p>
+				<p class=roundTotAmount style="display: none">
+					#{textBox id:'roundValue', label:'No.of decimal', value:fa?.roundValue, class:'numberOnly master', width:'120px', readOnly:readOnly, required:true /}
+					#{hidden id:'roundValueStripped', name:'fa.roundValue', value:fa?.roundValue /}
+					<span id="roundValueError" class="error">#{error 'Rounding Value is' /}</span>
+				</p>
+				
+				<div class="buttons">
+					<button id="proccess" #{if confirming || mode =='view' || calculated == true} disabled #{/if}>Distribute</button>
+				</div>
+			
+			</fieldSet>
+			</p>
+			<p>
+					#{textBox id:'externalReference', name:'fa.externalReference', label:'External References', value:fa?.externalReference, class:'capitalize master',  width:'300px', readOnly:readOnly,maxLength:50 /}
+			</p>
+			<p>	
+					#{textArea id:'remarks', name:'fa.remarks', label:'Remarks', value:fa?.remarks, readOnly:readOnly, class:'capitalize master', width:'300px', maxLength:100/}
+			</p>
+		</form>
+		</div>
+		<div class="pane" id="tab-2">
+			#{include 'RegistryFundAction/detail_dividen.html' /}
+		</div>
+		
+	</div>	
+	
+	<td>&nbsp;</td>
+<style>
+	#dividenGrid { width: 1800px; table-layout: fixed;}
+	div#dividenGrid_wrapper .ui-widget-header { width: 1788px; }
+</style>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'RegistryFundAction/FundAction.js' /}
+	$(document).ready(function() {
+		FundAction($("#main"));
+		
+		if ('${mode}' == 'view' || '${confirming}' == 'true') {
+			$('#proccess').button("disable");
+			$('#clearAll').button("disable");
+		}
+		
+		if ('${from}'=='cancelFundAction'){
+			$('.forCancelFundAction').css('display','');
+			$('#cancelDate').removeAttr("disabled");
+			$('#cancelPostDate').removeAttr("disabled");
+			if ('${confirming}'!='true')
+				$('#remarkForCancel').removeAttr("disabled");
+		}
+		
+		if ('${from}'=='listBatch' || '${from}'=='singleList'){
+			$('.forCancelFundAction').css('display','');
+			$('#cancelDate').attr("disabled", "disabled");
+			$('#cancelPostDate').attr("disabled", "disabled");
+			$('#remarkForCancel').attr("disabled", "disabled");
+		}
+
+		if('${fa.status}' == 'O') $('.forCancelFundAction').css('display','none');
+	});
+</script>

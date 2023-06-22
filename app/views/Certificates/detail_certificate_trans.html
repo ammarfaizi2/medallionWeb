@@ -1,0 +1,113 @@
+<script type="text/javascript">
+	$(function(){
+		$('#transactionNo').blur(function(){
+			$("#detailForCertificateTransDetails #detailCertificateTransForm #transactionNoError").html('').show();
+			if ($('#detailForCertificateTransDetails #detailCertificateTransForm #transactionNo').val()=="") {
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #transactionNo').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #transactionkey').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #transactionDate').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #transactionStatus').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #transactionCode').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #h_transactionCode').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #transactionDescription').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #h_transactionDescription').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #transactionTemplateKey').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #accountNo').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #accountKey').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #accountName').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #description').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #securityKey').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #securityCode').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #securityDesc').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #securityType').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #settlementDate').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #quantity').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #price').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #amount').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #h_amount').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #amountStripped').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #settlementAmount').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #h_settlementAmount').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #settlementAmountStripped').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #quantityStripped').val('');
+				$('#detailForCertificateTransDetails #detailCertificateTransForm #priceStripped').val('');
+			}
+			$('#detailForCertificateTransDetails #detailCertificateTransForm  #newTransactionKey').val($('#detailForCertificateTransDetails #detailCertificateTransForm #transactionNo').val());
+		}); 
+		
+		$('#cancelCertificateTransDetail').click(function() {
+			$("#detailForCertificateTransDetails #detailCertificateTransForm").find("span[id*='Error']").html("");
+			$("#detailForCertificateTransDetails").dialog('close');
+			return false;
+		})
+	});
+	
+</script>
+<style type="text/css">
+  .errmsg { color:red; }
+</style>
+<form></form>
+<form id="detailCertificateTransForm" class="form">
+<span id="errmsgNull" class="errmsg" ></span>
+	<p>
+		#{hidden id:'oldTransactionKey' /}
+		#{hidden id:'newTransactionKey' /}
+		#{hidden id:'rowPosition' /}
+		#{hidden id:'filter' /}
+		#{hidden id:'description' /}
+		#{hidden id:'holdingRefs' /}
+	</p>
+	&nbsp; <span id="existError" class="error"></span>
+	<p>
+		#{textBox id:'transactionNo', name:'transaction.transactionNumber', label:'Transaction No', value:transaction?.transactionNumber, dataold:transaction?.transactionNumber, class:'capitalize', width:'100px', required:true, readOnly:readOnly /}
+		#{hidden id:'transactionKey', name:'transaction.transactionKey', value:transaction?.transactionKey /}
+		#{button id:'transactionHelp', value:'?', class:'small', readOnly:readOnly /}
+		&nbsp; <span id="transactionNoError" class="error"></span>
+	</p>
+	<fieldset style="width: 550px"> <legend><b>Detail</b></legend>
+		#{hidden id:'accountKey', name:'transaction.account.custodyAccountKey', value:transaction?.account?.custodyAccountKey /}
+		<p>
+			#{textBox id:'transactionDate', name:'transaction.transactionDate', label:'Transaction Date', class:'calendar', value:transaction?.transactionDate?.format(appProp.dateFormat), readOnly:true, width:'100px' /} (${appProp.displayDateFormat})
+			&nbsp; <span><b>Status</b></span>
+			#{textBox id:'transactionStatus', name:'transaction.transactionStatus', value:transaction?.transactionStatus, readOnly:true, width:'50px' /}
+		</p>
+		<p>
+			#{textBox id:'transactionCode', name:'transaction.transactionTemplate.transactionCode', label:'Transaction Code', class:'capitalize', value:transaction?.transactionTemplate?.transactionCode, readOnly:true, width:'100px' /}
+			#{textBox id:'transactionDescription', name:'transaction.transactionTemplate.description', value:transaction?.transactionTemplate?.description, readOnly:true, width:'241.5px' /}
+			#{hidden id:'transactionTemplateKey', name:'transaction.transactionTemplate.transactionTemplateKey', value:transaction?.transactionTemplate?.transactionTemplateKey /}
+			<span id="transactionCodeError" class="error"></span>
+		</p>
+		<p>
+			#{textBox id:'securityType', name:'transaction.security.securityType.securityType', label:'Security Type', value:transaction?.security?.securityType?.securityType, class:'capitalize', readOnly:true, width:'100px' /}
+		</p>
+		<p>
+			#{textBox id:'securityCode', name:'transaction.security.securityId', label:'Security Code', class:'capitalize', value:transaction?.security?.securityId, readOnly:true, width:'100px' /}
+			#{textBox id:'securityDesc', name:'transaction.security.description', value:transaction?.security?.description, readOnly:true, width:'241.5px' /}
+			#{hidden id:'securityKey', name:'transaction.security.securityKey', value:transaction?.security?.securityKey /}
+			<span id="securityCodeError" class="error"></span>
+		</p>
+		<p>
+			#{radioButton id:'isScript', name:'isActive', value:((transaction?.isScript)?'true':'false'), label:'Script', options:operators, readOnly:readOnly /}
+			#{hidden id:'isScriptHidden', name:'transaction.isScript', value:((transaction?.isScript)?'true':'false') /}
+		</p>
+		<p>
+			#{textBox id:'settlementDate', name:'transaction.settlementDate', label:'Settlement Date', class:'calendar', value:transaction?.settlementDate?.format(appProp.dateFormat), readOnly:true, width:'100px' /} (${appProp.displayDateFormat})
+		</p>
+		<p>
+		#{textBox id:'quantity', name:'quantity', label:'Quantity', value:transaction?.quantity, format:'#,##0.####', class:'numeric', width:'100px', readOnly:true /}
+		#{hidden id:'quantityStripped', name:'transaction.quantity', value:transaction?.quantity /}
+		</p>
+		<p>
+			#{textBox id:'price', name:'transaction.price', label:'Price', value:transaction?.price, class:'numeric', format:'#,##0.####', width:'100px', readOnly:true /}
+			#{hidden id:'priceStripped', name:'transaction.price', value:transaction?.price /}
+		</p>
+		<p>
+			#{textBox id:'amount', name:'amount', label:'Nominal', value:transaction?.amount, class:'numeric', format:'#,##0.####', width:'100px', readOnly:true /}
+			#{hidden id:'amountStripped', name:'transaction.amount', value:transaction?.amount /}
+		</p>	
+		<p>
+			#{textBox id:'settlementAmount', name:'transaction.settlementAmount', label:'Settlement Amount', value:transaction?.settlementAmount, class:'numeric', format:'#,##0.####', width:'100px', readOnly:true /}
+			#{hidden id:'settlementAmountStripped', name:'transaction.settlementAmount', value:transaction?.settlementAmount /}
+		</p>
+	</fieldset>
+</form>

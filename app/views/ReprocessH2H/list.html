@@ -1,0 +1,124 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Reprocess for H2H PTP S-INVEST' /}
+
+<script type="text/javascript">
+	$(function() {
+		$('.button').button();
+
+		var backToWorkList = function() {
+			loading.dialog('open');
+			location.href="@{ReprocessH2H.list()}";
+		}
+
+		$('#processFrom').change(function(){
+			var prevDate = $('#prevDate').datepicker('getDate');
+			var processFrom = $('#processFrom').datepicker('getDate');
+			if (processFrom.getTime() < prevDate.getTime()){
+				$('#processFrom').addClass('fieldError');
+				$('#processFromError').html('Process From must greater equal than Previous Application Date');
+			}
+		});
+
+		$('#processTo').change(function(){
+			var prevDate = $('#prevDate').datepicker('getDate');
+			var processTo = $('#processTo').datepicker('getDate');
+			if (processTo.getTime() < prevDate.getTime()){
+				$('#processTo').addClass('fieldError');
+				$('#processToError').html('Process To must greater equal than Previous Application Date');
+			}
+
+			if(!($('#processFrom').hasClass('fieldError'))){
+				var processFrom = $('#processFrom').datepicker('getDate');
+				var processTo = $(this).datepicker('getDate');
+				var origin = 'to';
+				var id = '#process';
+				if ((($(this).val()!='') || ($(this).hasClass('fieldError'))) && ($('#processFrom').val()!='')){
+					compareDateFromToEqual(processFrom, processTo, origin, id);
+				}
+			}
+		});
+
+		var loadValidate = function() {
+			$('#processFrom').html('');
+			$('#processTo').html('');
+
+			if (($('#processFrom').hasClass('fieldError')) 
+				|| ($('#processTo').hasClass('fieldError'))){
+				return false;
+			}
+			return true;
+		}
+
+		$('#reset').click(function() {
+ 			location.href="@{ReprocessH2H.list()}";
+ 	 	});
+
+		$('#load').click(function() {
+			if (!loadValidate()) return false;
+
+			var action = "@{load()}?processFrom="+$('#processFrom').val()+"&processTo="+$('#processTo').val();
+			loading.dialog('open');
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+	    		loading.dialog('close');
+	    		if (data.status == 'success') {
+	    			$("#processFrom").val(data.processFrom);
+	    			$("#processTo").val(data.processTo);
+	    			$("#totalTransaction").val(data.totalTransaction);
+	    			if(data.totalTransaction > 0) $('#process').button({disabled: false});
+	    		} else {
+	    			alert("Load Failed");
+	    		}
+			});
+ 	 	});
+
+		$('#process').click(function() {
+			var action = "@{process()}?processFrom="+$('#processFrom').val()+"&processTo="+$('#processTo').val();
+			loading.dialog('open');
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "H2H Process Message", backToWorkList);
+				} else {
+	    			alert("Process Failed");
+	    		}
+			});
+ 	 	});
+	})
+</script>
+
+<form id="form" class="form" method="POST">
+	#{hidden id:'prevDate', name:'prevDate', value:prevDate, class:'calendar' /}
+	<table>
+		<tr>
+			<td valign="top" width="50%">
+				<p>
+					#{textBox id:'processFrom', name:'ib.processFrom', label:'Process From', value:ib?.processFrom?.format(appProp.dateFormat), class:'calendar', required:true, readOnly:readOnly /}
+					<span id="processFromError" class="error"></span>
+				</p>
+				<p>
+					#{textBox id:'processTo', name:'ib.proccessTo', label:'Process To', value:ib?.processTo?.format(appProp.dateFormat), class:'calendar', required:true, readOnly:readOnly /}
+					<span id="processToError" class="error"></span>
+				</p>
+
+				<p style="padding-top:10px;">
+					<input type="button" id="reset" value="Reset" class="button" />
+					<input type="button" id="load" value="Load &gt;&gt;" class="button" />
+				</p>
+			</td>
+			<td valign="top">
+				<fieldset>
+					<legend>Summary</legend>
+					<p>
+						#{textBox id:'totalTransaction', name:'ib.totalTransaction', label:'Number of Transaction', value:ib?.totalTransaction, readOnly:true /}
+					</p>
+
+					<p style="padding-top:10px;">
+						<input type=button id="process" value="Process" class="button" disabled="disabled" />
+					</p>
+				</fieldset>	
+			</td>
+		</tr>
+	</table>
+</form>

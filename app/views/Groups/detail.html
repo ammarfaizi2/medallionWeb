@@ -1,0 +1,371 @@
+#{extends 'templates/main.html' /}
+#{if mode == 'edit' || mode == 'entry' || mode == 'view'}
+	#{set pageTitle: 'Group Maintenance' /}
+#{/if}
+#{else}
+	#{set pageTitle: 'Group Maintenance Approval' /}
+#{/else}
+#{set id: grp?.groupKey /}
+
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+
+
+#{script 'lookups.js' /}
+<script type="text/javascript">
+	$(function() {	
+		//var rowCount = ${grp?.users?.size()};
+		$('#addUser').button();
+		$( "#dialog-message1" ).css("display","none");
+		$('.buttons input:button').button();
+		$('#tabs').tabs();
+		$('#tabs').css('height', '365');
+		
+		if (('${mode}'=='entry') || (('${mode}'=='edit') && (('${grp?.recordStatus?.decodeStatus()}' == 'Reject') || ($("#status").val() == 'R')))) {
+			$('input[name=isActive]').attr("disabled", "disabled");
+		}
+		
+		if (('${confirming}' != 'true')&&('${mode}' == 'entry')){
+			var	group = new Object();
+			group.organization = new Object();
+			group.users = new Array();
+			var users = (group.users);
+		}
+
+		if (('${mode}' == 'edit')||('${confirming}' == 'true')||('${mode}'=='view')) {
+			var group = ${dataGroups.raw()};
+			group.organization = new Object();
+			var users = (group.users);
+			$('#groupKey').val(group.groupKey);
+			$('#organizationId').val(group.organization.organizationId);
+			$('#groupName').val(group.groupName);
+			$('#isActiveHidden').val(group.isActive);
+			if ($('#isActiveHidden').val()=='true'){
+				$('#isActive1').attr("checked", true);
+			} else {
+				$('#isActive2').attr("checked", true);
+			}
+			if ('${id}'==''){
+				$('input[name=isActive]').attr("disabled", "disabled");
+			}
+		}
+
+		$('input[name=isActive]').change(function(){
+			$("input[name='grp.isActive']").val($("input[name='isActive']:checked").val());
+		})
+
+		var gridUser = $('#gridUser').dataTable({
+			aaData:users,
+			aoColumns: [{
+							bVisible:false,
+							mDataProp:'userKey'
+				
+						},
+						{
+							fnRender: function(obj) {
+								var controls;
+								controls = obj.aData.userId;
+								controls += '<input type="hidden" name="users[' + obj.iDataRow + '].userId" value="' + obj.aData.userId + '" />';
+								return controls;
+							}
+						},
+						{
+							fnRender: function(obj) {
+								var controls;
+								controls = obj.aData.userName;
+								controls += '<input type="hidden" name="users[' + obj.iDataRow + '].userName" value="' + obj.aData.userName + '" />';
+								return controls;
+							}
+						},
+						{
+							fnRender: function(obj) {
+				            	   var controls;
+				            	   controls = '<center><input id="deleteButton" type="button" value="Delete" #{if readOnly}disabled="disabled"#{/if} /></center>';
+				            	   controls += '<input type="hidden" name="users[' + obj.iDataRow + '].userKey" value="' + obj.aData.userKey + '" />';
+				            	   return controls;
+				               }
+						}],
+				aaSorting: [[1, 'asc']],
+				bAutoWidth: false,
+				bDestroy: true,
+				bJQueryUI: true,
+				bLengthChange: false,
+				sPaginationType: 'full_numbers',
+				bInfo: true,
+				bPaginate: true,
+				iDisplayLength:7
+		})
+		
+		// Delete row
+		$('#gridUser tbody tr #deleteButton').live('click', function() {
+			var row = $(this).parents('tr');
+			var rowNumber = gridUser.fnGetPosition(row[0]);
+			$("#dialog-message1").dialog({
+				autoOpen:false,
+				height:120,
+				width:250,
+				modal:true,
+				resizable : false,
+				buttons: {
+					"Yes": function() {
+						gridUser.fnDeleteRow(rowNumber);
+						var idTable = $("#listUser #gridUser");
+						var trs = $("tr", idTable);
+						$.each(trs, function(idx, data){
+							var hiddens = $("[type=hidden]", $(this));
+								$(hiddens).eq(0).attr("name", "users["+(idx-1)+"].userId");
+								$(hiddens).eq(1).attr("name", "users["+(idx-1)+"].userName");
+								$(hiddens).eq(2).attr("name", "users["+(idx-1)+"].userKey");
+						});
+						$("#dialog-message1").dialog("close");
+					},
+					"No ": function() {
+						$("#dialog-message1").dialog("close");
+					}	
+				}
+			});
+			$('#dialog-message1').css('overflow','hidden');
+			$("#dialog-message1").dialog('open');
+			$('.ui-widget-overlay').css('height',$('body').height());
+		})
+		
+		$('#userKey').lookup({
+			list: '@{Pick.users()}',
+			get: {
+				url: '@{Pick.user()}',
+				success: function(data) {
+					var rows = gridUser.fnGetNodes().length;
+					var found = false;
+					// Check duplicate row
+					for (i = 0; i < rows; i++) {
+						var cell = gridUser.fnGetData(i);
+						if (data.code == cell.userKey) {
+							$('#errUser').html('User id "'+ data.userId +'" was already exist !');
+							found = true;
+							break;
+						} else {
+							$('#errUser').html('');
+						}
+					}
+					// If no duplicate, then add new row
+					if (!found) {
+						var dataUser = new Object();
+						dataUser.userKey = data.code;
+						dataUser.userId = data.userId;
+						dataUser.userName = data.description;
+						gridUser.fnAddData(dataUser);
+						/*gridUser.fnAddData([
+						                   		data.code,
+						                   		data.userId,
+						                   		data.description,
+						                   		"<center><input type='button' value='Delete' id='deleteButton' /></center>" + 
+						                   	 	"<input type='hidden' name='users[" + rowCount + "].userKey' value='" + data.code + "' />" +
+						                   	 	"<input type='hidden' name='users[" + rowCount + "].userId' value='" + data.userId + "' />" +
+						                   	 	"<input type='hidden' name='users[" + rowCount + "].userName' value='" + data.description + "' />"						                   	 	
+						                     ]);
+						rowCount++; */
+					}
+					$('#userKey').val('');
+				}
+			},
+			help: $('#addUser')
+		})
+		
+		$('#save').click(function() {
+			if ($('#groupName').val()=='') {
+				$('#errGroupName').html('required');
+				return false;
+			}
+			
+			var grp = new Object();
+			grp.organization = new Object();
+			grp.organization.organizationId = $('#organizationId').val();
+			grp.groupKey = $('#groupKey').val();
+			grp.groupName = $('#groupName').val();
+			grp.isActive = $("input[name='grp.isActive']").val();
+			grp.users = $('#gridUser').dataTable().fnGetData();
+			
+			//loadingDialog();
+			var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Sending data to server ...</div>').appendTo('body');
+			loading.dialog({
+				closeOnEscape: false,
+				draggable: false,
+				modal: true,
+				resizable: false,
+				open:function() {
+					$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+				} 
+			});
+			
+			$.ajax({
+				type: 'POST',
+				url: '@{Groups.save()}?id='+$('#groupKey').val(),
+				data: JSON.stringify(grp),
+				contentType: 'application/json; charset=utf-8',
+				dataType: 'json',
+				success: function() {
+					location.href='@{Groups.confirming()}/'+$('#groupKey').val()+'?mode=${mode}';
+				}
+			})
+		})
+		
+		$('#confirm').click(function() {
+			
+		//	loadingDialog();
+		var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Sending data to server ...</div>').appendTo('body');
+			loading.dialog({
+				closeOnEscape: false,
+				draggable: false,
+				modal: true,
+				resizable: false,
+				open:function() {
+					$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+				} 
+			});
+			
+			var request = $.ajax({
+				url: '@{Groups.confirm()}/'+$('#groupKey').val()
+			//	success: function() {
+			//		location.href='@{FeeAccruals.list()}';
+			//	}
+			})
+//			console.debug(request);
+//			console.debug(request.responseText);
+			request.onreadystatechange = function(){
+				if((request.readyState == 4) && (request.status == 200)){
+					if(request.responseText == "error") {
+						//location.href='@{FeeAccruals.back()}/'+$('#feeKey').val()+'?mode=edit'+'?status=${status}';
+						location.href='@{Groups.confirming()}/'+$('#groupKey').val()+'?mode=${mode}';
+				} else {
+						location.href='@{Groups.list()}';
+					}
+				}
+			}
+			return false;
+		})
+		
+		// ====== EVENT BUTTON CANCEL ==== //
+		$('#cancel').click(function() {
+			location.href='@{Groups.list()}';
+			return false;
+		})
+	
+		// ====== EVENT BUTTON BACK =======//
+		$('#back').click(function() {
+			location.href='@{Groups.back()}/'+$('#groupKey').val()+'?mode=edit';
+			return false;
+		})
+		
+		function loadingDialog(){
+			var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Sending data to server ...</div>').appendTo('body');
+			loading.dialog({
+				closeOnEscape: false,
+				draggable: false,
+				modal: true,
+				resizable: false,
+				open:function() {
+					$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+				} 
+			});
+		}
+		
+	});
+	
+	
+	
+</script>
+<form class="form" id="groupForm">
+#{hidden id:'organizationId', name:'grp.organization.organizationId', value:grp?.organization?.organizationId /}
+#{hidden id:'groupKey', name:'grp.groupKey', value:grp?.groupKey /}
+<h3>Group Maintenance</h3>
+#{if flash.error || errors}
+    <div class="error">
+    	Error when saving data!<br/>
+		<li>${flash.error}</li>
+		#{ifErrors}
+			#{errors}
+				 <li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}
+<div id="tabs">
+	<ul>
+		<li><a href="#tab-1">Group Detail</a></li>
+		<li><a href="#tab-2">Users</a></li>
+	</ul>
+	<br />
+	<div class="pane" id="tab-1">
+		<p>      
+			#{textBox id:'groupName', name:'grp.groupName', label:'Group', value:grp?.groupName, class:"capitalize", width:'300px', required:true, readOnly:readOnly /}
+			<span class="error">#{error 'Group is' /}</span>
+			<span id="errGroupName" class="error"></span>
+		</p>
+		<p>
+			#{radioButton id:'isActive', name:'isActive', value:((grp?.isActive)?'true':'false'), label:'Active', options:operators, readOnly:readOnly /}
+			#{hidden id:'isActiveHidden', name:'grp.isActive', value:((grp?.isActive)?'true':'false') /}
+		</p>			
+	</div>
+	<div class="pane" id="tab-2">
+		<div id="listUser">
+		#{hidden id:'userKey' /}
+		<span id="errUser" class="error"></span>
+		<table id="gridUser" class="display">
+			<thead>
+				<tr>
+					<th>Key</th>
+					<th width="250px">User ID</th>					
+					<th>Name</th>
+					<th width="80px">Action</th>
+				</tr>
+			</thead>
+			<tbody>
+			 	#{list grp?.users, as:'item'}
+				<tr>
+					<td>
+						${item?.userKey}
+					</td>
+					<td>
+						${item?.userId}
+					</td>
+					<td>
+						${item?.userName}
+					</td>
+					<td>
+						<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} /></center>
+						#{hidden name:'users[' + (item_index-1) + '].userId', value:item?.userId /}
+						#{hidden name:'users[' + (item_index-1) + '].userName', value:item?.userName /}
+						#{hidden name:'users[' + (item_index-1) + '].userKey', value:item?.userKey /}
+					</td>	
+				</tr>
+				#{/list}
+			</tbody>
+		</table>
+		</div>
+		#{if (!confirming && mode != 'view')}
+		<div class="buttons">
+			<input type="button" id="addUser" value="Add" />
+		</div>
+		#{/if}	
+	</div>
+</div>
+<div class="buttons">
+		#{if mode == 'view'}
+		<input type="button" id="cancel" value="Close">
+		#{/if}
+		#{else}
+			#{if (!confirming) }
+				<input type="button" id="save" value="Save">
+				<input type="button" id="cancel" value="Cancel">
+			#{/if}
+			#{if confirming}
+				<input type="button" id="confirm" value="Confirm">
+				<input type="button" id="back" value="Back">
+			#{/if}
+		#{/else}
+</div>
+</form>
+<div id="dialog-message1" title="Message Confirmation">
+	<p>
+	<span class="ui-icon ui-icon-notice" style="float:left; margin:0 7px 50px 0;"></span>
+	Are you sure to delete data ? </p>
+</div>

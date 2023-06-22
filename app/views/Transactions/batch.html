@@ -1,0 +1,76 @@
+<script type="text/javascript">
+	$(function() {
+		$('#list').dataTable({
+		 	aaSorting:[[0,'asc']],
+		 	aoColumnDefs:[{bVisible:false,aTargets:[0]}],
+			bJQueryUI:true,
+			sScrollX:'100%',												// buat scrollbar di datatables (grid)
+			bScrollCollapse: true,		
+			sPaginationType: 'full_numbers'
+		});
+		$('#list tbody tr').click(function() {
+			var table = $('#list').dataTable();  
+			var pos = table.fnGetPosition(this);
+			var data = table.fnGetData(pos);
+			var detail=$('<div><div id="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div></div>');
+			detail.dialog({
+				autoOpen:false,
+				height:600,
+				width:800,
+				modal:true,
+				title:'Transaction Detail',
+				buttons: {
+					"Close": function() {
+						$(this).html('');
+						$(this).dialog('close');
+					}
+				}			
+			});
+			detail.dialog('open');
+			detail.load("@{view()}?settlement=${settlement}&id=" + data[0]+"&viewFrom=viewSingleBacth&backSettlement=true");
+		})
+	});
+</script>
+<form class="form">
+	#{hidden name:"taskId", value:taskId /}
+	<p>
+		#{textBox id:"transactionBatchKey", label:"Batch Number", name:"batch.transactionBatchKey", value:batch?.transactionBatchKey, readOnly:true /}
+	</p>
+	<p>
+		#{textBox id:"batchDate", label:"Batch Date", name:"batch.batchDate", value:batch?.batchDate?.format('MM/dd/yyyy'), class:'calendar', readOnly:true /}
+	</p>
+	<p></p>
+	<table id="list" class="display">
+		<thead>
+			<tr>
+				<th></th>
+				<th width="85">Txn #</th>			
+				<th width="100">Settle Date</th>			
+				<th width="120">Account No</th>			
+				<th width="100">Sec Code</th>
+				<th>Description</th>		
+				<th width="150">Settlement Amount</th>
+			</tr>
+		</thead>
+		<tbody>
+			#{list items:batch?.transactions, as:'transaction'}
+				<tr>
+					<td>${transaction.transactionKey}</td>
+					<td>${transaction.transactionNumber}</td>
+					<td>${transaction.settlementDate?.format('MM/dd/yyyy')}</td>
+					<td>${transaction.account?.accountNo}</td>
+					<td>${transaction.security?.securityId}</td>
+					<td>${transaction.transactionTemplate?.description}</td>
+					<td align="right">
+						#{if transaction?.transactionTemplate?.settlementTransaction?.cashTransaction != null}
+							${transaction.settlementAmount.format("#,##0.00")}
+						#{/if}
+						#{else}
+							0.00
+						#{/else}
+					</td>
+				</tr>
+			#{/list}
+		</tbody>
+	</table>
+</form>

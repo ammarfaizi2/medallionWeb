@@ -1,0 +1,106 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Chart Of Account' /}
+#{set fixData: true /}
+#{set mode: mode /}
+
+<script type="text/javascript">
+	$(function() {
+		//$('#filter').accordion({
+		//	collapsible: true
+		//})
+		//$('#filter').accordion('activate', false)
+		// end of Filter
+		
+		//$('#filterButton').click(function() {
+		//	$('#detail .loading').show()
+		//	$('#detail .response').hide()
+		//	$('#detail .response').load('@ {Branches.filter()}?key=' + $('#filterText').val(), function() {
+		//		$('#detail .loading').hide()
+		//		$('#detail .response').show()
+		//	});
+		//	return false;
+		//})
+		//$('#clearButton').click(function() {
+		//	$('#filterText').val('')
+		//	$('#detail .loading').show()
+		//	$('#detail .response').hide()
+		//	$('#detail .response').load('@ {Branches.filter()}', function() {
+		//		$('#detail .loading').hide()
+		//		$('#detail .response').show()
+		//	});
+		//	return false;
+		//})
+		
+		// DataTables section
+				
+		$('.buttons button').button()
+		$('#new').click(function() {
+			entry();
+		})
+	});
+	
+	function doSetupTable() {
+		var table = 
+			$('#list #grid').dataTable({
+				aoColumns: [
+					    {bVisible:false},
+					     null,
+					     null,
+					     null,
+					     null,
+					     null					     
+					   ],	
+				bJQueryUI:true,
+				bSort:false,
+				sPaginationType:'full_numbers',
+				bLengthChange:false,
+				iDisplayLength:15,
+				
+			});
+		$('#list #grid tbody tr').die('click');
+		$('#list #grid tbody tr').live('click', function() {
+			var data = table.fnGetData(this);
+			var id = data[0];
+			edit(id);
+		});
+	}
+	// end of DataTables
+</script>
+
+<div class="buttons">
+	<button id="new">Add</button>
+</div>
+<table id="grid" class="display">
+	<thead>
+		<tr>
+			<th width="50px">key</th>
+			<th width="320px">Description</th>
+			<th width="15px">Account No</th>
+			<th width="10px">Debit / Credit</th>
+			<th width="10px">Currency</th>
+			<th width="50px">Status</th>
+		</tr>
+	</thead>
+	<tbody>
+		#{list items:faCoaMasters, as:'faCoaMaster'}
+		<tr>
+			<td>${faCoaMaster.coaMasterKey}</td>
+			<td>
+				#{if faCoaMaster?.coaLevel > 0}
+					#{list 0..(faCoaMaster.coaLevel - 1)}
+						&nbsp;&nbsp;&nbsp;
+					#{/list}
+					    &#8970;__
+				#{/if}
+				${faCoaMaster.description}
+			</td>
+			<td align="center">${faCoaMaster.coaCode}</td>
+			<td align="center">${faCoaMaster.nature}</td>
+			<td align="center">${faCoaMaster?.currency?.currencyCode}</td>
+			<td>
+				${faCoaMaster?.isActive ? 'Active':'Disable'}
+			</td>
+		</tr>
+		#{/list}
+	</tbody>
+</table>

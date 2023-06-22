@@ -1,0 +1,104 @@
+<table>
+	<tr>
+		<td valign="top">
+			<p>	
+				#{textBox id:'subMinInitAmt', label:'Min. Initial Amount', value:prd?.subInitMinAmt, format:'#,##0.####', class:'numeric', width:'181px', readOnly:readOnly, required:true /}
+				#{hidden  id:'subMinInitAmtStripped', name:'prd.subInitMinAmt', value:prd?.subInitMinAmt /}
+				<span class="error">#{error 'Min. Initial Amount in tab Subscription is' /}</span> 
+			</p>
+
+			<p>
+				#{textBox id:'subMinAmt', label:'Min. Top up Amount', value:prd?.subMinAmt, format:'#,##0.####', class:'numeric', width:'181px', readOnly:readOnly, required:true /}
+				#{hidden  id:'subMinAmtStripped', name:'prd.subMinAmt', value:prd?.subMinAmt /}
+				<span class="error">#{error 'Min. Top up Amount in tab Subscription is' /}</span> 
+			</p>
+			
+			<p>
+				<label>Maximum Amount<span id="spanSubMaxAmt" class="req"> *</span></label>
+				#{textBox id:'subMaxAmt',value:prd?.subMaxAmt, format:'#,##0.####', class:'numeric maxValidate', width:'181px', readOnly:readOnly /}
+				#{hidden  id:'subMaxAmtStripped', name:'prd.subMaxAmt', value:prd?.subMaxAmt /}
+				#{checkBox id:'isCheckedSub', name:'prd.checkMaxSub', value:prd?.checkMaxSub, readOnly:readOnly /}Max
+				<span id = "isCheckedSubError" class="error">#{error 'Maximum Amount in tab Subscription is' /}</span>
+			</p>
+
+            <p></p>
+
+            <fieldset style="width:520px; height:115px">
+                <legend><b>Subscription Fee</b></legend>
+                
+                <p>
+	                #{textBox id:'subTax', name:'prd.taxMasterBySubTaxKey.taxCode', label:'Tax Code', value:prd?.taxMasterBySubTaxKey?.taxCode, width:'120px', readOnly:readOnly, class:'capitalize', required:true /}
+	                #{hidden  id:'subTaxKey', name:'prd.taxMasterBySubTaxKey.taxKey', value:prd?.taxMasterBySubTaxKey?.taxKey /}
+	                #{button  id:'subTaxHelp',  value:'?', class:'small', readOnly:readOnly /}
+	                #{textBox id:'subTaxDesc', name:'prd.taxMasterBySubTaxKey.description', value:prd?.taxMasterBySubTaxKey?.description, readOnly:true, width:'180px' /}
+	                <span class="error">#{error 'Tax Code in tab Subscription is' /}</span>
+	            </p>
+	            
+                #{list prd?.subFees, as:'fee'}
+                <p>
+	               #{textBox id:'valueSub['+(fee_index-1)+']', label:'Default Fee (%)', name:'subFeeTierValue', format:'#,##0.####', value:fee?.value, width:'140px', readOnly:readOnly, required:true /}
+	               #{hidden id:'valueSub['+(fee_index-1)+']Stripped', name:'prd.subFees['+(fee_index-1)+'].value', value:fee?.value /}
+	               (include tax)
+	               <span class="error">#{error 'Default Fee in tab Subscription is' /}</span> 
+	            </p>
+
+                <p>
+                   <label>Maximum Fee (%)<span id="spanSubFeeTierMaxValue" class="req"> *</span></label>
+	               #{textBox id:'maxValueSub['+(fee_index-1)+']', name:'subFeeTierMaxValue', format:'#,##0.####', width:'140px', readOnly:readOnly, value:fee?.maxValue /}
+	               #{hidden id:'maxValueSub['+(fee_index-1)+']Stripped', name:'prd.subFees['+(fee_index-1)+'].maxValue', value:fee?.maxValue /}
+	               #{hidden id:'tierNumber['+(fee_index-1)+']Stripped', name:'prd.subFees['+(fee_index-1)+'].tierNumber',  value:fee?.tierNumber /}
+	               #{hidden id:'upperLimit['+(fee_index-1)+']Stripped', name:'prd.subFees['+(fee_index-1)+'].upperLimit',  value:fee?.upperLimit /}
+	               #{checkBox id:'isCheckedSubMaxValue['+(fee_index-1)+']', name:'checkSubFeeTierMaxValue['+(fee_index-1)+']', readOnly:readOnly, value: prd?.checkSubFeeTierMaxValue /} Max
+                   #{hidden id:'isCheckedSubMaxValue['+(fee_index-1)+']Stripped', name:'prd.checkSubFeeTierMaxValue'/}
+	            </p>
+	            
+	            <p><span id = "isCheckedSubMaxFeeError" class="error">#{error 'Maximum Fee in tab Subscription is' /}</span></p>
+                #{/list}
+
+            </fieldset>
+		</td>
+		<td valign="top">
+			<fieldset style="width:345px; height:325px">
+				<legend><b>Subscription Window</b></legend>
+				<p>
+					#{radioButton id:'subLock', name:'prd.subLock', label:'Lock', options:operators, value:((prd?.subLock)?'true':'false'), readOnly:readOnly /}
+				</p>
+				
+				<p>
+					#{textBox id:'subExceptionDate', name:'subExceptionDate', class:'calendar invalidDateFormat', value:"", readOnly:readOnly, width:'80px' /}
+					<input type="button" id="subAddDate" value="Insert" #{if readOnly}disabled='disabled'#{/if}></input> (${appProp.displayDateFormat})
+				</p>
+				
+				<p style="margin-left: 162px">
+					<span id="subExceptionDateError" class="error"></span>
+				</p>
+				
+				<p></p>
+				
+				<div class="tier-box-IE" style="overflow-y:scroll;max-height:240px">
+					<table id="subExceptionSpecificDate" class="display">
+						<thead>
+							<tr>
+								<th>Date</th>
+								<th>Action</th>
+							</tr>
+						</thead>
+						<tbody>
+							#{list prd?.subLockExceptions, as:'lockException'}
+			 					<tr>
+									<td>${lockException?.id?.exceptionDate?.format(appProp.dateFormat)}</td>
+									<td del='true'>
+										<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} exceDateType="SUBSCRIBE" /></center>
+										#{hidden id:'exceptionDate'+(lockException_index-1), name:'prd.subLockExceptions[' + (lockException_index-1) + '].id.exceptionDate', value:lockException?.id?.exceptionDate?.format(appProp.dateFormat) /}
+										#{hidden id:'productCode'+(lockException_index-1), name:'prd.subLockExceptions[' + (lockException_index-1) + '].id.productCode', value:lockException?.id?.productCode /}
+										#{hidden id:'exceDateType'+(lockException_index-1), name:'prd.subLockExceptions[' + (lockException_index-1) + '].id.type', value:lockException?.id?.type /}
+									</td>
+								</tr>
+							#{/list}
+			 			</tbody>
+					</table>
+				</div>
+			</fieldset>
+		</td>
+	</tr>
+</table>

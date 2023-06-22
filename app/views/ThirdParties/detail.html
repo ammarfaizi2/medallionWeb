@@ -1,0 +1,6 @@
+#{extends 'templates/detail1.html' /}
+#{set pageTitle: "Third Party Maintenance - ${lookup?.lookupDescription}" /}
+
+#{set id: thirdParty?.thirdPartyKey /}
+
+#{include 'ThirdParties/form.html' /}

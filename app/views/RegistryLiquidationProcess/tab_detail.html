@@ -1,0 +1,35 @@
+<div id='pagingMain' style="overflow-y:scroll;height:380px;overflow-x:scroll;width:930px">
+	<table id="tblSummary" class="display">
+		<thead>
+			<tr>
+				<th field="recordStatus|string|none|left|sortdasc">No</th>
+				<th field="accountNumber|string|none|left|sort">Account No</th>
+				<th field="name|string|none|left|sort">Account Name</th>
+				<th field="unit|number|decimal2|right|sort">Unit Balance</th>
+				<th field="price|number|decimal2|right|sort">Price</th>
+				<th field="balanceAmount|number|decimal2|right|sort">Amount</th>
+			</tr>
+		</thead>
+	</table>
+</div>
+
+
+<div id="noncalc">
+	<hr style="border-color:#A6C9E2">
+		<input type="button" id="clearAll" value="Reset" />
+		<span Style="margin-left: 25em;" ><b>Total Unit:</b></span>
+		#{textBox id:'totalUnitDetail', value:liq?.totalUnitDetail?.format('#,##0.#####'), readOnly:true, width:'160px', class:'numeric' /}
+		<span Style="margin-left: 5em;" ><b>Total Amount:</b></span>
+		#{textBox id:'totalAmountDetail', value:liq?.totalAmount?.format('#,##0.#####'), readOnly:true, width:'180px', class:'numeric' /}
+	<hr style="border-color:#A6C9E2">
+</div>
+#{hidden id:'totalUnitDetailStripped', name:'liq.totalUnitDetail', value:liq?.totalUnitDetail /}
+#{hidden id:'totalAmountDetailStripped', name:'liq.totalAmount', value:liq?.totalAmount /}
+
+<script type="text/javascript">
+#{include 'RegistrySubscription/Util.js' /}
+	#{include 'RegistryLiquidationProcess/Paging.js' /}
+	$(document).ready(function() {
+		Paging($("#pagingMain"));
+	});
+</script>

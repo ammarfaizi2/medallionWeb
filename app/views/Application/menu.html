@@ -1,0 +1,52 @@
+<html>
+<head>
+#{stylesheet 'superfish.css' /}
+#{script 'jquery-1.4.4.min.js', characterset:'utf-8' /}
+#{script 'jquery-ui-1.8.7.custom.min.js', characterset:'utf-8' /}
+#{script 'hoverIntent.js', characterset:'utf-8' /}
+#{script 'superfish.js', characterset:'utf-8' /}
+</head>
+<script type="text/javascript">
+	jQuery(function() {
+		jQuery('ul.sf-menu').superfish();
+	})
+	
+</script>
+<body>
+<ul class="sf-menu">
+	<li>
+		<a href="#">Transaction</a>
+		<ul>
+			<li>
+				<a href="#">Transaction 1</a>
+			</li>
+			<li>
+				<a href="#">Transaction 2</a>
+			</li>
+		</ul>
+	</li>		
+	<li>
+		<a href="#">Maintenance</a>
+		<ul>
+			<li>
+				<a href="#">Maintenance 1</a>
+			</li>
+			<li>
+				<a href="#">Maintenance 2</a>
+				<ul>
+					<li>
+						<a href="#">Maintenance 2.1</a>
+					</li>
+					<li>
+						<a href="#">Maintenance 2.2</a>
+					</li>
+				</ul>
+			</li>
+		</ul>		
+	</li>
+	<li>
+		<a href="#">Administration</a>
+	</li>
+</ul>
+</body>
+</html>

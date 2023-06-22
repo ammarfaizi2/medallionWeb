@@ -1,0 +1,73 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Investment Account Information' /}
+#{script 'lookuppaging.js' /}
+#{script 'lookups.js' /}
+
+<div id="root">
+	<h3><a href="#">Search Product Account</a></h3>
+
+	<form id="searchForm" class="form">
+		<input id="param" name="params.param" type="hidden" value="${param}"/> 
+		#{hidden id:'query', name:'params.query', value:params?.query /} 
+		<p>
+			#{dropDownList id:'investmentAccountNoOperator', name:'params.InvestmentAccountNoOperator', label:'Account No', options:stringOperators, value:params.investmentAccountNoOperator /}
+			#{textBox id:'investmentAccountSearchNo', name:'params.InvestmentAccountSearchNo', value:params.investmentAccountSearchNo, class:'capitalize' /}
+		</p>
+
+		<p>
+			#{dropDownList id:'investmentAccountNameOperator', name:'params.InvestmentAccountNameOperator', label:'Name', options:stringOperators, value:params.investmentAccountNameOperator /}
+			#{textBox id:'investmentAccountSearchName', name:'params.InvestmentAccountSearchName', value:params.investmentAccountSearchName, width:'350px', class:'capitalize' /}
+		</p>
+
+		<p style="display:none">
+			#{dropDownList id:'identificationNoOperator', name:'params.identificationNoOperator', label:'Identification No', options:stringOperators, value:params.identificationNoOperator /}
+			#{textBox id:'investmentAccountSearchIdentificationNo', name:'params.investmentAccountSearchIdentificationNo', value:params.investmentAccountSearchIdentificationNo, width:'200px' /}
+		</p>
+
+		<p>
+            #{textBox id:'investmentAccountFundCode', name:'params.rgTradeSearchFundKey', label:'Fund Code', value:params?.rgTradeSearchFundKey, width:'100px', readOnly:readOnly, class:'capitalize' /}
+            #{button  id:'investmentAccountFundCodeHelp', value:'?', class:'small', readOnly:readOnly/}
+            #{textBox id:'investmentAccountFundCodeDesc', name:'rgProduct.name', value:rgProduct?.name, readOnly:true, width:'305px' /}
+        </p>
+
+        <p>
+            #{dropDownList id:'investmentAccountCifAperdOperator', name:'params.InvestmentAccountCifAperdOperator', label:'CIF APERD/IFUA', options:stringOperators, value:params.investmentAccountCifAperdOperator /}
+            #{textBox id:'investmentAccountSearchCifAperd', name:'params.InvestmentAccountSearchCifAperd', value:params.investmentAccountSearchCifAperd, width:'350px', class:'capitalize' /}
+        </p>
+
+		<p>
+			<div class="buttons">
+				<input type="button" id="search" value="Search" />				
+				<input type="button" id="reset" value="Reset" />
+			</div>
+		</p>
+	</form>
+</div>
+<br />
+<div id="result" style="display:none">
+	<table id="tableInvestment" class="display">
+		<thead>
+			<tr>
+				<th width="100px" field="customer.customerNo|string|none|left|sort">Investor&nbsp;No</th>
+				<th width="100px" field="accountNumber|string|none|left|sort">Account&nbsp;No</th>
+				<th width="250px" field="name|string|none|left|sort">Account&nbsp;Name</th>
+				<th width="200px" field="rgProduct.productCode|string|none|left|sort">Fund&nbsp;Code</th>
+				<th width="200px" field="cifWaperd|string|none|left|sort">CIF APERD/IFUA</th>
+<!-- 				<th width="80px" field="customer.customerNo|string|none|left|sort">Investor</th> -->
+				<th width="80px" field="thirdPartyBySaCode.thirdPartyCode|string|none|left|sort">Selling&nbsp;Agent&nbsp;Code</th>
+				<th width="80px" field="recordStatus|string|decode|center|sort">Status</th>
+				<th width="50px" field="active|boolean|yesno|center|sort">Active</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+</div>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'RegistryInvestment/InvestmentPaging.js' /}
+	$(document).ready(function() {
+		Paging($("#root").add("#result"));
+	});
+</script>

@@ -1,0 +1,27 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Monitoring AML ' /}
+#{set fixData: true /}
+#{script 'lookups.js' /}
+
+
+<script>
+	function setupTable() {
+		// method ini di gunakan untuk mengintrupt pembuatan data table
+	}
+</script>
+
+<div id="root">
+	<div id="tabProcess" >
+		<ul>
+			<li><a id="monitoringTab" href="#monitoringAml">Search Customer</a></li>
+		</ul>
+		<div id="monitoringAml"> #{include 'MonitoringAml/monitoringAml.html' /} </div>
+	</div>	
+</div>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	$(document).ready(function() {
+		$("#tabProcess").tabs();
+	});
+</script>

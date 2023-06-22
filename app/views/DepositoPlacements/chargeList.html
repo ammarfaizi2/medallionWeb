@@ -1,0 +1,292 @@
+<script type="text/javascript">
+	$(function() {
+		chargeGrid = $('#chargeList').dataTable({
+			aoColumnDefs: [{asSorting:["asc"], aTargets:[0]}, {asSorting:[""], aTargets:[1,2,3,4]}],
+			bAutoWidth:false,
+			bDestroy:true,
+			bFilter:false,
+			bInfo:false,
+			bJQueryUI:true,
+			bPaginate: false			
+		});					
+		$('.mask').autoNumeric();
+
+		$('#chargeList th:first').css('width', '');
+		
+		$('#chargeList tbody tr :input[id*="chargeValue"]').live('blur', function(){
+			var row = $(this).parents('tr');
+			var rowNumber = chargeGrid.fnGetPosition(row[0]);
+			var tr_row = chargeGrid.fnGetNodes(rowNumber);
+			$("input[id*='hiddenChargeValue']", tr_row).val($("input[id*='chargeValue']", tr_row).val());
+			$("input[id*='hiddenChargeValue']", tr_row).autoNumericGet();
+			$("input[id*='chargeValueStripped']", tr_row).val($("input[id*='hiddenChargeValue']", tr_row).autoNumericGet());
+			$("input[id*='hiddenChargeValueStripped']", tr_row).val($("input[id*='chargeValueStripped']", tr_row).val());
+			
+			var taxRate = $("input[id*='taxRate']", tr_row).autoNumericGet();
+			var newTaxAmout = 0;
+			var newChargeNet = 0;
+			var chargeValue = $("input[id*='chargeValue']", tr_row).autoNumericGet();
+			
+			newTaxAmount = (Number(taxRate)/100)*Number(chargeValue);
+			$("input[id*='taxAmount']", tr_row).autoNumericSet(newTaxAmount,{vMin:'-999999999999.'});
+			$("input[id*='taxAmountStripped']", tr_row).val(newTaxAmount);
+			$("input[id*='hiddenTaxAmount']", tr_row).val($("input[id*='taxAmount']", tr_row).val());
+			$("input[id*='hiddenTaxAmountStripped']", tr_row).val($("input[id*='taxAmountStripped']", tr_row).val());
+			
+			newChargeNet = Number(chargeValue) + Number(newTaxAmount);
+			$("input[id*='chargeNetAmount']", tr_row).autoNumericSet(newChargeNet);
+			$("input[id*='chargeNetAmountStripped']", tr_row).val(newChargeNet);
+			$("input[id*='hiddenChargeNetAmount']", tr_row).val($("input[id*='chargeNetAmount']", tr_row).val());
+			$("input[id*='hiddenNetAmountStripped']", tr_row).val($("input[id*='chargeValueStripped']", tr_row).val());
+			
+			calculate();
+		}); 
+
+		$('#chargeList tbody tr :input[id*="taxAmount"]').live('blur', function(){
+			var row = $(this).parents('tr');
+			var rowNumber = chargeGrid.fnGetPosition(row[0]);
+			var tr_row = chargeGrid.fnGetNodes(rowNumber);
+			$("input[id*='hiddenTaxAmount']", tr_row).val($("input[id*='taxAmount']", tr_row).val());
+			$("input[id*='hiddenTaxAmount']", tr_row).autoNumericGet();
+			$("input[id*='taxAmountStripped']", tr_row).val($("input[id*='hiddenTaxAmount']", tr_row).autoNumericGet());
+			$("input[id*='hiddenTaxAmountStripped']", tr_row).val($("input[id*='taxAmountStripped']", tr_row).val());
+			
+			//var chargeNetAmount = $("input[id*='chargeNetAmount']", tr_row).autoNumericGet();
+			var taxAmount = $("input[id*='taxAmount']", tr_row).autoNumericGet();
+			//var newChargeValue = 0;
+			/* newChargeValue = Number(chargeNetAmount) - Number(taxAmount);
+			$("input[id*='chargeValue']", tr_row).autoNumericSet(newChargeValue);
+			$("input[id*='chargeValueStripped']", tr_row).val(newChargeValue);
+			$("input[id*='hiddenChargeValue']", tr_row).val($("input[id*='chargeValue']", tr_row).val());
+			$("input[id*='hiddenChargeValueStripped']", tr_row).val($("input[id*='chargeValueStripped']", tr_row).val()); */
+			
+			var cargeValue = $("input[id*='chargeValue']", tr_row).autoNumericGet();
+			var newChargeNet = 0;
+			newChargeNet = Number(cargeValue) + Number(taxAmount);
+			$("input[id*='chargeNetAmount']", tr_row).autoNumericSet(newChargeNet);
+			$("input[id*='chargeNetAmountStripped']", tr_row).val(newChargeNet);
+			$("input[id*='hiddenChargeNetAmount']", tr_row).val($("input[id*='chargeNetAmount']", tr_row).val());
+			$("input[id*='hiddenNetAmountStripped']", tr_row).val($("input[id*='chargeValueStripped']", tr_row).val());
+			$("input[id*='hiddenChargeNetAmountStripped']", tr_row).val($("input[id*='chargeNetAmountStripped']", tr_row).val());
+			calculate();
+		});
+
+		$('#chargeList tbody tr :input[id*="chargeNetAmount"]').live('blur', function(){
+			var row = $(this).parents('tr');
+			var rowNumber = chargeGrid.fnGetPosition(row[0]);
+			var tr_row = chargeGrid.fnGetNodes(rowNumber);
+			$("input[id*='hiddenChargeNetAmount']", tr_row).val($("input[id*='chargeNetAmount']", tr_row).val());
+			$("input[id*='hiddenChargeNetAmount']", tr_row).autoNumericGet();
+			$("input[id*='chargeNetAmountStripped']", tr_row).val($("input[id*='hiddenChargeNetAmount']", tr_row).autoNumericGet());
+			$("input[id*='hiddenNetAmountStripped']", tr_row).val($("input[id*='chargeValueStripped']", tr_row).val());
+			
+			var chargeValue = $("input[id*='chargeValue']", tr_row).autoNumericGet();
+			var chargeNetAmount = $("input[id*='chargeNetAmount']", tr_row).autoNumericGet();
+			var taxAmount = $("input[id*='taxAmount']", tr_row).autoNumericGet();
+			var chargeType = $("input[id*='chargeType']", tr_row).val();
+			var taxRate = $("input[id*='taxRate']", tr_row).autoNumericGet();
+			var newTaxAmount = 0;
+			var newChargeValue = 0;
+			if (chargeType == "CHARGE_TYPE-M"){
+				newTaxAmount = Number(taxRate)/(Number(taxRate) + 100)*Number(chargeNetAmount);
+			} else {
+				newTaxAmount = (Number(taxAmount)/ ((Number(chargeValue))+(Number(taxAmount)))) * Number(chargeNetAmount);
+			}
+			
+			if (isNaN(newTaxAmount)) newTaxAmount = 0;
+			
+			newChargeValue = Number(chargeNetAmount) - Number(newTaxAmount);
+			$("input[id*='taxAmount']", tr_row).autoNumericSet(newTaxAmount);
+			$("input[id*='taxAmountStripped']", tr_row).val(newTaxAmount);
+			$("input[id*='hiddenTaxAmount']", tr_row).val($("input[id*='taxAmount']", tr_row).val());
+			$("input[id*='hiddenTaxAmountStripped']", tr_row).val($("input[id*='taxAmountStripped']", tr_row).val());
+			
+			$("input[id*='chargeValue']", tr_row).autoNumericSet(newChargeValue);
+			$("input[id*='chargeValueStripped']", tr_row).val(newChargeValue);
+			$("input[id*='hiddenChargeValue']", tr_row).val($("input[id*='chargeValue']", tr_row).val());
+			$("input[id*='hiddenChargeValueStripped']", tr_row).val($("input[id*='chargeValueStripped']", tr_row).val());
+			calculate();
+		});
+		
+		// Check Waive
+		// 1. IF IE Browser
+		if($.browser.msie){
+			$('#chargeList tbody tr :checkbox[name*="chargeWaived"]').live('change', function() {
+				var row = $(this).parents('tr');
+				var rowNumber = chargeGrid.fnGetPosition(row[0]);
+				var tr_row = chargeGrid.fnGetNodes(rowNumber);
+				var freq = $("input[id*='freq']", tr_row).val();
+				if($(':checkbox[name*="chargeWaived"]', tr_row).is (':checked')) {
+					
+					$("input[id*='chargeValue']", tr_row).val('0');
+					$("input[id*='chargeValueStripped']", tr_row).val('0');
+					$("input[id*='taxAmount']", tr_row).val('0');
+					$("input[id*='taxAmountStripped']", tr_row).val('0');
+					$("input[id*='chargeNetAmount']", tr_row).val('0');
+					$("input[id*='chargeNetAmountStripped']", tr_row).val('0');
+					
+					$("input[id*='aChargeValue']", tr_row).val('0');
+					$("input[id*='aChargeValueStripped']", tr_row).val('0');
+					$("input[id*='aTaxAmount']", tr_row).val('0');
+					$("input[id*='aTaxAmountStripped']", tr_row).val('0');
+					$("input[id*='aChargeNetAmount']", tr_row).val('0');
+					$("input[id*='aChargeNetAmountStripped']", tr_row).val('0');
+
+					/* $("input[name*='chargeCapitalized']", tr_row).attr('checked', false);
+					$("input[name*='chargeCapitalized']", tr_row).attr('disabled', 'disabled'); */
+
+					$("input[id*='chargeValue']", tr_row).attr('disabled', 'disabled');
+					$("input[id*='taxAmount']", tr_row).attr('disabled', 'disabled');
+					calculate();
+				} else {
+					$("input[id*='chargeValue']", tr_row).val($("input[id*='hiddenChargeValue']", tr_row).val());
+					$("input[id*='chargeValueStripped']", tr_row).val($("input[id*='hiddenChargeValueStripped']", tr_row).val());
+					$("input[id*='taxAmount']", tr_row).val($("input[id*='hiddenTaxAmount']", tr_row).val());
+					$("input[id*='taxAmountStripped']", tr_row).val($("input[id*='hiddenTaxAmountStripped']", tr_row).val());
+					$("input[id*='chargeNetAmount']", tr_row).val($("input[id*='hiddenChargeNetAmount']", tr_row).val());
+					$("input[id*='chargeNetAmountStripped']", tr_row).val($("input[id*='hiddenChargeNetAmountStripped']", tr_row).val());
+					
+					$("input[id*='aChargeValue']", tr_row).val($("input[id*='aHiddenChargeValue']", tr_row).val());
+					$("input[id*='aChargeValueStripped']", tr_row).val($("input[id*='aHiddenChargeValueStripped']", tr_row).val());
+					$("input[id*='aTaxAmount']", tr_row).val($("input[id*='aHiddenTaxAmount']", tr_row).val());
+					$("input[id*='aTaxAmountStripped']", tr_row).val($("input[id*='aHiddenTaxAmountStripped']", tr_row).val());
+					$("input[id*='aChargeNetAmount']", tr_row).val($("input[id*='aHiddenChargeNetAmount']", tr_row).val());
+					$("input[id*='aChargeNetAmountStripped']", tr_row).val($("input[id*='aHiddenChargeNetAmountStripped']", tr_row).val());
+					
+					/* if (freq == 'T'){
+						$("input[name*='chargeCapitalized']", tr_row).attr('checked', false);
+						$("input[name*='chargeCapitalized']", tr_row).attr('disabled', false);
+					} */
+					$("input[id*='chargeValue']", tr_row).removeAttr('disabled');
+					$("input[id*='taxAmount']", tr_row).removeAttr('disabled');
+					calculate();
+				}
+				$(':checkbox[name*="chargeWaived"]', tr_row).val($(':checkbox[name*="chargeWaived"]', tr_row).is (':checked'));
+			});
+		
+		// All browser except IE	
+		} else {
+		
+			$('#chargeList tbody tr :checkbox[name*="chargeWaived"]').live('click', function() {
+				var row = $(this).parents('tr');
+				var rowNumber = chargeGrid.fnGetPosition(row[0]);
+				var tr_row = chargeGrid.fnGetNodes(rowNumber);
+				var freq = $("input[id*='freq']", tr_row).val();
+				if($(':checkbox[name*="chargeWaived"]', tr_row).is (':checked')) {
+					
+					$("input[id*='chargeValue']", tr_row).val('0');
+					$("input[id*='chargeValueStripped']", tr_row).val('0');
+					
+					$("input[id*='taxAmount']", tr_row).val('0');
+					$("input[id*='taxAmountStripped']", tr_row).val('0');
+					$("input[id*='chargeNetAmount']", tr_row).val('0');
+					$("input[id*='chargeNetAmountStripped']", tr_row).val('0');
+					
+					$("input[id*='aChargeValue']", tr_row).val('0');
+					$("input[id*='aChargeValueStripped']", tr_row).val('0');
+					$("input[id*='aTaxAmount']", tr_row).val('0');
+					$("input[id*='aTaxAmountStripped']", tr_row).val('0');
+					$("input[id*='aChargeNetAmount']", tr_row).val('0');
+					$("input[id*='aChargeNetAmountStripped']", tr_row).val('0');
+					
+					/* $("input[name*='chargeCapitalized']", tr_row).attr('checked', false);
+					$("input[name*='chargeCapitalized']", tr_row).attr('disabled', 'disabled'); */
+					$("input[id*='chargeValue']", tr_row).attr('disabled', 'disabled');
+					$("input[id*='taxAmount']", tr_row).attr('disabled', 'disabled');
+					calculate();
+				} else {
+					$("input[id*='chargeValue']", tr_row).val($("input[id*='hiddenChargeValue']", tr_row).val());
+					$("input[id*='chargeValueStripped']", tr_row).val($("input[id*='hiddenChargeValueStripped']", tr_row).val());
+					$("input[id*='taxAmount']", tr_row).val($("input[id*='hiddenTaxAmount']", tr_row).val());
+					$("input[id*='taxAmountStripped']", tr_row).val($("input[id*='hiddenTaxAmountStripped']", tr_row).val());
+					$("input[id*='chargeNetAmount']", tr_row).val($("input[id*='hiddenChargeNetAmount']", tr_row).val());
+					$("input[id*='chargeNetAmountStripped']", tr_row).val($("input[id*='hiddenChargeNetAmountStripped']", tr_row).val());
+					
+					$("input[id*='aChargeValue']", tr_row).val($("input[id*='aHiddenChargeValue']", tr_row).val());
+					$("input[id*='aChargeValueStripped']", tr_row).val($("input[id*='aHiddenChargeValueStripped']", tr_row).val());
+					$("input[id*='aTaxAmount']", tr_row).val($("input[id*='aHiddenTaxAmount']", tr_row).val());
+					$("input[id*='aTaxAmountStripped']", tr_row).val($("input[id*='aHiddenTaxAmountStripped']", tr_row).val());
+					$("input[id*='aChargeNetAmount']", tr_row).val($("input[id*='aHiddenChargeNetAmount']", tr_row).val());
+					$("input[id*='aChargeNetAmountStripped']", tr_row).val($("input[id*='aHiddenChargeNetAmountStripped']", tr_row).val());
+					$("input[id*='chargeValue']", tr_row).removeAttr('disabled');
+					$("input[id*='taxAmount']", tr_row).removeAttr('disabled');
+					/* if (freq == 'T'){
+						$("input[name*='chargeCapitalized']", tr_row).attr('checked', false);
+						$("input[name*='chargeCapitalized']", tr_row).attr('disabled', false);
+					} */
+					calculate();
+				}
+				$(':checkbox[name*="chargeWaived"]', tr_row).val($(':checkbox[name*="chargeWaived"]', tr_row).is (':checked'));
+			});		
+		}
+	});
+</script>
+<table id="chargeList" class="display">
+	<thead>
+		<tr>
+			<th style="width:200px">Charge</th>
+			<th style="width:120px">Value</th>
+			<th style="width:120px">Tax</th>
+			<th style="width:120px">Net</th>
+			<th style="width:30px">Frq</th>
+			<!-- <th style="width:30px">Cap</th> -->			
+			<th style="width:30px">Waive</th>
+		</tr>
+	</thead>
+	<tbody>
+		#{list deposito?.depositoCharges, as:'charge'}
+		<tr>
+			<td>
+				${charge.chargeMaster?.chargeCode}
+			</td>
+			<td>
+				#{if charge?.chargeWaived}
+					#{textBox id:'chargeValue[' + (charge_index-1) + ']', value:charge.chargeValue, format:'#,##0.####', class:'rgNumeric', readOnly:true, width:'120px' /}
+				#{/if}
+				#{else}
+					#{textBox id:'chargeValue[' + (charge_index-1) + ']', value:charge.chargeValue, format:'#,##0.####', class:'rgNumeric', readOnly:readOnly, width:'120px' /}
+				#{/else}
+				
+				#{hidden id:'hiddenChargeValue[' + (charge_index-1) + ']', value:charge.chargeValue.format('#,##0.####') , class:'rgNumeric mask' /}
+				#{hidden id:'chargeValueStripped[' + (charge_index-1) + ']', name:'charges[' + (charge_index-1) + '].chargeValue', value:charge.chargeValue /}
+				#{hidden id:'hiddenChargeValueStripped[' + (charge_index-1) + ']', name:'charges[' + (charge_index-1) + '].chargeValue', value:charge.chargeValue /}
+			</td>
+			<td>
+				#{if charge?.chargeWaived}
+					#{textBox id:'taxAmount[' + (charge_index-1) + ']', value:(charge.taxAmount?:0), format:'#,##0.####', class:'rgNumeric', readOnly:true, width:'120px' /}
+				#{/if}
+				#{else}
+					#{textBox id:'taxAmount[' + (charge_index-1) + ']', value:(charge.taxAmount?:0), format:'#,##0.####', class:'rgNumeric', readOnly:readOnly, width:'120px' /}
+				#{/else}
+				
+				#{hidden id:'hiddenTaxAmount[' + (charge_index-1) + ']', value:(charge.taxAmount?:0).format('#,##0.####'), class:'rgNumeric' /}
+				#{hidden id:'taxAmountStripped[' + (charge_index-1) + ']', name:'charges[' + (charge_index-1) + '].taxAmount', value:(charge.taxAmount?:0) /}
+				#{hidden id:'hiddenTaxAmountStripped[' + (charge_index-1) + ']', name:'charges[' + (charge_index-1) + '].taxAmount', value:(charge.taxAmount?:0) /}
+			</td>
+			<td>
+				#{textBox id:'chargeNetAmount[' + (charge_index-1) + ']', value:charge.chargeNetAmount, format:'#,##0.####', class:'rgNumeric', readOnly:true, width:'120px' /}
+				#{hidden id:'hiddenChargeNetAmount[' + (charge_index-1) + ']', value:charge.chargeNetAmount.format('#,##0.####'), class:'rgNumeric' /}
+				#{hidden id:'chargeNetAmountStripped[' + (charge_index-1) + ']', name:'charges[' + (charge_index-1) + '].chargeNetAmount', value:charge.chargeNetAmount /}
+				#{hidden id:'hiddenChargeNetAmountStripped[' + (charge_index-1) + ']', name:'charges[' + (charge_index-1) + '].chargeNetAmount', value:charge.chargeNetAmount /}
+			</td>
+			<td align="center">
+				${charge?.chargeFrequency}				
+			</td>
+			<!-- <td align="center">
+				#{checkBox id:'chargeCapitalized', name:'charges[' + (charge_index-1) + '].chargeCapitalized', value:charge.chargeCapitalized, readOnly:true /}
+			</td> -->
+			<td align="center">
+				#{checkBox id:'chargeWaived', name:'charges[' + (charge_index-1) + '].chargeWaived', value:charge.chargeWaived, readOnly:readOnly /}
+				#{hidden name:'charges[' + (charge_index-1) + '].chargeMaster.chargeKey', value:charge?.chargeMaster?.chargeKey /}
+				#{hidden name:'charges[' + (charge_index-1) + '].chargeMaster.chargeCode', value:charge?.chargeMaster?.chargeCode /}
+				#{hidden id:'chargeType[' + (charge_index-1) + ']',name:'charges[' + (charge_index-1) + '].chargeMaster.chargeType.lookupId', value:charge?.chargeMaster?.chargeType?.lookupId /}
+				#{hidden name:'charges[' + (charge_index-1) + '].taxMaster.taxKey', value:charge?.taxMaster?.taxKey /}
+				#{hidden id:'taxRate[' + (charge_index-1) + ']', name:'charges[' + (charge_index-1) + '].taxMaster.taxRate', value:charge?.taxMaster?.taxRate /}
+				#{hidden id:'freq[' + (charge_index-1) + ']', name:'charges[' + (charge_index-1) + '].chargeFrequency', value:charge?.chargeFrequency /}
+				#{hidden name:'charges[' + (charge_index-1) + '].id.transactionKey', value:charge?.id?.transactionKey /}
+				#{hidden name:'charges[' + (charge_index-1) + '].id.rowNumber', value:charge?.id?.rowNumber /}
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>

@@ -1,0 +1,173 @@
+<table>
+    <tr>
+        <td valign="top" style="width:541px;">
+			<p>
+   		    	#{radioButton id:'generateToAria', label:'Generate To ARIA', name:'prd.checkGenerateToAria', value:((prd?.checkGenerateToAria)? 'true':'false'), options:operators, readOnly:readOnly/}
+            </p>
+
+			<p>
+				<label>ARIA Code<span id="spanEreportCode" class="req"> *</span></label>
+               	#{textBox id:'ereportCode', name:'prd.ereportCode', value:prd?.ereportCode, readOnly:readOnly, class:'capitalize', width:'181px',maxLength:50/}
+               	<span class="error">#{error 'ARIA Code in tab More Information is' /}</span> 
+            </p>
+
+<!--             <p> -->
+<!-- 			    #{radioButton id:'fixnav', label:'FIX NAV', name:'prd.fixnav', value:((prd?.fixnav)?'true':'false'), options:operators, readOnly:readOnly/} -->
+<!-- 			</p> -->
+
+<!-- 			<p> -->
+<!-- 			    #{textBox id:'fixNavPrice', label:'Fix NAV Price', value:prd?.fixNavPrice, format:'#,##0.####', class:'numeric', width:'181px', readOnly:readOnly /} -->
+<!-- 			    #{hidden  id:'fixNavPriceStripped', name:'prd.fixNavPrice', value:prd?.fixNavPrice /} -->
+<!-- 			    <span class="error">#{error 'Fix NAV Price in tab More Information is' /}</span> -->
+<!-- 			</p> -->
+
+			<p>
+			    #{textBox id:'effectiveDate', name:'prd.effectiveDate', label:'Effective Date', value:prd?.effectiveDate?.format(appProp.dateFormat), class:'calendar invalidDateFormat', readOnly:readOnly, width:'80px' , required:true/} (${appProp.displayDateFormat})
+			    <span class="error">#{error 'Effective Date in tab More Information is' /}</span>
+			    <span id="effectiveDateError" class="error"></span> 
+			</p>
+
+			<p>
+				<label>Maturity Date<span id="spanLiquidDate" class="req"> *</span></label>
+			    #{textBox id:'liquidDate', name:'prd.liquidDate', value:prd?.liquidDate?.format(appProp.dateFormat), class:'calendar invalidDateFormat', readOnly:readOnly, width:'80px', required:true/} (${appProp.displayDateFormat})
+			    <span class="error">#{error 'Maturity Date in tab More Information is' /}</span>
+			    <span id="liquidDateError" class="error"></span>
+			    #{checkBox id:'isMaturityDateMax', name:'prd.checkMaturityDateMax', value:prd?.checkMaturityDateMax, readOnly:readOnly /}Max
+			</p>
+
+            <p>
+                #{textBox id:'initNavPrice', label:'Initial NAV Price', value:prd?.initNavPrice, format:'#,##0.####', class:'numeric', width:'181px', readOnly:readOnly, required:true/}
+                #{hidden  id:'initNavPriceStripped', name:'prd.initNavPrice', value:prd?.initNavPrice /}
+                <span class="error">#{error 'Initial NAV Price in tab More Information is' /}</span>
+            </p>
+
+			<p> 
+			    #{textBox id:'initSponsor', label:'Initial Sponsorship', value:prd?.initSponsor, format:'#,##0.####', class:'numeric', width:'181px', readOnly:readOnly/}
+			    #{hidden  id:'initSponsorStripped', name:'prd.initSponsor', value:prd?.initSponsor /}
+			</p>
+
+            <p>
+                #{textBox id:'minNavAmt', name:'minNavAmt', label:'Minimum NAV Amount', value:prd?.minNavAmt, format:'#,##0.####', class:'rgNumeric', readOnly:readOnly, width:'181px', required:true/}
+                #{hidden  id:'minNavAmtStripped', name:'prd.minNavAmt', value:prd?.minNavAmt /}
+                <span class="error">#{error 'Minimum NAV Amount in tab More Information is' /}</span>
+            </p>
+
+            <p></p>
+
+            <p>
+	            #{include 'RegistryProduct/grid_nav.html' /}
+            </p>
+
+            <p></p>
+
+			<p> 
+			    #{textBox id:'totalUnit', label:'Maximum unit issued', value:prd?.totalUnit, format:'#,##0.####', class:'numeric', width:'181px', readOnly:readOnly, required:true/}
+			    #{hidden  id:'totalUnitStripped', name:'prd.totalUnit', value:prd?.totalUnit /}
+			    <span class="error">#{error 'Maximum unit issued in tab More Information is' /}</span>
+			</p>
+			
+			<p> 
+                #{textBox id:'unitLimitTolerance', name:'prd.unitLimitTolerance', label:' ', format:'#,##0.####', value:prd?.unitLimitTolerance, readOnly:readOnly/}
+                <span id="percentage">%</span> of limit tolerance<span class="req"> *</span>
+                <span class="error">#{error 'Limit Tolerance in tab More Information is' /}</span>
+            </p>
+
+            <p>
+                <label>Maximum Unit Holders<span id="spanMaxInvestor" class="req"></span></label>
+                #{textBox id:'maxInvestor', name:'maxInvestor', value:prd?.maxInvestor, format:'#,##0.####', class:'rgNumeric', readOnly:readOnly, width:'80px'/}
+                #{hidden  id:'maxInvestorStripped', name:'prd.maxInvestor', value:prd?.maxInvestor /}
+                #{checkBox id:'isCheckMaxInvestor', name:'prd.checkMaxInvestor', value:prd?.checkMaxInvestor, readOnly:readOnly /}Max
+                <span id = "isCheckMaxInvestorError" class="error">#{error 'Maximum Unit Holders in tab More Information is' /}</span>
+            </p>
+        </td>
+        <td valign="top">
+            <fieldset style="width:345px;">
+                <legend><b>Digit Parameter</b></legend>
+
+                <p>
+                    <label>For Amount</label>
+                </p>
+
+                <p>
+                    #{dropDownList id:'amountType', name:'prd.amountRoundType', label:'Type', options:roundingType, value:prd?.amountRoundType, readOnly:readOnly, required:true, width:'140px' /}
+                    <span class="error">#{error 'Type For Amount in tab More Information is' /}</span>
+                </p>
+
+                <p>
+                    #{textBox id:'amountVal', label:'No. of decimal', name:'prd.amountRoundValue' ,value:prd?.amountRoundValue, readOnly:readOnly, required:true, width:'50px' /} (Only 0-6)
+                    <span class="error">#{error 'No. of Decimal For Amount in tab More Information is' /}</span>
+                </p>
+
+                <br>
+
+                <p>
+                    <label>For Unit</label>
+                </p>
+
+                <p>
+                    #{dropDownList id:'unitType', name:'prd.unitRoundType', label:'Type', options:roundingType, value:prd?.unitRoundType, readOnly:readOnly, required:true, width:'140px' /}
+                    <span class="error">#{error 'Type For Unit in tab More Information is' /}</span>
+                </p>
+
+                <p>
+                    #{textBox id:'unitVal', label:'No. of decimal', name:'prd.unitRoundValue',value:prd?.unitRoundValue, readOnly:readOnly, required:true, width:'50px' /} (Only 0-8)
+                    <span class="error">#{error 'No. of Decimal For Unit in tab More Information is' /}</span>
+                </p>
+
+                <br>
+
+                <p>
+				    <label>For Price</label>
+				</p>
+
+				<p>
+				    #{dropDownList id:'priceType', name:'prd.priceRoundType', label:'Type', options:roundingType, value:prd?.priceRoundType, readOnly:readOnly , required:true, width:'140px' /}
+				    <span class="error">#{error 'Type For Price in tab More Information is' /}</span>
+				</p>
+
+				<p>
+				    #{textBox id:'priceVal', label:'No. of decimal', name:'prd.priceRoundValue',value:prd?.priceRoundValue, readOnly:readOnly, required:true, width:'50px' /}(Only 0-6)
+				    <span class="error">#{error 'No. of Decimal For Value Price in tab More Information is' /}</span>
+				</p>
+            </fieldset>
+            <fieldset style="border:0px;padding-top:15px;">
+<!-- 	            <p> -->
+<!-- 	                <label style="width: 190px;">Maximum Payment Date <span class="req">*</span></label> -->
+<!-- 			        #{textBox id:'maximumPaymentDate', name:'prd.maxPaymentDate', value:prd?.maxPaymentDate, readOnly:readOnly, required:true, class:'numericminus', width:'70px' /} -->
+<!-- 			        (T+n) -->
+<!-- 			        <span class="error">#{error 'Maximum Payment Date is in tab More Information is' /}</span>  -->
+<!-- 			    </p> -->
+
+			    <fieldset>			    
+			        <legend>Minimum Balance</legend>
+
+	                <p>
+	                    #{checkBox id:'isMinBalAmount', name:'prd.isMinBalAmount', value:prd?.isMinBalAmount, readOnly:readOnly /}
+		                <label>By Amount<span id="spanByAmount" class="req"> *</span></label>
+		                #{textBox id:'minBalAmt', value:prd?.minBalAmt, format:'#,##0.####', class:'numeric', width:'70px', readOnly:readOnly/}
+		                #{hidden  id:'minBalAmtStripped', name:'prd.minBalAmt', value:prd?.minBalAmt /}
+		                <span class="error">#{error 'Minimum Balance By Amount in tab More Information is' /}</span> 
+		            </p>
+		            
+		            <p>
+		                <label></label>
+		                <span id="errMinBalAmt" class="error"></span>
+	                </p>
+
+	                <p>
+	                    #{checkBox id:'isMinBalUnit', name:'prd.isMinBalUnit', value:prd?.isMinBalUnit, readOnly:readOnly /}
+	                    <label>By Unit<span id="spanByUnit" class="req"> *</span></label>
+	                    #{textBox id:'minBalUnit', value:prd?.minBalUnit, format:'#,##0.####', class:'numeric', width:'70px', readOnly:readOnly/}
+	                    #{hidden  id:'minBalUnitStripped', name:'prd.minBalUnit', value:prd?.minBalUnit /}
+	                    <span class="error">#{error 'Minimum Balance By Unit in tab More Information is' /}</span>
+	                </p>
+
+	                <p>
+	                    <label></label>
+	                    <span id="errMinBalUnit" class="error"></span>
+	                </p>
+                </fieldset>
+		    </fieldset>
+        </td>
+    </tr>
+</table>

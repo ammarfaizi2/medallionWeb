@@ -1,0 +1,36 @@
+#{hidden id:'posRuleDetailKey' /}
+<table id="gridPostingRuleDetail" class="display">
+	<thead>
+		<tr>
+			<!-- th>Posting Rule Detail Key</th-->
+			<th>COA No</th>
+			<th>Account Name</th>
+			<th>D/C/B</th>
+			<th>Source</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list faPostingRule?.faPostingRuleDetails, as:'faPostingRuleDetail'}
+		<tr>
+			<!-- td>${faPostingRuleDetail?.postingDetailKey}</td-->
+			<td>${faPostingRuleDetail?.faCoaMaster?.coaCode}</td>
+			<td>${faPostingRuleDetail?.faCoaMaster?.description}</td>
+			<td>${faPostingRuleDetail?.postingDc}</td>
+			<td>${faPostingRuleDetail?.postingField?.lookupDescription}</td>
+			<td>
+				#{hidden name:'faPostingRuleDetails[' + (faPostingRuleDetail_index-1) + '].faCoaMaster.coaCode', value:faPostingRuleDetail?.faCoaMaster?.coaCode /}
+				#{hidden name:'faPostingRuleDetails[' + (faPostingRuleDetail_index-1) + '].faCoaMaster.coaMasterKey', value:faPostingRuleDetail?.faCoaMaster?.coaMasterKey /}
+				#{hidden name:'faPostingRuleDetails[' + (faPostingRuleDetail_index-1) + '].faCoaMaster.description', value:faPostingRuleDetail?.faCoaMaster?.description /}
+				#{hidden name:'postingDc[' + (faPostingRuleDetail_index-1) + ']', value:faPostingRuleDetail?.postingDc /}
+				#{hidden name:'faPostingRuleDetails[' + (faPostingRuleDetail_index-1) + '].postingDc', value:faPostingRuleDetail?.postingDc /}
+				#{hidden name:'faPostingRuleDetails[' + (faPostingRuleDetail_index-1) + '].postingField.lookupCode', value:faPostingRuleDetail?.postingField?.lookupCode /}
+				#{hidden name:'faPostingRuleDetails[' + (faPostingRuleDetail_index-1) + '].postingField.lookupId', value:faPostingRuleDetail?.postingField?.lookupId /}
+				#{hidden name:'faPostingRuleDetails[' + (faPostingRuleDetail_index-1) + '].postingField.lookupDescription', value:faPostingRuleDetail?.postingField?.lookupDescription /}
+				#{hidden name:'faPostingRuleDetails[' + (faPostingRuleDetail_index-1) + '].postingDetailKey', value:faPostingRuleDetail?.postingDetailKey /}
+				<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} /></center>
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>

@@ -1,0 +1,72 @@
+#{extends 'templates/main.html' /}
+
+<div id="detail">
+	#{include 'BookTransfers/detail.html' /}
+</div>
+
+#{hidden id:'from', name:'from', value:from /}	
+
+<div id="actions" class="buttons">
+
+	<input type="button" id="approve" value="Approve" />
+	<input type="button" id="reject" value="Reject" />
+	<input type="button" id="closeWorkflow" value="Cancel" />			
+
+</div>
+
+<script type="text/javascript">
+	$(function() {
+		$('.buttons input:button').button();
+		
+		$('.buttons #reset').hide();
+		$('.buttons #close').hide();
+		
+		var backToWorkList = function() {
+			loading.dialog('open');
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			};
+		}
+		
+		$('#approve').click(function() {
+			var action = "@{approve()}?keyId=${cBestMessage?.msgid}&taskId=${taskId}";
+			loading.dialog('open');
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+				if (data.status == 'success') {
+					loading.dialog('close');
+					messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+				} else {
+					loading.dialog('close');
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+				}
+			});			
+		});
+		
+		// ACTION BUTTON REJECT
+		$('#reject').click(function() {
+			var action = "@{reject()}?keyId=${cBestMessage?.msgid}&taskId=${taskId}";
+			loading.dialog('open');
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+				if (data.status == 'success') {
+					loading.dialog('close');
+					messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+				} else {
+					loading.dialog('close');
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+				}
+			});
+		});
+
+		$('#closeWorkflow').click(function() {
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			}
+		});
+	});
+</script>

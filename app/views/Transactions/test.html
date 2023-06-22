@@ -1,0 +1,87 @@
+#{extends 'templates/main.html' /}
+
+<script type="text/javascript">
+	$(function() {
+		// Action buttons 
+		$('#save').click(function() {
+			$('#h_effectiveDate').val($('#effectiveDate').val());
+			$('#h_maturityDate').val($('#maturityDate').val());
+			
+			var action = "@{save()}?mode=${mode}";
+			var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+			loading.dialog({
+				closeOnEscape: false,
+				draggable: false,
+				modal: true,
+				resizable: false,
+				open:function() {
+					$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+				} 
+			});
+			$('#transactionForm').attr('action', action);
+			$('#transactionForm').submit();
+		});
+		$('#confirm').click(function() {
+			var action = "@{confirm()}?mode=${mode}";
+			var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+			loading.dialog({
+				closeOnEscape: false,
+				draggable: false,
+				modal: true,
+				resizable: false,
+				open:function() {
+					$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+				} 
+			});
+			$.post(action, $('#transactionForm').serialize(), function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					alert("Your transaction no is #" + data.transactionNo);
+					location = "@{entry()}";
+				} else {
+					alert(data.error);
+				}
+			});
+			//$('#transactionForm').attr('action', action);
+			//$('#transactionForm').submit();
+		});
+		$('#back').click(function() {
+			var action = "@{back()}?mode=${mode}#{if taskId}&taskId=${taskId}#{/if}";
+			$.post(action, $('#transactionForm').serialize(), function(data, status, xhr) {
+	    		checkRedirect(data);
+				if (status == 'success') {
+					$('#detail').html(data);
+					$("#actions #confirming").css('display', 'none');
+					$('#actions #editing').css('display', '');
+				}
+			});			
+		});
+		$('#clear').click(function() {
+			var action = "@{clear()}?mode=${mode}#{if taskId}&taskId=${taskId}#{/if}";
+			$.post(action, $('#transactionForm').serialize(), function(data, status, xhr) {
+	    		checkRedirect(data);
+				if (status == 'success') {
+					$('#detail').html(data);
+					$("#actions #confirming").css('display', 'none');
+					$('#actions #editing').css('display', '');
+				}
+			});	
+			
+		});
+	});	
+</script>
+<h2>Transaction Entry</h2>
+<div id="detail">
+	#{include 'Transactions/detail1.html' /}	
+</div>
+<div id="actions" class="buttons">
+	#{if confirming}
+		<input type="button" id="confirm" value="Confirm" />
+		<input type="button" id="back" value="Back" />
+	#{/if}
+	#{else}
+		<input type="button" id="save" value="Save" />
+		<input type="button" id="clear" value="Clear" />
+	#{/else}
+</div>

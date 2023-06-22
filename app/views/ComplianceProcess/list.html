@@ -1,0 +1,52 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Compliance Process' /}
+
+#{script 'lookups.js' /}
+
+<script type="text/javascript">
+	function doEdit(data) {
+		if ((data[9] == "New") || (data[9] == "Updated")) {
+			view(data[0]);
+			return false;
+		} else {
+			return true;
+		}
+	}
+</script>
+<form id="processForm" class="form"  name="process">
+#{hidden name:'PROCESSMARK', value:params?.PROCESSMARK/}
+#{hidden name:'cpItem.sessionTag', value:cpItem?.sessionTag/}
+#{hidden name:'cpItem.processMark', value:cpItem?.processMark/}
+
+	<p>
+		#{textBox id:'fundCode', name:'cpItem.fund.fundCode', label:'Fund Code', value:cpItem?.fund?.fundCode, width:'120px', readOnly:false, class:'capitalize', required:true, maxLength:50/}
+		#{hidden  id:'fundCodeKey', name:'cpItem.fund.fundKey', value:cpItem?.fund?.fundKey /}
+		#{button  id:'fundCodeHelp', value:'?', class:'small', readOnly:false/}
+		#{textBox id:'fundCodeDesc', name:'cpItem.fund.fundDescription', value:cpItem?.fund?.fundDescription, readOnly:true, width:'340px' /}
+		<span class="error">#{error 'Fund Code is' /}</span> 
+	</p>
+	<p>			
+		#{textBox id:'date', name:'cpItem.date', label:'Date', value:cpItem?.date?.format(appProp.dateFormat), class:'calendar', readOnly:false, required:true /} (${appProp.displayDateFormat})
+		<span id="dateError" class="error">#{error 'Date is' /}</span>
+	</p>
+	<p>
+		<textarea id='log' rows="10" cols="125" readonly="readonly">
+#{list logs, as:'log'}${log}
+#{/list}
+		</textarea>
+	</p>	
+	<div class="buttons">
+		#{button  id:'btnProcess', value:'Process', readOnly:false/} 
+		#{button  id:'btnReset', value:'Reset', readOnly:false/}
+	</div>
+</form>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'ComplianceProcess/CpProcess.js' /}
+	$(document).ready(function() {
+		$('#new').remove();
+		$('.buttons input:button').button();
+		CpProcess($("#processForm"));
+	});	
+</script>

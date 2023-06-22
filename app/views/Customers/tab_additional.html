@@ -1,0 +1,416 @@
+<script type="text/javascript">
+$(function() {
+	
+	if ('${fromInquiry}'=='${menuInquiry}'){
+		if ($('#customerFile').val()==''){
+			$('#idDownloadHere').html('');
+		}
+	}
+	if ($.browser.msie){
+		$("#additionalDesc[maxlength]").bind('input propertychange', function() {  
+	        var maxLength = $(this).attr('maxlength');  
+	        if ($(this).val().length > maxLength) {  
+	            $(this).val($(this).val().substring(0, maxLength));  
+	        }  
+	    });
+	}
+	$('#sof'+'${otherSourceOfFundInd}').change(function(){
+		adjustOther();
+		$('#otherSofInd').val('');
+	});
+	
+	$('#inv'+'${otherInvObjInd}').change(function(){
+		adjustOther();
+		$('#otherInvObjInd').val('');
+	});
+	
+	$('#sof'+'${otherSourceOfFundCorp}').change(function(){
+		adjustOther();
+		$('#otherSofCorp').val('');
+	});
+	
+	$('#inv'+'${otherInvObjCorp}').change(function(){
+		adjustOther();
+		$('#otherInvObjCorp').val('');
+	});
+	
+	adjustOther();
+	/* if ('${mode}'=='view'){
+		if ($('#attachmentFile').val()!=''){
+			$('#flagAttachFile').attr('checked', 'checked');
+		}
+	} */
+	
+	$("#attachFile").bind('change',function(){
+		if(this.files[0] !=null) {
+			var maxSize = Number('${maxSize}');
+			var dispSize = maxSize/1024;
+			$("#attachFileError").html("");
+			var fileSize = this.files[0].size/1024;
+			if(fileSize > maxSize){
+				$("#attachFileError").html("Size of file max "+dispSize+ " MB");
+				$(this).val('');
+			}
+		}
+	});
+	
+	if (!$('#flagAttachFile').is(':checked')){
+			$('#attachFile').disabled();
+			$('p[id=pAttach] label span').html('');
+	}
+	
+	if((('${mode}'=='entry')&&(!'${confirming}'))||(('${mode}'=='edit')&&(!'${confirming}'))){
+		if ($('#swiftCodeID').val()==''){
+			$('.swiftStatusClass1').disabled();
+			$('p[id=pAttach] label span').html('');
+		}else {
+			$('td[class=swiftStatusLabel1] label span').html(' *');
+		}
+
+		if ($('#swiftCodeID2').val()==''){
+			$('.swiftStatusClass2').disabled();
+			$('p[id=pAttach] label span').html('');
+		}else {
+			$('td[class=swiftStatusLabel2] label span').html(' *');
+		}
+	}else{
+		$('input[class=swiftStatusClass]:radio').click(function(){
+		    return false;
+		});
+	}
+	
+	$('#flagAttachFile').change(function(){
+		if (!$('#flagAttachFile').is(':checked')){
+			$('#attachFile').disabled();
+			if ($.browser.msie) {
+				$('#attachFile').replaceWith($('#attachFile').clone(true));
+			} else {
+				$('#attachFile').val('');
+			}
+			$('p[id=pAttach] label span').html('');
+		} else {
+			$('#attachFile').enabled();
+			$('p[id=pAttach] label span').html(' *');
+		}
+	});
+	
+	
+	$('#swiftCodeID').change(function(){
+		if($('#swiftCodeID').val()!=''){
+			$('.swiftStatusClass1').enabled();
+			$('td[class=swiftStatusLabel1] label span').html(' *');
+		}else{
+			$('.swiftStatusClass1').disabled();
+			$("#swiftStatus1").val("${swiftStatusNA}");
+			$('td[class=swiftStatusLabel1] label span').html('');
+		}
+	});
+
+	$('#swiftCodeID2').change(function(){
+		if($('#swiftCodeID2').val()!=''){
+			$('.swiftStatusClass2').enabled();
+			$('td[class=swiftStatusLabel2] label span').html(' *');
+		}else{
+			$('.swiftStatusClass2').disabled();
+			$("#swiftStatus2").val("${swiftStatusNA}");
+			$('td[class=swiftStatusLabel2] label span').html('');
+		}
+	});
+
+	
+/* 	function adjustCustomerType() {
+		var select_customer; 
+	    select_customer = $('#customerType').val(); 
+	    
+		if (/CUSTOMER_TYPE-I/i.test(select_customer)){
+			console.debug('Individual');
+	    	$(".corporate_only").css("display", "none");
+	    	//$("#show_corporate_only").remove();   	
+	    	//return true;
+		} else if (/CUSTOMER_TYPE-C/i.test(select_customer)){
+	    	console.debug('Corporate');
+	    	$(".individual_only").css("display", "none");
+	    	//$("#show_individual_only").remove();
+	    	//return true;
+	    } else {
+	    	$(".corporate_only").css("display", "none");
+	    	$(".individual_only").css("display", "none");
+	    }  
+	    
+	}; */
+
+/* $('#customerType').change(adjustCustomerType);
+adjustCustomerType(); */
+	fileName = $('#customerFile').val();
+	$('#generateFile').click(function(){
+		var fileName = $('#customerFile').val();
+		location.href='@{customerDownload()}?fileName='+fileName;	
+	});
+
+
+});
+
+function adjustOther(){
+	if ($('#customerType').val()=='${typeIndi}'){
+		// INDIVIDUAL
+		if ($('#sof'+'${otherSourceOfFundInd}').is(':checked')){
+			if((('${mode}'=='entry')&&(!'${confirming}'))||(('${mode}'=='edit')&&(!'${confirming}'))){
+				$('#otherSofInd').enabled();
+			}
+			$('td[id=sofMandatory] label span').html(' *');
+		} 
+		
+		if (!$('#sof'+'${otherSourceOfFundInd}').is(':checked')){
+			$('#otherSofInd').disabled();
+			$('td[id=sofMandatory] label span').html('');
+		}
+		
+		if ($('#inv'+'${otherInvObjInd}').is(':checked')){
+			if((('${mode}'=='entry')&&(!'${confirming}'))||(('${mode}'=='edit')&&(!'${confirming}'))){
+				$('#otherInvObjInd').enabled();
+			}
+			$('td[id=invMandatory] label span').html(' *');
+		}
+		
+		if (!$('#inv'+'${otherInvObjInd}').is(':checked')){
+			$('#otherInvObjInd').disabled();
+			$('td[id=invMandatory] label span').html('');
+		}
+	}
+	
+	// CORPORATE
+	if ($('#customerType').val()=='${typeCorp}'){
+		if ($('#sof'+'${otherSourceOfFundCorp}').is(':checked')){
+			if((('${mode}'=='entry')&&(!'${confirming}'))||(('${mode}'=='edit')&&(!'${confirming}'))){
+				$('#otherSofCorp').enabled();
+			}
+			$('td[id=sofMandatory] label span').html(' *');
+		} 
+		
+		if (!$('#sof'+'${otherSourceOfFundCorp}').is(':checked')){
+			$('#otherSofCorp').disabled();
+			$('td[id=sofMandatory] label span').html('');
+		}
+		
+		if ($('#inv'+'${otherInvObjCorp}').is(':checked')){
+			if((('${mode}'=='entry')&&(!'${confirming}'))||(('${mode}'=='edit')&&(!'${confirming}'))){
+				$('#otherInvObjCorp').enabled();
+			}
+			$('td[id=invMandatory] label span').html(' *');
+		}
+		
+		if (!$('#inv'+'${otherInvObjCorp}').is(':checked')){
+			$('#otherInvObjCorp').disabled();
+			$('td[id=invMandatory] label span').html('');
+		}
+	}
+}
+</script>
+<style type="text/css">
+	textarea { resize:none; height: 50px;}
+</style>
+<!-- <p>
+			#{radioButton id:'isConsolidate', name:'customer.isConsolidate', value:((customer?.isConsolidate)?'true':'false'), label:'Consolidate Invoice', options:yesNo, readOnly:readOnly /}
+		</p> -->
+
+<div class="individual_only" style="height:350px;">
+	<div style="width: 450px">
+		<table>
+			<tr>
+				<td valign="top" atr="mandatoryDirect">
+					<label>Source of Fund<span class="req"> *</span></label>
+					<span class="error">#{error 'Source of Fund in tab Additional is' /}</span>
+					
+				</td>
+				<td>
+					#{list items:sourceOfFundInd, as:'item'}
+						<input id="sof${item.lookupId}" type="checkbox" name="sourceOfFunds" value="${item.lookupId}"/><span>${item.lookupDescription}</span><br />
+						<input id="hiddenSof${item.lookupId}" type="hidden" name="hidSourceOfFunds" value="" />
+					#{/list}
+					
+				</td>
+			</tr>
+			<tr>
+				<td id="sofMandatory" valign="top"><label>(Others)<span class="req"> *</span></label></td>
+				<td valign="top">
+					<p>
+						#{textBox id:'otherSofInd', name:'customer.sourceOfFundOthers', value:customer?.sourceOfFundOthers, class:'capitalize individual specialField', maxLength:100, readOnly:readOnly/}
+						<span class="error">#{error 'Source of Fund (Others) in tab Additional is' /}</span>
+					</p>			
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div style="width: 450px;position: relative;left:450px;top:-230px">
+		<table>
+			<tr valign="top">
+				<td valign="top" atr="mandatoryDirect">
+				<label>Investment Objective<span class="req"> *</span></label>
+				<span class="error">#{error 'Investment Objectives in tab Additional is' /}</span>
+						
+					</td>
+					<td valign="top">
+						#{list items:investObjInd, as:'item'}
+							<input id="inv${item.lookupId}" type="checkbox" name="investObjs" value="${item.lookupId}"><span>${item.lookupDescription}</span><br />
+							<input id="hiddenInv${item.lookupId}" type="hidden" name="hidInvestObjs" value=""/>
+						#{/list}
+						
+				</td>
+			</tr>
+			<tr>
+				<td id="invMandatory" ><label>(Others)<span class="req"> *</span></label></td>
+				<td>
+					<p>
+						#{textBox id:'otherInvObjInd', name:'customer.purposeOfInvestmentOthers', value:customer?.purposeOfInvestmentOthers, maxLength:100, class:'capitalize individual specialField', readOnly:readOnly/}
+						<span class="error">#{error 'Investment Objectives (Others) in tab Additional is' /}</span>
+					</p>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div style="width: 450px;position: relative;left:450px;top:-200px; border-style: solid;">
+			<table>
+				<tr>
+					<td><label>SWIFT</label></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td id="invMandatory"><label>SWIFT Code</label></td>
+					<td>
+						<p>
+							#{textBox id:'swiftCodeID', name:'customer.swiftCode', value:customer?.swiftCode,  class:'capitalize corporate specialField', maxLength:20, readOnly:readOnly/}
+							<span class="error">#{error 'SWIFT Code in tab Additional is' /}</span>
+						</p>
+					</td>
+				</tr>
+				<tr>
+					<td id="invMandatory" class="swiftStatusLabel1"><label>Status via SWIFT<span class="req"> *</span></label></td>
+					<td>
+						<p>
+							<!-- #{radioButton id:'swiftStatusID', class:'swiftStatusClass', name:'customer.swiftStatus.lookupId', value:customer?.swiftStatus?.lookupId, options:statusViaSwiftOperators, readOnly:readOnly/}-->
+							#{dropDownList id:'swiftStatus1', name:'customer.swiftStatus.lookupId', value:customer?.swiftStatus?.lookupId, readOnly:readOnly, options:listSwiftStatus, , removeEmpty:'true', class:'swiftStatusClass1' /}
+							<span class="error">#{error 'Status via SWIFT in tab Additional is' /}</span>
+						</p>
+					</td>
+				</tr>
+			</table>
+		</div>
+</div>
+<div class="corporate_only" style="width: auto;height: auto;">
+	<div style="width: 450px">
+		<table>
+			<tr>
+				<td valign="top" atr="mandatoryDirect">
+					<label>Source of Fund<span class="req"> *</span></label>
+					<span class="error">#{error 'Source of Fund in tab Additional is' /}</span>
+				</td>
+				<td>
+					#{list items:sourceOfFundCorp, as:'item'}
+						<input id="sof${item.lookupId}" type="checkbox" name="sourceOfFunds" value="${item.lookupId}"/><span>${item.lookupDescription}</span><br />
+						<input id="hiddenSof${item.lookupId}" type="hidden" name="hidSourceOfFunds" value=""/>
+					#{/list}
+				</td>
+			</tr>
+			<tr>
+				<td id="sofMandatory"><label>(Others)<span class="req"> *</span></label></td>
+				<td>
+					<p>
+						#{textBox id:'otherSofCorp', name:'customer.sourceOfFundOthers', value:customer?.sourceOfFundOthers,  class:'capitalize corporate specialField', maxLength:100, readOnly:readOnly/}
+						<span class="error">#{error 'Source of Fund (Others) in tab Additional is' /}</span>
+					</p>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div style="width: 450px;position: relative;left:450px;top:-130px">
+		<table>
+			<tr>
+				<td valign="top"  atr="mandatoryDirect">
+					<label>Investment Objective<span class="req"> *</span></label>
+				<span class="error">#{error 'Investment Objectives in tab Additional is' /}</span>
+				</td>
+				<td valign="top">
+					#{list items:investObjCorp, as:'item'}
+						<input id="inv${item.lookupId}" type="checkbox" name="investObjs" value="${item.lookupId}"><span>${item.lookupDescription}</span><br />
+						<input id="hiddenInv${item.lookupId}" type="hidden" name="hidInvestObjs" value=""/>
+					#{/list}
+				</td>
+			</tr>
+			<tr>
+				
+				<td id="invMandatory"><label>(Others)<span class="req"> *</span></label></td>
+				<td>
+					<p>
+						#{textBox id:'otherInvObjCorp', name:'customer.purposeOfInvestmentOthers', value:customer?.purposeOfInvestmentOthers,  class:'capitalize corporate specialField', maxLength:100, readOnly:readOnly/}
+						<span class="error">#{error 'Investment Objectives (Others) in tab Additional is' /}</span>
+					</p>
+				</td>
+			</tr>
+		</table>
+	</div>
+	
+	<div style="width: 450px;position: relative;left:450px;top:-100px; border-style: solid;">
+			<table>
+				<tr>
+					<td><label>SWIFT</label></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td id="invMandatory"><label>SWIFT Code</label></td>
+					<td>
+						<p>
+							#{textBox id:'swiftCodeID2', name:'customer.swiftCode', value:customer?.swiftCode,  class:'capitalize corporate specialField', maxLength:20, readOnly:readOnly/}
+							<span class="error">#{error 'SWIFT Code in tab Additional is' /}</span>
+						</p>
+					</td>
+				</tr>
+				<tr>
+					<td id="invMandatory" class="swiftStatusLabel2"><label>Status via SWIFT<span class="req"> *</span></label></td>
+					<td>
+						<p>
+							<!-- #{radioButton id:'swiftStatusID', class:'swiftStatusClass', name:'customer.swiftStatus.lookupId', value:customer?.swiftStatus?.lookupId, options:statusViaSwiftOperators, readOnly:readOnly/}-->
+							#{dropDownList id:'swiftStatus2', name:'customer.swiftStatus.lookupId', value:customer?.swiftStatus?.lookupId, readOnly:readOnly, options:listSwiftStatus, , removeEmpty:'true', class:'swiftStatusClass2' /}
+							<span class="error">#{error 'Status via SWIFT in tab Additional is' /}</span>
+						</p>
+					</td>
+				</tr>
+			</table>
+		</div>
+</div>
+
+<p>
+	<label style="margin-right: 6px">Asset Owner <span class="req"> *</span></label>
+	#{dropDownList id:'assetOwner', name:'customer.assetOwner.lookupId', value:customer?.assetOwner?.lookupId, readOnly:readOnly, options:assetOwner, class:'all' /}
+	<span class="error">#{error 'Asset Owner in tab Additional is' /}</span>
+</p>
+<p>
+	<label style="margin-right: 6px">Additional Description</label>
+	#{textArea id:'additionalDesc', name:'customer.remarks', value:customer?.remarks, readOnly:readOnly, class:'capitalize all specialField',width:'255px', maxLength:225 /}
+</p>
+<p id="pAttach">
+	#{hidden id:'isAttachment', name:'isAttachment', value:isAttachment /}
+	#{hidden id:'customerFile', name:'customer.attachment', value:customer?.attachment /}
+	
+	<label style="margin-right: 3px">Attach Document<span class="req"> *</span></label>
+	#{checkBox id:'flagAttachFile', name:'customer.flagAttachFile', value:customer?.flagAttachFile, readOnly:readOnly, class:'all' /} Yes
+	
+</p>
+<p>
+	<label style="margin-right: 5px"></label>
+	#{if ((!confirming)&&(mode=='entry')) ||((!confirming)&&(mode=='edit'))}
+		#{fileUpload id:'attachFile', name:'attachment', value:attachment, disabled:readOnly, class:'all' /}
+		<span id="attachFileError" class="error">#{error 'Attach Document in tab Additional is' /}</span>
+		${nameFile} 
+	#{/if}
+	#{else}
+		<span id="attachmentFile">${nameFile}</span>
+	#{/else}
+	
+	#{if fromInquiry==menuInquiry}
+	<span id="idDownloadHere"> , Download it <a style="color: blue;" href="@{customerDownload()}/${customer?.customerKey}"> here</a></span>
+	#{/if}
+	
+</p>
+<p>
+	<label style="margin-right: 5px"></label>${validateAttach}
+</p>

@@ -1,0 +1,79 @@
+#{script 'lookups.js' /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{set mode: mode /}
+
+<script type="text/javascript">
+	$(function() {
+		$('.calendar').datepicker();
+		
+		if ('${mode}' == 'view' || '${confirming}' == 'true') {
+			$('#process').css('display', 'none');
+		}
+		
+	});
+</script>
+
+
+<div id="profilMaster" >
+	#{hidden id:'corporateAnnouncementKey', name:'corporateAnnouncement.corporateAnnouncementKey', value:corporateAnnouncement?.corporateAnnouncementKey /}
+	<p>      
+		#{textBox id:'corporateAnnouncementCode', name:'corporateAnnouncement.corporateAnnouncementCode', label:'Announcement Code', class:'capitalize', value:corporateAnnouncement?.corporateAnnouncementCode, width:'150px', required:true, readOnly:true /} 
+		 <span><b>&nbsp;&nbsp; Status &nbsp;</b></span>
+		#{textBox id:'status', name:'corporateAnnouncement.status', width:'85px',value:corporateAnnouncement?.status, readOnly:true /}
+	</p>			
+	<p>			
+		#{textBox id:'description', name:'corporateAnnouncement.description', label:'Description', width:'308px',value:corporateAnnouncement?.description,required:true, class:'capitalize', readOnly:true /}
+	</p>			
+	<p>
+		#{textBox id:'securityType', name:'corporateAnnouncement.securityType.securityType', label:'Security Type', value:corporateAnnouncement?.securityType?.securityType, class:'capitalize', required:true, readOnly:true, width:'100px' /}
+		#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:true  /}
+		#{textBox id:'securityTypeDesc', name:'corporateAnnouncement.securityType.description', value:corporateAnnouncement?.securityType?.description, readOnly:true, width:'330px' /}
+		#{hidden id:'securityTypeId'/}
+	</p>				
+	<p>
+		#{textBox id:'securityId', name:'corporateAnnouncement.security.securityId', label:'Security Id', value:corporateAnnouncement?.security?.securityId, class:'capitalize', readOnly:true, required:true, width:'100px' /}
+		#{hidden id:'securityKey', name:'corporateAnnouncement.security.securityKey', value:corporateAnnouncement?.security?.securityKey /}
+		#{button id:'securityIdHelp', value:'?', class:'small', readOnly:true /}
+		#{textBox id:'securityIdDescription', name:'corporateAnnouncement.security.description', value:corporateAnnouncement?.security?.description, readOnly:true, width:'330px' /}
+	</p>
+	<p>			
+		#{textBox id:'announcementDate', name:'corporateAnnouncement.announcementDate', label:'Announcement Date', value:corporateAnnouncement?.announcementDate?.format('MM/dd/yyyy'), readOnly:true, class:'calendar'/}(MM/DD/YYYY)
+	</p> 
+	
+	<p>			
+		#{textBox id:'cumDate', name:'corporateAnnouncement.cumDate', label:'Cum Date', value:corporateAnnouncement?.cumDate?.format('MM/dd/yyyy'), readOnly:true, class:'calendar'/}(MM/DD/YYYY)
+	</p> 
+	
+	<p>			
+		#{textBox id:'exDate', name:'corporateAnnouncement.exDate', label:'Ex Date', value:corporateAnnouncement?.exDate?.format('MM/dd/yyyy'), readOnly:true, class:'calendar'/}(MM/DD/YYYY)
+	</p> 
+	
+	<p>			
+		#{textBox id:'recordingDate', name:'corporateAnnouncement.recordingDate', label:'Recording Date', value:corporateAnnouncement?.recordingDate?.format('MM/dd/yyyy'), readOnly:true, class:'calendar'/}(MM/DD/YYYY)
+	</p>
+	
+	<p>			
+		#{if from == 'corporateaction-settlement'}
+			#{textBox id:'distributionDate', name:'corporateAnnouncement.distributionDate', label:'Distribution Date', value:corporateAnnouncement?.distributionDate?.format('MM/dd/yyyy'), readOnly:false, required:true , class:'calendar'/}(MM/DD/YYYY)
+		#{/if}
+		#{else}
+			#{textBox id:'distributionDate', name:'corporateAnnouncement.distributionDate', label:'Distribution Date', value:corporateAnnouncement?.distributionDate?.format('MM/dd/yyyy'), readOnly:true, class:'calendar'/}(MM/DD/YYYY)
+		#{/else}
+		
+	</p> 
+	
+	<p>			
+		#{textBox id:'exchangeRate', name:'corporateAnnouncement.exchangeRate', label:'Exchange Rate', value:corporateAnnouncement?.exchangeRate, readOnly:true, width:'150px' /}
+	</p>  		
+</div>
+
+<div class="buttons">
+	<button id="process">Populate</button>
+</div>
+
+
+
+
+
+
+

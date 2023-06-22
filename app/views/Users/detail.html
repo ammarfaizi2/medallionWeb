@@ -1,0 +1,640 @@
+#{extends 'templates/detail1.html' /}
+#{set pageTitle: 'User Maintenance' /}
+#{set id:user?.userKey /}
+
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+
+#{script 'jquery.rc4.js' /}
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+
+
+<!--[if IE ]>
+	<style type="text/css">
+		#passwordDialog {margin-left: -2px;}
+		#adminField {margin-left: -2px;}
+	</style>
+<![endif]-->
+
+
+<script type="text/javascript">
+	$(function() {
+		if (('${mode}'=='entry')||(('${mode}'=='edit')&&(('${user?.recordStatus?.decodeStatus()}'=='Reject') || ($("#status").val() == 'R' )))){
+			$('input[name=isActive]').attr("disabled", "disabled");
+		}
+		
+		$('input[name=isActive]').change(function(){
+			$("input[name='user.isActive']").val($("input[name='isActive']:checked").val());
+		});
+		
+		if ($('#roleKey').val() == '1'){
+			$('#adminField').css('display', '');
+		}
+		
+		if ('${confirming}'=='true'){
+			if ($('#roleKey').val() == '1'){
+				$('#adminField').css('display', '');
+			}
+		}
+		
+		$('.calendar').datepicker();
+		$('#tabs').tabs();
+		//$('#tabs').css('height', '300');
+		$('.buttons input:button').button();
+		
+		$('#branchNo').lookup({
+			list:'@{Pick.branches()}',
+			get:{
+				url:'@{Pick.branch()}',
+				success: function(data){
+					$('#branchNo').removeClass('fieldError');
+					$('#branchKey').val(data.code);
+					$('#branchName').val(data.description);
+					$('#h_branchName').val(data.description);
+				},
+				error: function(data){
+					$('#branchNo').addClass('fieldError');
+					$('#branchKey').val('');
+					$('#branchNo').val('');
+					$('#branchName').val('NOT FOUND');
+					$('#h_branchName').val('');
+				}
+			},
+			description:$('#branchName'),
+			help:$('#branchHelp')
+		});
+		
+		$('#password').change(function(){
+			var result = validatePassword();
+			if ((!$('#password').hasClass('fieldError'))&&($('#password').val()!='')){
+				if ($('#password').val() != $('#confirmPassword').val()){
+					$('#confirmPassword').addClass('fieldError');
+					$('#confirmError').html('Password do not match');
+					return false;
+				} else {
+					$('#confirmPassword').removeClass('fieldError');
+					$('#confirmError').html('');
+				}
+			}
+			if (result) return true;
+			if ($('#password').val()==''){
+				$('#password').removeClass('fieldError');
+				$('#passwordError').html('');
+			}
+		});
+		
+		$('#confirmPassword').change(function(){
+			if ((!$('#password').hasClass('fieldError'))&&($('#password').val()!='')){
+				if ($('#password').val() != $('#confirmPassword').val()){
+					$('#confirmPassword').addClass('fieldError');
+					$('#confirmError').html('Password do not match');
+					return false;
+				} else {
+					$('#confirmPassword').removeClass('fieldError');
+					$('#confirmError').html('');
+				}
+			}
+		});
+		
+		#{if mode == 'view'}
+			$('#passwordDialog').css('display','none');
+			if (($('#roleKey').val() == '1')||($('#roleKey').val()=='1050')) {
+				$('#adminField').css('display', '');
+			}
+		#{/if}
+		#{if mode == 'edit'}
+			$('#passwordDialog').dialog({
+				autoOpen: false,
+				height: 125,
+				modal: true,
+				resizable: false,
+				title: 'Set Password',
+				width: 420
+			});
+		#{/if}
+		#{else}
+			#{if !confirming && mode != 'view'}
+				$('#password').removeAttr('disabled');
+				$('#confirmPassword').removeAttr('disabled');
+			#{/if}
+				$('#resetPassword').css('display', 'none');
+				$('#passwordButtons').css('display', 'none');
+		#{/else}
+		
+		#{if confirming}
+			$('#resetPassword').css('display', 'none');
+			$('#passwordButtons').css('display', 'none');
+		#{/if}
+		
+			
+		$('#resetPassword').button();
+		
+		if ($('#loginLDAP').val()=='true'){
+			$('#resetPassword').button("option", "disabled", true);
+			$('p[id=pPassword] label span').html("");
+			$('p[id=pConfPassword] label span').html("");
+			
+			//Add by Fadly 2017-12-21 Redmine #3496
+			$("#accountExpiredDate").attr('disabled', true);
+			$("#isDisabled1").attr('disabled', true);
+			$("#isDisabled2").attr('disabled', true);
+			$("#isLocked1").attr('disabled', true);
+			$("#isLocked2").attr('disabled', true);
+			//End Redmine #3496
+			
+		}
+		
+		$('#resetPassword').click(function() {
+			//alert($('#emailAddress').val());
+			$('#password').val(password(8));
+			$('#history').val($('#password').val());
+			encrypt();
+			 $.post('@{resetPassword}',
+					{'userId':$('#userId').val(), 'password':$('#password').val(),'historyPass':$('#history').val(),'username':$('#name').val(),'emailAddress':$('#emailAddress').val()},
+					function(data, status, xhr) {
+			    		checkRedirect(data);
+						if(data == "error.Send.Email")
+							alert("Failed to connect email server!");
+						else if (data == "error.Reset.Email"){
+							alert("Failed to reset password!");
+						} else {
+							alert("Reset password successful, check your email!");
+						}
+							
+					}
+			); 
+			/* $.post('@{resetPassword}', 
+				 
+					function(data, status, xhr) {
+						alert(data);
+					} 
+			); */
+			/* $('#password').removeAttr('disabled');
+			$('#confirmPassword').removeAttr('disabled');
+			$('#password').val('');
+			$('#confirmPassword').val('');
+			$('#passwordError').html('');
+			$('#confirmError').html('');
+			$('#passwordDialog').dialog('open'); */
+		});
+			
+		$('#savePassword').click(function() {
+			// check password
+			var password = $('#password').val();
+			var confirmPassword = $('#confirmPassword').val();
+			$('#passwordError').html('');
+			$('#confirmError').html('');
+
+			// both password must not be blank
+			if (password == '' || confirmPassword == '') {
+				if (password == '') $('#passwordError').html('Required');
+				if (confirmPassword == '') $('#confirmError').html('Required');
+				return;
+			}
+			
+			// both password must match
+			if (password != confirmPassword) {
+				$('#passwordError').html('Not match');
+				$('#confirmError').html('Not match');
+				return;
+			}
+				
+			// hash password 
+			encrypt();
+			$.post('@{resetPassword}', 
+					{'id':$('#userKey').val(),'password':$('#password').val(),'confirmPassword':$('#confirmPassword').val()}, 
+					function(data, status, xhr) {
+			    		checkRedirect(data);
+						alert("Reset Password successful.");
+					}
+			);
+			// TODO [JUN] hash password
+			$('#passwordDialog').dialog('close');
+		});
+		
+		$('#cancelPassword').click(function() {
+			$('#password').attr('disabled', 'disabled');
+			$('#confirmPassword').attr('disabled', 'disabled');
+			$('#password').val('');
+			$('#confirmPassword').val('');
+			$('#passwordDialog').dialog('close');
+		});
+	});
+	
+	#{if mode == 'entry'}
+		function doSave() {
+			/* if (($('#accountExpiredDate').hasClass('fieldError'))||
+				($('#password').hasClass('fieldError'))||
+				($('#confirmPassword').hasClass('fieldError'))){
+				return false;
+			} */
+			$("#prepareSubmit").trigger("prepareSubmit");
+			
+			if (($('#password').hasClass('fieldError'))||
+					($('#confirmPassword').hasClass('fieldError'))){
+					return false;
+				}
+			$('#history').val($('#password').val());
+			encrypt();
+			return true;
+			
+		}
+	
+	#{/if}
+	
+	function doConfirm() {
+		$("#prepareSubmit").trigger("prepareSubmit");
+		encrypt();
+		return true;
+	}
+		
+	#{if mode == 'edit'}
+		function doSave() {
+			/* if ($('#accountExpiredDate').hasClass('fieldError')){
+				return false;
+			} */
+			$("#prepareSubmit").trigger("prepareSubmit");
+			
+			return true;
+		}
+	#{/if}
+
+	function encrypt() {
+		var id = '${session.id}';
+		for (i = 0; i < id.length; i++) {
+			if (!isNaN(id.substring(i, i+1))) {
+				var start = Number(id.substring(i, i+1));
+				if ($('#password').val() != '') {
+					$('#password').rc4({
+						key: id.substring(start, start + 8)
+					});
+				}
+				if ($('#confirmPassword').val() != '') {
+					$('#confirmPassword').rc4({
+						key: id.substring(start, start + 8)
+					});
+				}
+				break;
+			}
+		}		
+	}
+	
+	function password(length, special) {
+		  var iteration = 0;
+		  var password = "";
+		  var randomNumber;
+		  if(special == undefined){
+		      var special = false;
+		  }
+		  while(iteration < length){
+		    randomNumber = (Math.floor((Math.random() * 100)) % 94) + 33;
+		    if(!special){
+		      if ((randomNumber >=33) && (randomNumber <=47)) { continue; }
+		      if ((randomNumber >=58) && (randomNumber <=64)) { continue; }
+		      if ((randomNumber >=91) && (randomNumber <=96)) { continue; }
+		      if ((randomNumber >=123) && (randomNumber <=126)) { continue; }
+		    }
+		    iteration++;
+		    password += String.fromCharCode(randomNumber);
+		  }
+		  return password;
+		}
+	
+	function validatePassword(){
+		var password = $('#password').val();
+		var confirmPassword = $('#confirmPassword').val();
+		
+		var passMinLength = $('#passMinLength').val();
+		var passMaxLength = $('#passMaxLength').val();
+		var passCombiChar = $('#passCombiChar').val();
+		var passMinUpper = $('#passMinUpper').val();
+		var passMinLower = $('#passMinLower').val();
+		var passMinChar = $('#passMinChar').val();
+		var passCombiNum = $('#passCombiNum').val();
+		var passMinNum = $('#passMinNum').val();
+		var passCombiSpechar = $('#passCombiSpechar').val();
+		var passMinSpechar = $('#passMinSpechar').val();
+		var listPassRestricted = $('#listPassRestricted').val();
+		
+		//if ((password != '') && (confirmPassword != '')){
+			
+			/* // validate of mathces New Password and Confirm Password
+			if (password != confirmPassword){
+				$('#confirmPassword').addClass('fieldError');
+				$('#confirmError').html('Password do not match');
+				return false;
+			} else {
+				$('#confirmPassword').removeClass('fieldError');
+				$('#confirmError').html('');
+			} */
+			
+			// validate minimum length password
+	 		if (password.length < passMinLength){
+		 		$('#password').addClass('fieldError');
+		 		$('#passwordError').html('Password must have min length = '+passMinLength);
+		 		return false;
+		 	}
+			
+	 	// validate maximum length password
+		 	if (password.length > passMaxLength){
+		 		$('#password').addClass('fieldError');
+		 		$('#passwordError').html('Password must have max length = '+passMaxLength);
+		 		return false;
+		 	} 
+		 	
+		 	// validate if password use combination of characters
+		 	//alert("passCombiChar = " +passCombiChar);
+		 	if (passCombiChar){
+		 		var path=/[a-z, A-Z]/g;
+		 		if ((password.match(path)==null)||(password.match(/\s/g))){
+					$('#password').addClass('fieldError');
+			 		$('#passwordError').html('Password must have character value');
+			 		return false;
+				}
+		 		
+				// validate minimal char
+		 		if (password.replace(/[^a-z, ^A-Z]/g, "").length < passMinChar){
+		 			$('#password').addClass('fieldError');
+			 		$('#passwordError').html('Password must have a minimum of '+passMinChar+' Character');
+			 		return false;
+		 		};
+		 		 
+		 		// validate count uppercase in password
+	 	 		if (password.replace(/[^A-Z]/g, "").length < passMinUpper){
+		 			$('#password').addClass('fieldError');
+			 		$('#passwordError').html('Passwords must have a minimum number of '+passMinUpper+' Uppercase Character');
+			 		return false;
+		 		};
+		 		
+		 		// validate count lowercase in password
+		 		if (password.replace(/[^a-z]/g, "").length < passMinLower){
+		 			$('#password').addClass('fieldError');
+			 		$('#passwordError').html('Passwords must have a minimum number of '+passMinLower+' Lowercase Character');
+			 		return false;
+		 		};
+		 	} else {
+		 		// validate if password not use combination of characters
+		 		if (password.replace(/[^a-z, ^A-Z]/g, "").length > '0'){
+		 			$('#password').addClass('fieldError');
+			 		$('#passwordError').html('Character are not allowed as a password');
+			 		return false;
+		 		}
+		 	} 
+		 	
+		 	// validate if password user combination of characters
+		 	if (passCombiNum){
+	 	 		var path=/[0-9]/g;
+
+		 		// validate match pattern numeric
+				if (password.match(path)==null){
+					$('#password').addClass('fieldError');
+			 		$('#passwordError').html('Password must have number value');
+			 		return false;
+				} 
+		 		
+		 		// validate minimum numeric value
+		 		if (password.replace(/[^0-9]/g, "").length < passMinNum){
+		 			$('#password').addClass('fieldError');
+			 		$('#passwordError').html('Password must have a minimum of '+passMinNum+' Number');
+			 		return false;
+		 		}
+		 		
+		 		var strArray = new Array();
+		 		var strListOrdNum = $('#listOrdNum').val();
+		 		var strSplit = strListOrdNum.split("|");
+		 		var a=0;
+		 		
+		 		for ( var i = 0; i < strSplit.length; i++) {
+		 			if (strSplit[i] != "") {
+		 				strArray[a] = strSplit[i];
+		 				a+=1;
+			 				if (password.indexOf(strArray[i]) > -1){
+		 					$('#password').addClass('fieldError');
+		 			 		$('#passwordError').html('There is a order numbers that are not allowed');
+		 			 		return false;
+		 			 		break;
+		 			 		
+		 				}
+		 			}
+		 		}
+		 		
+		 	 } else {
+		 		 if (password.replace(/[^0-9]/g, "").length > '0'){
+		 		 	 $('#password').addClass('fieldError');
+			 		 $('#passwordError').html('Number are not allowed as a password');
+			 		 return false;
+		 		 }
+		 	 }
+		 	
+		 	
+		 	 if (passCombiSpechar){
+		 	//	alert("spechar = " +password.match(/[a-z]/g));
+		 	//	alert("spechar = " +password.match(/[^a-z, ^A-Z, ^0-9]/g));
+		 	//	alert("space = " +password.match(/\s/g));
+		 		
+		 		if (password.match(/[^a-z, ^A-Z, ^0-9]/g)==null){
+		 			$('#password').addClass('fieldError');
+			 		$('#passwordError').html('Password must have special character!');
+			 		return false;
+		 		}
+		 		
+		 		if (password.replace(/[a-z, A-Z, 0-9]/g,"").length < passMinSpechar){
+		 			$('#password').addClass('fieldError');
+			 		$('#passwordError').html('Password must have a minimum of '+passMinSpechar+' special character');
+			 		return false;
+		 		}
+		 	 } else {
+		 		 if (password.replace(/[a-z, A-Z, 0-9]/g,"").length > '0'){
+		 			 $('#password').addClass('fieldError');
+			 		 $('#passwordError').html('Special Character are not allowed as a password');
+			 		 return false;
+		 		 }
+		 	 } 
+
+		 	// validate Restricted Password
+		 	var strArrayRest = new Array();
+	 		var strSplitRest = listPassRestricted.split("|");
+	 		var count=0;
+	 		for ( var i = 0; i < strSplitRest.length; i++) {
+	 			if (strSplitRest[i] != "") {
+	 				strArrayRest[count] = strSplitRest[i];
+	 				count+=1;
+	 				if (password.indexOf(strSplitRest[i]) > -1){
+	 					$('#password').addClass('fieldError');
+	 			 		$('#passwordError').html('Password must not contain Restricted Password');
+	 			 		return false;
+	 			 		break;
+	 			 		
+	 				}
+	 			}
+	 		// }
+	 		
+	 		$('#password').removeClass('fieldError');
+			$('#passwordError').html('');
+	 		return true;
+
+		}
+	}
+</script>
+
+#{hidden name:'user.organization.organizationId', value:user?.organization?.organizationId /}
+#{hidden id:'userKey', name:'user.userKey', value:user?.userKey /}
+#{hidden name:'user.isInternal', value:user?.isInternal /}
+#{hidden id:'status', name:'status', value:status /}
+#{hidden id:'roleKey', name:'user.roleKey', value:user?.roleKey /}
+#{hidden id:'history', name:'user.history', value:user?.history /}
+
+#{hidden id:'passMinLength', name:'passParam.minLength', value:passParam?.minLength /}
+#{hidden id:'passMaxLength', name:'passParam.maxLength', value:passParam?.maxLength /}
+
+#{hidden id:'passCombiChar', name:'passParam.combiChar', value:passParam?.combiChar /}
+#{hidden id:'passMinUpper', name:'passParam.minUpper', value:passParam?.minUpper /}
+#{hidden id:'passMinLower', name:'passParam.minLower', value:passParam?.minLower /}
+#{hidden id:'passMinChar', name:'passParam.minChar', value:passParam?.minChar /}
+
+#{hidden id:'passCombiNum', name:'passParam.combiNum', value:passParam?.combiNum /}
+#{hidden id:'passMinNum', name:'passParam.minNum', value:passParam?.minNum /}
+#{hidden id:'listOrdNum', name:'passParam.listOrderedNumber', value:passParam?.listOrderedNumber /}
+
+#{hidden id:'passCombiSpechar', name:'passParam.combiSpechar', value:passParam?.combiSpechar /}
+#{hidden id:'passMinSpechar', name:'pasParam.minSpechar', value:passParam?.minSpechar /}
+
+#{hidden id:'listPassRestricted', name:'listPassRestricted', value:listPassRestricted /}
+#{hidden id:'loginLDAP', name:'user.loginLDAP', value:loginLDAP /}
+
+#{hidden id:'json', name:'user.json', value:user?.json /}
+
+<div id="tabs">
+	<ul>
+		<li><a href="#tab-1">User Detail</a></li>
+		<li><a href="#tab-2">Cash Limit</a></li>
+		<!--li><a href="#tab-2">Groups</a></li-->
+	</ul>
+	<div class="pane" id="tab-1">
+		<p>      
+			#{textBox id:'userId', name:'user.userId', label:'User ID',value:user?.userId, width:'150px',maxLength:'50', required:true, readOnly:((mode=='entry') ? confirming : true ) /}
+			<span class="error">#{error 'User ID is' /}</span>
+		</p>		
+		<div id="passwordDialog" class="form">
+			<p id="pPassword">
+				#{textBox id:'password', name:'user.password', label:'New Password',value:user?.password, password:true, width:'150px', required:true, readOnly:((mode=='entry') ? confirming : true ) /}
+				<span id="passwordError" class="error">#{error 'New Password is' /}#{error 'Password validation.equals Confirm Password' /}</span>
+			</p>
+			<p id="pConfPassword">			
+				#{textBox id:'confirmPassword', name:'confirmPassword', label:'Confirm Password',value:user?.confirmPassword, password:true, width:'150px', required:true, readOnly:((mode=='entry') ? confirming : true ) /}
+				<span id="confirmError" class="error">#{error 'Confirm Password is' /}</span>
+			</p>
+			<div class="buttons" id="passwordButtons">
+				<input type="button" id="savePassword" value="Save" />
+				<input type="button" id="cancelPassword" value="Close" />
+			</div>	
+		</div>	
+		<p>			
+			#{textBox id:'name', name:'user.userName', label:'Name', value:user?.userName, class:"capitalize", width:'300px',maxLength:'100', required:true, readOnly:readOnly /}
+			<span class="error">#{error 'Name is' /}</span>
+		</p>
+		<p>
+			#{hidden id:'employeeKey', name:'user.employee.employeeKey', value:user?.employee?.employeeKey /}			
+			#{textBox id:'employeeNo', name:'user.employee.employeeNo', label:'Employee No', value:user?.employee?.employeeNo, class:"capitalize", width:'150px',maxLength:'18', required:true, readOnly:readOnly /}
+			<span class="error">#{error 'Employee No is' /}</span>
+		</p>
+		<p>			
+			#{textBox id:'branchNo', name:'user.employee.branch.branchNo', label:'Branch No', value:user?.employee?.branch?.branchNo, required:true, readOnly:readOnly, class:"capitalize", width:'50px' /}
+			#{hidden id:'branchKey', name:'user.employee.branch.branchKey', value:user?.employee?.branch?.branchKey /}
+			#{button id:'branchHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'branchName', name:'user.employee.branch.name', value:user?.employee?.branch?.name, readOnly:true, width:'222px' /}
+			<span class="error">#{error 'Branch No is' /}</span>						
+		</p>
+		<p>
+			#{textBox id:'emailAddress', name:'user.email', label:'Email Address', value:user?.email, readOnly:readOnly, required:true, class:'email', width:'150px',maxLength:200 /}
+			<span id="emailAddressError" class="error">#{error 'Email is' /}</span>
+		</p>
+		<p>
+			#{textBox id:'accountExpiredDate', name:'user.accountExpiredDate', label:'User Expired Date', value:user?.accountExpiredDate?.format(appProp.dateFormat), readOnly:readOnly, class:'calendar' /}(${appProp.displayDateFormat})
+			<!-- <span id="accountExpiredDateError" class="error"></span>  -->
+		</p>
+		<p>
+			#{radioButton id:'passNeverExpired', name:'user.passwordNeverExpired', value:((user?.passwordNeverExpired)?'true':'false') , label:'Password Never Expired', options:operators, readOnly:readOnly /}
+		</p>
+		<p>
+			#{radioButton id:'isDisabled', name:'user.isDisabled', value:((user?.isDisabled)?'true':'false'), label:'Disabled', options:operators, readOnly:readOnly /}
+		</p>	
+		<div id="adminField" class="form" style="display: display">
+			<p>
+				#{radioButton id:'isLocked', name:'user.isLocked', value:((user?.isLocked)?'true':'false'), label:'User Locked', options:operators, readOnly:readOnly /}
+			</p>
+		</div>
+		<p>
+			#{radioButton id:'isActive', name:'isActive', value:((user?.isActive)?'true':'false'), label:'Active', options:operators, readOnly:readOnly /}
+			#{hidden id:'isActiveHidden', name:'user.isActive', value:((user?.isActive)?'true':'false') /}
+		</p>	
+		<p>
+			<input type="button" id="resetPassword" value="Reset Password" />
+		</p>
+	</div>
+	<div class="pane" id="tab-2">
+		<div style='overflow:auto;height: 340px'>
+			<table id='tblCashLimit' class="display">
+				<thead style="width: 100%">
+					<tr style="width: 100%">
+						<td style="width: 100px;text-align: left;">Currency</td>
+						<td style="width: 100px;text-align: left;">Amount&nbsp;Limit</td>
+						<td style="width: 100px;text-align: left;">Type</td>
+						<td style="width: 100px;text-align: left;">Action</td>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>				
+			</table>
+			</br>
+			<input id='btnNewData' type="button" value="New Data"/>
+		</div>
+		<div id='prepareSubmit' style="display: none;">
+		</div>
+		<div id="dlgEntry" title="Cash Limit">
+			<div class="form">
+				<span id="dlgEntryErr" class="error"></span>
+				</br>
+				</br>
+				<form class="form">
+					#{textBox id:'dlgCurrency', label:'Currency', width:'100px', class:'capitalize', required:true /}
+					#{hidden id:'dlgCurrencyKey'/}
+					#{button id:'dlgCurrencyHelp', value:'?', class:'small', readOnly:readOnly /}
+					#{textBox id:'dlgCurrencyDesc', readOnly:true, width:'200px' /}
+					<span id="dlgCurrencyErr" class="error"></span>
+					</p>
+					
+					#{textBox id:'dlgAmountLimit', label:'Amount Limit', width:'100px', required:true/}
+					<span id="dlgAmountLimitErr" class="error"></span>
+					</p>
+					
+					#{dropDownList id:'dlgAmountType', label:'Amount Type', options:amountTypes, required:true /}
+					<span id="dlgAmountTypeErr" class="error"></span>
+				</form>
+			</div>	
+		</div>
+		<div id="dialogView" title="Cash Limit">
+			<form class="form">
+				#{textBox id:'dlgCurrency2', label:'Currency', width:'100px', class:'capitalize', required:true, readOnly:true /}
+				#{hidden id:'dlgCurrency2Key'/}
+				#{button id:'dlgCurrency2Help', value:'?', class:'small', readOnly:readOnly, readOnly:true /}
+				#{textBox id:'dlgCurrency2Desc', readOnly:true, width:'200px' /}
+				</p>
+				
+				#{textBox id:'dlgAmountLimit2', label:'Amount Limit', width:'100px', required:true, readOnly:true/}
+				</p>
+				
+				#{dropDownList id:'dlgAmountType2', label:'Amount Type', options:amountTypes, required:true, readOnly:true /}
+			</form>	
+		</div>	
+	</div>
+</div>
+
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'Users/entry.js' /}
+	$(document).ready(function() {
+		entry($("#tab-2"));
+	});
+</script>

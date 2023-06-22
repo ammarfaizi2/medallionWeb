@@ -1,0 +1,36 @@
+#{hidden id:'rowNumber' /} 
+<table id="gridJournalTemplateDetail" class="display">
+	<thead>
+		<tr>
+			<th>COA No</th>
+			<th>Account Name</th>
+			<th>Dr/Cr</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list faJournalMaster?.faJournalTemplates, as:'faJournalTemplate'}
+		<tr>
+			<td>
+				${faJournalTemplate?.faCoaMaster?.coaCode}
+			</td>
+			<td>
+				${faJournalTemplate?.faCoaMaster?.description}
+			</td>
+			<td>
+				${faJournalTemplate?.dorc}
+			</td>
+			<td>
+				#{hidden id:'journalTemplateKey', name:'faJournalTemplates[' + (faJournalTemplate_index-1) + '].journalTemplateKey', value:faJournalTemplate?.journalTemplateKey /}
+				#{hidden id:'coaCode', name:'faJournalTemplates[' + (faJournalTemplate_index-1) + '].faCoaMaster?.coaCode', value:faJournalTemplate?.faCoaMaster?.coaCode /}
+				#{hidden id:'coaDescription', name:'faJournalTemplates[' + (faJournalTemplate_index-1) + '].faCoaMaster?.description', value:faJournalTemplate?.faCoaMaster?.description /}
+				#{hidden id:'coaMasterKey', name:'faJournalTemplates[' + (faJournalTemplate_index-1) + '].faCoaMaster?.coaMasterKey', value:faJournalTemplate?.faCoaMaster?.coaMasterKey /}
+				#{hidden id:'journalMasterKey', name:'faJournalTemplates[' + (faJournalTemplate_index-1) + '].faJournalMaster.journalMasterKey', value:faJournalTemplate?.faJournalMaster?.journalMasterKey /}
+				#{hidden id:'position', name:'faJournalTemplates[' + (faJournalTemplate_index-1) + '].dorc', value:faJournalTemplate?.dorc /}
+				
+				<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} /></center>
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>

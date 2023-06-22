@@ -1,0 +1,11 @@
+#{if flash.error || errors}
+    <div class="error">
+    	Error when saving data!<br/>
+		<li>${flash.error}</li>
+		#{ifErrors}
+			#{errors}
+				 <li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}

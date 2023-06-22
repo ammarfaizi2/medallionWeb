@@ -1,0 +1,204 @@
+<!-- Start: Copied from templates/main.html -->
+#{stylesheet 'jquery-ui.custom.css' /}
+#{stylesheet 'jquery.dataTables.css' /}
+#{stylesheet 'menu.css' /}
+#{script 'jquery-1.4.4.min.js', characterset:'utf-8' /}
+#{script 'jquery-ui-1.8.13.min.js', characterset:'utf-8' /}
+#{script 'autoNumeric-1.7.1.js', characterset:'utf-8' /}
+#{script 'console.js', characterset:'utf-8' /}
+<script type="text/javascript">
+	$(function() {
+		$('input:text.capitalize').live('change', function() {
+			$(this).val($(this).val().toUpperCase());
+		})		
+		$('input.numeric').autoNumeric();		
+		$('input.numeric').live('blur', function() {
+			var el = $(this);
+			var id = this.id;
+			var stripped = "#" + id + "Stripped";
+			el.siblings(stripped).val(el.autoNumericGet());
+		});
+	})
+</script>
+<!-- End: Copied from templates/main.html -->
+
+#{script 'transaction.js' /}
+<script type="text/javascript">
+	$(function() {
+		$('.calendar').datepicker();
+		
+		var txn = new Transaction();
+
+		$('#calculate1').click(function() {
+			txn.lastPaymentDate = $('#lastPaymentDate').datepicker('getDate');
+			txn.nextPaymentDate = $('#nextPaymentDate').datepicker('getDate');
+			txn.settlementDate = $('#settlementDate').datepicker('getDate');
+			txn.frequency = $('#frequency').val();
+			txn.accrualBase = $('#accrualBase').val();
+			txn.yearBase = $('#yearBase').val();
+			txn.interestRate = $('#interestRate').autoNumericGet();
+			txn.quantity = $('#quantity').autoNumericGet();
+			var accruedInterest = txn.calculateAccruedInterest();
+			$('#accruedDays').autoNumericSet(txn.accruedDays);
+			$('#accruedInterest').autoNumericSet(accruedInterest);
+		});
+		
+		$('#calculate3').click(function() {
+			txn.securityClass = $('#securityClass').val();
+			txn.transactionType = $('#transactionType').val();
+			txn.lastPaymentDate = $('#lastPaymentDate').datepicker('getDate');
+			txn.nextPaymentDate = $('#nextPaymentDate').datepicker('getDate');
+			txn.settlementDate = $('#settlementDate').datepicker('getDate');
+			txn.frequency = $('#frequency').val();
+			txn.accrualBase = $('#accrualBase').val();
+			txn.yearBase = $('#yearBase').val();
+			txn.quantity = $('#quantity').autoNumericGet();
+			txn.price = $('#price').autoNumericGet();
+			txn.priceUnit = 0.01;
+			txn.discountAmount = $('#discountAmount').autoNumericGet();
+			txn.discountTax = $('#discountTax').autoNumericGet();
+			txn.totalCharges = $('#totalCharges').autoNumericGet();
+			txn.interestRate = $('#interestRate').autoNumericGet();
+			txn.taxOnInterest = $('#taxOnInterest').autoNumericGet();
+			txn.capitalGainTax = $('#capitalGainTax').autoNumericGet();
+			txn.calculate();
+			$('#discountNet').autoNumericSet(txn.discountNet);
+			$('#netAmount').autoNumericSet(txn.netAmount);
+			$('#grossAmount').autoNumericSet(txn.grossAmount);
+			$('#accruedDays').autoNumericSet(txn.accruedDays);
+			$('#accruedInterest').autoNumericSet(txn.accruedInterest);
+			$('#netInterest').autoNumericSet(txn.netAccruedInterest);
+			$('#proceed').autoNumericSet(txn.proceed);
+			$('#settlementAmount').autoNumericSet(txn.settlementAmount);			
+		});
+	});
+</script>
+<div>
+	<p>
+		<input type="button" id="calculate3" value="Calculate All" />
+		<input type="button" id="calculate1" value="Calculate Interest Rate" />	
+	</p>
+</div>
+<div style="display:inline:block;float:left;width:30%">
+	<p>
+		<label for="securityClass">Security Class</label> 
+		<input type="text" id="securityClass" value="FI" />
+	</p>
+	<p>
+		<label for="transactionType">Transaction Type</label> 
+		<input type="text" id="transactionType" value="B" />
+	</p>
+	<p>
+		<label for="lastPaymentDate">Last Payment Date</label> 
+		<input type="text" id="lastPaymentDate" class="calendar" value="09/01/2011" />
+	</p>
+	<p>
+		<label for="nextPaymentDate">Next Payment Date</label> 
+		<input type="text" id="nextPaymentDate" class="calendar" value="12/01/2011" />
+	</p>
+	<p>
+		<label for="settlementDate">Settlement Date</label> 
+		<input type="text" id="settlementDate" class="calendar" value="10/10/2011" />
+	</p>
+	<p>
+		<label for="effectiveDate">Effective Date</label> 
+		<input type="text" id="effectiveDate" class="calendar" value="" disabled="disabled" />
+	</p>
+	<p>
+		<label for="maturityDate">Maturity Date</label> 
+		<input type="text" id="maturityDate" class="calendar" value="" />
+	</p>
+	<p>
+		<label for="frequency">Frequency</label> 
+		<select id="frequency">
+			<option value="12">M</option>
+			<option value="4">Q</option>
+			<option value="2">H</option>
+			<option value="1">Y</option>
+		</select>
+	</p>
+	<p>
+		<label for="accrualBase">Accrual Base</label>
+		<select id="accrualBase">
+			<option value="0">ACT</option>
+			<option value="30">30</option>
+			<option value="31">31</option>
+		</select> 
+	</p>
+	<p>
+		<label for="yearBase">Year Base</label>
+		<select id="yearBase">
+			<option value="0">ACT</option>
+			<option value="360">360</option>
+			<option value="365">365</option>
+		</select> 
+	</p>
+</div>
+<div style="display:inline-block;width:30%">
+	<p>
+		<label for="quantity">Quantity</label> 
+		<input type="text" id="quantity" class="numeric" value="10,000,000" />
+	</p>
+	<p>
+		<label for="price">Price</label> 
+		<input type="text" id="price" class="numeric" value="100" />
+	</p>
+	<p>
+		<label for="discountAmount">Discount Amount</label> 
+		<input type="text" id="discountAmount" class="numeric" value="0" />
+	</p>
+	<p>
+		<label for="discountTax">Discount Tax</label> 
+		<input type="text" id="discountTax" class="numeric" value="0" />
+	</p>
+	<p>
+		<label for="discountNet">Discount Net</label> 
+		<input type="text" id="discountNet" class="numeric" value="0" disabled="disabled" />
+	</p>
+	<p>
+		<label for="netAmount">Net Amount</label> 
+		<input type="text" id="netAmount" class="numeric" value="0" disabled="disabled" />
+	</p>
+	<p>
+		<label for="totalCharges">Total Charges</label> 
+		<input type="text" id="totalCharges" class="numeric" value="0" />
+	</p>
+	<p>
+		<label for="grossAmount">Gross Amount</label> 
+		<input type="text" id="grossAmount" class="numeric" value="0" disabled="disabled" />
+	</p>
+</div>
+<div style="display:inline-block;float:right;height:80%;width:30%">
+	<p>
+		<label for="interestRate">Interest Rate</label> 
+		<input type="text" id="interestRate" class="numeric" value="10" /> %
+	</p>
+	<p>
+		<label for="accruedDays">Accrued Days</label> 
+		<input type="text" id="accruedDays" class="numeric" value="" disabled="disabled" />
+	</p>
+	<p>
+		<label for="accruedInterest">Accrued Interest</label> 
+		<input type="text" id="accruedInterest" class="numeric" value="" disabled="disabled" />
+	</p>
+	<p>
+		<label for="taxOnInterest">Tax On Interest</label> 
+		<input type="text" id="taxOnInterest" class="numeric" value="0"  />
+	</p>
+	<p>
+		<label for="netInterest">Net Interest</label> 
+		<input type="text" id="netInterest" class="numeric" value="" disabled="disabled" />
+	</p>
+	<p>
+		<label for="proceed">Proceed</label> 
+		<input type="text" id="proceed" class="numeric" value="" disabled="disabled" />
+	</p>
+	<p>
+		<label for="capitalGainTax">Capital Gain Tax</label> 
+		<input type="text" id="capitalGainTax" class="numeric" value="0" />
+	</p>
+	<p>
+		<label for="settlementAmount">Settlement Amount</label> 
+		<input type="text" id="settlementAmount" class="numeric" value="" disabled="disabled" />
+	</p>
+</div>

@@ -1,0 +1,42 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: ' ' /}
+#{set fixData: true /}
+#{set mode: mode /}
+#{script 'lookups.js' /}
+
+<div id="root">
+	<h3>Cash Forecasting Process </h3>
+	<form id="form" class="form">
+		#{hidden name:'PROCESSMARK', value:params?.PROCESSMARK/}
+		#{hidden id:'sessionTag', name:'param.sessionTag', value:param?.sessionTag/}
+		#{hidden id:'processMark', name:'param.processMark', value:param?.processMark/}
+		
+		
+		#{hidden id:'appDate', name:'param.appDate', value:param?.appDate /}
+		
+		<p>			
+			#{textBox id:'fromDate', name:'param.fromDate', label:'Periode', value:param?.fromDate?.format(appProp.dateFormat), class:'calendar', readOnly:false, required:true/}
+			<span id="fromDateErr" class="error">#{error 'PeriodeFrom' /}</span> 
+			<b>&nbsp;to&nbsp;</b>
+			#{textBox id:'toDate', name:'param.toDate', value:param?.toDate?.format(appProp.dateFormat), class:'calendar', readOnly:false, required:true/}(${appProp.displayDateFormat})
+			<span id="toDateErr" class="error">#{error 'PeriodeTo' /}</span>
+		</p>
+		
+		<p>&nbsp;</p>
+		<p>
+			<div class="buttons">
+				<input id='btnProcess' type="button" value="Process" ></input>
+				<input id='btnReset' type="button" id="reset" value="Reset" ></input>			
+			</div>
+		</p>
+	</form>
+</div>	
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'CashForeCastingProcess/list.js' /}
+	$(document).ready(function() {
+		$('.buttons input:button').button();
+		list($("#root"));
+	});
+</script>

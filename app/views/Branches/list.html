@@ -1,0 +1,48 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Branch Maintenance' /}
+
+<script type="text/javascript">
+	function doEdit(data) {
+		if ((data[3] == "New") || (data[3] == "Updated")) {
+			view(data[0]);
+			return false;
+		} else {
+			return true;
+		}
+	}
+</script>
+<table class="display">
+	<thead>
+		<tr>
+			<th width="0">Key</th>
+			<th width="120px">Branch No</th>
+			<th>Name</th>
+			<th>Status</th>
+			<th>Active</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:branches, as:'branch'}
+		<tr>
+			<td>
+				${branch.branchKey} 
+			</td>
+			<td>
+				${branch.branchNo}
+			</td>
+			<td>
+				${branch.name}
+			</td>
+			<td>
+				${branch?.recordStatus?.decodeStatus()}
+			</td>
+			<td>
+				${(branch?.isActive)? 'Yes':'No' }
+			</td>		
+		</tr>
+	#{/list}
+	</tbody>
+</table>
+	
+
+

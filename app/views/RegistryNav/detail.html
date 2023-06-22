@@ -1,0 +1,162 @@
+#{extends 'templates/detail1.html' /}
+#{if mode == 'edit' || mode == 'entry' || mode == 'view'}
+	#{set pageTitle: 'Inject NAV Price' /}
+#{/if}
+#{if taskId != null}
+	#{set pageTitle: 'Inject NAV Price Approval' /}
+#{/if}
+
+#{set id:nav?.id /}
+
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+
+#{script 'lookups.js' /}
+#{script 'date.format.js' /}
+
+<style type="text/css">
+  .errmsg { color:red; }
+    #offerPct { margin-left: -50}
+  #bidPct { margin-left: -50}
+  
+</style>
+
+<!-- MAIN SCREEN -->
+<form id="registryNavForm" class="form" method="POST" name="nav">
+	
+	#{hidden id:'effectiveDate', name:'nav.rgProduct.effectiveDate',value:nav?.rgProduct?.effectiveDate?.format(appProp.dateFormat), class:'calendar' /}
+	#{hidden id:'liquidDate',name:'nav.rgProduct.liquidDate', value:nav?.rgProduct?.liquidDate?.format(appProp.dateFormat), class:'calendar' /}
+	#{hidden id:'status', name:'status', value:status /}
+	#{hidden id:'amountRoundValue', name:'nav.rgProduct.amountRoundValue', value:nav?.rgProduct?.amountRoundValue /}
+	#{hidden id:'amountRoundType', name:'nav.rgProduct.amountRoundType', value:nav?.rgProduct?.amountRoundType /}
+	#{hidden id:'unitRoundValue', name:'nav.rgProduct.unitRoundValue', value:nav?.rgProduct?.unitRoundValue /}
+	#{hidden id:'unitRoundType', name:'nav.rgProduct.unitRoundType', value:nav?.rgProduct?.unitRoundType /}
+	#{hidden id:'priceRoundValue', name:'nav.rgProduct.priceRoundValue', value:nav?.rgProduct?.priceRoundValue /}
+	#{hidden id:'priceRoundType', name:'nav.rgProduct.priceRoundType', value:nav?.rgProduct?.priceRoundType /}
+	#{hidden id:'minNavAmt', name:'nav.rgProduct.minNavAmt', value:nav?.rgProduct?.minNavAmt /}
+	#{hidden id:'offer', name:'nav.offer', value:nav?.offer /}
+	#{hidden id:'bid', name:'nav.bid', value:nav?.bid /}
+	<p>			
+		#{textBox id:'navDate', name:'nav.id.navDate', label:'Date', value:nav?.id?.navDate?.format(appProp.dateFormat), class:'calendar', readOnly:((mode=='entry') ? confirming : true ), required:true /} (${appProp.displayDateFormat})
+		<span id="tradeDateError" class="error">#{error 'Trade date is' /}</span>
+		<span id="navDateError" class="error">#{error 'Date is' /}</span>
+	</p>
+	<p>			
+		#{textBox id:'fundCode', name:'nav.rgProduct.productCode', label:'Fund Code', value:nav?.rgProduct?.productCode, width:'120px', readOnly:((mode=='entry') ? confirming : true ), class:'capitalize', required:true /}
+		#{hidden  id:'fundCodeKey', value:nav?.rgProduct?.productCode /}
+		#{button  id:'fundCodeHelp', value:'?', class:'small', readOnly:((mode=='entry') ? confirming : true ) /}
+		#{textBox id:'fundCodeDesc', name:'nav.rgProduct.name', value:nav?.rgProduct?.name, readOnly:true, width:'340px' /}
+		#{hidden  id:'fundCodeId', name:'nav.id.productCode', value:nav?.id?.productCode/}
+		<span class="error">#{error 'Fund Code is' /}</span>
+	</p>
+	<p>			
+		#{textBox id:'currency', label:'Currency', value:nav?.rgProduct?.currency?.currencyCode, class:'capitalize', width:'75px', readOnly:true /}
+		#{hidden  id:'currencyHidden', name:'nav.rgProduct.currency.currencyCode', value:nav?.rgProduct?.currency?.currencyCode /}
+	</p>
+	<p>			
+		#{textBox id:'totalUnit', label:'Total Unit', value:nav?.totalUnit, format:'#,##0.##########', class:'rgNumeric', width:'120px', readOnly:true /}
+		#{hidden  id:'totalUnitStripped', name:'nav.totalUnit', value:nav?.totalUnit /}
+	</p>	
+	<p>
+		#{textBox id:'navPerUnit', label:'NAV Price', value:nav?.nav, format:'#,##0.##########', class:'rgNumeric', width:'120px', readOnly:readOnly, required:true /}
+		#{hidden  id:'navPerUnitStripped', name:'nav.nav', value:nav?.nav /}
+		<span id="navPerUnitErrMasg" class="error">#{error 'NAV/Unit is' /}</span>
+		<span id="navPerUnitErrorMessage" class="error"></span>
+	</p>
+	<p>
+		#{textBox id:'navAmount', label:'NAV Amount', value:nav?.navAmount, format:'#,##0.##########', class:'rgNumeric', width:'120px', readOnly:true /}
+		#{hidden  id:'navAmountStripped', name:'nav.navAmount', value:nav?.navAmount /}
+		<span id="navAmountError" class="error">#{if flash.navMinAmtError}${flash.navMinAmtError} ${nav?.rgProduct?.minNavAmt?.format('#,##0.##########')}#{/if}</span>
+	</p>
+<!-- 	<p> -->
+<!-- 		#{checkBox id:'checkBidOffer', name:'nav.checkBidOffer', value:nav?.checkBidOffer, label:'Bid & Offer Price', readOnly:readOnly /} -->
+<!-- 	</p> -->
+<!-- 	<p id="pOffer">  -->
+<!-- 		<label style="margin-left: 50">Offer<span id="reqOffer" class=req>&nbsp;*</span></label> -->
+<!-- 		#{textBox id:'offerPct', value:nav?.offerPricePct, class:'numericMaxLength', width:'80px', readOnly:readOnly/}% -->
+<!-- 		#{hidden  id:'offerPctStripped', name:'nav.offerPricePct', value:nav?.offerPricePct /} -->
+<!-- 		#{textBox id:'offerAmt', name:'offerAmt', value:offerAmt, format:'#,##0.##########', class:'rgNumeric', width:'150px', readOnly:true /} -->
+<!-- 		<span class="error">#{error 'Offer is' /}</span> -->
+<!-- 	</p> -->
+<!-- 	<p id="pBid"> -->
+<!-- 		<label style="margin-left: 50">Bid<span id="reqBid" class=req>&nbsp;*</span></label> -->
+<!-- 		#{textBox id:'bidPct', value:nav?.bidPricePct, class:'numericMaxLength', width:'80px', readOnly:readOnly /}% -->
+<!-- 		#{hidden  id:'bidPctStripped', name:'nav.bidPricePct', value:nav?.bidPricePct /} -->
+<!-- 		#{textBox id:'bidAmt',name:bidAmt, value:bidAmt, format:'#,##0.##########', class:'rgNumeric', width:'150px', readOnly:true /} -->
+<!-- 		<span class="error">#{error 'Bid is' /}</span> -->
+<!-- 	</p> -->
+	<p>
+		#{radioButton id:'isActive', name:'nav.isActive', value:((nav?.isActive)?'true':'false'), label:'Active', options:operators, readOnly:readOnly /}
+	</p>	
+</form>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'RegistryNav/Nav.js' /}
+	$(document).ready(function() {
+		Nav($("#main"));
+		
+		if (('${mode}'=='entry') || (('${mode}'=='edit') && (('${nav?.recordStatus?.decodeStatus()}' == 'Reject') || ($("#status").val() == 'R')))) {
+			$('input[name=nav.isActive]').attr("disabled", "disabled");
+		}
+		
+		#{ifnot flash.error || errors}
+		/* if ('${mode}' == 'entry' && '${confirming}'!='true'){
+			$('#checkBidOffer').attr('disabled', 'disabled');
+			if ($('#checkBidOffer').is(':checked')){
+				$('#offerPct').attr('disabled', false);
+				$('#bidPct').attr('disabled', false);
+				$("#reqOffer").html(" *");
+				$("#reqBid").html(" *");
+				$('#checkBidOffer').val(true);
+				$('#checkBidOffer').attr('disabled', false);
+			} else {
+				$('#offerPct').attr('disabled', 'disabled');
+				$('#bidPct').attr('disabled', 'disabled');
+				$("#reqOffer").html("");
+				$("#reqBid").html("");
+				$('#checkBidOffer').val(false);
+				if (($('#offer').val()!='')&&($('#bid').val()!=''))
+					$('#checkBidOffer').attr('disabled', false);
+				else 
+					$('#checkBidOffer').attr('disabled', 'disabled');
+			}
+		} else {
+			if ($('#checkBidOffer').is(':checked')){
+				$("#reqOffer").html(" *");
+				$("#reqBid").html(" *");
+			} else {
+				$("#reqOffer").html("");
+				$("#reqBid").html("");
+			}
+				
+		} */
+		#{/ifnot}
+		if ('${navDate}' != '') {
+ 			//var newNavDate = new Date('${navDate}');
+ 			if (('${mode}' == 'entry')||('${confirming}'=='true')) {
+ 				$('#navDate').val('${navDate}');
+ 				//$('#navDate').val(newNavDate.format('mm/dd/yyyy'));
+ 			}
+		} 
+ 		 
+	});
+	
+	function doSave() {
+		var checkError = $("input").hasClass('fieldError');
+		if (checkError){
+			return false;
+		}
+		submit('@{save()}?mode=${mode}&isNewRec=${isNewRec}#{if group}&group=${group}#{/}');
+		return false;
+	};
+	
+	function doConfirm() {
+		submit('@{confirm()}/?mode=${mode}&isNewRec=${isNewRec}#{if group}&group=${group}#{/}');
+		return false;
+	};
+	
+	function doBack() {
+		location.href='@{back(id)}/?mode=${mode}&isNewRec=${isNewRec}#{if status}&status=${status}#{/}#{if group}&group=${group}#{/}';
+		return false;
+	};
+</script>

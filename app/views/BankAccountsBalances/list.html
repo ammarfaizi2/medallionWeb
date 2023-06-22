@@ -1,0 +1,154 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle:'Bank Account Balance' /}
+#{script 'lookups.js' /}
+#{set fixData: true /}
+#{script 'lookuppaging.js' /}
+#{script 'forms.js' /}
+#{script 'date.js', characterset:'utf-8' /}
+
+<script type="text/javascript">
+$(function(){
+	$('.buttons input:button').button();
+	
+	$('#fundCode').change(function(){
+		if ($(this).val()==''){
+			$('#fundCodeKey').val('');
+			$('#fundCodeDesc').val('');
+			$('#h_fundCodeDesc').val('');
+		}
+	});
+	
+	$('#fundCode').lookup({
+		list:'@{Pick.faMasterInCfMaster()}',
+		get:{
+			url:'@{Pick.faFundSetup()}',
+			success: function(data){
+				$('#fundCode').removeClass('fieldError');
+				$('#fundCodeKey').val(data.code);
+				$('#fundCodeDesc').val(data.description);
+				$('#h_fundCodeDesc').val(data.description);
+			},
+			error: function(data){
+				$('#fundCode').addClass('fieldError');
+				$('#fundCodeKey').val('');
+				$('#fundCode').val('');
+				$('#fundCodeDesc').val('NOT FOUND');
+				$('#h_fundCodeDesc').val('');
+			}
+		},
+		description:$('#fundCodeDesc'),
+		help:$('#fundCodeHelp')
+	});
+	
+	$('#dateFrom').change(function(){
+		var dateFrom = $(this).datepicker('getDate');
+		var dateTo = $('#dateTo').datepicker('getDate');
+		var origin = 'from';
+		var id = '#date';
+		if ((($(this).val()!='') || ($(this).hasClass('fieldError'))) && ($('#dateTo').val()!=''))
+			compareDateFromTo(dateFrom, dateTo, origin, id);
+	});
+	
+	$('#dateTo').change(function(){
+		var dateFrom = $('#dateFrom').datepicker('getDate');
+		var dateTo = $(this).datepicker('getDate');
+		var origin = 'to';
+		var id = '#date';
+		if ((($(this).val()!='') || ($(this).hasClass('fieldError'))) && ($('#dateFrom').val()!=''))
+			compareDateFromTo(dateFrom, dateTo, origin, id);
+	});
+	
+	$('#accountNoOperator').children().eq(0).remove();
+	
+	
+	$('#reset').click(function() {
+		location.href="@{list()}";		
+	});
+	
+	$('#new').click(function() {
+		location.href="@{entry()}";
+	});
+});
+
+function validateSearch() {
+	 if (($('#fundCodeKey').val() == '')){
+		 $('#fundCodeError').html('Required');
+		return false;
+	 }else if($('#dateFrom').val()!='' || $('#dateTo').val()!=''){
+			if($('#dateFrom').hasClass('fieldError') || $('#dateTo').hasClass('fieldError'))
+				return false;
+			else
+				return true;
+	} else {
+		$('#fundCodeError').html('');
+		return true;
+	} 
+	
+}
+
+</script>
+
+<div id="accordion">
+	<h3><a href="#">Search Bank Account Balance</a></h3>
+	<form id="searchForm" class="form">
+		<input id="param" name="params.param" type="hidden" value="${param}"/>
+		#{hidden id:'query', name:'params.query', value:params?.query /}
+		<p>
+			#{textBox id:'fundCode',width:'100px', name:'params.fundCode', label:'Fund Code', value:params.fundCode, required:true, class:'capitalize' /}
+			#{hidden id:'fundCodeKey', name:'' /}
+			#{button id:'fundCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'fundCodeDesc', name:'', readOnly:true, width:'200px' /}
+			<span id="fundCodeError" class="error"></span>
+		</p>
+		<p>
+			#{textBox id:'dateFrom', name:'params.dateFrom', label:'Date', value:params?.dateFrom?.format(appProp.dateFormat), width:'100px', required:false, class:'calendar' /} To
+			<span id="dateFromError" class="error"></span>
+			#{textBox id:'dateTo', name:'params.dateTo', value:params?.dateTo?.format(appProp.dateFormat), width:'100px', required:true, class:'calendar' /}
+			(${appProp.displayDateFormat})
+			<span id="dateToError" class="error"></span>
+		</p>
+		<p>
+			#{dropDownList id:'accountNoOperator', name:'params.accountNoOperator', label:'Account No', options:stringOperators, value:params.accountNoOperator /}
+			#{textBox id:'accountSearchNo', name:'params.accountSearchNo', value:params.accountSearchNo,  width:'132px', class:'capitalize' /}
+		</p>
+		<p>
+			<div class="buttons">
+				<input type="button" id="search" value="Search" />				
+				<input type="button" id="reset" value="Reset" />					
+			</div>
+		</p>
+	</form>
+</div>
+<div class="buttons">
+	<input type="button" id="new" value="New Data" />					
+</div>
+<!-- <div id="result" style="display:none">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<div class="response"></div>
+</div> -->
+
+<div id="result" style="display:none">
+	<table id="tableBnBalance" class="display">
+		<thead>
+			<tr>
+				<th field="balanceDate|date|date|center|sort" width="110px">Date</th>
+				<th field="bnAccount.accountNo|string|none|left|sort">Account No</th>
+				<th field="bnAccount.name|string|none|left|sort">Beneficiary Name</th>
+				<th field="balanceAmount|number|decimal4|right|sort">Balance Amount</th>
+				<th field="recordStatus|string|decode|left|sort">Status</th>
+				<th width="100px" field="active|boolean|yesno|center|sort">Active</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+	
+</div>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'BankAccountsBalances/pagingBankBalance.js' /}
+	$(document).ready(function() {
+		Paging($("#accordion").add("#result"));
+	});
+</script>

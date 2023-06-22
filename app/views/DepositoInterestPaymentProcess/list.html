@@ -1,0 +1,119 @@
+#{extends 'templates/main.html' /}
+#{script 'lookuppaging.js' /}
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+<h2>Deposito Interest Payment Process</h2>
+
+<form id="searchForm" class="form">
+	#{hidden id:'dispatch', label:'Dispatch', name:'param.dispatch', value:param?.dispatch /}
+	#{hidden id:'readOnly', label:'ReadOnly', name:'param.readOnly', value:param?.readOnly /}
+	#{hidden id:'query', label:'Query', name:'param.query', value:param?.query /}
+	<p> 
+		#{textBox id:'paymentDate', name:'param.paymentDate', class:'calendar', label:'Date', readOnly:'true', value:param?.paymentDate?.format(appProp.dateFormat) /}
+		<span id="paymentDateError" class="error"></span>
+	</p>
+	</br>
+	<div id="accordionMandatory">
+		<h3><a href="#">Mandatory Filter</a></h3>
+		<div>
+			<p>
+				<input id="allNo" type="radio" value="false" name="param.all" ${param?.all == false ? 'checked=checked' : ''} ${param?.readOnly == true ? 'disabled=disabled' : ''}></input>
+				#{hidden  id:'customerNo', name:'param.customerNo', value:param?.customerNo /}
+				#{textBox id:'customer', label:'Customer Code', name:'param.cfMaster.customerNo', value:param?.cfMaster?.customerNo, class:'capitalize', readOnly:(param.readOnly || param.all), width:'100px', required: true /}
+				#{hidden  id:'customerKey', name:'param.cfMaster.customerKey', value:param?.cfMaster?.customerKey /}
+				#{button  id:'customerHelp', value:'?', class:'small' , readOnly:(param.readOnly || param.all) /}
+				#{textBox id:'customerDesc', name:'param.cfMaster.customerName', value:param?.cfMaster?.customerName, readOnly:true, width:'200px' /}
+				<span id="customerError" class="error"></span>
+			</p>
+			<p>
+				<input id="allYes" type="radio" value="true" name="param.all" ${param?.all == true ? 'checked=checked' : ''} ${param?.readOnly == true ? 'disabled=disabled' : ''}></input>
+				<label>All</label>
+			</p>
+			#{if param.readOnly}
+				<input id="all" type="hidden" name="param.all" value=${param?.all}> 
+			#{/if}
+		</div>
+	</div>
+	
+	</br>
+	
+	<div id="accordionOptional">
+		<h3><a href="#">Optional Filter</a></h3>
+		<div>
+			<p>
+				#{textBox id:'securityType', label:'Security Type', value:param?.scTypeMaster?.securityType, class:'capitalize', readOnly:param.readOnly, width:'100px', required: false /}
+				#{hidden  id:'securityTypeKey', name:'param.scTypeMaster.securityType', value:param?.scTypeMaster?.securityType /}
+				#{button  id:'securityTypeHelp', value:'?', class:'small', readOnly:param.readOnly /}
+				#{textBox id:'securityTypeDesc', name:'param.scTypeMaster.description', value:param?.scTypeMaster?.description, readOnly:true, width:'200px' /}
+			</p>
+			<p>
+				#{textBox id:'security', label:'Security Code', name:'param.scMaster.securityId', value:param?.scMaster?.securityId, class:'capitalize', readOnly:param.readOnly, width:'100px', required: false /}
+				#{hidden  id:'securityKey', name:'param.scMaster.securityKey', value:param?.scMaster?.securityKey /}
+				#{button  id:'securityHelp', value:'?', class:'small', readOnly:param.readOnly /}
+				#{textBox id:'securityDesc', name:'param.scMaster.description', value:param?.scMaster?.description, readOnly:true, width:'200px' /}
+			</p>
+			<p>
+				#{dropDownList id:'depositNoSign', name:'param.depositNoSign', label:'Deposit No', options:operators, value:param.depositNoSign, readOnly:param.readOnly  /}
+				#{textBox id:'depositNo', name:'param.depositNo', value:param.depositNo, class:'capitalize', readOnly:param.readOnly /}
+			</p>
+		</div>
+	</div>
+	
+	</br>
+	
+	<div>
+		<input type="button" id="populate" value="Populate" />
+	</div>
+	
+	<p>&nbsp;</p>
+	
+	<div id="result">
+		<table id="tableDeposito" class="display">
+			<thead> 
+				<tr>
+					<th width="10px" field="component|checkbox|none|center|nosort"><input type="checkbox"></th>
+					<th width="100px" field="error|string|none|left|nosort">Message</th>
+					<th width="50px" field="paymentDate|date|date|center|sort">Payment Date</th>
+					<th width="50px" field="deposito.depositoNo|string|none|center|sort">Deposito #</th>
+					<th width="50px" field="id.paymentNo|string|none|center|sort">Payment #</th>
+					<th width="50px" field="deposito.account.accountNo|string|none|center|sort">Account No</th>
+					<th width="50px" field="deposito.account.name|string|none|left|sort">Account Name</th>
+					<th width="50px" field="deposito.security.description|string|none|center|sort">Security Name</th>
+					<th width="50px" field="deposito.amount|number|decimal2|right|sort">Nominal</th>
+					<th width="50px" field="startDate|date|date|center|sort">Start Date</th>
+					<th width="50px" field="endDate|date|date|center|sort">End Date</th>
+<!--				<th width="50px" field="interestNet|number|decimal2|right|nosort">Interest (Net)</th>
+ -->
+					<th width="50px" field="accruedInterest|number|decimal2|right|nosort">Interest (Gross)</th>
+<!--				<th width="50px" field="tax|number|decimal2|right|nosort">Tax</th>
+					<th width="50px" field="deposito.account.customer.customerNo|string|none|right|nosort">CustomerNo</th>
+ -->					
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+	</div>
+	<br>
+	
+	<p id="buttonList">
+		<input type="button" id="process" value="Process" />
+		<input type="button" id="reset" value="Reset" />
+	</p>
+	
+	<p id="buttonConfirm">
+		<input type="button" id="confirm" value="Confirm" />
+		<input type="button" id="back" value="Back" />
+	</p>
+	
+	#{list param.ids, as:'id'}
+		#{hidden name:'param.ids', value:id /}
+	#{/list}
+</form>
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'DepositoInterestPaymentProcess/DepositoInterestPaymentProcess.js' /}
+	$(document).ready(function() {
+		new DepositoInterestPaymentProcess($("#searchForm"));
+	});
+</script>
+

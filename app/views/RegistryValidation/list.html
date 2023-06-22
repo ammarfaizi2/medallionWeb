@@ -1,0 +1,117 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'TA - Transaction Validation' /}
+
+#{script 'lookups.js' /}
+
+<script type="text/javascript">
+	function doEdit(data) {
+		return false;
+	}
+</script>
+#{if flash.error || errors}
+    <div class="error">
+    	#{ifErrors}
+			#{errors}
+				 <li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}
+<form id="registryValidationForm" class="form" method="POST" name="validation">
+	#{hidden  id:'processCount', value:trades?.size /}
+	#{hidden id:'formatAmount' /}
+	#{hidden id:'formatUnit' /}
+	#{hidden id:'formatPrice' /}
+	#{hidden id:'notValid', name:'notValid', value:notValid /}
+	<p>			
+		#{textBox id:'fundCode', name:'val.rgProduct.productCode', class:'capitalize', label:'Fund Code', value:val?.rgProduct?.productCode, width:'120px', readOnly:readOnly, class:'capitalize', required:true/}
+		#{hidden  id:'fundCodeKey', value:val?.rgProduct?.productCode /}
+		#{button  id:'fundCodeHelp', value:'?', class:'small', readOnly:readOnly/}
+		#{textBox id:'fundCodeDesc',  name:'val.rgProduct.name', value:val?.rgProduct?.name, readOnly:true, width:'340px' /}
+		<span id="fundCodeError" class="error">#{error 'Fund Code is' /}</span>
+	</p>
+	<p>			
+		#{textBox id:'goodfundDate', name:'val.goodfundDate', label:'Good Fund Date', value:val?.goodfundDate?.format(appProp.dateFormat), class:'calendar', readOnly:readOnly, required:true/} (${appProp.displayDateFormat})
+		<span id="goodfundDateError" class="error">#{error 'Good Fund Date is' /}</span>
+	</p>
+	<p>
+		#{hidden id:'reProcessAll', name:'val.reProcessAll',  label:'Re-Process All', readOnly:readOnly, value:val?.reProcessAll /}
+	</p>
+	<p>	
+		#{button  id:'btnNext', value:'Populate', readOnly:readOnly/}
+	</p>
+	#{if summeries?.size > 0}
+	<span id="errLimit" class="error"></span>
+	<table id="summaryTable" class="display">
+		<thead>
+			<tr>
+				<th>Type</th>
+				<th>Type</th>
+				<th>Amount</th>
+				<th>Unit</th>
+				<th>Count</th>
+				<th>Limit</th>
+			</tr>
+		</thead>
+		<tbody>
+		#{list summeries, as:'summary'}
+			<tr>
+				<td>${summary?.type}</td>
+				<td>${summary?.type}</td>
+				<td class="amountCell" align="right">${summary?.amount?.format('###,##0.##########')}</td>
+				<td class="unitCell" align="right">${summary?.unit?.format('###,##0.##########')}</td>
+				<td align="right">${summary?.count?.format('###,##0')}</td>
+				<td class="amountCell" align="right">${summary?.limit?.format('###,##0.##########')}</td>
+			</tr>
+		#{/list}
+		</tbody>
+	</table>
+	#{/if}
+	<p>&nbsp;</p>
+	<table id="validationTable" class="display">
+		<thead>
+		<tr>
+			<th>Trans No</th>
+			<th>Trans No</th>
+			<th>Account No.</th>
+			<th>Type</th>
+			<th>NAV Date</th>
+			<th>Posting Date</th>
+			<th>Amount</th>
+			<th>Price</th>
+			<th>Unit</th>
+			<th>Message</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list trades, as:'trade'}
+		<tr>
+			<td>${trade?.tradeKey}</td>
+			<td>${trade?.tradeKey}</td>
+			<td>${trade?.rgInvestmentaccount?.accountNumber}</td>
+			<td>${trade?.type}</td>
+			<td>${trade?.navDate?.format(appProp.dateFormat)}</td>
+			<td align="center">${trade?.postDate?.format(appProp.dateFormat)}</td>	
+			<td class="amountCell" align="right">${trade?.validateTransaction?.amount?.format('###,##0.##########')}</td>
+			<td class="priceCell" align="right">${trade?.validateTransaction?.price?.format('###,##0.##########')}</td>
+			<td class="unitCell" align="right">${trade?.validateTransaction?.unit?.format('###,##0.##########')}</td>
+			<td>${trade?.message}</td>	
+		</tr>
+	#{/list}
+	</tbody>
+	</table>
+	<p>
+		#{button  id:'btnProcess', value:'Process', readOnly:!readOnly/}
+		#{button  id:'btnCancel', value:'Cancel', readOnly:!readOnly/}
+	</p>
+</form>
+
+	
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'RegistryValidation/Validation.js' /}
+	$(document).ready(function() {
+		Validation($("#registryValidationForm"));
+	});
+</script>
+

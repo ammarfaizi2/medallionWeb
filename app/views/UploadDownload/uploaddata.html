@@ -1,0 +1,87 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: '' /}
+#{set fixData: true /}
+#{set mode: mode /}
+#{script 'lookups.js' /}
+
+#{if flash.error || errors}
+    <div class="error">
+    	<b>Error when saving data!</b><br/><br/>
+    	#{if flash.error}
+<li>${flash.error}</li>
+		#{/if}
+		#{ifErrors}
+			#{errors}
+<li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}
+
+<h3>Upload Data</h3>
+<form id="uploadDataForm" class="form" method="POST" enctype="multipart/form-data">
+#{hidden id:'batchKey', name:'batch.batchKey', value:batch?.batchKey /}
+	<p>
+		#{dropDownList id:'profileKey', name:'batch.profile.profileKey', label:'Template', value:batch?.profile?.profileKey, options:templetes, required:true, readOnly:false /}
+		<span class="error">#{error 'Template is' /}</span>
+	</p> 
+	<p>
+		
+		#{if ( mode == 'entry')}
+			#{fileUpload name:'file', id:'file', label:'File', required:true /}
+		#{/if}
+		#{else}
+			<label style="width: 165px"></label><label style="width: 700px">${batch?.filename}</label>
+		#{/else}
+		
+		#{hidden id:'filename', name:'batch.filename', value:batch?.filename, width:'150px', required:true, maxLength:50, size:50/}
+		<span class="error">#{error 'File is' /}</span>
+	</p>
+	<p>
+		#{checkBox id:'hasTitle', name:'batch.hasTitle', value:batch?.hasTitle, label:'Title'/}<b>Has Title</b>
+	</p>		
+	<p>
+		<label>Description</label>
+		<textarea id="description" name="batch.description" rows="3" cols="25"></textarea>
+	</p>
+	<br/>
+	<br/>
+	#{if (mode == 'entry') || (flash.error || errors)}
+		<div id="actions" class="buttons">
+			<input id='btnPopulate' type="button" value="Populate" />
+			<input id='btnClear' type="button" value="Clear" />
+		</div>
+	#{/if}
+	#{else}
+		<div id="actions" class="buttons">
+			<input id='btnClose' type="button" value="Close" />
+		</div>
+	#{/else}
+	<p>
+		<table id="tblPopulate">
+			<thead id="tblHead">
+				<tr id="tblTr"><tr>
+			</thead>
+			<tbody id="tblBody"></tbody>
+		</table>
+	</p>
+</form>
+	
+<div id="result" style="display:none">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<div class="response"></div>
+</div>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'UploadDownload/UploadData.js' /}
+	$(document).ready(function() {
+		$('#btnPopulate').button();
+		$('#btnCancel').button();
+		$('.buttons input:button').button();
+		UploadData($("#html"));
+	});
+	$('#btnClose').click(function() {
+		location.href = "@{UploadDownload.uploaddata()}";
+	})
+</script>

@@ -1,0 +1,52 @@
+<h3>Search results</h3>
+
+#{if transactions}
+<table id="grid" class="display">
+	<thead>
+		<tr>
+			<th width="100px">Key</th>
+			<th width="100px">Transaction Date</th>
+			<th width="100px">Txn #</th>
+			<th width="100px">Account No.</th>
+			<th width="100px">Account Name</th>
+			<th width="100px">Description</th>
+			<th width="100px">Sec Code</th>
+			<th width="100px">Settlement Amount</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:transactions, as:'transaction'}
+		<tr>
+			<td>
+				${transaction?.transactionKey}
+			</td>
+			<td>
+				${transaction?.transactionDate?.format(appProp.dateFormat)}
+			</td>
+			<td>
+				${transaction?.transactionNumber}
+			</td>
+			<td>
+				${transaction?.account?.accountNo}
+			</td>
+			<td>
+				${transaction?.account?.name}
+			</td>
+			<td>
+				${transaction?.transactionTemplate?.description}
+			</td>
+			<td>
+				${transaction?.security?.securityId}
+			</td>
+			<td align="right">
+				${transaction?.settlementAmount?.format('#,##0.##########')}
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>
+
+#{/if}
+#{else}
+<div>No record found</div>
+#{/else}

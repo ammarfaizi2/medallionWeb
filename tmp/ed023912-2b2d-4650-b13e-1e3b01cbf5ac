@@ -1,0 +1,1429 @@
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.organization.organizationId"
+
+2FE3AD52-C618-484F-857E-A9D530EF716A
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.securityKey"
+
+2901
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.securityType.category"
+
+
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.securityCategory"
+
+
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.todayPlusOne"
+
+
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="checkIsExpire"
+
+
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fairValueTrade"
+
+
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="amortizedTrade"
+
+
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fairValueAFS"
+
+
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="amortizedAFS"
+
+
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fairValueHTM"
+
+
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="amortizedHTM"
+
+
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.nextPaymentDate"
+
+22/08/2022
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.lastPaymentDate"
+
+22/05/2022
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="status"
+
+A 
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.securityType.isPrice"
+
+true
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.securityType.isDiscounted"
+
+true
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.securityType.priceUnit"
+
+0.01
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.securityType.hasInterest"
+
+true
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="isreload"
+
+true
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.securityType.securityType"
+
+SUKUK
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.securityType.description"
+
+SYARIAH CORPORATE BOND
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="securityClass"
+
+FI
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.securityType.securityClass.lookupCode"
+
+FI
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="securityClassDesc"
+
+FIX INCOME
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.securityType.securityClass.lookupDescription"
+
+FIX INCOME
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.securityId"
+
+SIPPLN02ACN3
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.description"
+
+SUKUK IJARAH BKLJ II PLN THP III TAHUN 2018 SERI A
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.syariah"
+
+true
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.apoloType.lookupCode"
+
+F04150205
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.apoloType.lookupId"
+
+JENIS_EFEK-F04150205
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.apoloType.lookupDescription"
+
+Ijarah Fixed Rate
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.issuer.thirdPartyCode"
+
+PPLN
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.issuer.thirdPartyKey"
+
+88532
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.issuer.thirdPartyName"
+
+PERUSAHAAN LISTRIK NEGARA (PERSERO), PT
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.currency.currencyCode"
+
+IDR
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.currency.description"
+
+INDONESIAN RUPIAH
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.subSector.lookupCode"
+
+OTH
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.subSector.lookupId"
+
+SUB_SECTOR-OTH
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.subSector.lookupDescription"
+
+LAINNYA
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.marketOfRisk.lookupCode"
+
+ID
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.marketOfRisk.lookupId"
+
+COUNTRY-ID
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.marketOfRisk.lookupDescription"
+
+INDONESIA
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.registrarCode.lookupCode"
+
+NA
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.registrarCode.lookupId"
+
+REGISTRAR-NA
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.registrarCode.lookupDescription"
+
+NOT AVAILABLE
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.isinCode"
+
+IDJ0000103A5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="settlementDays"
+
+2
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.settlementDays"
+
+2
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.isExpire"
+
+false
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.isScript"
+
+false
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="isActive"
+
+true
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.isActive"
+
+true
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.issueDate"
+
+23/02/2018
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.maturityDate"
+
+22/02/2023
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.accrualBase.lookupId"
+
+ACCRUAL_BASE-30
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.yearBase.lookupId"
+
+YEAR_BASE-360
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.isFraction"
+
+true
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="k"
+
+1,000,000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.fractionRatioSource"
+
+1000000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fractionRatioTarget"
+
+16,250
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.fractionRatioTarget"
+
+16250
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.frequency.lookupId"
+
+FREQUENCY-Q
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.firstCouponDate"
+
+22/05/2018
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="interestRate"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.interestRate"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.isFloatingRate"
+
+false
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.totalCoupon"
+
+20
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.depositoryCode.lookupId"
+
+DEPOSITORY_CODE-1
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.externalCode"
+
+SIPPLN02ACN3
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.externalType.lookupId"
+
+
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="isTrade"
+
+on
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.checkTrade"
+
+true
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.checkAfs"
+
+false
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="isHtm"
+
+on
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.checkHtm"
+
+true
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.valuationMethodTrade.lookupId"
+
+VALUATION_METHOD-FV
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.valuationMethodHTM.lookupId"
+
+VALUATION_METHOD-AM
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="marketPriceTrade"
+
+MARKET_PRICE-CL
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.marketPriceTrade.lookupId"
+
+MARKET_PRICE-CL
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="marketPriceHTM"
+
+MARKET_PRICE-NA
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.marketPriceHTM.lookupId"
+
+MARKET_PRICE-NA
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.amortizationMethodTrade.lookupId"
+
+
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="amortizationMethodAFS"
+
+
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="amortizationMethodHTM"
+
+AMORTIZATION_METHOD-SL
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.amortizationMethodHTM.lookupId"
+
+AMORTIZATION_METHOD-SL
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="minTrxQuantity"
+
+0
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.minTrxQuantity"
+
+0
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security?.parUnitValue"
+
+100
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.parUnitValue"
+
+100
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security?.listedShare"
+
+0
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="security.listedShare"
+
+0
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[16].lastPaymentDate"
+
+24/02/2018
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[16].nextPaymentDate"
+
+22/05/2018
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fractionBase[16]"
+
+1,000,000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[16].fractionBase"
+
+1000000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fraction[16]"
+
+16,250
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[16].fraction"
+
+16250
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="interestRate[16]"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[16].interestRate"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[16].paymentDate"
+
+22/05/2018
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[16].paidInterest"
+
+true
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[16].id.securityKey"
+
+2901
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[16].id.couponNo"
+
+1
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[16].paymentDate"
+
+22/05/2018
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[5].lastPaymentDate"
+
+23/05/2018
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[5].nextPaymentDate"
+
+22/08/2018
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fractionBase[5]"
+
+1,000,000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[5].fractionBase"
+
+1000000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fraction[5]"
+
+16,250
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[5].fraction"
+
+16250
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="interestRate[5]"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[5].interestRate"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[5].paymentDate"
+
+23/08/2018
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[5].paidInterest"
+
+true
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[5].id.securityKey"
+
+2901
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[5].id.couponNo"
+
+2
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[5].paymentDate"
+
+23/08/2018
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[10].lastPaymentDate"
+
+23/08/2018
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[10].nextPaymentDate"
+
+22/11/2018
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fractionBase[10]"
+
+1,000,000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[10].fractionBase"
+
+1000000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fraction[10]"
+
+16,250
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[10].fraction"
+
+16250
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="interestRate[10]"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[10].interestRate"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[10].paymentDate"
+
+22/11/2018
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[10].paidInterest"
+
+true
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[10].id.securityKey"
+
+2901
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[10].id.couponNo"
+
+3
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[10].paymentDate"
+
+22/11/2018
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[17].lastPaymentDate"
+
+23/11/2018
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[17].nextPaymentDate"
+
+22/02/2019
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fractionBase[17]"
+
+1,000,000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[17].fractionBase"
+
+1000000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fraction[17]"
+
+16,250
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[17].fraction"
+
+16250
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="interestRate[17]"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[17].interestRate"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[17].paymentDate"
+
+22/02/2019
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[17].paidInterest"
+
+true
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[17].id.securityKey"
+
+2901
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[17].id.couponNo"
+
+4
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[17].paymentDate"
+
+22/02/2019
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[7].lastPaymentDate"
+
+23/02/2019
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[7].nextPaymentDate"
+
+22/05/2019
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fractionBase[7]"
+
+1,000,000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[7].fractionBase"
+
+1000000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fraction[7]"
+
+16,250
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[7].fraction"
+
+16250
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="interestRate[7]"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[7].interestRate"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[7].paymentDate"
+
+22/05/2019
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[7].paidInterest"
+
+true
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[7].id.securityKey"
+
+2901
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[7].id.couponNo"
+
+5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[7].paymentDate"
+
+22/05/2019
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[1].lastPaymentDate"
+
+23/05/2019
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[1].nextPaymentDate"
+
+22/08/2019
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fractionBase[1]"
+
+1,000,000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[1].fractionBase"
+
+1000000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fraction[1]"
+
+16,250
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[1].fraction"
+
+16250
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="interestRate[1]"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[1].interestRate"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[1].paymentDate"
+
+22/08/2019
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[1].paidInterest"
+
+true
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[1].id.securityKey"
+
+2901
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[1].id.couponNo"
+
+6
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[1].paymentDate"
+
+22/08/2019
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[2].lastPaymentDate"
+
+23/08/2019
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[2].nextPaymentDate"
+
+22/11/2019
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fractionBase[2]"
+
+1,000,000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[2].fractionBase"
+
+1000000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fraction[2]"
+
+16,250
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[2].fraction"
+
+16250
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="interestRate[2]"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[2].interestRate"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[2].paymentDate"
+
+22/11/2019
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[2].paidInterest"
+
+true
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[2].id.securityKey"
+
+2901
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[2].id.couponNo"
+
+7
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[2].paymentDate"
+
+22/11/2019
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[14].lastPaymentDate"
+
+23/11/2019
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[14].nextPaymentDate"
+
+22/02/2020
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fractionBase[14]"
+
+1,000,000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[14].fractionBase"
+
+1000000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fraction[14]"
+
+16,250
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[14].fraction"
+
+16250
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="interestRate[14]"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[14].interestRate"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[14].paymentDate"
+
+24/02/2020
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[14].paidInterest"
+
+true
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[14].id.securityKey"
+
+2901
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[14].id.couponNo"
+
+8
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[14].paymentDate"
+
+24/02/2020
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[9].lastPaymentDate"
+
+23/02/2020
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[9].nextPaymentDate"
+
+22/05/2020
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fractionBase[9]"
+
+1,000,000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[9].fractionBase"
+
+1000000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fraction[9]"
+
+16,250
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[9].fraction"
+
+16250
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="interestRate[9]"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[9].interestRate"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[9].paymentDate"
+
+26/05/2020
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[9].paidInterest"
+
+true
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[9].id.securityKey"
+
+2901
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[9].id.couponNo"
+
+9
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[9].paymentDate"
+
+26/05/2020
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[15].lastPaymentDate"
+
+23/05/2020
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[15].nextPaymentDate"
+
+22/08/2020
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fractionBase[15]"
+
+1,000,000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[15].fractionBase"
+
+1000000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fraction[15]"
+
+16,250
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[15].fraction"
+
+16250
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="interestRate[15]"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[15].interestRate"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[15].paymentDate"
+
+24/08/2020
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[15].paidInterest"
+
+true
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[15].id.securityKey"
+
+2901
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[15].id.couponNo"
+
+10
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[15].paymentDate"
+
+24/08/2020
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[13].lastPaymentDate"
+
+23/08/2020
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[13].nextPaymentDate"
+
+22/11/2020
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fractionBase[13]"
+
+104,000,000,000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[13].fractionBase"
+
+104000000000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fraction[13]"
+
+1,690,000,000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[13].fraction"
+
+1690000000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="interestRate[13]"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[13].interestRate"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[13].paymentDate"
+
+23/11/2020
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[13].paidInterest"
+
+true
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[13].id.securityKey"
+
+2901
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[13].id.couponNo"
+
+11
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[13].paymentDate"
+
+23/11/2020
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[19].lastPaymentDate"
+
+23/11/2020
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[19].nextPaymentDate"
+
+22/02/2021
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fractionBase[19]"
+
+104,000,000,000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[19].fractionBase"
+
+104000000000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fraction[19]"
+
+1,690,000,000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[19].fraction"
+
+1690000000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="interestRate[19]"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[19].interestRate"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[19].paymentDate"
+
+22/02/2021
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[19].paidInterest"
+
+true
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[19].id.securityKey"
+
+2901
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[19].id.couponNo"
+
+12
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[19].paymentDate"
+
+22/02/2021
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[6].lastPaymentDate"
+
+23/02/2021
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[6].nextPaymentDate"
+
+22/05/2021
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fractionBase[6]"
+
+104,000,000,000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[6].fractionBase"
+
+104000000000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fraction[6]"
+
+1,690,000,000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[6].fraction"
+
+1690000000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="interestRate[6]"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[6].interestRate"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[6].paymentDate"
+
+24/05/2021
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[6].paidInterest"
+
+true
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[6].id.securityKey"
+
+2901
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[6].id.couponNo"
+
+13
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[6].paymentDate"
+
+24/05/2021
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[18].lastPaymentDate"
+
+23/05/2021
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[18].nextPaymentDate"
+
+22/08/2021
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fractionBase[18]"
+
+104,000,000,000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[18].fractionBase"
+
+104000000000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fraction[18]"
+
+1,690,000,000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[18].fraction"
+
+1690000000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="interestRate[18]"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[18].interestRate"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[18].paymentDate"
+
+23/08/2021
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[18].paidInterest"
+
+true
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[18].id.securityKey"
+
+2901
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[18].id.couponNo"
+
+14
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[18].paymentDate"
+
+23/08/2021
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[4].lastPaymentDate"
+
+23/08/2021
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[4].nextPaymentDate"
+
+22/11/2021
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fractionBase[4]"
+
+104,000,000,000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[4].fractionBase"
+
+104000000000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fraction[4]"
+
+1,690,000,000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[4].fraction"
+
+1690000000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="interestRate[4]"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[4].interestRate"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[4].paymentDate"
+
+22/11/2021
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[4].paidInterest"
+
+true
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[4].id.securityKey"
+
+2901
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[4].id.couponNo"
+
+15
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[4].paymentDate"
+
+22/11/2021
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[0].lastPaymentDate"
+
+23/11/2021
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[0].nextPaymentDate"
+
+22/02/2022
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fractionBase[0]"
+
+104,000,000,000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[0].fractionBase"
+
+104000000000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fraction[0]"
+
+1,690,000,000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[0].fraction"
+
+1690000000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="interestRate[0]"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[0].interestRate"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[0].paymentDate"
+
+22/02/2022
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[0].paidInterest"
+
+true
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[0].id.securityKey"
+
+2901
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[0].id.couponNo"
+
+16
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[0].paymentDate"
+
+22/02/2022
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[8].lastPaymentDate"
+
+23/02/2022
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[8].nextPaymentDate"
+
+22/05/2022
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fractionBase[8]"
+
+104,000,000,000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[8].fractionBase"
+
+104000000000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fraction[8]"
+
+1,690,000,000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[8].fraction"
+
+1690000000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="interestRate[8]"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[8].interestRate"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[8].paymentDate"
+
+23/05/2022
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[8].paidInterest"
+
+true
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[8].id.securityKey"
+
+2901
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[8].id.couponNo"
+
+17
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[8].paymentDate"
+
+23/05/2022
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[3].lastPaymentDate"
+
+23/05/2022
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[3].nextPaymentDate"
+
+22/08/2022
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fractionBase[3]"
+
+104,000,000,000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[3].fractionBase"
+
+104000000000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fraction[3]"
+
+1,690,000,000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[3].fraction"
+
+1690000000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="interestRate[3]"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[3].interestRate"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[3].paymentDate"
+
+22/08/2022
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[3].paidInterest"
+
+true
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[3].id.securityKey"
+
+2901
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[3].id.couponNo"
+
+18
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[3].paymentDate"
+
+22/08/2022
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[12].lastPaymentDate"
+
+23/08/2022
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[12].nextPaymentDate"
+
+22/11/2022
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fractionBase[12]"
+
+104,000,000,000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[12].fractionBase"
+
+104000000000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fraction[12]"
+
+1,690,000,000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[12].fraction"
+
+1690000000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="interestRate[12]"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[12].interestRate"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[12].paymentDate"
+
+22/11/2022
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[12].id.securityKey"
+
+2901
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[12].id.couponNo"
+
+19
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[12].paymentDate"
+
+22/11/2022
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[11].lastPaymentDate"
+
+23/11/2022
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[11].nextPaymentDate"
+
+22/02/2023
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fractionBase[11]"
+
+1,000,000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[11].fractionBase"
+
+1000000
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="fraction[11]"
+
+16,250
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[11].fraction"
+
+16250
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="interestRate[11]"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[11].interestRate"
+
+6.5
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[11].paymentDate"
+
+22/02/2023
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[11].id.securityKey"
+
+2901
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[11].id.couponNo"
+
+20
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="schedules[11].paymentDate"
+
+22/02/2023
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="udfs[0].value"
+
+
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="udfs[0].fieldName"
+
+RATING
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="udfs[0].displayType.lookupId"
+
+DISPLAY_TYPE-1
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="udfs[0].dataType.lookupId"
+
+DATA_TYPE-STR
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="udfs[0].label"
+
+RATING
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="udfs[0].lookupGroup.lookupGroup"
+
+
+-----------------------------24011647673455189057174669580
+Content-Disposition: form-data; name="udfs[0].sequence"
+
+1
+-----------------------------24011647673455189057174669580--

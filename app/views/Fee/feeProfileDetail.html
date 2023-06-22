@@ -1,0 +1,102 @@
+#{extends 'main.html' /}
+#{set title:'Medallion&#0153;' /}
+#{set pageName:'Fee' /}
+
+#{if flash.error}
+    <p style="color:#c00">
+        ${flash.error}
+    </p>
+#{/if}
+
+<script type="text/javascript">
+$(function(){
+	$("#global").css("display", "none");
+	$("#shs").css("display", "none");
+
+	$("#label1").click(function () { 
+	    //  $(this).slideUp(); 
+
+	    	$("#global").css("display", "");
+	    	$("#shs").css("display", "none");
+	    	
+	
+		});
+	$("#label2").click(function () { 
+	    //  $(this).slideUp(); 
+	    	$("#global").css("display", "none");
+	    	$("#shs").css("display", "");
+	    	
+		});
+	
+	
+	    $("span").hover(function () {
+	      $(this).addClass("hilite");
+	    }, function () {
+	      $(this).removeClass("hilite");
+	    });
+});
+</script>
+
+<style>
+span{ color:red; margin:5px; cursor:pointer; }
+span.hilite { background:yellow; }
+
+
+</style>
+
+
+<div style="position:absolute; top:5px; left:10px;width:159px; height:400px; border:1px solid black;padding:5px;">
+
+        <ul class="closed" id="menu"><span id = "label1">GLOBAL</span>
+		<li class="closed"><span>EQUITY</span>
+			<ul>
+				<li><span id="label2" ">SHS</span></li>
+			</ul>
+		</li>
+		<li class="closed"><span>FIX INCOME</span>
+			<ul>
+
+				<li class="closed"><span>FIX INT BOND</span>
+				<ul>
+				
+				<li class="closed"><span>12100</span></li>
+				</ul></li>
+
+			</ul>
+		</li>
+		</ul>
+		
+	</div>
+	<div style="position:absolute; top:5px; left:180px;width:250px; height:400px; border:1px solid black;padding:5px;">
+ 
+  
+              <div id="global" style="position:absolute;left:20px; top:10px;width:300px;">
+
+				<table class="grid" style="text-align:center" width="200px">
+				<tr class="header">
+				<td>FEE ITEM</td>
+				</tr>
+				<tr class="oddrow">
+				<td>SAFE KEEPING FEE</td>
+				</tr>
+				</table>             
+              </div>
+
+              <div id="shs" style=" position:absolute;left:20px; top:10px;width:300px;">
+ 			
+    			<table class="grid" style="text-align:center" width="200px">
+				<tr class="header">
+				<td>FEE ITEM</td>
+				</tr>
+				<tr class="oddrow">
+				<td>Broker</td>
+				</tr>
+				<tr class="evenrow">
+				<td>LEVY</td>
+				</tr>
+				<tr class="oddrow">
+				<td>TAX</td>
+				</tr>
+				</table>             
+              </div>
+ </div>

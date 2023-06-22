@@ -1,0 +1,358 @@
+#{set pageTitle: 'Corporate Action Announcement' /}
+#{set id:corporateAnnouncement?.corporateAnnouncementKey /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{set readOnlyCancel:(confirming) /}
+
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+
+#{if flash.error || errors}
+    <div class="error">
+    	<b>Error when saving data!</b><br/><br/>
+    	#{if flash.error}
+<li>${flash.error}</li>
+		#{/if}
+		#{ifErrors}
+			#{errors}
+<li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}
+
+#{script 'date.format.js' /}
+#{script 'external/Util.js' /}
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'CorporateAnnouncements/announcement.js' /}
+</script>
+
+<style type="text/css">
+  #errmsg {color:red;}
+  #isUnsettledHolding {margin-left:1.7em;}
+  #targetQuantityRow {margin-left:2px;}
+  textarea {resize:none; height: 50px;}
+  /* .master {margin-left:2em;} */
+</style>
+
+<form id="corporateAnnouncementForm" class="form" accept-charset="utf-8" encType="multipart/form-data" method="post">
+#{hidden id:'parValue', name:'corporateAnnouncement.security.parUnitValue', value:corporateAnnouncement?.security?.parUnitValue /}
+#{hidden id:'corporateAnnouncementKey', name:'corporateAnnouncement.corporateAnnouncementKey', value:corporateAnnouncement?.corporateAnnouncementKey /}
+#{hidden id:'announcementDetailKey', name:'announcementDetail.announcementDetailKey', value:announcementDetail?.announcementDetailKey /}
+#{hidden id:'checkDate2', name:'checkDate', value:checkDate/}
+#{hidden id:'result2', name:'result', value:result/}
+#{hidden id:'holdingBasedOn', name:'corporateAnnouncement.holdingBasedOn.lookupId', value:corporateAnnouncement?.holdingBasedOn?.lookupId /}
+#{hidden id:'isCoupon', name:'corporateAnnouncement.actionTemplate.isCoupon', value:corporateAnnouncement?.actionTemplate?.isCoupon /}
+#{hidden id:'targetType', name:'corporateAnnouncement.actionTemplate.targetType.lookupId', value:corporateAnnouncement?.actionTemplate?.targetType?.lookupId /}
+#{hidden id:'taxObject', name:'corporateAnnouncement.taxObject', value:corporateAnnouncement?.taxObject /}
+#{hidden id:'transactionSource', name:'corporateAnnouncement.actionTemplate.sourceTransaction.transactionTemplateKey', value:corporateAnnouncement?.actionTemplate?.sourceTransaction?.transactionTemplateKey /}
+#{hidden id:'transactionTarget', name:'corporateAnnouncement.actionTemplate.targetTransaction.transactionTemplateKey', value:corporateAnnouncement?.actionTemplate?.targetTransaction?.transactionTemplateKey /}
+<table>
+	<tr>
+		<td>
+			<p>      
+				#{textBox id:'corporateAnnouncementCode', name:'corporateAnnouncement.corporateAnnouncementCode', label:'Announcement No', value:corporateAnnouncement?.corporateAnnouncementCode, class:'capitalize master', width:'120px', required:false, maxLength:'100', readOnly:true /} 
+				<!-- <span><b>&nbsp;&nbsp; Status&nbsp;</b></span>
+				#{textBox id:'status', name:'corporateAnnouncement.status', width:'85px',value:corporateAnnouncement?.status, readOnly:true /} -->
+			 	<span class="error">#{error 'corporateAnnouncement.corporateAnnouncementCode' /}</span>
+			</p>
+			<p>			
+				#{textBox id:'description', name:'corporateAnnouncement.description', label:'Subject', width:'350px',value:corporateAnnouncement?.description, class:'capitalize master', readOnly:readOnly, required:true, maxLength:100 /}
+				<span class="error">#{error 'Subject is' /}</span>
+			</p>
+			<p>
+				#{textBox id:'securityType', name:'corporateAnnouncement.securityType.securityType', label:'Security Type', dataold:corporateAnnouncement?.securityType?.securityType, class:'capitalize master', value:corporateAnnouncement?.securityType?.securityType, required:true, readOnly:readOnly, width:'85px' /}
+				#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:readOnly  /}
+				#{textBox id:'securityTypeDesc', name:'corporateAnnouncement.securityType.description', value:corporateAnnouncement?.securityType?.description, readOnly:true, width:'232px' /}
+				<span class="error">#{error 'Security Type is' /}</span>		
+			</p>
+			<p>
+				#{textBox id:'securityCode', name:'corporateAnnouncement.security.securityId', label:'Security Code', class:'capitalize master', value:corporateAnnouncement?.security?.securityId, required:true, readOnly:readOnly, width:'85px' /}
+				#{button id:'securityCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'securityCodeDesc', name:'corporateAnnouncement.security.description', value:corporateAnnouncement?.security?.description, readOnly:true, width:'232px' /}
+				#{hidden id:'securityKey', name:'corporateAnnouncement.security.securityKey', value:corporateAnnouncement?.security?.securityKey /}
+				<span class="error">#{error 'Security Code is' /}</span>
+			</p>
+			<p>
+				#{textBox id:'actionCode', name:'corporateAnnouncement.actionTemplate.actionCode', label:'Action Code', class:'capitalize master', value:corporateAnnouncement?.actionTemplate?.actionCode, required:true, readOnly:readOnly, width:'85px' /}
+				#{button id:'actionCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'actionCodeDesc', name:'corporateAnnouncement.actionTemplate.description', value:corporateAnnouncement?.actionTemplate?.description, readOnly:true, width:'232px' /}
+				#{hidden id:'actionCodeKey', name:'corporateAnnouncement.actionTemplate.actionTemplateKey', value:corporateAnnouncement?.actionTemplate?.actionTemplateKey /}
+				<span class="error">#{error 'Action Code is' /}</span>
+			</p>
+			<p>
+				#{textBox id:'refNo', name:'corporateAnnouncement.referencesNumber', value:corporateAnnouncement?.referencesNumber, label:'Reference No', maxLength:50, readOnly:readOnly, class:'capitalize' /}
+			</p>
+			<p>
+				#{textArea id:'remarks', name:'corporateAnnouncement.remarksNews', value:corporateAnnouncement?.remarksNews, label:'Remarks', maxLength:255, readOnly:readOnly, class:'capitalize',width:'350px' /}
+			</p>			
+			<p id="pAttach">
+				<label style="margin-right: 3px">Attach Document<span class="req"> *</span></label>
+				#{checkBox id:'flagAttachFile', name:'corporateAnnouncement.flagAttachFile', value:corporateAnnouncement?.flagAttachFile, readOnly:readOnly, class:'all' /} Yes
+				#{hidden id:'announcementFile', name:'corporateAnnouncement.document', value:corporateAnnouncement?.document /}
+			</p>
+			<p>	
+			<label></label>
+				#{if ((!confirming)&&(mode=='entry')) ||((!confirming)&&(mode=='edit'))}
+					#{fileUpload id:'attachFile', name:'attachment', value:attachment, disabled:readOnly /}
+				#{/if}
+				#{else}
+					#{if ((!nameFile?.trim().equals("")) && (nameFile != null))}
+					, ${nameFile} 
+					#{/if}
+					#{if (inquiry == 'inquiry')}
+						#{if ((!corporateAnnouncement?.document?.trim().equals("")) && (corporateAnnouncement?.document != null))}
+							<span id="idDownloadHere"> , Download it <a style="color: blue;" href="@{announcementdownload()}/${corporateAnnouncement?.corporateAnnouncementKey}"> here</a></span>
+						#{/if}
+					#{/if}
+				#{/else}
+				<span id="attachFileError" class="error">#{error 'Attach Document is' /}</span>
+			</p>
+			
+			#{if ((!confirming)&&(mode=='entry')) ||((!confirming)&&(mode=='edit'))}
+			<p>
+				<label></label>
+				${nameFile} 
+			</p>
+			#{/if}
+			<p>
+				<label style="margin-right: 5px"></label>${validateAttach}			
+			</p>			
+			<p>
+				#{radioButton id:'applyCharges', name:'corporateAnnouncement.chargeable', value:((corporateAnnouncement?.chargeable)?'true':'false'), label:'Apply Charges', readOnly:readOnly, options:operators /}
+			</p>
+			<p>
+				#{radioButton id:'emailAuto', name:'corporateAnnouncement.autoEmail', value:((corporateAnnouncement?.autoEmail)?'true':'false'), label:'Email Automatically', readOnly:readOnly, options:operators /}
+			</p>
+		</td>
+		<td valign="top">
+			#{if inquiry == 'inquiry' || fromCancel == 'fromCancel'}
+			<p> 
+				#{textBox id:'status', name:'corporateAnnouncementstatus', width:'195px',value:corporateAnnouncement?.status?.decodeDataStatus(), readOnly:true, label:'Status' /}
+				#{hidden id:'statusHidden', name:'corporateAnnouncement.status', value:corporateAnnouncement?.status /}
+			</p>
+			#{/if}
+			#{if fromCancel == 'fromCancel'}
+			<p id="pCancelDate">			
+				#{textBox id:'cancelDate', name:'corporateAnnouncement.cancelledDate', label:'Cancel Date', value:corporateAnnouncement?.cancelledDate?.format(appProp.dateFormat), class:'calendar', readOnly:readOnlyCancel /} (${appProp.displayDateFormat})
+			</p>
+			<p>
+				<span id="cancelDateError" class="error">#{error 'Cancel Date is' /}</span>
+			</p>
+			<p>
+				#{textArea id:'remarksCancel', name:'corporateAnnouncement.remarkCancel', value:corporateAnnouncement?.remarkCancel, label:'Remarks', required:true, class:'capitalize', width:'200px', readOnly:readOnlyCancel, maxLength:200  /}
+				<span id="remarkCancelError" class="error">#{error 'Remark Cancel is' /}</span>
+			</p>
+			#{/if}
+			<br />
+			#{if fromCancel != 'fromCancel'}
+			<fieldset id="correction" style="display: none;">
+				<p>
+					#{checkBox id:'needCorrection', name:'corporateAnnouncement.needCorrection', label:'Need Correction', value:corporateAnnouncement?.needCorrection, width:'100px' /}
+				</p>
+				<p id="pRemarkCorrection">
+					<label>Remarks Correction <span class="req">*</span></label>
+					
+				</p>
+				<p>
+					#{textArea id:'remarkCorrection', name:'remarkCorrection', value:corporateAnnouncement?.remarkCorrection, class:'capitalize', width:'263px', maxLength:200 /}
+					#{hidden id:'remarkCorrectionHide', name:'corporateAnnouncement.remarkCorrection', value:corporateAnnouncement?.remarkCorrection /}
+					<span id="remarkCorrectionError" class="error">#{error 'Remarks Correction is' /}</span>
+				</p>
+			</fieldset>
+			#{/if}
+			<br />
+			<fieldset id="taxApplyDiv" style="width: 370px">
+				<p>
+					#{radioButton id:'taxable', name:'corporateAnnouncement.taxable', label:'Taxable', value:(corporateAnnouncement?.taxable) ? 'true':'false', options:operators, class:'taxAble', readOnly:readOnly /}
+				</p>
+				<p>
+					<label></label>
+					#{textBox id:'taxableObject', name:'corporateAnnouncement.actionTemplate.taxObject.lookupDescription', value:corporateAnnouncement?.actionTemplate?.taxObject?.lookupDescription, readOnly:true, class:'capitalize' /}
+					#{hidden id:'taxableObjectId', name:'corporateAnnouncement.actionTemplate.taxObject.lookupId', value:corporateAnnouncement?.actionTemplate?.taxObject?.lookupId /}
+					#{hidden id:'taxableObjectOri', name:'corporateAnnouncement.actionTemplate.taxObjectTamp.lookupDescription', value:corporateAnnouncement?.actionTemplate?.taxObjectTamp?.lookupDescription /}
+					#{hidden id:'taxableObjectIdOri', name:'corporateAnnouncement.actionTemplate.taxObjectTamp.lookupId', value:corporateAnnouncement?.actionTemplate?.taxObjectTamp?.lookupId /}
+				</p>
+				
+				<p id="pExercisePrice">
+					#{hidden id:'hasExercisePrice', name:'corporateAnnouncement.actionTemplate.exercisePrice', value:corporateAnnouncement?.actionTemplate?.exercisePrice /}
+					#{hidden id:'hasExercisePriceOri', name:'corporateAnnouncement.actionTemplate.exercisePriceTamp', value:corporateAnnouncement?.actionTemplate?.exercisePriceTamp /}
+					#{textBox id:'exercisePrice', name:'exercisePrice', value:corporateAnnouncement?.exercisePrice, label:'Exercise Price', readOnly:readOnly, class:'numeric', format:'#,##0.####', required:true /}
+					#{hidden id:'exercisePriceStripped', name:'corporateAnnouncement.exercisePrice', value:corporateAnnouncement?.exercisePrice/}
+				</p>
+				<span class="error">#{error 'Exercise Price is' /}</span>
+				<p id="pActionTemplateLink">
+					#{checkBox id:'cekBoxTaxApplied', name:'cekBoxLinkAnnouncement', value:corporateAnnouncement?.flagLinkAnnouncement, label:'Tax applied to', readOnly:true, required:true/} Yes
+					#{hidden id:'hidCekBoxTaxApplied', name:'corporateAnnouncement.flagLinkAnnouncement', value:corporateAnnouncement?.flagLinkAnnouncement /}
+				</p>
+				<span class="error">#{error 'Tax applied to is' /}</span>
+				<p >
+					<label></label>
+					#{textBox id:'announcementLink', name:'corporateAnnouncement.taxCaLink.corporateAnnouncementCode', value:corporateAnnouncement?.taxCaLink?.corporateAnnouncementCode, class:'capitalize',  readOnly:readOnly, width:'50px' /}
+					#{hidden id:'announcementLinkKey', name:'corporateAnnouncement.taxCaLink.corporateAnnouncementKey', value:corporateAnnouncement?.taxCaLink?.corporateAnnouncementKey /}
+					#{hidden id:'announcementLinkExDate', name:'corporateAnnouncement.taxCaLink.exDate', value:corporateAnnouncement?.taxCaLink?.exDate?.format(appProp.dateFormat),class:'calendar' /}
+					#{hidden id:'announcementLinkRecDate', name:'corporateAnnouncement.taxCaLink.recordingDate', value:corporateAnnouncement?.taxCaLink?.recordingDate?.format(appProp.dateFormat), class:'calendar' /}
+					<!-- #{hidden id:'announcementLinkCouponDate', name:'corporateAnnouncement.taxCaLink.distributionDate', value:corporateAnnouncement?.taxCaLink?.distributionDate?.format(appProp.dateFormat), class:'calendar' /} -->
+					#{button id:'announcementLinkHelp', value:'?', class:'small', readOnly:readOnly /}
+					
+					#{hidden id:'announcementLinkActionKey', name:'corporateAnnouncement.actionTemplate.actionTemplateLink.actionTemplateKey', value:corporateAnnouncement?.actionTemplate?.actionTemplateLink?.actionTemplateKey /}
+				</p>
+				<p>
+					<label></label>
+					#{textBox id:'announcementLinkDesc', name:'corporateAnnouncement.taxCaLink.description', value:corporateAnnouncement?.taxCaLink?.description, required:true, readOnly:true, width:'180px' /}
+				</p>
+			</fieldset>
+		</td>
+	</tr>
+</table>
+<!-- <p>	
+	#{dropDownList id:'holdingBasedOn', name:'corporateAnnouncement.holdingBasedOn.lookupId', label:'Holding Based On', options:holdingBasedOn, value:corporateAnnouncement?.holdingBasedOn?.lookupId, required:true, readOnly:readOnly, class:'master' /}		
+	<span class="error">#{error 'corporateAnnouncement.holdingBasedOn.lookupId' /}</span>
+</p>
+<p>			
+	#{textBox id:'executionPrice', label:'Execution Price', value:corporateAnnouncement?.executionPrice, class:'numeric master', format:'#,##0.####', readOnly:readOnly, width:'120px', maxLength:24 /}
+	#{hidden id:'executionPriceStripped', name:'corporateAnnouncement.executionPrice', value:corporateAnnouncement?.executionPrice /}
+</p> 
+
+<p>
+	#{checkBox id:'isUnsettledHolding', label:'Include Unsettle Holding', name:'corporateAnnouncement.isUnsettledHolding', value:corporateAnnouncement?.isUnsettledHolding, readOnly:readOnly, class:'master' /}
+</p> -->
+#{if fromCancel == 'fromCancel'}
+<br />
+#{/if}
+<div id="tabs" >
+	<ul>
+		<li><a href="#tab1">Schedule</a></li>
+		<li><a href="#tab2">Ratio</a></li>
+	</ul>
+	
+	<div id="tab1">
+		<p id="pCouponSchedule">
+			#{textBox id:'couponSchedule', name:'announcementDetail.couponNo', value:announcementDetail?.couponNo, class:'numberOnly', label:'Coupon Schedule', readOnly:readOnly, required:true, width:'85px', tabIndex:'1' /}
+			#{hidden id:'couponScheduleKey', name:'announcementDetail.couponSchedule.id.securityKey', value:announcementDetail?.couponSchedule?.id?.securityKey /}
+			#{button id:'couponScheduleHelp', value:'?', class:'small', readOnly:readOnly, tabIndex:'2' /}
+			#{textBox id:'couponScheduleDesc', name:'announcementDetail.couponSchedule.paymentDate', value:announcementDetail?.couponSchedule?.paymentDate?.format(appProp.dateFormat), readOnly:true,class:'calendar', width:'150px' /}
+			<span class="error">#{error 'Coupon Schedule is' /}</span>
+		</p>
+		<p>			
+			#{textBox id:'announcementDate', name:'corporateAnnouncement.announcementDate', label:'Announcement Date', value:corporateAnnouncement?.announcementDate?.format(appProp.dateFormat),required:true , readOnly:readOnly, class:'calendar master' /} (${appProp.displayDateFormat})
+			<span id="announcementDateError" class="error">#{error 'Announcement Date is' /}</span>
+		</p> 
+		<p>			
+			#{textBox id:'cumDate', name:'corporateAnnouncement.cumDate', label:'Cum Date', value:corporateAnnouncement?.cumDate?.format(appProp.dateFormat), readOnly:readOnly, required:true, class:'calendar master' /} (${appProp.displayDateFormat})
+			<span id="cumDateError" class="error">#{error 'Cum Date is' /}</span>
+		</p> 
+		<p>			
+			#{textBox id:'exDate', name:'corporateAnnouncement.exDate', label:'Ex Date', value:corporateAnnouncement?.exDate?.format(appProp.dateFormat), readOnly:readOnly, required:true, class:'calendar master' /} (${appProp.displayDateFormat})
+			<span id="exDateError" class="error">#{error 'Ex Date is' /}</span>	
+		</p> 
+		<p>			
+			#{textBox id:'recordingDate', name:'corporateAnnouncement.recordingDate', label:'Recording Date', value:corporateAnnouncement?.recordingDate?.format(appProp.dateFormat), readOnly:readOnly, required:true, class:'calendar master' /} (${appProp.displayDateFormat})
+			<span  id="recordingDateError" class="error">#{error 'Recording Date is' /}</span>		
+		</p>
+		<p>			
+			#{textBox id:'distributionDate', name:'corporateAnnouncement.distributionDate', label:'Distribution Date', value:corporateAnnouncement?.distributionDate?.format(appProp.dateFormat), readOnly:readOnly, required:true, class:'calendar master' /} (${appProp.displayDateFormat})
+			<span id="distributionDateError" class="error">#{error 'Distribution Date is' /}</span>
+		</p>
+		
+		#{if fromCancel == 'fromCancel'}
+		<br>
+		<label style="color: red; width: 400px;"> Entitlement for this announcement will run on ${entitleDate?.format(appProp.dateFormat)} </label> 
+		#{/if}
+	</div>
+	
+	<div id="tab2">
+	<b><span class="req" id="errorSecTypeAndCode"></span></b>
+		<table width="100%">
+			<tr bgcolor="#e2e4ff">
+				<th>Description</th>
+				<th>Source</th>
+				<th>Target</th>
+			</tr>
+			<tr bgcolor="#e2e4ff">
+				<td><label>Security Type <span class="req">*</span></label></td>
+				<td align="center">
+					#{textBox id:'securityTypeSource', readOnly:true, name:'securityTypeSource', value:announcementDetail?.securityTypeSource?.securityType, class:'capitalize' /}
+					#{hidden id:'securityTypeSourceHidden', name:'announcementDetail.securityTypeSource.securityType', value:announcementDetail?.securityTypeSource?.securityType /}
+				</td>
+				<td>
+					#{textBox id:'securityTypeTarget', name:'securityTypeTarget', value: announcementDetail?.securityTypeTarget?.securityType, class:'capitalize target', required:true, readOnly:true, width:'85px', tabIndex:'9' /}
+					#{button id:'securityTypeTargetHelp', value:'?', class:'small', readOnly:readOnly, tabIndex:'10'  /}
+					#{textBox id:'securityTypeTargetDesc', name:'securityTypeTargetDesc', value:announcementDetail?.securityTypeTarget?.description, class:'target', readOnly:true, width:'250px' /}
+					#{hidden id:'securityTypeTargetHidden', name:'announcementDetail.securityTypeTarget.securityType', value: announcementDetail?.securityTypeTarget?.securityType /}
+					#{hidden id:'securityTypeTargetDescHidden', name:'announcementDetail.securityTypeTarget.description', value: announcementDetail?.securityTypeTarget?.description /}
+					<span class="error">#{error 'Security Type Target in tab Ratio is' /}</span>
+				</td>
+			</tr>
+			<tr bgcolor="#e2e4ff">
+				<td><label>Security Code <span class="req">*</span></label></td>
+				<td align="center">
+					#{textBox id:'securityCodeSource', readOnly:true, name:'securityCodeSource', value:announcementDetail?.securitySource?.securityId, class:'capitalize' /}
+					#{hidden id:'securityCodeSourceHidden', name:'announcementDetail.securitySource.securityId', value:announcementDetail?.securitySource?.securityId /}
+					#{hidden id:'securityCodeSourceKeyHidden', name:'announcementDetail.securitySource.securityKey', value:announcementDetail?.securitySource?.securityKey /}
+				</td>
+				<td>
+					#{textBox id:'securityCodeTarget', name:'securityId',  value:announcementDetail?.securityTarget?.securityId, class:'capitalize target', required:true,readOnly:true, width:'85px', tabIndex:'11' /}
+					#{button id:'securityCodeTargetHelp', value:'?', class:'small', readOnly:readOnly, tabIndex:'12' /}
+					#{textBox id:'securityCodeTargetDesc', name:'securityCodeTargetDesc', value:announcementDetail?.securityTarget?.description, class:'target', readOnly:true, width:'250px' /}
+					#{hidden id:'securityCodeTargetKey', name:'announcementDetail.securityTarget.securityKey', value:announcementDetail?.securityTarget?.securityKey, tabIndex:'14', class:'target' /}
+					#{hidden id:'securityCodeTargetHidden',name:'announcementDetail.securityTarget.securityId',value:announcementDetail?.securityTarget?.securityId /}
+					#{hidden id:'securityCodeTargetDescHidden',name:'announcementDetail.securityTarget.description',value:announcementDetail?.securityTarget?.description /}
+					<span class="error">#{error 'Security Code Target in tab Ratio is' /}</span>
+				</td>
+			</tr>
+		</table>
+		<br />
+		<table>
+			<tr>
+				<td>
+					<p id="pSourceTargetQty">
+						#{textBox id:'sourceQuantityRow', name:'sourceQuantity', value:announcementDetail?.sourceQuantity, label:'Ratio (X:Y)', class:'numeric', format:'#,##0.####', readOnly:readOnly, width:'100px', tabIndex:'15', required:true/}
+						#{hidden id:'sourceQuantityRowStripped', name:'announcementDetail.sourceQuantity', value:announcementDetail?.sourceQuantity /}
+						<b>:</b>
+						#{textBox id:'targetQuantityRow',  name:'targetQuantity', value:announcementDetail?.targetQuantity, required:true, class:'numeric', format:'#,##0.####', readOnly:readOnly, width:'100px', tabIndex:'16'/}
+						#{hidden id:'targetQuantityRowStripped', name:'announcementDetail.targetQuantity', value:announcementDetail?.targetQuantity /}
+						<span class="error">#{error 'Ratio (X:Y) in tab Ratio is' /}</span>
+					</p>
+					<p>	
+						#{dropDownList id:'roundingType', name:'corporateAnnouncement.roundingType.lookupId', label:'Rounding Type', options:roundingType, value:corporateAnnouncement?.roundingType?.lookupId, required:true, readOnly:readOnly, width:'150px', class:'master' /}
+						<span class="error">#{error 'Rounding Type in tab Ratio is' /}</span>		
+					</p>
+					<p>			
+						#{textBox id:'roundingValue', label:'No. of decimal', name:'corporateAnnouncement.roundingValue', value:corporateAnnouncement?.roundingValue, readOnly:readOnly, width:'120px', class:'numberOnly master', required:true, maxLength:24 /}
+						<span class="error">#{error 'No. of decimal in tab Ratio is' /}</span>
+						<!-- #{hidden id:'roundingValueStripped', name:'corporateAnnouncement.roundingValue',  value:corporateAnnouncement?.roundingValue /} -->
+						<span id="errmsg"></span>
+					</p>
+				</td>
+				<td>
+					<fieldset>
+						<legend>Information of Coupon</legend>
+						<p>
+							#{radioButton id:'isFraction', label:'Fraction', name:'isFraction', value:((announcementDetail?.couponSchedule?.security?.isFraction) ?'true':'false'), options:operators, readOnly:true /}
+							#{hidden id:'isFractionHidden', name:'announcementDetail.couponSchedule.security.isFraction', value:((announcementDetail?.couponSchedule?.security?.isFraction) ?'true':'false') /}
+						</p>
+						<p>
+							#{textBox id:'interestRate', name:'interestRate', value:announcementDetail?.couponSchedule?.interestRate, label:'Interest Rate',class:'numeric', format:'#,##0.####', readOnly:true /} %
+							#{hidden id:'interestRateStripped', name:'announcementDetail.couponSchedule.interestRate', value:announcementDetail?.couponSchedule?.interestRate /}
+						</p>
+						<p>
+							#{textBox id:'fractionAmount',  name:'fractionAMount', value:announcementDetail?.couponSchedule?.fraction, label:'Fraction Amount',class:'numeric', format:'#,##0.####', readOnly:true /}
+							#{hidden id:'fractionAmountStripped', name:'announcementDetail.couponSchedule.fraction', value:announcementDetail?.couponSchedule?.fraction /}
+						</p>
+						<p>
+							#{textBox id:'fractionRatio', name:'fractionBase', value:announcementDetail?.couponSchedule?.fractionBase, label:'Fraction Ratio',class:'numeric',format:'#,##0.####', readOnly:true /}
+							#{hidden id:'fractionRatioStripped', name:'announcementDetail.couponSchedule.fractionBase', value:announcementDetail?.couponSchedule?.fractionBase /}
+						</p>
+					</fieldset>
+				</td>
+			</tr> 
+		</table>
+	</div>
+</div>
+	
+<b><span id="errorAnnouncementGlobal" class="error"></span></b>
+</form>
+
+
+

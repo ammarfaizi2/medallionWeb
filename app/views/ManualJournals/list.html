@@ -1,0 +1,201 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'FA - Manual Journal' /}
+#{script 'lookups.js', characterset:'utf-8' /}
+#{script 'lookuppaging.js' /}
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	$(function(){
+		$('#transactionDate').datepicker();
+		
+		$('#searchFundCode').change(function(){
+			if ($('#searchFundCode').val()==''){
+				$('#searchFundCodeKey').val('');
+				$('#searchFundCodeDesc').val('');
+				$('#h_searchFundCodeDesc').val('');
+			}
+		});
+		
+		$('#searchFundCode').dynapopup2({key:'searchFundCodeKey', help:'searchFundCodeHelp', desc:'searchFundCodeDesc'}, 'PICK_FA_MASTER', '', 'transactionDateFrom', function(data){
+			$('#searchFundCode').removeClass('fieldError');
+			$('#searchFundCodeKey').val(data.code);
+			$('#searchFundCodeDesc').val(data.description);
+			$('#h_searchFundCodeDesc').val(data.description);
+		},function(data){
+			$('#searchFundCode').addClass('fieldError');
+			$('#searchFundCode').val('');
+			$('#searchFundCodeKey').val('');
+			$('#searchFundCodeDesc').val('NOT FOUND');
+			$('#h_searchFundCodeDesc').val('');
+		});
+		
+		$('#accordion').accordion({
+			collapsible: true
+		});
+		
+		$('.buttons button:first').button({
+			icons: {
+				primary: 'ui-icon-search'
+			}
+		}).next().button();	
+		
+		$('#transactionDateFrom').change(function(){
+			$("#pTransactionDateFrom label span").remove();
+			if($(this).val() != '' || $('#transactionDateTo').val() != ''){
+				$("#pTransactionDateFrom label").append("<span class='req'>*</span>");
+			}
+		});
+		
+		$('#transactionDateTo').change(function(){
+			$("#pTransactionDateFrom label span").remove();
+			if($(this).val() != '' || $('#transactionDateFrom').val() != ''){
+				$("#pTransactionDateFrom label").append("<span class='req'>*</span>");
+			}
+		});
+
+// 		var validateDate = function(from){
+// 	        var DateFrom = new Date($('#transactionDateFrom').datepicker('getDate'));
+// 	        var DateTo = new Date($('#transactionDateTo').datepicker('getDate'));
+// 	        if (($('#transactionDateFrom').val()!='') && ($('#transactionDateTo').val()!='')) { 
+// 	            if (DateTo.getTime() < DateFrom.getTime()) {
+// 	                if (from=='From'){
+// 	                    $('#transactionDateFrom').addClass('fieldError');
+// 	                    $("#transactionDateFromError").html("Date From must be less or equal than Date To");
+// 	                } else {
+// 	                    $('#transactionDateTo').addClass('fieldError');
+// 	                    $("#transactionDateToError").html("Date To must be greather or equal than Date From");
+// 	                }
+// 	            } else {
+//                     $('#transactionDateTo').removeClass('fieldError');
+//                     $("#transactionDateToError").html("");
+//                     $('#transactionDateFrom').removeClass('fieldError');
+//                     $("#transactionDateFromError").html("");
+// 	            }
+// 	        }
+// 	    };
+
+		$('#search').click(function() {
+			search();
+			return false;
+		});
+		// end of Search
+		
+		$('#reset').click(function() {
+			location.href="@{list()}";	
+			return false;
+		});
+		
+		$('#new').click(function() {
+			location.href="@{entry()}";			
+		});
+		
+		$('.buttons input:button').button();
+		
+	});
+	
+	var search = function() {
+		$("#transactionDateFromError").html("");
+		$("#transactionDateToError").html("");
+		$("#errmsgSearchFundCode").html("");
+		
+		if (($('#transactionDateFrom').val() == '') && ($('#transactionDateTo').val() == '')) {
+			$('#transactionDateToError').html('');
+			$('#transactionDateFromError').html('');
+			$('#transactionDateFrom').removeClass('fieldError');
+			$('#transactionDateTo').removeClass('fieldError');
+		} else {
+			if ($('#transactionDateFrom').val() != '') {
+				if ($('#transactionDateTo').val() == '') {
+					$('#transactionDateToError').html('Required');
+					return false;
+				} else {
+					$('#transactionDateToError').html('');
+				}
+				if($('#transactionDateFrom').hasClass('fieldError')){
+					return false;
+				}
+			}
+			if ($('#transactionDateTo').val() !='') {
+				if ($('#transactionDateFrom').val() == '') {
+					$('#transactionDateFromError').html('Required');
+					return false;
+				} else {
+					$('#transactionDateFromError').html('');
+				}
+				
+				if($('#transactionDateTo').hasClass('fieldError')){
+					return false;
+				}
+			}
+			
+			if (($('#transactionDateFrom').val() != '') && ($('#transactionDateTo').val() != '')) {
+				var dateFrom = $('#transactionDateFrom').datepicker('getDate');
+				var dateTo = $('#transactionDateTo').datepicker('getDate');
+				var origin = 'from';
+				var id = '#transactionDate';
+				
+				compareDateFromToEqual(dateFrom, dateTo, origin, id);
+				if($('#transactionDateTo').hasClass('fieldError') || $('#transactionDateFrom').hasClass('fieldError')){
+					return false;
+				}
+			}
+		}
+		
+		if ($('#searchFundCode').val()!=='') {
+			$("#errmsgSearchFundCode").html("");
+		}
+		
+		$('#result .loading').show();
+		$('#result .response').hide();
+		$('#result').show();
+		$.get('@{search()}', $('#searchForm').serialize(), function(data) {
+			checkRedirect(data);
+			$("#navDateError").html("");
+			$('#result .response').html(data);
+			$('#result .loading').hide();
+			$('#result .response').show();
+			setupTable();
+		});	
+		
+	};
+
+</script>
+
+<style type="text/css">
+  .error { color:red; }
+</style>
+
+<div id="accordion">
+	<h3><a href="#">Search Manual Journal</a></h3>
+		<form id="searchForm" class="form">
+			<input id="param" name="params.param" type="hidden" value="${param}"/> 
+			<p>		
+				#{textBox id:'searchFundCode', name:'faTransaction.faMaster.fundCode', label:'Fund Code', value:faTransaction?.faMaster?.fundCode, width:'120px', readOnly:readOnly, class:'capitalize' /}
+				#{hidden  id:'searchFundCodeKey', name:'params.faTransactionSearchFundKey', value:params?.faTransactionSearchFundKey /}
+				#{button  id:'searchFundCodeHelp', value:'?', class:'small', readOnly:readOnly/}
+				#{textBox id:'searchFundCodeDesc', name:'faTransaction.faMaster.fundDescription', value:faTransaction?.faMaster?.fundDescription, readOnly:true, width:'340px' /}
+				<span id="errmsgSearchFundCode" class="error"></span>
+			</p>
+			<p id="pTransactionDateFrom">
+				#{textBox id:'transactionDateFrom', name:'params.faTransactionSearchTransactionDateFrom', label:'As of Date', value:params?.faTransactionSearchTransactionDateFrom?.format(appProp.dateFormat), width:'85px', class:'calendar' /} (${appProp.displayDateFormat})
+				<span id="transactionDateFromError" class="error"></span> <b>To</b>
+				#{textBox id:'transactionDateTo', name:'params.faTransactionSearchTransactionDateTo', value:params?.faTransactionSearchTransactionDateTo?.format(appProp.dateFormat), class:'calendar'  /} (${appProp.displayDateFormat})
+				<span id="transactionDateToError" class="error"></span>
+			</p>
+			<p>
+				#{dropDownList id:'TransactionNoOperator', name:'params.TransactionNoOperator', label:'Transaction No', options:stringOperators, removeEmpty:'true', value:params?.TransactionNoOperator /}
+				#{textBox id:'transactionSearchNoOperator', name:'params.transactionSearchNoOperator', value:params?.transactionSearchNoOperator, class:'numericnosep' /}
+			</p>
+			<p>
+				<div class="buttons">
+					<input type="button" id="search" value="Show"  class="btn"/>
+					<input type="button" id="reset" value="Reset"  class="btn"/>
+				</div>
+			</p>
+		</form>
+</div>
+
+<div id="result" style="display:none">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<div class="response"></div>
+</div>

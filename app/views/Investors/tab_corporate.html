@@ -1,0 +1,546 @@
+<script type="text/javascript">
+	$(function() {
+		$('.tabs').tabs();
+
+		$('#taxId').lookup({
+			list:'@{Pick.lookupByUdfs()}?group=TAX_ID',
+			get:{
+				url:'@{Pick.lookupByUdf()}?group=TAX_ID',
+				success: function(data) {
+					$('#taxId').removeClass('fieldError');
+					$('#taxIdKey').val(data.code);
+					$('#taxIdDesc').val(data.description);
+					$('#h_taxIdDesc').val(data.description);
+					$('#supplementDocReq').val(data.isRequired);
+					
+					adjustSupplementDocReq();
+					
+				},
+				error: function(data) {
+					$('#taxId').addClass('fieldError');
+					$('#taxIdDesc').val('NOT FOUND');
+					$('#taxId').val('');
+					$('#taxIdKey').val('');
+					$('#h_taxIdDesc').val('');
+					
+				}
+			},
+			filter:['${lookupCustType}', 'C'],
+			description:$('#taxIdDesc'),
+			help:$('#taxIdHelp')
+		});
+		
+		$('#taxId').change(function(){
+			if ($(this).val()==''){
+				$('#taxId').val('');
+				$('#taxIdDesc').val('');
+				$('#taxId').val('');
+				$('#taxIdKey').val('');
+				$('#h_taxIdDesc').val('');
+			}			
+		});
+		
+		/* $('#originCountry').lookup({
+			list:'@{Pick.lookups()}?group=COUNTRY',
+			get:{
+				url:'@{Pick.lookup()}?group=COUNTRY',
+				success: function(data) {
+					if (data) {
+						$('#originCountry').removeClass('fieldError');
+						$('#originCountryId').val(data.code);
+						$('#originCountryDesc').val(data.description);
+						$('#h_originCountryDesc').val(data.description);
+						
+						$('#placeCompEstb').val('');
+						$('#placeCompEstbDesc').val('');
+						$('#placeCompEstbId').val('');
+						$('#placeCompEstb').val('');
+						$('#h_placeCompEstbDesc').val('');
+						
+						$('#placeCompEstbArea').val('');
+						$('#placeCompEstbAreaDesc').val('');
+						$('#placeCompEstbAreaId').val('');
+						$('#placeCompEstbArea').val('');
+						$('#h_placeCompEstbAreaDesc').val('');
+						
+						adjustSupplementDocReq();
+						adjustCountryCorp();
+					}
+				},
+				error : function(data) {
+					$('#originCountry').addClass('fieldError');
+					$('#originCountryDesc').val('NOT FOUND');
+					$('#originCountry').val('');
+					$('#originCountryId').val('');
+					$('#h_originCountryDesc').val('');
+				}
+			},
+			//filter: {'key':'3','value':$('#nationality')},
+			//filter:$('#legalDomicile'),
+			key:$('#originCountryId'),
+			description:$('#originCountryDesc'),
+			help:$('#originCountryHelp'),
+			nextControl:$('#companyCharacteristic')
+		}); */
+		
+		$('#originCountry').dynapopup2({key:'address1Country', help:'originCountryHelp', desc:'originCountryDesc'},'PICK_GN_LOOKUP', "COUNTRY", "companyCharacteristic", 
+				function(data){
+					if (data) {
+						$('#originCountry').removeClass('fieldError');
+						$('#originCountryId').val(data.code);
+						$('#originCountryDesc').val(data.description);
+						$('#h_originCountryDesc').val(data.description);
+						
+						$('#placeCompEstb').val('');
+						$('#placeCompEstbDesc').val('');
+						$('#placeCompEstbId').val('');
+						$('#placeCompEstb').val('');
+						$('#h_placeCompEstbDesc').val('');
+						
+						$('#placeCompEstbArea').val('');
+						$('#placeCompEstbAreaDesc').val('');
+						$('#placeCompEstbAreaId').val('');
+						$('#placeCompEstbArea').val('');
+						$('#h_placeCompEstbAreaDesc').val('');
+						
+						adjustSupplementDocReq();
+						adjustCountryCorp();
+					}
+				},
+				function(data){
+					$('#originCountry').addClass('fieldError');
+					$('#originCountryDesc').val('NOT FOUND');
+					$('#originCountry').val('');
+					$('#originCountryId').val('');
+					$('#h_originCountryDesc').val('');
+				}
+		);
+		
+		adjustCountryCorp();
+		adjustSupplementDocReq();
+		
+		$('#originCountry').change(function(){
+			if ($('#originCountry').val() == "") {
+				$('#originCountry').val("");
+				$('#originCountryId').val("");
+				$('#originCountryDesc').val("");
+				$('#h_originCountryDesc').val("");
+				
+				$('#placeCompEstb').val('');
+				$('#placeCompEstbDesc').val('');
+				$('#placeCompEstbId').val('');
+				$('#placeCompEstb').val('');
+				$('#h_placeCompEstbDesc').val('');
+				
+				$('#placeCompEstbArea').val('');
+				$('#placeCompEstbAreaDesc').val('');
+				$('#placeCompEstbAreaId').val('');
+				$('#placeCompEstbArea').val('');
+				$('#h_placeCompEstbAreaDesc').val('');
+			}
+		});
+		
+		$('#placeCompEstb').lookup({
+			list:'@{Pick.lookups()}?group=STATE',
+			get:{
+				url:'@{Pick.lookup()}?group=STATE',
+				success: function(data) {
+					if (data) {
+						$('#placeCompEstb').removeClass('fieldError');
+						$('#placeCompEstbId').val(data.code);
+						$('#placeCompEstbDesc').val(data.description);
+						$('#h_placeCompEstbDesc').val(data.description);
+						
+						$('#placeCompEstbArea').val('');
+						$('#placeCompEstbAreaDesc').val('');
+						$('#placeCompEstbAreaId').val('');
+						$('#placeCompEstbArea').val('');
+						$('#h_placeCompEstbAreaDesc').val('');
+					}	
+				},
+				error: function(data) {
+					$('#placeCompEstb').addClass('fieldError');
+					$('#placeCompEstbDesc').val('NOT FOUND');
+					$('#placeCompEstbId').val('');
+					$('#placeCompEstb').val('');
+					$('#h_placeCompEstbDesc').val('');
+					
+				}
+			},
+			filter:{'key':'1','value':$('#originCountryId')},
+			description:$('#placeCompEstbDesc'),
+			help:$('#placeCompEstbHelp')
+		});
+		
+		$('#placeCompEstb').change(function(){
+			if ($(this).val()==''){
+				$('#placeCompEstb').val('');
+				$('#placeCompEstbDesc').val('');
+				$('#placeCompEstbId').val('');
+				$('#placeCompEstb').val('');
+				$('#h_placeCompEstbDesc').val('');
+				
+				$('#placeCompEstbArea').val('');
+				$('#placeCompEstbAreaDesc').val('');
+				$('#placeCompEstbAreaId').val('');
+				$('#placeCompEstbArea').val('');
+				$('#h_placeCompEstbAreaDesc').val('');
+			}
+			
+		});
+		
+		$('#placeCompEstbArea').lookup({
+			list:'@{Pick.lookups()}?group=AREA',
+			get:{
+				url:'@{Pick.lookup()}?group=AREA',
+				success: function(data) {
+					if (data) {
+						$('#placeCompEstbArea').removeClass('fieldError');
+						$('#placeCompEstbAreaId').val(data.code);
+						$('#placeCompEstbAreaDesc').val(data.description);
+						$('#h_placeCompEstbAreaDesc').val(data.description);
+						
+					}	
+				},
+				error: function(data) {
+					$('#placeCompEstbArea').addClass('fieldError');
+					$('#placeCompEstbAreaDesc').val('NOT FOUND');
+					$('#placeCompEstbAreaId').val('');
+					$('#placeCompEstbArea').val('');
+					$('#h_placeCompEstbAreaDesc').val('');
+					
+				}
+			},
+			filter:{'key':'2','value':$('#placeCompEstbId')},
+			description:$('#placeCompEstbAreaDesc'),
+			help:$('#placeCompEstbAreaHelp')
+		});
+		
+		$('#placeCompEstbArea').change(function(){
+			if ($(this).val()==''){
+				$('#placeCompEstbArea').val('');
+				$('#placeCompEstbAreaDesc').val('');
+				$('#placeCompEstbAreaId').val('');
+				$('#placeCompEstbArea').val('');
+				$('#h_placeCompEstbAreaDesc').val('');
+			}
+			
+		});
+		
+		$('#typeOfBusiness').change(function(){
+			adjustOtherCorp();
+		});
+		
+		$('#companyCharacteristic').change(function(){
+			adjustOtherCorp();
+		});
+		adjustOtherCorp();
+		
+		$('#documentType1').change(function(){
+			checkIdentificationTypeIndv("#documentType", "Document");
+			$('#document1No').val('');
+			$('#document1Expiry').val('');
+			$('#document1Expiry').removeClass('fieldError');
+			$('#document1ExpiryError').html('');
+		});
+		
+		$('#documentType2').change(function(){
+			checkIdentificationTypeIndv("#documentType", "Document");
+			$('#document2No').val('');
+			$('#document2Expiry').val('');
+			$('#document1Expiry').removeClass('fieldError');
+			$('#document1ExpiryError').html('');
+		});
+		
+		$('#documentType3').change(function(){
+			checkIdentificationTypeIndv("#documentType", "Document");
+			$('#document3No').val('');
+			$('#document3Expiry').val('');
+			$('#document3Expiry').removeClass('fieldError');
+			$('#document3ExpiryError').html('');
+		});
+		
+		$('#documentType4').change(function(){
+			checkIdentificationTypeIndv("#documentType", "Document");
+			$('#document4No').val('');
+			$('#document4Expiry').val('');
+			$('#document4Expiry').removeClass('fieldError');
+			$('#document4ExpiryError').html('');
+		});
+		
+		$('#document1Expiry').change(function(){
+			var id = this.id;
+			var thisId = "#" + id;
+			var value = $(this).datepicker("getDate");
+			if($(thisId).val()==""){
+				$(thisId).removeClass('fieldError');
+				$(thisId+"Error").html("");
+			}else{
+				if (!$(this).hasClass('fieldError')){
+					compareDateMustAfterApplicationDate(thisId, value);
+				}
+			}
+		});
+		
+		$('#document2Expiry').change(function(){
+			var id = this.id;
+			var thisId = "#" + id;
+			var value = $(this).datepicker("getDate");
+			if($(thisId).val()==""){
+				$(thisId).removeClass('fieldError');
+				$(thisId+"Error").html("");
+			}else{
+				if (!$(this).hasClass('fieldError')){
+					compareDateMustAfterApplicationDate(thisId, value);
+				}
+			}
+		});
+		
+		$('#document3Expiry').change(function(){
+			var id = this.id;
+			var thisId = "#" + id;
+			var value = $(this).datepicker("getDate");
+			if($(thisId).val()==""){
+				$(thisId).removeClass('fieldError');
+				$(thisId+"Error").html("");
+			}else{
+				if (!$(this).hasClass('fieldError')){
+					compareDateMustAfterApplicationDate(thisId, value);
+				}
+			}
+		});
+		
+		$('#document4Expiry').change(function(){
+			var id = this.id;
+			var thisId = "#" + id;
+			var value = $(this).datepicker("getDate");
+			if($(thisId).val()==""){
+				$(thisId).removeClass('fieldError');
+				$(thisId+"Error").html("");
+			}else{
+				if (!$(this).hasClass('fieldError')){
+					compareDateMustAfterApplicationDate(thisId, value);
+				}
+			}
+		});
+		
+		if ($('#asOfYear').val()!=''){
+			$('.spanLatestYear').html(' ('+$('#asOfYear').val()+')');
+			$('.spanLast2Year').html(' ('+(Number($('#asOfYear').val())-Number(1))+')');
+			$('.spanLast3Year').html(' ('+(Number($('#asOfYear').val())-Number(2))+')');
+		}
+		
+		$('#asOfYear').change(function(){
+			if ($(this).val()!=''){
+				$('.spanLatestYear').html(' ('+$(this).val()+')');
+				$('.spanLast2Year').html(' ('+(Number($(this).val())-Number(1))+')');
+				$('.spanLast3Year').html(' ('+(Number($(this).val())-Number(2))+')');
+			} else {
+				$('.spanLatestYear').html('');
+				$('.spanLast2Year').html('');
+				$('.spanLast3Year').html('');
+			}
+		});
+		
+	});
+	
+	function adjustOtherCorp(){
+		if ($('#typeOfBusiness').val()=='${otherTypeBusiness}'){
+			if((('${mode}'=='entry')&&(!'${confirming}'))||(('${mode}'=='edit')&&(!'${confirming}'))){
+				$('#typeOfBusinessOther').enabled();
+			}
+			$('p[id=otherTypeOfBusinessMandatory] label span').html(' *');
+		}
+		
+		if ($('#typeOfBusiness').val()!='${otherTypeBusiness}'){
+			$('#typeOfBusinessOther').disabled();
+			if (!'${confirming}'){
+				$('#typeOfBusinessOther').val('');
+			}
+			$('p[id=otherTypeOfBusinessMandatory] label span').html('');
+		}
+		
+		if ($('#companyCharacteristic').val()=='${otherCompCharacter}'){
+			
+			if((('${mode}'=='entry')&&(!'${confirming}'))||(('${mode}'=='edit')&&(!'${confirming}'))){
+				$('#companyCharacteristicOther').enabled();
+			}
+			$('p[id=otherCompCharMandatory] label span').html(' *');
+		}
+		
+		if ($('#companyCharacteristic').val()!='${otherCompCharacter}'){
+			$('#companyCharacteristicOther').disabled();
+			if (!'${confirming}'){
+				$('#companyCharacteristicOther').val('');
+			}
+			$('p[id=otherCompCharMandatory] label span').html(' ');
+		}
+	}
+	
+	function adjustCountryCorp(){
+		var select_customer; 
+		select_customer = $('#customerType').val();
+    	if (select_customer == '${typeCorp}'){
+    		if ($('#originCountryId').val()== '${countryId}'){
+    			$('p[id=classNpwpNo] label span').html(' ');
+    		}
+    		
+    		if ($('#originCountryId').val()!= '${countryId}'){
+    			$('p[id=classNpwpNo] label span').html(' ');
+    		}
+		}
+	}
+	
+	function adjustSupplementDocReq(){
+		if (($('#originCountryId').val()== '${countryId}')&&($('#supplementDocReq').val()=='1')){
+			$('td[id=tdDocType] label span').html(' *')
+		}
+		
+		if (($('#originCountryId').val()!= '${countryId}')&&($('#isSupplementDocReq').val()!='1')){
+			$('td[id=tdDocType] label span').html('')
+		}
+	}
+</script>
+	
+<div class="corporate_only">
+
+		<p>
+			#{textBox id:'bicCode', name:'customer.bicCode', label:'BIC Code', value:customer?.bicCode, readOnly:readOnly, width:'150px', class:'corporate capitalize', maxLength:20 /}
+			<span class="error">#{error 'BIC Code in tab Institutional is' /}</span>
+		</p>
+		<p>			
+			#{textBox id:'taxId', name:'customer.taxId.lookupCode', label:'Tax ID', value:customer?.taxId?.lookupCode, readOnly:readOnly, width:'80px', class:'capitalize corporate' /}
+			#{hidden id:'taxIdKey', name:'customer.taxId.lookupId', value:customer?.taxId?.lookupId, class:'corporate' /}
+			#{button id:'taxIdHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'taxIdDesc', name:'customer.taxId.lookupDescription', value:customer?.taxId?.lookupDescription, readOnly:true, width:'216px', class:'corporate' /}
+			#{hidden id:'supplementDocReq', name:'customer.supplementDocReq', value:customer?.supplementDocReq , class:'corporate'/}
+			<span class="error">#{error 'Tax ID in tab Institutional is' /}</span>
+		</p>
+		<p>
+			#{textBox id:'originCountry', name:'customer.originCountry.lookupCode', label:'Legal Domicile', value:customer?.originCountry?.lookupCode, class:'capitalize corporate', readOnly:readOnly, required:true, width:'80px' /}
+			#{hidden id:'originCountryId', name:'customer.originCountry.lookupId', value:customer?.originCountry?.lookupId, class:'corporate' /}
+			#{button id:'originCountryHelp', value:'?', class:'small', readOnly:readOnly /}	
+			#{textBox id:'originCountryDesc', name:'customer.originCountry.lookupDescription', value:customer?.originCountry?.lookupDescription, readOnly:true, class:'corporate', width:'216px' /}			
+			<span class="error">#{error 'Legal Domicile in tab Institutional is' /}</span>
+		</p>
+		<p>
+			
+			#{textBox id:'birthPlaceOtherDummy', name:'customer.birthPlaceOtherDummy', label:'Place of Comp Estb. ', value:customer?.birthPlaceOtherDummy, readOnly:readOnly, width:'320px', maxLength:100, class:'capitalize' /}
+			<span class="error">#{error 'Place of Comp. Estb. (State) in tab Institutional is' /}</span>
+		</p>
+		
+		<p>
+			#{textBox id:'dateCompEstb', name:'customer.birthDate', label:'Date of Comp. Estb.', value:customer?.birthDate?.format(appProp.dateFormat), readOnly:readOnly, class:'calendar corporate', maxLength:10 /} (${appProp.displayDateFormat})
+			<span id="dateCompEstbError" class="error">#{error 'Date of Company Estb. in tab Institutional is' /}</span>
+		</p>
+
+<br>
+	<fieldSet>
+		<p>
+			#{dropDownList id:'typeOfBusiness', name:'customer.typeOfBusiness.lookupId', label:'Type Of Business', value:customer?.typeOfBusiness?.lookupId, options:typeOfBusiness, readOnly:readOnly, required:true, width:'300px', class:'corporate'/}
+			<span class="error">#{error 'Type Of Business in tab Institutional is' /}</span>
+		</p>
+		<p id="otherTypeOfBusinessMandatory">
+			<label style="margin-left: 75px">(Others)<span class="req"> *</span></label>
+			<span style="margin-left: -75px">
+			#{textBox id:'typeOfBusinessOther', name:'customer.typeOfBusinessOthers', value:customer?.typeOfBusinessOthers, readOnly:readOnly, width:'300px', maxLength:100, class:'corporate capitalize' /}
+			<span class="error">#{error 'Type Of Business (Others) in tab Institutional is' /}</span>
+			</span>
+		</p>
+		<p atr="mandatoryDirect">
+			#{dropDownList id:'companyCharacteristic', name:'customer.companyCharacteristic.lookupId', label:'Comp. Characteristic', value:customer?.companyCharacteristic?.lookupId, options:companyCharacteristic, class:'corporate', width:'300px', readOnly:readOnly, required:true /}
+			<span class="error">#{error 'Comp. Characteristic in tab Institutional is' /}</span>
+		</p>
+		<p id="otherCompCharMandatory">
+			<label style="margin-left: 75px">(Others)<span class="req"> *</span></label>
+			<span style="margin-left: -75px">
+			#{textBox id:'companyCharacteristicOther', name:'customer.companyCharacteristicOthers', value:customer?.companyCharacteristicOthers, readOnly:readOnly, width:'300px', maxLength:100, class:'corporate capitalize', required:true /}
+			<span class="error">#{error 'Comp. Characteristic (Others) in tab Institutional is' /}</span>
+			</span>
+		</p>
+	</fieldSet>
+<br>
+
+<fieldset style="width: 860px">
+	<legend><b>Contact Person</b></legend>
+	<div id="contact" style="overflow-x:scroll;width:901px">
+		<table id="grid-contact" class="display">
+			<thead>
+				<tr>
+					<th width="200px">Contact Type</th>
+					<th width="400px">Contact Name</th>
+					<th width="200px">Position</th>
+					<th width="100px">Action</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>
+					</td>
+					<td>
+					</td>
+					<td>
+					</td>
+					<td>					
+						<input type="button" value="Delete" id="deleteContact" #{if readOnly}disabled='disabled'#{/if} />
+					</td>
+				</tr>		
+			</tbody>
+		</table>
+	</div>
+	<div class="buttons">
+			<input type="button" id="newContact"  #{if readOnly}disabled="disabled"#{/if} value="Add" />
+			<span id="deleteErrorMessage" class="errorMessage"></span>
+	</div>
+	
+</fieldset>		
+<br>		
+
+<fieldset>
+	<legend><b>Financial Information for last 3 Years</b></legend>
+	<br />
+	<p class="indent" >
+		#{textBox id:'asOfYear', label:'As of (year)',  name:'customer.asOfYear', value:customer?.asOfYear, readOnly:readOnly, class:'numberOnly corporate', maxLength:4, width:'50px' /}
+	</p>
+	<table>
+		<tr>
+			<td>
+				<h2>ASSETS</h2>
+				<p class="indent">
+					<label>Latest Year<span class="spanLatestYear"></span></label>
+					#{dropDownList id:'assetYear1', name:'customer.assetYear1.lookupId', value:customer?.assetYear1?.lookupId, options:incomeCorp, readOnly:readOnly, class:'corporate' /}
+					<span class="error">#{error 'Asset Last Year in tab Corporate is' /}</span>
+				</p>
+				<p class="indent">
+					<label>Last 2 Year<span class="spanLast2Year"></span></label>
+					#{dropDownList id:'assetYear2', name:'customer.assetYear2.lookupId', value:customer?.assetYear2?.lookupId, required:false, options:incomeCorp, readOnly:readOnly, class:'corporate' /}
+					<span class="error">#{error 'Asset Second Year in tab Corporate is' /}</span>
+				</p>
+				<p class="indent">
+					<label>Last 3 Year<span class="spanLast3Year"></span></label>
+					#{dropDownList id:'assetYear3', name:'customer.assetYear3.lookupId', value:customer?.assetYear3?.lookupId, required:false, options:incomeCorp, readOnly:readOnly, class:'corporate' /}
+					<span class="error">#{error 'Asset Third Year in tab Corporate is' /}</span>
+				</p>
+			</td>
+			<td>
+				<h2 style="margin-left: 100px">OPERATING PROFIT</h2>
+				<p class="indent" style="margin-left: 100px">
+					<label>Latest Year<span class="spanLatestYear"></span></label>
+					#{dropDownList id:'profitYear1', name:'customer.profitYear1.lookupId', value:customer?.profitYear1?.lookupId, required:false, options:profitCorp, readOnly:readOnly, class:'corporate' /}
+					<span class="error">#{error 'Operating Profit Last Year in tab Corporate is' /}</span>
+				</p>
+				<p class="indent" style="margin-left: 100px">
+					<label>Last 2 Year<span class="spanLast2Year"></span></label>	
+					#{dropDownList id:'profitYear2', name:'customer.profitYear2.lookupId', value:customer?.profitYear2?.lookupId, required:false, options:profitCorp, readOnly:readOnly, class:'corporate' /}
+					<span class="error">#{error 'Operating Profit Second Year in tab Corporate is' /}</span>
+				</p>
+				<p class="indent" style="margin-left: 100px">
+					<label>Last 3 Year<span class="spanLast3Year"></span></label>
+					#{dropDownList id:'profitYear3', name:'customer.profitYear3.lookupId', value:customer?.profitYear3?.lookupId, required:false, options:profitCorp, readOnly:readOnly, class:'corporate' /}
+					<span class="error">#{error 'Operating Profit Third Year in tab Corporate is' /}</span>
+				</p>
+			</td>
+		</tr>
+	</table>
+</fieldset>
+</div>

@@ -1,0 +1,54 @@
+<!-- #{extends 'templates/list1.html' /} -->
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Lookup Reference Maintenance' /}
+#{set subList: true /}
+#{set fixData: true /}
+
+<!-- <table class="display"> -->
+<!-- 	<thead> -->
+<!-- 		<tr> -->
+<!-- 			<th>Key</th> -->
+<!-- 			<th>Source</th> -->
+<!-- 			<th>Target</th> -->
+<!-- 		</tr> -->
+<!-- 	</thead> -->
+<!-- 	<tbody> -->
+<!-- 		#{list items:lookupReferences, as:'lookupReference'} -->
+<!-- 			<tr> -->
+<!-- 				<td> -->
+<!-- 					${lookupReference.lookupReferenceKey} -->
+<!-- 				</td> -->
+<!-- 				<td> -->
+<!-- 					${lookupReference.lookupGroupSource.lookupGroup}  -->
+<!-- 				</td> -->
+<!-- 				<td> -->
+<!-- 					${lookupReference.lookupGroupTarget.lookupGroup}  -->
+<!-- 				</td> -->
+<!-- 			</tr> -->
+<!-- 		#{/list} -->
+<!-- 	</tbody> -->
+<!-- </table> -->
+
+<script type="text/javascript">
+#{include 'RegistrySubscription/Util.js' /}
+#{include 'LookupReferences/lookupReferencesPaging.js' /}
+$(document).ready(function() {
+	Paging($("#main"));
+});
+</script>
+
+<div id="root">
+	<h3>Lookup Reference Maintenance</h3>
+</div>
+<div id="result" style="display:block">
+    <table id="tableLookupReferences" class="display">
+        <thead>
+            <tr>
+                <th width="80px" field="lookupGroupSource.lookupGroup|string|none|left|sort">Source</th>
+                <th width="80px" field="lookupGroupTarget.lookupGroup|string|none|left|sort">Target</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>

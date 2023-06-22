@@ -1,0 +1,58 @@
+#{extends 'templates/detail1.html' /}
+
+#{if mode == 'edit' || mode == 'entry' || mode == 'view'}
+	#{set pageTitle: 'Transaction Master Maintenance' /}
+#{/if}
+#{if taskId != null}
+	#{set pageTitle: 'Transaction Master Approval' /}
+#{/if}
+
+#{set id: custodyTransactionMaster?.transactionMasterKey /}
+
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{script 'lookups.js' /}
+
+<script type="text/javascript">
+	
+	$(function() {	
+		
+		if (('${mode}'=='entry') || (('${mode}'=='edit') && (('${custodyTransactionMaster?.recordStatus?.decodeStatus()}' == 'Reject') || ($("#status").val() == 'R' )))) {
+			$('input[name=isActive]').attr("disabled", "disabled");
+		}
+		
+		$('input[name=isActive]').change(function(){
+			$("input[name='custodyTransactionMaster.isActive']").val($("input[name='isActive']:checked").val());
+		});
+	});
+	
+	function doSave() {
+		return true;
+	}
+	
+	function doConfirm() {
+		return true;
+	}
+	
+</script>
+
+<div>
+	#{hidden name:'custodyTransactionMaster.organization.organizationId', value:custodyTransactionMaster?.organization?.organizationId /}
+	#{hidden id:'transactionMasterKey', name:'custodyTransactionMaster.transactionMasterKey', value:custodyTransactionMaster?.transactionMasterKey /}
+	#{hidden id:'status', name:'status', value:status /}
+	<p>      
+		#{textBox id:'custodyTransactionCode', name:'custodyTransactionMaster.custodyTransactionCode', label:'Transaction Code',value:custodyTransactionMaster?.custodyTransactionCode, class:'capitalize', width:'150px',required:true, readOnly:((mode=='entry') ? confirming : true ), maxLength:50 /}
+		<span class="error">#{error 'Transaction Code is' /}</span>
+	</p>
+	<p>			
+		#{textBox id:'description', name:'custodyTransactionMaster.transactionDescription', label:'Description', width:'300px',value:custodyTransactionMaster?.transactionDescription, class:'capitalize', required:true, readOnly:readOnly, maxLength:50 /}
+		<span class="error">#{error 'Description is' /}</span>
+	</p>
+	<p>	
+		#{dropDownList id:'transactionType', name:'custodyTransactionMaster.transactionType.lookupId', label:'Transaction Type', options:transactionTypes, value:custodyTransactionMaster?.transactionType?.lookupId, required:true, readOnly:readOnly /}		
+		<span class="error">#{error 'Transaction Type is' /}</span>
+	</p>
+	<p>
+		#{radioButton id:'isActive', name:'isActive', value:((custodyTransactionMaster?.isActive)?'true':'false'), label:'Active', options:operators, readOnly:readOnly /}
+		#{hidden id:'isActiveHidden', name:'custodyTransactionMaster.isActive', value:((custodyTransactionMaster?.isActive)?'true':'false') /}
+	</p>
+</div>

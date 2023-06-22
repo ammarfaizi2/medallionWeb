@@ -1,0 +1,114 @@
+#{extends 'main.html' /}
+#{set title:'Medallion&#0153;' /}
+#{set pageName:'Fee' /}
+
+#{if flash.error}
+    <p style="color:#c00">
+        ${flash.error}
+    </p>
+#{/if}
+
+<form class="form">
+			<ul>
+				<li>
+				<label>Code</label>
+					<input value="BKR" type="text" style="width:80px" disabled="disabled" />
+					<input value="Broker Fee" type="text" style="width:200px" disabled="disabled" />
+				</li>
+				
+				<li>							
+					<label>Fee Type<span class="req">*</span></label>
+					<select>
+						<option>Manual</option>
+						<option>Calculated</option>
+						<option>Editable</option>
+					</select>
+				</li>
+				<li>							
+					<label>Calculation Type<span class="req">*</span></label>
+					<select>
+						<option>Flat</option>
+						<option>Tiered</option>
+						<option>Progressive</option>
+					</select>
+				</li>
+				<li>							
+					<label>Base Calc. Type<span class="req">*</span></label>
+					<select>
+						<option>quantity</option>
+						<option>price</option>
+						<option>proceed</option>
+						<option>accured interact</option>
+						<option>cost</option>
+						<option>revaluation</option>
+						<option>Broker Fee</option>
+						<option>LEVY</option>
+						<option>TAX</option>
+						<option>FEE 1</option>
+						<option>FEE 2</option>
+					</select>
+				</li>
+				<li>							
+					<label>Tier Base<span class="req">*</span></label>
+					<select>
+						<option>*quantity</option>
+						<option>*price</option>
+						<option>*proceed</option>
+						<option>*accured interact</option>
+						<option>*cost</option>
+						<option>*revaluation</option>
+						<option>Broker Fee</option>
+						<option>LEVY</option>
+						<option>TAX</option>
+						<option>FEE 1</option>
+						<option>FEE 2</option>
+					</select>
+				</li>
+				<br>
+				<li>
+				<label>Min Value</label>
+					<input value="300000" type="text" />
+				</li>
+
+				<li>	
+				
+					<div>
+					<table class="grid" style="text-align:center">
+					<tr class="header">
+			
+						<th width="150px">Max</th>
+						<th width="200px">Value</th>
+					</tr>
+					<tr class="oddRow">
+						
+					<td>50</td><td>10000</td>
+					</tr>
+					<tr class="evenRow">
+						
+						<td>100</td><td>20000</td>
+					
+					</tr>
+					<tr class="oddRow">
+						
+						<td>MAX</td><td>30000</td>
+					
+					</tr>
+
+				</table>
+					
+					</div>
+					<div class="buttons"> 
+						<a href="#" class="btn"><span>Add</span></a>
+					</div>
+				</li>
+
+				<li>
+					<div class="buttons"> 
+						<a href="#" class="btn yellow"><span>Save</span></a>
+						<a href="#" class="btn red"><span>Cancel</span></a>
+						<a href="#" class="btn"><span>Reset</span></a>
+						
+					</div>
+				</li>
+			</ul>
+		</form>

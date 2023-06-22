@@ -1,0 +1,89 @@
+#{extends 'templates/main.html' /}
+#{set readOnly:((mode !='edit' && mode !='entry') || confirming) /}
+<script type="text/javascript">
+	$(function() {
+		$('.buttons input:button').button();
+
+		var backToEntry = function() {
+			loading.dialog('open');
+			location = "@{entry()}";
+		}
+		
+		var closeDialogMessage = function() {
+			$("dialog-message").dialog('close');
+		}
+		
+		// Action buttons
+		$('#save').click(function(){
+			$(".cancel").remove();
+			var checkError = $('#bankAccount').hasClass('fieldError');
+			if (checkError) {
+				$('#bankAccount').val('');
+			}
+			var action = "@{save()}?mode=${mode}";
+			/* var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+			loading.dialog({
+				closeOnEscape: false,
+				draggable: false,
+				modal: true,
+				resizable: false,
+				open:function() {
+					$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+				} 
+			}); */
+			loading.dialog('open');
+			$('#cashTransactionForm').attr('action', action);
+			$('#cashTransactionForm').submit();
+			
+		});
+
+		$('#confirm').click(function() {
+			$(".cancel").remove();
+			var action = "@{confirm()}?mode=${mode}";
+			/* var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+			loading.dialog({
+				closeOnEscape: false,
+				draggable: false,
+				modal: true,
+				resizable: false,
+				open:function() {
+					$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+				} 
+			}) */;
+			loading.dialog('open');
+			$.post(action, $('#cashTransactionForm').serialize(), function(data, status) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Notification", backToEntry);
+				} else {
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+				}
+			});
+		});
+	
+		$('#back').click(function() {
+			location.href = '@{back()}?mode=${mode}';		
+		});
+
+		$('#clear').click(function() {
+			location.href = '@{entry()}';
+			
+		});
+	});
+</script>
+<h2>Cash Transaction Entry</h2>
+<div id="detail">
+	#{include 'CashTransactions/detail.html' /}	
+</div>
+<div id="actions" class="buttons">
+	#{if confirming}
+		<input type="button" id="confirm" value="Confirm" />
+		<input type="button" id="back" value="Back" />
+	#{/if}
+	#{else}
+		<input type="button" id="save" value="Save" />
+		<input type="button" id="clear" value="Clear" />
+	#{/else}
+</div>
+	

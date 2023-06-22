@@ -1,0 +1,41 @@
+<script type="text/javascript">
+	function doView(data) {
+		var closeDialog = function(){
+			$("#dialog-message").dialog('close');
+		}
+		location.href="@{view()}?id=" + data[0] + "&fromInquiry=fromInquiry";
+		return false;
+	}
+</script>
+<table id="list" class="display">
+	<thead>
+		<tr>
+			<th>key</th>
+			<!-- <th>Batch #</th> -->
+			<th>Transaction Date</th>
+			<th>Txn #</th>
+			<th>Account No</th>
+			<th>Account Name</th>
+			<th>Description</th>
+			<th>Security Code</th>
+			<th>Settlement Amount</th>
+			<th>Status</th>
+		</tr>
+	</thead>
+	<tbody>
+		#{list items:csCancelTrades, as:'csCancelTrade'}
+			<tr>
+				<td>${csCancelTrade?.transactionKey}</td>
+				<!-- <td>${csCancelTrade?.settlementNumber}</td> -->
+				<td>${csCancelTrade?.transactionDate?.format(appProp.dateFormat)}</td>
+				<td>${csCancelTrade?.transactionNumber}</td>
+				<td>${csCancelTrade?.account?.accountNo}</td>
+				<td>${csCancelTrade?.account?.name}</td>
+				<td>${csCancelTrade?.transactionTemplate?.description}</td>
+				<td>${csCancelTrade?.security?.securityId}</td>
+				<td align="right">${csCancelTrade?.settlementAmount?.format("#,##0.00")}</td>
+				<td>${csCancelTrade?.transactionStatus?.decodeDataStatus()}</td>
+			</tr>
+		#{/list}
+	</tbody>
+</table>

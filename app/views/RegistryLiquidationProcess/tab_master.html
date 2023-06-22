@@ -1,0 +1,144 @@
+
+<script type="text/javascript">
+	$(function() {
+	
+	});
+</script>
+
+	
+	<table>
+		<tr>
+			<td width="570px">
+				<p>
+					#{textBox id:'batchNo', name:'liq.batchNo', label:'Batch No', value:liq?.batchNo, required:true, readOnly:readOnly /}
+					<span id="batchNoError" class="error"></span>
+				</p>
+				<p>
+					#{textBox id:'fundCode', name:'liq.rgProduct.productCode', label:'Fund Code', value:liq?.rgProduct?.productCode, class:'capitalize', width:'85px', required:true, readOnly:readOnly /}
+					#{button id:'fundCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+					#{textBox id:'fundCodeDesc', name:'liq.rgProduct.name', value:liq?.rgProduct?.name, readOnly:readOnly, width:'250px' /}
+					#{hidden id:'maxPaymentDate' , name:'liq.rgProduct.maxPaymentDate', value:liq?.rgProduct?.maxPaymentDate /}
+					#{hidden id:'redPostPeriod' , name:'liq.rgProduct.redPostPeriod', value:liq?.rgProduct?.redPostPeriod /}
+					#{hidden id:'redPayPeriod' , name:'liq.rgProduct.redPayPeriod', value:liq?.rgProduct?.redPayPeriod /}
+					#{hidden id:'redNavUsed' , name:'liq.rgProduct.redNavUsed', value:liq?.rgProduct?.redNavUsed /}
+					<span id="errFundCode" class="error"></span>
+				</p>
+				<p>
+					#{textBox id:'maturityDate', name:'liq.rgProduct.liquidDate', label:'Maturity Date', value:liq?.rgProduct?.liquidDate?.format(appProp.dateFormat), class:'calendar', required:true, readOnly:readOnly /} (${appProp.displayDateFormat})
+					#{hidden id:'maturityDateHidden' ,name:'liq.rgProduct.liquidDate', value:liq?.rgProduct?.liquidDate?.format(appProp.dateFormat) /}
+					<span class="error"></span>
+				</p>
+				<p>
+					#{hidden id:'goodFundDate', name:'liq.goodFundDate', value:liq?.goodFundDate?.format(appProp.dateFormat), class:'calendar', required:true, readOnly:readOnly /}
+					<span class="error"></span>
+				</p>
+				<p>
+					#{textBox id:'transactionDate', name:'liq.transactionDate', label:'Transaction Date', value:liq?.transactionDate?.format(appProp.dateFormat), class:'calendar modeView', required:true, readOnly:readOnlyEdit/} (${appProp.displayDateFormat})
+					<span class="error"></span>
+				</p>
+				<p>
+					#{textBox id:'navDate', label:'Nav Date', name:'liq.navDate', value:liq?.navDate?.format(appProp.dateFormat), class:'calendar modeView', required:true, readOnly:readOnlyEdit /} (${appProp.displayDateFormat})
+					<span id="navDateError" class="error"></span>
+				</p>
+				<p>
+					#{textBox id:'postDate', label:'Posting Date', name:'liq.postDate', value:liq?.postDate?.format(appProp.dateFormat), class:'calendar modeView', required:true, readOnly:readOnlyEdit/} (${appProp.displayDateFormat})
+				</p>
+				<p>
+					<span id="postDateError" class="error"></span>
+				</p>
+				
+				<p>
+					#{textBox id:'paymentDate', label:'Payment Date', name:'liq.paymentDate', value:liq?.paymentDate?.format(appProp.dateFormat), class:'calendar modeView', required:true, readOnly:readOnlyEdit /} (${appProp.displayDateFormat})
+				</p>
+				<p>
+					<span id="paymentDateError" class="error"></span>
+				</p>
+				
+			</td>
+			<td>
+				<p>
+					<label>&nbsp;</label>
+				</p>
+				<p>
+					<label>&nbsp;</label>
+				</p>
+				<p>
+					<label>&nbsp;</label>
+				</p>
+				<p>
+					<label>&nbsp;</label>
+				</p>
+				<p>
+					<label>&nbsp;</label>
+				</p>
+				<p>
+					<label>&nbsp;</label>
+				</p>
+				<p>
+					<b class="indent">Total Unit</b>#{textBox id:'totalUnit', value:liq?.totalUnit?.format('#,##0.#####'), class:'numeric',  width:'200px', readOnly:readOnly/}
+					#{hidden id:'totalUnitStripped', name:'liq.totalUnit', value:liq?.totalUnit /}
+					<span id="totalUnitError" class="error"></span>
+				</p>
+				
+				<p>
+					<b class="indent">Price</b>#{textBox id:'price', value:liq?.price?.format('#,##0.#####'), class:'numeric',  width:'200px', readOnly:readOnly/}
+					#{hidden id:'priceStripped', name:'liq.price', value:liq?.price /}
+					<span id="priceError" class="error"></span>
+				</p>
+				
+			</td>
+		</tr>
+	</table>	
+	
+	
+	<br />
+<!-- 	<p id="header"> -->
+<!-- 		<label style="width:80px;margin-left:18em;"><b>%</b></label> -->
+<!-- 		<label><b>Amount</b></label> -->
+<!-- 	</p> -->
+	<p>
+		#{hidden id:'feePct', value:0, format:'#,##0.##########', class:'numericMaxLength', width:'85px', readOnly:readOnly, required:true /}
+		#{hidden id:'feePctStripped', name:'liq.feePct', value:0 /}
+		
+		#{hidden id:'feeAmt', value:0, format:'#,##0.##########', class:'rgNumeric', width:'140px', readOnly:readOnly, required:true /}
+		#{hidden id:'feeAmtStripped', name:'liq.feeAmt', value:0 /}
+		<span id="errFee" class="error"></span> 
+	</p>
+	<p>
+		#{hidden id:'discPct', value:0, format:'#,##0.##########', class:'numericMaxLength', width:'85px', readOnly:readOnly, required:true /}
+		#{hidden id:'discPctStripped', name:'liq.discountPct', value:0 /}
+			
+		#{hidden id:'discAmt', value:0, format:'#,##0.##########', class:'rgNumeric', width:'140px', readOnly:readOnly /}
+		#{hidden id:'discAmtStripped', name:'liq.discountAmt', value:0 /}
+		<span class="error">#{error 'Discount is' /}</span>
+		<span id="errDiscount" class="error"></span>
+	</p>
+	<p>
+		#{hidden id:'otherPct', format:'#,##0.##########', class:'numericMaxLength', value:0, width:'85px', readOnly:readOnly, required:true /}
+		#{hidden id:'otherPctStripped', name:'liq.otherPct', value:0 /}
+		
+		#{hidden id:'otherAmt', format:'#,##0.##########', class:'rgNumeric', value:0, width:'140px', readOnly:readOnly, required:true /}
+		#{hidden id:'otherAmtStripped', name:'liq.otherAmt', value:0 /}
+		<span class="error">#{error 'Other is' /}</span>
+		<span id="errOther" class="error"></span>
+	</p>
+	<p>			
+		#{hidden id:'tax', value:"NOT", width:'85px', readOnly:readOnly, class:'capitalize', required:true /}
+		#{hidden id:'taxHidden', name:'liq.capGainTax.taxCode', value:liq?.capGainTax?.taxCode /}
+		#{hidden id:'taxKey', name:'liq.capGainTax.taxKey', value:liq?.capGainTax?.taxKey /}
+		#{hidden id:'taxRate', name:'liq.capGainTax.taxRate', value:liq?.capGainTax?.taxRate /}
+		#{hidden  id:'taxHelp',  value:'?', class:'small', readOnly:readOnly /}
+		#{hidden id:'taxDesc', name:'liq.capGainTax.description', value:liq?.capGainTax?.description, readOnly:readOnly, width:'250px' /}
+		<span class="error">#{error 'Cap Gain Tax is' /}</span>
+		<span class="error" id="errTax"></span>
+	</p>
+	<p>
+		#{button id:'processCalculate', value:'Populate', readOnly:readOnlyEdit /}		
+	</p>	
+	<p>
+		#{textBox id:'externalreference',  label:'External Reference', name:'liq.externalReference', value:liq?.externalReference, class:'capitalize modeView',  width:'369px', readOnly:readOnlyEdit, maxLength:50 /}
+	</p>
+	<p>
+		#{textArea id:'remarks', label:'Remarks', name:'liq.remarks', value:liq?.remarks, class:'capitalize modeView',  width:'369px', readOnly:readOnlyEdit, maxLength:100 /}
+	</p>
+	<br />

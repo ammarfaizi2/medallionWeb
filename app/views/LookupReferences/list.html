@@ -1,0 +1,31 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Lookup Reference Maintenance' /}
+#{set canGoBack: true /}
+#{set group: group /}
+
+<table class="display">
+	<thead>
+		<tr>
+			<th>Key</th>
+			<th width="500px">Source</th>
+			<th width="500px">Target</th>
+			
+		</tr>
+	</thead>
+	<tbody>
+		
+		#{list items:lookupReferenceItems, as:'lookupReferenceItem'}
+			<tr>
+				<td>
+					${lookupReferenceItem.lookupReferenceItemKey} 
+				</td>
+				<td>
+					${lookupReferenceItem.lookupSource.lookupDescription} 
+				</td>
+				<td>
+					${lookupReferenceItem.lookupTarget.lookupDescription}
+				</td>
+			</tr>
+		#{/list}
+	</tbody>
+</table>

@@ -1,0 +1,76 @@
+#{extends 'templates/main.html' /}
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+
+<div id="root">
+	<h3><a href="#">Search Announcement</a></h3>
+	<form id="searchForm" class="form">
+		<input id="param" name="params.param" type="hidden" value="${param}"/>
+		#{hidden id:'query', name:'params.query', value:params?.query /}
+		<p>
+			#{textBox id:'actionCode',width:'100px', name:'', label:'Action Code', value:'', required:true, class:'capitalize' /}
+			#{hidden id:'actionCodeKey', name:'params.actionCode', value:params.actionCode /}
+			#{button id:'actionCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'actionCodeDesc', name:'', value:customer?.customerName, readOnly:true, width:'200px' /}
+			<span id="actionCodeError" class="error"></span>
+		</p>
+		<p>
+			#{textBox id:'securityType',width:'100px', name:'', label:'Security Type', value:'',required:true, class:'capitalize' /}
+			#{hidden id:'securityTypeId', name:'params.securityType', value:params?.securityType /}
+			#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'securityTypeName', name:'transaction.transactionTemplate.securityType.description', value:transaction?.transactionTemplate?.securityType?.description, readOnly:true, width:'200px' /}
+			<span id="securityTypeError" class="error"></span>
+		</p>
+		<p>
+			#{textBox id:'securityCode',width:'100px', name:'', label:'Security Code', value:'',required:true, class:'capitalize' /}
+			#{hidden id:'securityCodeId', name:'params.securityCode', value:params?.securityCode /}
+			#{button id:'securityCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'securityCodeName', name:'transaction.security.description', value:transaction?.security?.description, readOnly:true, width:'200px' /}
+			<span id="securityCodeError" class="error"></span>
+		</p>
+		<p>
+			#{textBox id:'distributionDateFrom', name:'params.dateFrom', label:'Distribution Date', value:params?.dateFrom?.format(appProp.dateFormat), width:'100px', required:false, class:'calendar' /}
+			(${appProp.displayDateFormat}) 
+			<span id="distributionDateFromError" class="error"></span> 
+			<b>To</b>
+			#{textBox id:'distributionDateTo', name:'params.dateTo', value:params?.dateTo?.format(appProp.dateFormat), width:'100px', required:true, class:'calendar' /}
+			(${appProp.displayDateFormat})
+			<span id="distributionDateToError" class="error"></span>
+		</p>
+		<p>
+			#{dropDownList id:'announcementNoOperator', name:'params.announcementNoOperator', label:'Announcement No', options:stringOperators, value:params.announcementNoOperator /}
+			#{textBox id:'announcementSearchNo', name:'params.announcementNo', value:params.announcementNo, class:'numberOnly', width:'100px' /}
+		</p>
+		<div class="buttons">
+				<input type="button" id="search" value="Search" />				
+				<input type="button" id="reset" value="Reset" />					
+			</div>
+		
+	</form>
+</div>
+<br />
+<div id="result" style="display:none">
+	<table id="tableannouncement" class="display">
+		<thead>
+			<tr>
+				<th width="100px" field="corporateAnnouncementCode|string|none|left|sort">Announcement #</th>
+				<th width="250px" field="description|string|none|left|sort">Subject</th>
+				<th width="80px" field="announcementDate|date|date|center|sort">Announcement Date</th>
+				<th width="80px" field="recordingDate|date|date|center|sort">Recording Date</th>
+				<th width="80px" field="distributionDate|date|date|center|sort">Distribution Date</th>				
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+</div>
+<div class="buttons">
+	<input type="button" id="newDataAnnouncement" value="New Data" />	
+</div>
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'CorporateAnnouncements/AnnouncementList.js' /}
+	$(document).ready(function() {
+		Paging($("#root").add("#result"));
+	});
+</script>

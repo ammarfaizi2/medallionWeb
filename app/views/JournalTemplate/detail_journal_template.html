@@ -1,0 +1,55 @@
+<script type="text/javascript"> 
+	$(function(){
+
+		$('#coaCode').dynapopup2({key:'coaMasterKey', help:'coaHelp', desc:'coaDescription'},'PICK_FA_COA_BOTTOM_LEVEL', '', 'position', function(data){
+			if (data) {
+				$('#coaCode').removeClass('fieldError');
+				$('#coaMasterKey').val(data.code);
+				$('#coaDescription').val(data.description);
+				$('#h_coaDescription').val(data.description);
+			}
+		},function(data){
+			$('#coaCode').addClass('fieldError');
+			$('#coaMasterKey').val('');
+			$('#coaCode').val('');
+			$('#coaDescription').val('NOT FOUND');
+			$('#h_coaDescription').val('');
+		});
+
+		$('#cancelJournalTemplateDetail').click(function() {
+			$('#coaCode').removeClass('fieldError');
+			$("#detailForJournalTemplateDetails").dialog('close');
+			return false;
+		})
+		
+		$('#coaCode').blur(function(){
+		});
+	});
+	
+</script>
+<style type="text/css">
+  .errmsg { color:red; }
+</style>
+<form id="JournalTemplateDetailForm" class="form">
+<span id="errmsgNull" class="errmsg" ></span>
+<p>
+		#{hidden id:'oldMaxRange' /}
+		#{hidden id:'newMaxRange' /}
+		#{hidden id:'rowPosition' /}
+		#{hidden id:'journalMasterKey', name:'faJournalTemplate.faJournalMaster.journalMasterKey', value:faJournalTemplate?.faJournalMaster?.journalMasterKey /}
+		#{hidden id:'journalTemplateKey', name:'faJournalTemplate.journalTemplateKey', value:faJournalTemplate?.journalTemplateKey /}
+	</p>
+	<p>
+		#{textBox id:'coaCode', name:'faJournalTemplate.faCoaMaster.coaCode', label:'COA No', value:faJournalTemplate?.faCoaMaster?.coaCode, class:'capitalize', width:'100px', required:true, readOnly:readOnly /}
+		#{hidden id:'coaMasterKey', name:'faJournalTemplate.faCoaMaster.coaMasterKey', value:faJournalTemplate?.faCoaMaster?.coaMasterKey /}
+		#{button id:'coaHelp', value:'?', class:'small', readOnly:readOnly /}
+		&nbsp; <span id="coaCodeError" class="error"></span>
+	</p>
+	<p>
+		#{textBox id:'coaDescription', name:'faJournalTemplate.faCoaMaster.Description', label:'COA Name', class:'capitalize', value:faJournalTemplate?.faCoaMaster?.Description, readOnly:true, width:'250px' /}
+	</p>
+	<p>
+	 	#{dropDownList id:'position', name:'faJournalTemplate.dorc', label:'Position', value:faJournalTemplate?.dorc, options:debitCredit, required:true, width:'104px', readOnly:readOnly /}  
+		&nbsp; <span id="positionError" class="error"></span>
+	</p>	
+</form>

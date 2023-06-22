@@ -1,0 +1,78 @@
+#{extends 'templates/list1.html' /}
+#{script 'lookuppaging.js' /}
+#{script 'lookups.js' /}
+
+<form id="rootMonitoringAml" class="form">
+	<input id="param" name="params.param" type="hidden" value="${param}"/>
+	<p>
+		#{dropDownList id:'monitoringNoOperator', name:'params.monitoringNoOperator', label:'AML Key', options:stringOperators, value:params.monitoringNoOperator /}
+		#{textBox id:'amlKey', name:'params.monitoringAmlKey', value:params?.monitoringAmlKey, class:'capitalize' /}
+		<span id="errmsgSearchAMlKey" class="error"></span>
+	</p>
+		
+	<p>
+		#{dropDownList id:'monitoringNameOperator', name:'params.monitoringNameOperator', label:'AML Name', options:stringOperators, value:params.monitoringNameOperator /}
+		#{textBox id:'amlName', name:'params.monitoringAmlName', value:params?.monitoringAmlName, class:'capitalize' /}
+		<span id="errmsgSearchAMlName" class="error"></span>
+	</p>
+		
+	<p>		
+		#{textBox id:'custRetailOf', name:'amlCustomer.customerGroup.thirdPartyCode', label:'Retail Of', value:amlCustomer?.customerGroup?.thirdPartyCode, required:false, readOnly:readOnly, width:'80px', class:'capitalize' /}
+		#{hidden id:'custRetailOfKey', name:'params.retailOf', value:params?.retailOf /}
+		#{button id:'custRetailOfHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'custRetailOfDesc', name:'amlCustomer.customerGroup.thirdPartyName', value:amlCustomer?.customerGroup?.thirdPartyName, readOnly:true, width:'218px' /}
+		<span id="errmsgSearchRetailOf" class="error"></span>
+	</p>
+		
+	<p>
+		#{dropDownList id:'apiStatus', name:'params.status', label:'Status', options:stringApiStatus, value:params?.status /}
+		<span id="errmsgSearchApiStatus" class="error"></span>
+	</p>
+		
+	<p>
+		<div class="buttons">
+			<input type="button" id="search" value="Search"  class="btn"/>
+			<input type="button" id="reset" value="Reset"  class="btn"/>
+		</div>
+	</p>
+		
+	<p>
+		<table id="tblAmlMonitoringTable" class="display">
+			<thead>
+				<tr>
+					<td><input id='checkAll' type="checkbox"/></td>
+					<td>AML&nbsp;Key</td>
+					<td width="200px">Name</td>
+					<td>Birth&nbsp;Date</td>
+					<td width="200px">Identification&nbsp;No</td>
+					<td>Retail&nbsp;Of</td>
+					<td>Risk&nbsp;Profile</td>
+					<td width="100px">Status</td>
+				</tr>
+			</thead>
+			<tbody>
+        	</tbody>
+		</table>
+	</p>
+</form>
+
+<div id="sentInterface">
+	<table>
+		<tr>
+			<td>
+				<input type="button" id="interface" value="Interface to AML"  class="ui-button ui-widget ui-state-default ui-corner-all"/>
+			</td>
+			<td>
+				<input type="radio" id="customer" name="radioInterface" value=aml.tipeIndividu>Customer</input>
+				<input type="radio" id="benefOwner" name="radioInterface" value=aml.tipeIndividu.bo>Beneficiary Owner</input>
+			</td>
+		</tr>
+	</table>
+</div>
+
+<script type="text/javascript">
+	#{include 'MonitoringAml/monitoringAml.js' /}
+	$(document).ready(function() {
+		MonitoringAml($("#rootMonitoringAml"));
+	});
+</script>

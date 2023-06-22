@@ -1,0 +1,41 @@
+<script type="text/javascript">
+	function doView(data) {
+		location.href='@{Entitlements.approval()}?keyId='+ data[0] + '&from=corporateaction-settlement';
+		return false;
+	}
+</script>
+
+
+<table id="grid" class="display">
+	<thead>
+		<tr>
+			<th width="100px">Entitlement No</th>
+			<th width="100px">Announcement Code</th>
+			<th width="100px">Security Type</th>
+			<th width="100px">Security Code</th>
+			<th width="150px">Description</th>
+			
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:scEntitlements, as:'scEntitlement'}
+		<tr onclick="edit('${scEntitlement?.entitlementKey}','scEntitlement')">
+			<td>
+				${scEntitlement?.entitlementKey}
+			</td>
+			<td>
+				${scEntitlement?.corporateAnnouncement?.corporateAnnouncementKey}
+			</td>
+			<td class="capitalize">
+				${scEntitlement?.corporateAnnouncement?.securityType?.securityType}
+			</td class="capitalize">
+			<td class="capitalize">
+				${scEntitlement?.corporateAnnouncement?.security?.securityId}
+			</td class="capitalize">
+			<td>
+				${scEntitlement?.corporateAnnouncement?.description}
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>

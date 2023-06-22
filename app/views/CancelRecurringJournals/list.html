@@ -1,0 +1,214 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'FA - Cancel Recurring Journal' /}
+#{script 'lookups.js', characterset:'utf-8' /}
+
+<script type="text/javascript">
+	$(function(){
+		$("#new").css("display","none");
+
+		$('#recurringNoOperator').children().eq(0).remove();
+		
+		$('#effectiveDateFrom').datepicker();
+        $('#effectiveDateTo').datepicker();
+
+		$('#searchFundCode').lookup({
+			list:'@{Pick.faFundSetups()}',
+			get:{
+				url:'@{Pick.faFundSetup()}',
+				success: function(data){
+					$('#searchFundCode').removeClass('fieldError');
+					$('#searchFundKey').val(data.code);
+					$('#searchFundCodeDesc').val(data.description);
+					$('#h_searchFundCodeDesc').val(data.description);
+				},
+				error: function(data){
+					$('#searchFundCode').addClass('fieldError');
+					$('#searchFundCode').val('');
+					$('#searchFundKey').val('');
+					$('#searchFundCodeDesc').val('NOT FOUND');
+					$('#h_searchFundCodeDesc').val('');
+				}
+			},
+			key:$('#searchFundCodeKey'),
+			description:$('#searchFundCodeDesc'),
+			help:$('#searchFundCodeHelp')
+		});
+		
+		$('#accordion').accordion({
+			collapsible: true
+		});
+		
+		$('.buttons button:first').button({
+			icons: {
+				primary: 'ui-icon-search'
+			}
+		}).next().button();	
+		
+		$('#effectiveDateFrom').change(function(){
+            var dateFrom = $(this).datepicker('getDate');
+            var dateTo = $('#effectiveDateTo').datepicker('getDate');
+            var origin = 'from';
+            var id = '#effectiveDate';
+            if ((($(this).val()!='') || ($(this).hasClass('fieldError'))) && ($('#effectiveDateTo').val()!='')) {
+                //compareDateFromTo(dateFrom, dateTo, origin, id);
+                compareDateFromToEqual(dateFrom, dateTo, origin, id);
+            }
+
+//             validateDate("From");
+            var checkError = $("input").hasClass('fieldError');
+            if (checkError){
+                $('#search').button('disable');
+            }  else {
+                $('#search').button('enable');
+            }
+        });
+		
+		$('#effectiveDateTo').change(function(){
+            var dateFrom = $('#effectiveDateFrom').datepicker('getDate');
+            var dateTo = $(this).datepicker('getDate');
+            var origin = 'to';
+            var id = '#effectiveDate';
+            if ((($(this).val()!='') || ($(this).hasClass('fieldError'))) && ($('#effectiveDateFrom').val()!='')) {
+                //compareDateFromTo(dateFrom, dateTo, origin, id);
+                compareDateFromToEqual(dateFrom, dateTo, origin, id);
+            }
+
+//             validateDate("To");
+            
+            var checkError = $("input").hasClass('fieldError');
+            if (checkError){
+                $('#search').button('disable');
+            }  else {
+                $('#search').button('enable');
+            }
+        });
+
+// 		var validateDate = function(from) {
+//             var DateFrom = new Date($('#effectiveDateFrom').datepicker('getDate'));
+//             var DateTo = new Date($('#effectiveDateTo').datepicker('getDate'));
+//             if (($('#effectiveDateFrom').val()!='') && ($('#effectiveDateTo').val()!='')) { 
+//                 if (DateTo.getTime() < DateFrom.getTime()) {
+//                     if (from=='From'){
+//                         $('#effectiveDateFrom').addClass('fieldError');
+//                         $("#effectiveDateFromError").html("Date From must be less or equal than Date To");
+//                     } else {
+//                         $('#effectiveDateTo').addClass('fieldError');
+//                         $("#effectiveDateToError").html("Date To must be greather or equal than Date From");
+//                     }
+//                 } else {
+//                    $('#effectiveDateTo').removeClass('fieldError');
+//                    $("#effectiveDateToError").html("");
+//                    $('#effectiveDateFrom').removeClass('fieldError');
+//                    $("#effectiveDateFromError").html("");
+//                 }
+//             }
+//         };
+
+		$('#search').click(function() {
+			search();
+			return false;
+		});
+		// end of Search
+		
+		$('#reset').click(function() {
+			location.href="@{list()}";	
+			return false;
+		});
+		
+		$('.buttons input:button').button();
+		
+	});
+	
+	var search = function() {
+		$("#effectiveDateFromError").html("");
+		$("#effectiveDateToError").html("");
+		$("#errmsgSearchFundCode").html("");
+		if (($('#effectiveDateFrom').val()=='') || ($('#effectiveDateTo').val()=='') || ($('#searchFundCode').val()=='')) {
+			
+			if ($('#effectiveDateFrom').val()=='') {
+				$("#effectiveDateFromError").html("Required");
+			}
+			
+			if ($('#effectiveDateTo').val()=='') {
+				$("#effectiveDateToError").html("Required");
+			}
+			
+			if ($('#searchFundCode').val()=='') {
+				$("#errmsgSearchFundCode").html("Required");
+			}
+			
+			return false;
+		}
+		
+		if ($('#effectiveDateFrom').val()!=='') {
+			$("#effectiveDateFromError").html("");
+		}
+		
+		if ($('#effectiveDateTo').val()!=='') {
+			$("#effectiveDateToError").html("");
+		}
+		
+		if ($('#searchFundCode').val()!=='') {
+			$("#errmsgSearchFundCode").html("");
+		}
+		
+		$('#result .loading').show();
+		$('#result .response').hide();
+		$('#result').show();	
+		
+		$.get('@{search()}', $('#searchForm').serialize(), function(data) {
+			checkRedirect(data);
+			$("#navDateError").html("");
+			$('#result .response').html(data);
+			$('#result .loading').hide();
+			$('#result .response').show();
+			setupTable();
+		});	
+		
+	};
+	
+	function doEdit(data) {
+		location.href='@{view()}/?key=' + data[0];
+		return false;
+	}
+
+</script>
+
+<style type="text/css">
+  .error { color:red; }
+</style>
+
+<div id="accordion">
+	<h3><a href="#">Search Cancel Recurring Journal</a></h3>
+		<form id="searchForm" class="form">
+			<input id="param" name="params.param" type="hidden" value="${param}"/> 
+			<p>		
+				#{textBox id:'searchFundCode', name:'faRecurring.faMaster.fundCode', label:'Fund Code', value:faRecurring?.faMaster?.fundCode, width:'120px', readOnly:readOnly, class:'capitalize', required:'true' /}
+				#{hidden  id:'searchFundCodeKey', name:'params.faRecurringSearchFundKey', value:params?.faRecurringSearchFundKey /}
+				#{button  id:'searchFundCodeHelp', value:'?', class:'small', readOnly:readOnly/}
+				#{textBox id:'searchFundCodeDesc', name:'faRecurring.faMaster.fundDescription', value:faRecurring?.faMaster?.fundDescription, readOnly:true, width:'340px' /}
+				<span id="errmsgSearchFundCode" class="error"></span>
+			</p>
+			<p>
+				#{textBox id:'effectiveDateFrom', name:'params.faRecurringSearchEffectiveDateFrom', label:'Effective Date', width:'85px', value:params?.faRecurringSearchEffectiveDateFrom ,class:'calendar', required:'true'  /} (${appProp.displayDateFormat})
+				<span id="effectiveDateFromError" class="error"></span> <b>To</b>
+				#{textBox id:'effectiveDateTo', name:'params.faRecurringSearchEffectiveDateTo', value:params?.faRecurringSearchEffectiveDateTo, class:'calendar'  /} (${appProp.displayDateFormat})
+				<span id="effectiveDateToError" class="error"></span>
+			</p>
+			<p>
+				#{dropDownList id:'recurringNoOperator', name:'params.recurringNoOperator', label:'Recurring No', options:stringOperators, value:params?.recurringNoOperator /}
+				#{textBox id:'recurringSearchNoOperator', name:'params.recurringSearchNoOperator', value:params?.recurringSearchNoOperator, class:'capitalize' /}
+			</p>
+			<p>
+				<div class="buttons">
+					<button id="search">Show</button>
+					<button id="reset">Reset</button>
+				</div>
+			</p>
+		</form>
+</div>
+
+<div id="result" style="display:none">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<div class="response"></div>
+</div>

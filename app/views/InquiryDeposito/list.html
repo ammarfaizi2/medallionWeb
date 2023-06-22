@@ -1,0 +1,73 @@
+#{extends 'templates/main.html' /}
+#{script 'lookuppaging.js' /}
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+
+<div id="root">
+	<h3><a href="#">Search Deposito Inquiry</a></h3>
+	<form id="searchForm" class="form">
+		<input id="param" name="params.param" type="hidden" value="${param}"/>
+		<p>
+			#{textBox id:'customerCode',width:'100px', name:'', label:'Customer Code', value:'', required:true, class:'capitalize' /}
+			#{hidden id:'customerCodeKey', name:'params.customerCode', value:params.customerCode /}
+			#{button id:'customerCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'customerCodeDesc', name:'', value:customer?.customerName, readOnly:true, width:'200px' /}
+			<span id="customerCodeError" class="error"></span>
+		</p>
+		<p>
+			#{textBox id:'securityType',width:'100px', name:'', label:'Security Type', value:'', class:'capitalize' /}
+			#{hidden id:'securityTypeId', name:'params.securityType', value:params?.securityType /}
+			#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'securityTypeName', name:'transaction.transactionTemplate.securityType.description', value:transaction?.transactionTemplate?.securityType?.description, readOnly:true, width:'200px' /}
+			<span id="securityTypeError" class="error"></span>
+		</p>
+		<p>
+			#{textBox id:'securityCode',width:'100px', name:'', label:'Security Code', value:'', class:'capitalize' /}
+			#{hidden id:'securityCodeId', name:'params.securityCode', value:params?.securityCode /}
+			#{button id:'securityCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'securityCodeName', name:'transaction.security.description', value:transaction?.security?.description, readOnly:true, width:'200px' /}
+			<span id="securityCodeError" class="error"></span>
+		</p>
+		
+		<p>
+			#{dropDownList id:'depositoNoOperator', name:'params.depositoNoOperator', label:'Deposito No', options:stringOperators, removeEmpty:'true', value:params.depositionOperator /}
+			#{textBox id:'depositoSearchNo', name:'params.depositoNo', value:params?.depositoNo, class:'capitalize', width:'100px' /}
+		</p>
+		<p>
+			#{radioButton id:'nominal', name:'nominal', label:'Nominal', options:operatorNominal /}
+			#{hidden id:'nominalHidden', name:'params.nominal', value:params.nominal /}
+		</p>
+		<div class="buttons">
+				<input type="button" id="search" value="Search" />				
+				<input type="button" id="reset" value="Reset" />					
+			</div>
+		
+	</form>
+</div>
+<br />
+<div id="result" style="display:none">
+	<table id="tabledeposito" class="display">
+		<thead>
+			<tr>
+				<th width="80px" field="depositoNo|string|none|left|sort">Deposito #</th>
+				<th width="100px" field="account.accountNo|string|none|left|sort">Account No</th>
+				<th width="100px" field="account.name|string|none|left|sort">Account Name</th>
+				<th width="80px" field="security.securityType.securityType|string|none|left|sort">Security Type</th>
+				<th width="100px" field="security.securityId|string|none|left|sort">Security Code</th>
+				<th width="120px" field="amount|number|decimal2|right|sort">Nominal</th>
+				<th width="80px" field="interestRate|number|decimal2|right|sort">Interest Rate (%)</th>
+				<th width="80px" field="maturityDate|date|date|center|sort">Maturity Date</th>
+				<th width="80px" field="recordStatus|string|none|center|sort">Status</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+</div>
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'InquiryDeposito/InquiryDepositoList.js' /}
+	$(document).ready(function() {
+		Paging($("#root").add("#result"));
+	});
+</script>

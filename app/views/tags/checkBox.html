@@ -1,0 +1,10 @@
+#{if _label}<label>${_label} #{if _required}<span class="req">*</span>#{/if}</label>#{/if}
+<input #{if _id}id="${_id}"#{/if} 
+		type="checkbox"  
+		#{if _name}name="${_name}"#{/if}
+		#{if _value} checked="checked"#{/if}
+		#{if _readOnly}disabled="disabled"#{/if} 
+		value="true"/>
+#{if _readOnly} 
+<input #{if _id}id="h_${_id}"#{/if} #{if _name}name="${_name}"#{/if} type="hidden" value="${_readOnly?_value:'false'}" />
+#{/if} 

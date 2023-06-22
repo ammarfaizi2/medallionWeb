@@ -1,0 +1,80 @@
+#{extends 'templates/main.html' /}
+#{set readOnly:((mode !='edit' && mode !='entry') || confirming) /}
+<script type="text/javascript">
+	$(function() {
+		
+
+		// Action buttons
+		$('#save').click(function(){
+			var action = "@{save()}?mode=${mode}";
+			var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+			loading.dialog({
+				closeOnEscape: false,
+				draggable: false,
+				modal: true,
+				resizable: false,
+				open:function() {
+					$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+				} 
+			});
+			$('#cashTransactionForm').attr('action', action);
+			$('#cashTransactionForm').submit();
+		});
+
+		$('#confirm').click(function() {
+			var action = "@{confirm()}?mode=${mode}";
+			var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+			loading.dialog({
+				closeOnEscape: false,
+				draggable: false,
+				modal: true,
+				resizable: false,
+				open:function() {
+					$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+				} 
+			});
+			$.post(action, $('#cashTransactionForm').serialize(), function(data, status) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (status == 'success') {
+					alert("Your transaction no is " + data);
+					location = "@{entry()}";
+				} else {
+					alert("Failed saving data!");					
+				}
+			});
+		});
+	
+		$('#back').click(function() {
+			location.href = '@{back()}?mode=${mode}';		
+		});
+
+		$('#clear').click(function() {
+			var action = "@{clear()}?mode=${mode}#{if id}&id=${id}#{/if}";
+			$.post(action, $('#cashTransactionForm').serialize(), function(data, status, xhr) {
+	    		checkRedirect(data);
+				if (status == 'success') {
+					$('#detail').html(data);
+				//	$("#actions #confirming").css('display', 'none');
+				//	$('#actions #editing').css('display', '');
+				}
+			});	
+			
+		});
+	});
+</script>
+<h2>In House Transfer</h2>
+<div id="detail">
+	#{include 'InHouseTransfers/detail.html' /}	
+</div>
+<div id="actions" class="buttons">
+	#{if confirming}
+		<input type="button" id="confirm" value="Confirm" />
+		<input type="button" id="back" value="Back" />
+	#{/if}
+	#{else}
+		<input type="button" id="save" value="Save" />
+		<input type="button" id="clear" value="Clear" />
+	#{/else}
+</div>
+	

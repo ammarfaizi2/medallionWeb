@@ -1,0 +1,64 @@
+<script type="text/javascript">		
+	$(document).ready(function() {
+		investorUnit();
+	});
+	
+	//formatAmount(digitAmount, typeAmount);
+	//formatUnit(digitUnit, typeUnit);
+	//formatPrice(digitPrice, typePrice);
+</script>
+
+<div class="tabs">
+	<ul>
+		<li><a href="#tabs-1">Investor Unit Valuation</a></li>
+	</ul>
+	<div class="pane" id="tabs-1">
+		<h4 class="infoHolder"><span id ='beginUnit'></span> s/d <span id ='currentUnit'></span></h4>
+		<table id="grid-unit-valuation" class="display">
+			<thead>
+				<tr>
+					<th>Key</th>
+					<th width="60px">Date</th>
+					<th width="85px" >Unit</th>
+					<th width="85x">NAV / Unit</th>
+					<th width="70px">Amount</th>
+					<th width="200px">Cost</th>
+					<th width="200px">Unrealized</th>
+				</tr>
+			</thead>
+			<tbody>
+			#{list unitValuations, as:'unitVal'}
+				<tr>
+					<td>
+						${unitVal?.id?.accountNumber}
+					</td>
+					<td>
+						${unitVal?.id?.holdingDate?.format('MM/dd/yyyy')}
+					</td>
+					<td align="right" name="unitCell">
+						${unitVal?.unit?.format('##,##0.########')}
+					</td>
+					<td align="right" name="priceCell">
+						${unitVal?.navPrice?.format('##,##0.##########')}
+					</td>
+					<td align="right" name="amountCell">
+						${unitVal?.amount?.format('##,##0.######')}
+					</td>
+					<td align="right" name="amountCell">
+						${unitVal?.balanceAmount?.format('##,##0.######')}
+					</td>
+					<td align="right" name="amountCell">
+						${unitVal?.unrealized?.format('##,##0.######')}
+					</td>
+				</tr>
+			#{/list}
+			</tbody>
+		</table>
+		<br />
+		<div id="button-unit-valuation">
+			<button id="printUnitValuation" class="btn">Print</button>
+			<button id="historyUnit" class="btn">History</button>
+		</div>
+	</div>
+</div>
+	

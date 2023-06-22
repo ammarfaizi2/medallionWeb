@@ -1,0 +1,59 @@
+#{extends 'templates/main.html' /}
+
+#{script 'forms.js' /}
+<script type="text/javascript">
+$(function() {
+	$('.buttons input:button').button();
+	var backToList = function(){
+		location = "@{settlement()}";
+	}
+	
+	var closeDialogMessage = function() {
+		$("#dialog-message").dialog("close");
+	}
+	
+	$('#confirm').click(function() {
+		var action = "@{confirmBatch()}";
+		var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+		loading.dialog({
+			closeOnEscape: false,
+			draggable: false,
+			modal: true,
+			resizable: false,
+			open:function() {
+				$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+			} 
+		});
+		var table = $('#list').dataTable();
+		var cell = table.fnGetData();
+		var data = {};
+		for (var i = 0; i < cell.length; i++) {
+			data['transactionKeys[' + i + ']'] = cell[i][0];
+		}
+		$.post(action, data, function(result, status, xhr) {
+    		checkRedirect(result);
+			if (result.status == 'success') {
+				//alert(result.message);
+				messageAlertOk(result.message, "ui-icon ui-icon-circle-check", "Notification", backToList);
+				//location = "@{settlement()}";
+			} else {
+				/* loading.dialog('close');
+				alert(result.error); */
+				messageAlertOk(result.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+			}
+		});			
+	});
+	$('#back').click(function() {
+		location.href="@{settlement()}";
+	});
+});	
+</script>
+
+<h2>Batch Settlement</h2>
+#{include 'Transactions/batch.html' /}
+<p>
+	<div class="buttons">
+		<input type="button" id="confirm" value="Confirm" />
+		<input type="button" id="back" value="Back" />
+	</div>
+</p>

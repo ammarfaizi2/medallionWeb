@@ -1,0 +1,50 @@
+#{hidden id:'rowNumber' /}
+<table id="gridThirdParty" class="display">
+	<thead>
+		<tr>
+			<th>Depository</th>
+			<th>Member Code</th>
+			<th>Agent Code</th>
+			<th>Investor Code</th>
+			<th>Sub Account</th>
+			<th>Cash Account</th>
+			<th>Action</th>
+			
+		</tr>
+	</thead>
+	<tbody>
+	#{list thirdParty?.thirdPartyAccounts, as:'thirdPartyAccount'}
+		<tr>
+			<td>
+				${thirdPartyAccount?.accountCategory?.lookupDescription}
+			</td>
+			<td>
+				${thirdPartyAccount?.accountCode}
+			</td>
+			<td>
+				${thirdPartyAccount?.accountAgentCode}
+			</td>
+			<td>
+				${thirdPartyAccount?.investorCode}
+			</td>
+			<td>
+				${thirdPartyAccount?.subAccountCode}
+			</td>
+			<td>
+				${thirdPartyAccount?.cashAccount}
+			</td>
+			<td>
+				#{hidden id:'thirdPartyAccountKey', name:'thirdPartyAccountss[' + (thirdPartyAccount_index-1) + '].thirdPartyAccountKey', value:thirdPartyAccount?.thirdPartyAccountKey /}
+ 				#{hidden id:'accountCat', name:'thirdPartyAccountss[' + (thirdPartyAccount_index-1) + '].accountCategory?.lookupId', value:thirdPartyAccount?.accountCategory?.lookupId /}
+			  	#{hidden id:'lookupDescription', name:'thirdPartyAccountss[' + (thirdPartyAccount_index-1) + '].accountCategory?.lookupDescription', value:thirdPartyAccount?.accountCategory?.lookupDescription /}
+			  	#{hidden id:'accountCode', name:'thirdPartyAccountss[' + (thirdPartyAccount_index-1) + '].accountCode', value:thirdPartyAccount?.accountCode /}
+			  	#{hidden id:'accountAgentCode', name:'thirdPartyAccountss[' + (thirdPartyAccount_index-1) + '].accountAgentCode', value:thirdPartyAccount?.accountAgentCode /}
+			  	#{hidden id:'investorCode', name:'thirdPartyAccountss[' + (thirdPartyAccount_index-1) + '].investorCode', value:thirdPartyAccount?.investorCode /}
+			  	#{hidden id:'subAccountCode', name:'thirdPartyAccountss[' + (thirdPartyAccount_index-1) + '].subAccountCode', value:thirdPartyAccount?.subAccountCode /}
+			  	#{hidden id:'cashAccount', name:'thirdPartyAccountss[' + (thirdPartyAccount_index-1) + '].cashAccount', value:thirdPartyAccount?.cashAccount /}
+				<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} /></center>
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>

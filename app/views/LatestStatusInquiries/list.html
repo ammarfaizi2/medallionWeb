@@ -1,0 +1,264 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Latest Status Inquiry' /}
+#{set fixData: true /}
+#{script 'lookups.js', characterset:'utf-8' /}
+#{script 'json2.js', characterset:'utf-8' /}
+#{script 'generaldateformat.js', characterset:'utf-8' /}
+<script>
+	#{include 'LatestStatusInquiries/HtmlUtils.js' /}
+</script>
+
+<div id="accordion">
+	<form id="searchForm" class="form">
+
+			<input id="param" name="params.param" type="hidden" value="${param}"/>
+		<p>
+			<label>Filter By</label>
+		</p>
+		<p>
+			#{dropDownList id:'searchMessageType', name:'params.searchMessageType', label:'Message Type', options:messageTypeOptions, value:'params?.searchMessageType', removeEmpty:true /}
+			<span class="searchMessageType error"></span>
+		</p>
+		<p>
+			#{textBox id:'searchFromDate', name:'params.searchFromDate', label:'From Date', value:'params?.searchFromDate', class:'calendar' /}&nbsp;&nbsp;(dd/mm/yyyy)
+			<span class="searchFromDate error"></span>
+		</p>
+		<p>
+			#{textBox id:'searchToDate', name:'params.searchToDate', label:'To Date', value:'params?.searchToDate', class:'calendar' /}&nbsp;&nbsp;(dd/mm/yyyy)
+			<span class="searchToDate error"></span>
+		</p>
+		<p>
+			<div class="buttons">
+				<input type="button" id="search" value="Show" />
+				<input type="button" id="reset" value="Clear" />
+			</div>
+		</p>
+	</form>
+</div>
+
+
+<div id="data-container">
+	<table width="100%" class="display" id="table-data">
+		<thead>
+			<tr>
+				<th align="left">Outgoing Date</th>
+				<th align="left">Outgoing Name</th>
+				<th align="left">Incoming Name</th>
+				<th align="left">Prematch Name</th>
+				<th align="left">Incoming Status</th>
+				<th align="left">Prematch Status</th>
+				<th align="left">External Reference</th>
+				<th align="left">Counterpart Code</th>
+				<th align="left">Security Code</th>
+				<th align="left">Trade Date</th>
+				<th align="left">Quantity</th>
+				<th align="left">Settlement Date</th>
+				<th align="left">Settlement Amount</th>
+			</tr>
+		</thead>
+		<tbody></tbody>
+	</table>
+</div>
+<div id="result" style="display:none">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<div class="response"></div>
+</div>
+<script type="text/javascript">	
+	$(function() {
+		
+		$('.buttons button:first').button({
+			icons: {
+				primary: 'ui-icon-search'
+			}
+		}).next().button();	
+		$('#search').click(function() {
+			var isValid = true;
+			// clean up
+			$( ".searchFromDate.error" ).html("");
+			$( ".searchToDate.error" ).html("");
+			// validate
+			if( $("#searchFromDate").val().trim() === "" ){
+				$( ".searchFromDate.error" ).html("required");
+				isValid = false;
+			}
+			if( $("#searchToDate").val().trim() === "" ){
+				$( ".searchToDate.error" ).html("required");
+				isValid = false;
+			}
+			if( $("#searchFromDate").val().trim() !== "" && $("#searchToDate").val().trim() !== "" ){
+				var fromDateTime = $('#searchFromDate').datepicker( "getDate" );
+				var toDateTime = $('#searchToDate').datepicker( "getDate" );
+				if( fromDateTime.getTime() > toDateTime.getTime() ){
+					$( ".searchFromDate.error" ).html("From Date must be less then/equal To Date.");
+					isValid = false;
+				}
+			}
+			if( isValid === true ){
+				createtable();
+			}
+			
+		});
+		// end of Search
+		
+		$('#reset').click(function() {
+			location.href="@{LatestStatusInquiries.list()}";
+		});
+		
+		$('.buttons input:button').button();
+	});
+	
+	var tableview;
+	
+	function createtable(){
+		
+		TableTools.BUTTONS.download = {
+			    "sAction": "text",
+			    "sFieldBoundary": "",
+			    "sFieldSeperator": "\t",
+			    "sNewLine": "<br>",
+			    "sToolTip": "",
+			    "sButtonClass": "DTTT_button_text",
+			    "sButtonClassHover": "DTTT_button_text_hover",
+			    "sButtonText": "Download",
+			    "mColumns": "all",
+			    "bHeader": true,
+			    "bFooter": true,
+			    "sDiv": "",
+			    "fnMouseover": null,
+			    "fnMouseout": null,
+			    "fnClick": function( nButton, oConfig ) {
+				    var iframe = document.createElement('iframe');
+				    iframe.style.height = "0px";
+				    iframe.style.width = "0px";//					    
+					var messageType = $( '#searchMessageType' ).val();
+					var sSearch = $('.dataTables_filter input').val();
+					var ua = window.navigator.userAgent;
+					var msie = ua.indexOf ( "MSIE " );
+
+					var messageType = $('#searchMessageType').val();
+					if( messageType === "ALL" ){
+						messageType = "";
+						$('#searchMessageType').find("option").each(function(idx, obj){
+							if( $(obj).val() !== "ALL"){ // skip all
+								messageType = messageType + $(obj).val()+";";
+							}
+							
+						});
+					}else{
+						messageType = messageType+";";
+					}
+
+					/* IE FIX TRIM */
+					var fromDateTime = $('#searchFromDate').datepicker( "getDate" );
+					var toDateTime = $('#searchToDate').datepicker( "getDate" );
+					var p_fromDateTime = fromDateTime.fmtYYYYMMDDHHMMSSSSS(true);
+					var p_toDateTime = toDateTime.fmtYYYYMMDDHHMMSSSSS(true);
+			
+					iframe.src = "downloadLatestStatusInquiryAjax?" +
+											 "messageType="+messageType+"&" +
+											 "fromDateTime="+p_fromDateTime+"&" +
+											 "toDateTime="+p_toDateTime+"&" +
+											 "search=";
+				    document.body.appendChild( iframe );
+					
+			    },
+			    "fnComplete": null,
+			    "fnInit": null
+		};
+		$('#table-data').dataTable().fnDestroy();
+		tableview = $('#table-data').dataTable({						
+			sDom: '<"H"Tlfr>t<"F"ip>',
+			"oTableTools": {
+				"sSwfPath": "/swf/copy_cvs_xls_pdf.swf",
+				"aButtons": [ {
+		            "sExtends": "download",
+		            "sButtonText": "Download"
+		          } ]
+			},
+			oLanguage: {
+				"sSearch": "Search External Reference:"
+			},
+			bJQueryUI: true,
+			sPaginationType: "full_numbers",
+			bSortClasses: false,
+			bRetrieve: true,
+			sScrollX: "100%",
+			bScrollCollapse: true,
+		    bProcessing: true,
+		    bServerSide: true,
+		    bDestroy: true,
+		    bPaginate: true,
+			fnServerData: function ( sSource, aoData, fnCallback ) {
+				getLatestStatusInquiry(aoData, fnCallback);
+			}		
+		});	
+		
+		$('.dataTables_filter input')
+	    .unbind('keypress keyup')
+	    .bind('blur', function(e){
+	    	tableview.fnFilter($(this).val());
+	    });
+		
+		$('#list table tbody tr').die('click');
+	}
+	
+	function getLatestStatusInquiry(aoData, fnCallback) {
+		try{
+			var p_messageType = $('#searchMessageType').val();
+			if( p_messageType === "ALL" ){
+				p_messageType = "";
+				$('#searchMessageType').find("option").each(function(idx, obj){
+					if( $(obj).val() !== "ALL"){ // skip all
+						p_messageType = p_messageType + $(obj).val()+";";
+					}
+					
+				});
+			}else{
+				p_messageType = p_messageType+";";
+			}
+			
+			var fromDateTime = $('#searchFromDate').datepicker( "getDate" );
+			var toDateTime = $('#searchToDate').datepicker( "getDate" );
+			toDateTime.setHours(23);
+			toDateTime.setMinutes(59);
+			toDateTime.setSeconds(59);
+			var p_fromDateTime = fromDateTime.fmtYYYYMMDDHHMMSSSSS(true);
+			var p_toDateTime = toDateTime.fmtYYYYMMDDHHMMSSSSS(true);
+			
+			var aoDataString = JSON.stringify( aoData );
+			$.post('@{getLatestStatusInquiryAjax()}', {'messageType':p_messageType, 'fromDateTime':p_fromDateTime, 'toDateTime':p_toDateTime, 'aoData':aoDataString}, function(data) {
+	    		checkRedirect(data);
+				if (data.aaData) {
+					data.aaData = render(data.aaData);
+					fnCallback( data );
+				}
+			});
+		}catch(err) {
+			alert(err);
+		}
+	}		
+
+	function render(data){
+		var allData = [];
+		for(var idxhist in data){
+			var currObject = data[ idxhist ];
+			var outgoingDate = new Date(currObject[1]);
+			allData.push([
+			              outgoingDate.fmtDDMMYYYY("/"),
+			              currObject[2],
+			              currObject[3],
+			              currObject[4],
+			              currObject[5],
+			              currObject[6],
+			              currObject[7],
+			              currObject[8],
+			              currObject[9],
+			              currObject[10],
+			              currObject[11],
+			              currObject[12],
+			              currObject[13],
+			              ]);
+		}
+		return allData;
+	}	
+</script>

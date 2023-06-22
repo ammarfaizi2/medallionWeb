@@ -1,0 +1,102 @@
+#{extends 'templates/main.html' /}
+
+<script type="text/javascript">
+	$(function() {
+		$('#save').button();
+		$('#cancel').button();
+		$('#clear').button();
+		$('#confirm').button();
+		$('#back').button();
+		// Action buttons 
+		$('#save').click(function() {
+			var resume = true;
+			if (typeof doSave == 'function') { 
+				resume = doSave();
+			}
+			if (resume) {
+				var action = "@{save()}";
+				var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+				loading.dialog({
+					closeOnEscape: false,
+					draggable: false,
+					modal: true,
+					resizable: false,
+					open:function() {
+						$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+					} 
+				});
+				$('#shareHoldersMeetingForm').attr('action', action);
+				$('#shareHoldersMeetingForm').submit();
+			}
+		});
+		
+		var closeDialogMessage = function() {
+			$("#dialog-message").dialog("close");
+		}
+		
+		$('#confirm').click(function() {
+			loading.dialog('open');
+			$.post("@{confirm()}", $('#shareHoldersMeetingForm').serialize(), function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				var backToInquiryList = function() {
+					loading.dialog('open');
+					location = "@{inquiry()}";
+				}
+				var backToEntry = function() {
+					loading.dialog('open');
+					location = "@{entry()}";
+				}
+				if (data.status == 'success') {
+					if ('${mode}' == 'entry') {
+						messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Notification", backToEntry);
+					} else if ('${mode}' == 'edit') {
+						messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Notification", backToInquiryList);
+					}
+					
+				} else {
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+				}
+			});
+		});
+		
+		$('#back').click(function() {
+			location.href="@{back()}?meetingKey=${csMeeting?.meetingKey}&mode=${mode}&isAttached="+$('#attachFile').val();
+		});
+		$('#cancel').click(function() {
+			location.href="@{inquiry()}";			
+		});
+		$('#clear').click(function() {
+			location.href="@{entry()}";			
+		});
+		/* $('#statusMeeting').hide();
+		$('#statusMeeting').css("display","none");*/
+		$('#cancelMeeting').hide();
+		$('#cancelMeeting').css("display","none"); 
+		
+		$('#statusMeeting').show();
+		$('#statusMeeting').css("display","");
+		
+		if ((jQuery.trim('${csMeeting?.cancelDate}') !== '') && (jQuery.trim('${csMeeting?.cancelRemarks}') !== '')) {
+			$('#cancelMeeting').show();
+			$('#cancelMeeting').css("display","");
+		}
+	});	
+</script>
+<h2>Company/Shareholders Meeting</h2>
+<div id="detail">
+	#{include 'ShareholdersMeetingInquiries/detail.html' /}	
+</div>
+<div id="actions" class="buttons">
+	#{if confirming}
+		<input type="button" id="confirm" value="Confirm" />
+		<input type="button" id="back" value="Back" />
+	#{/if}
+	#{elseif (mode == 'edit') && (!confirming)}
+		<input type="button" id="save" value="Save" />
+		<input type="button" id="cancel" value="Cancel" />
+	#{/elseif}
+	#{else}
+		<input type="button" id="cancel" value="Close" />
+	#{/else}
+</div>

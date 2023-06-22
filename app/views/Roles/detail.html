@@ -1,0 +1,775 @@
+#{extends 'templates/detail1.html' /}
+#{set pageTitle: 'Role Maintenance' /}
+#{set id:role?.roleKey /}
+
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{script 'lookups.js' /}
+<script type="text/javascript">
+	$(function() {
+		var mappingCount = ${role?.roleMappings?.size()};
+		var menuCount = ${role?.menus?.size()};
+		var reportCount = ${role?.reportMappings?.size()};
+		var worklistCount = ${role?.workflowMappings?.size()};
+		
+		var data = new Object();
+		tabRoleMapping(data);
+		
+		$('#tabs').tabs();
+		$('#tabs').css('height', '350');
+		
+		$('.buttons input:button').button();
+		$( "#dialog-message" ).css("display","none");
+		
+		// ================================= START ROLE MAPPING / GROUP ================================//
+	/*	var gridRoleMapping = $('#gridRoleMapping').dataTable({
+			aoColumnDefs: [{bVisible:false,aTargets:[0]},{bSortable:false,aTargets:[3]}],
+			aaSorting: [[1, 'asc']],
+			bAutoWidth: false,
+			bFilter: false,
+			bInfo: false,
+			bJQueryUI: true,	
+			bPaginate: false,
+			bSearch: false,	
+			bLengthChange:false,
+			iDisplayLength:15
+		});
+	*/	
+		// Delete row
+		$('#gridRoleMapping tbody tr #deleteButton').live('click', function() {
+			var row = $(this).parents('tr');
+			var rowNumber = tableRoleMapping.fnGetPosition(row[0]);
+			$("#dialog-message").dialog({
+				autoOpen:false,
+				height:120,
+				width:250,
+				modal:true,
+				resizable : false,
+				buttons: {
+					"Yes": function() {
+						tableRoleMapping.fnDeleteRow(rowNumber);
+						var idTable = $("#listGroup #gridRoleMapping");
+						var trs = $("tr", idTable);
+						$.each(trs, function(idx, data){
+							var hiddens = $("[type=hidden]", $(this));
+								$(hiddens).eq(0).attr("name", "mappings["+(idx-1)+"].groupName");
+						});
+						$("#dialog-message").dialog("close");
+					},
+					"No ": function() {
+						$("#dialog-message").dialog("close");
+					}	
+				}
+			});
+			$('#dialog-message').css('overflow','hidden');
+			$("#dialog-message").dialog('open');
+			$('.ui-widget-overlay').css('height',$('body').height());
+		});
+		
+		$( "#detailRoleMapping" ).dialog({
+			autoOpen:false,
+			modal:true,
+			heigth:'1000px',
+			width:'400px',
+			resizable:false
+		});
+
+		
+		$('#addGroup').die("click");
+		$('#addGroup').live("click", function(){
+			selectedRow = null;
+			$("#detailRoleMapping").dialog('open');
+			$('.ui-widget-overlay').css('height',$('body').height());
+			$("#detailRoleMapping :text").val(""); 
+			$("#detailRoleMapping :hidden").val("");
+			$("#errGroupName").html('');
+			return false;
+		});
+		
+		$('#cancelGroups').die("click");
+		$('#cancelGroups').live("click", function(){
+			$("#detailRoleMapping").dialog('close');
+			return false;
+		});
+		
+		$('#addGroups').die("click");
+		$('#addGroups').live("click", function(){
+			var table = $('#listGroup #gridRoleMapping').dataTable();
+			var rowPosition = $('#detailRoleMapping #rowPosition').val();
+			saveRoleMapping();
+			
+			function saveRoleMapping(){
+				var dataMapping = table.fnGetData(parseFloat(rowPosition));
+				if ($('#detailRoleMapping #groupNameText').val()==""){
+					//alert("Empty Field ! Please fill the required field()")
+					$("#errGroupName").html('Required');
+					return false;
+				}
+				
+				if (rowPosition != ""){
+					var found = false;
+					var rows = table.fnGetNodes().length;
+					for(i=0;i<rows;i++){
+						var cells = table.fnGetData(i);
+					}
+					if (!found) {
+						table.fnUpdate(dataMapping.groupName = $('#detailRoleMapping #groupNameText').val(), parseFloat(rowPosition),1);
+						$('#detailRoleMapping').dialog('close');
+					}
+				} else {
+					
+					var found = false;
+					var rows = table.fnGetNodes().length;
+					for(i=0;i<rows;i++){
+						var cells = table.fnGetData(i);
+					}
+					if (!found){
+						var dataMapping = new Object();
+						dataMapping.groupName = $('#detailRoleMapping #groupNameText').val();
+						dataMapping.roleMappingKey = $('#detailRoleMapping #roleMappingKey').val();
+						table.fnAddData(dataMapping);
+						$('#detailRoleMapping').dialog('close');
+					}
+				}
+				return false;
+			}
+			
+		});
+	/*	$('#groupKey').lookup({
+			list: '@{Pick.groups()}',
+			get: {
+				url: '@{Pick.group()}',
+				success: function(data) {
+					var rows = gridRoleMapping.fnGetNodes().length;
+					var found = false;
+					// Check duplicate row
+					for (i = 0; i < rows; i++) {
+						var nodes = gridRoleMapping.fnGetNodes(i);
+						var cells = $(nodes).find('td');
+						if ($(cells[1]).html() == 'Group') {
+							var groupKey = $(cells[2]).find('[name*="group.groupKey"]').val();
+							if (data.code == groupKey) {
+								alert("Group already exist");
+								found = true;
+								break;
+							}
+						}
+					}
+					// If no duplicate, then add new row
+					if (!found) {
+						gridRoleMapping.fnAddData([
+						                   		'',
+						                   		data.description,
+						                   		'Group',
+						                   		"<center><input type='button' value='Delete' id='deleteButton' /></center>" + 
+						                   	 	"<input type='hidden' name='mappings[" + mappingCount + "].roleMappingKey' value='' />" +
+						                   	 	"<input type='hidden' name='mappings[" + mappingCount + "].role.roleKey' value='${id}' />" +
+						                   	 	"<input type='hidden' name='mappings[" + mappingCount + "].user.userKey' value='' />" +
+						                   	 	"<input type='hidden' name='mappings[" + mappingCount + "].user.userId' value='' />" +
+						                   	 	"<input type='hidden' name='mappings[" + mappingCount + "].group.groupKey' value='" + data.code + "' />" +
+						                   	 	"<input type='hidden' name='mappings[" + mappingCount + "].group.groupName' value='" + data.description + "' />"
+						                     ]);
+						mappingCount++;
+					}
+					$('#groupKey').val('');
+				}
+			},
+			help: $('#addGroup')
+		});		
+	
+		$('#userKey').lookup({
+			list: '@{Pick.users()}',
+			get: {
+				url: '@{Pick.user()}',
+				success: function(data) {
+					var rows = gridRoleMapping.fnGetNodes().length;
+					var found = false;
+					// Check duplicate row
+					for (i = 0; i < rows; i++) {
+						var nodes = gridMenu.fnGetNodes(i);
+						var cells = $(nodes).find('td');
+						if ($(cells[1]).html() == 'User') {
+							var groupKey = $(cells[2]).find('[name*="user.userKey"]').val();
+							if (data.code == groupKey) {
+								alert("User already exist");
+								found = true;
+								break;
+							}
+						}
+					}
+					// If no duplicate, then add new row
+					if (!found) {
+						gridRoleMapping.fnAddData([
+						                   		'',
+						                   		data.userId,
+						                   		'User',
+						                   		"<center><input type='button' value='Delete' id='deleteButton' /></center>" + 
+						                   	 	"<input type='hidden' name='mappings[" + mappingCount + "].reportMappingKey' value='' />" +
+						                   	 	"<input type='hidden' name='mappings[" + mappingCount + "].role.roleKey' value='${id}' />" +
+						                   	 	"<input type='hidden' name='mappings[" + mappingCount + "].user.userKey' value='" + data.code + "' />" +
+						                   	 	"<input type='hidden' name='mappings[" + mappingCount + "].user.userId' value='" + data.userId + "' />" +
+						                   	 	"<input type='hidden' name='mappings[" + mappingCount + "].group.groupKey' value='' />" +
+						                   	 	"<input type='hidden' name='mappings[" + mappingCount + "].group.groupName' value='' />"
+						                     ]);
+						mappingCount++;
+					}
+					$('#userKey').val('');
+				}
+			},
+			help: $('#addUser')
+		});
+	*/	
+	
+		// ===================================== END ROLE MAPPING / GROUP =============================================//
+		
+		// ================================================= START MENU ===============================================//
+	
+		
+		var gridMenu = $('#gridMenu').dataTable({
+			aoColumnDefs: [{bVisible:false,aTargets:[0]},{bSortable:false,aTargets:[3]}],
+			aaSorting: [[1, 'asc']],
+			bAutoWidth: false,
+			bJQueryUI: true,
+			bLengthChange: false,
+		//	sScrollY: "200px",
+		//	sScrollX:"100%",
+	    //  bScrollCollapse: true
+		//	iDisplayLength: 7,
+			sPaginationType: 'full_numbers',
+			bInfo: true,
+			bPaginate: true,
+			iDisplayLength:7
+
+		});
+
+		$('#menuKey').lookup({
+			list: '@{Pick.menus()}',
+			get: {
+				url: '@{Pick.menu()}',
+				success: function(data) {
+					var rows = gridMenu.fnGetNodes().length;
+					var found = false;
+					// Check duplicate row
+					for (i = 0; i < rows; i++) {
+						var cell = gridMenu.fnGetData(i);
+						if (data.code == cell[0]) {
+							$("#errMenu").html('Menu (' + data.description + ') already exist !');
+							found = true;
+							break;
+						} else {
+							$("#errMenu").html('');
+						}
+					}
+					// If no duplicate, then add new row
+					if (!found) {
+						gridMenu.fnAddData([
+						                   		data.code,
+						                   		data.number,
+						                   		data.description,
+						                   		"<center><input type='button' value='Delete' id='deleteButton' /></center>" + 
+						                   	 	"<input type='hidden' name='menus[" + rows + "].menuKey' value='" + data.code + "' />" +
+						                   	 	"<input type='hidden' name='menus[" + rows + "].menuNumber' value='" + data.number + "' />" +
+						                   	 	"<input type='hidden' name='menus[" + rows + "].menuBreadCrumb' value='" + data.description + "' />"
+						                     ]);
+						rows++;
+					}
+					$('#menuKey').val('');
+				}
+			},
+			help: $('#addMenu')
+		});
+		
+		// Delete row Menu
+		$('#gridMenu tbody tr #deleteButton').live('click', function() {
+			var row = $(this).parents('tr');
+			var rowNumber = gridMenu.fnGetPosition(row[0]);
+			
+			$("#dialog-message").dialog({
+				autoOpen:false,
+				height:120,
+				width:250,
+				modal:true,
+				resizable : false,
+				buttons: {
+					"Yes": function() {
+						gridMenu.fnDeleteRow(rowNumber);
+						var idTable = $("#listMenu #gridMenu");
+						var trs = $("tr", idTable);
+						$.each(trs, function(idx, data){
+							var hiddens = $("[type=hidden]", $(this));
+								$(hiddens).eq(0).attr("name", "menus["+(idx-1)+"].menuKey");
+								$(hiddens).eq(1).attr("name", "menus["+(idx-1)+"].menuNumber");
+								$(hiddens).eq(2).attr("name", "menus["+(idx-1)+"].menuBreadCrumb");
+						});
+						$("#dialog-message").dialog("close");
+					},
+					"No ": function() {
+						$("#dialog-message").dialog("close");
+					}	
+				}
+			});
+			$('#dialog-message').css('overflow','hidden');
+			$("#dialog-message").dialog('open');
+			$('.ui-widget-overlay').css('height',$('body').height());
+		});
+		
+		// ================================================= END MENU ===============================================//
+		
+		// =============================================== START REPORT =============================================//
+		
+		var gridReport = $('#gridReport').dataTable({
+			aoColumnDefs: [{bVisible:false,aTargets:[0]},{bSortable:false,aTargets:[2]}],
+			aaSorting: [[1, 'asc']],
+			bAutoWidth: false,
+			bJQueryUI: true,
+			bLengthChange: false,
+		//	sScrollY: "200px",
+		//	sScrollX:"100%",
+	    //  bScrollCollapse: true
+		//	iDisplayLength: 7,
+			sPaginationType: 'full_numbers',
+			bInfo: true,
+			bPaginate: true,
+			iDisplayLength:7
+		});
+		
+		$('#reportKey').lookup({
+			list: '@{Pick.reportLoaders()}',
+			get: {
+				url: '@{Pick.reportLoader()}',
+				success: function(data) {
+					var rows = gridReport.fnGetNodes().length;
+					var found = false;
+					
+					// Check duplicate row
+						var idTable = $("#listReport #gridReport");
+						var trs = $("tr", idTable);
+						$.each(trs, function(idx, xx){
+							var hiddens = $("[type=hidden]", $(this));
+								var cell = $(hiddens).eq(1).attr("name", "reports["+(idx-1)+"].reportList.reportKey").val();
+								if (data.code == cell) {
+									$("#errReport").html('Report (' + data.name + ') already exist !');
+									found = true;
+									return false;
+								} else {
+									$("#errReport").html('');
+								}
+						});
+						
+					// If no duplicate, then add new row
+					if (!found) {
+						gridReport.fnAddData([
+						                   		data.code,
+						                   		data.name,
+						                   		"<center><input type='button' value='Delete' id='deleteButton' /></center>" + 
+						                   		"<input type='hidden' name='reports[" + rows + "].reportMappingKey' value='' />" +
+						                   		"<input type='hidden' name='reports[" + rows + "].reportLoader.reportKey' value='" + data.code + "' />" +
+						                   	 	"<input type='hidden' name='reports[" + rows + "].reportLoader.reportName' value='" + data.name + "' />"
+						                     ]);
+						rows++;
+					}
+//					alert(data.code);
+					$('#reportKey').val('');
+				}
+			},
+			help: $('#addReport')
+		});
+		
+		// Delete row
+		$('#gridReport tbody tr #deleteButton').live('click', function() {
+			var row = $(this).parents('tr');
+			var rowNumber = gridReport.fnGetPosition(row[0]);
+			$("#dialog-message").dialog({
+				autoOpen:false,
+				height:120,
+				width:250,
+				modal:true,
+				resizable : false,
+				buttons: {
+					"Yes": function() {
+						gridReport.fnDeleteRow(rowNumber);
+						var idTable = $("#listReport #gridReport");
+						var trs = $("tr", idTable);
+						$.each(trs, function(idx, data){
+							var hiddens = $("[type=hidden]", $(this));
+								$(hiddens).eq(0).attr("name", "reports["+(idx-1)+"].reportMappingKey");
+								$(hiddens).eq(1).attr("name", "reports["+(idx-1)+"].reportLoader.reportKey");
+								$(hiddens).eq(2).attr("name", "reports["+(idx-1)+"].reportLoader.reportName");
+						});
+						$("#dialog-message").dialog("close");
+					},
+					"No ": function() {
+						$("#dialog-message").dialog("close");
+					}	
+				}
+			});
+			$('#dialog-message').css('overflow','hidden');
+			$("#dialog-message").dialog('open');
+			$('.ui-widget-overlay').css('height',$('body').height());
+		});
+		
+		// =============================================== END REPORT =============================================//
+		
+		// ============================================= START WORKLIST ===========================================//
+		
+		var gridWorklist = $('#gridWorklist').dataTable({
+			aoColumnDefs: [{bVisible:false,aTargets:[0]},{bSortable:false,aTargets:[2]}],
+			aaSorting: [[1, 'asc']],
+			bAutoWidth: false,
+			bJQueryUI: true,
+			bLengthChange: false,
+		//	sScrollY: "200px",
+		//	sScrollX:"100%",
+	    //  bScrollCollapse: true
+		//	iDisplayLength: 7,
+			sPaginationType: 'full_numbers',
+			bInfo: true,
+			bPaginate: true,
+			iDisplayLength:7
+		});
+		
+		$('#worklistKey').lookup({
+			list: '@{Pick.worklists()}',
+			get: {
+				url: '@{Pick.worklist()}',
+				success: function(data) {
+					var rows = gridWorklist.fnGetNodes().length;
+					var found = false;
+					// Check duplicate row
+						var idTable = $("#listWorkflow #gridWorklist");
+						var trs = $("tr", idTable);
+						$.each(trs, function(idx, xx){
+							var hiddens = $("[type=hidden]", $(this));
+								var cell = $(hiddens).eq(1).attr("name", "workflowMappings["+(idx-1)+"].workflowDetail.workflowDetailKey").val();
+								if (data.code == cell) {
+									$("#errWorklist").html('Worklist (' + data.procDef + ') already exist !');
+									found = true;
+									return false;
+								} else {
+									$("#errWorklist").html('');
+								}
+						});
+
+					// If no duplicate, then add new row
+					if (!found) {
+						gridWorklist.fnAddData([
+						                   		data.code,
+						                   		data.procDef,
+						                   		"<center><input type='button' value='Delete' id='deleteButton' /></center>" + 
+						                   		"<input type='hidden' name='workflowMappings[" + rows + "].workflowMappingKey' value='' />" +
+						                   		"<input type='hidden' name='workflowMappings[" + rows + "].workflowDetail.workflowDetailKey' value='" + data.code + "' />" +
+						                   	 	"<input type='hidden' name='workflowMappings[" + rows + "].workflowDetail.processDefinition' value='" + data.procDef + "' />"
+						                     ]);
+						rows++;
+					}
+//					alert(data.code);
+					$('#worklistKey').val('');
+				}
+			},
+			help: $('#addWorklist')
+		});
+		
+		// Delete row
+		$('#gridWorklist tbody tr #deleteButton').live('click', function() {
+			var row = $(this).parents('tr');
+			var rowNumber = gridWorklist.fnGetPosition(row[0]);
+			$("#dialog-message").dialog({
+				autoOpen:false,
+				height:120,
+				width:250,
+				modal:true,
+				resizable : false,
+				buttons: {
+					"Yes": function() {
+						gridWorklist.fnDeleteRow(rowNumber);
+						var idTable = $("#listWorkflow #gridWorklist");
+						var trs = $("tr", idTable);
+						$.each(trs, function(idx, data){
+							var hiddens = $("[type=hidden]", $(this));
+								$(hiddens).eq(0).attr("name", "workflowMappings["+(idx-1)+"].workflowMappingKey");
+								$(hiddens).eq(1).attr("name", "workflowMappings["+(idx-1)+"].workflowDetail.workflowDetailKey");
+								$(hiddens).eq(2).attr("name", "workflowMappings["+(idx-1)+"].workflowDetail.processDefinition");
+						});
+						$("#dialog-message").dialog("close");
+					},
+					"No ": function() {
+						$("#dialog-message").dialog("close");
+					}	
+				}
+			});
+			$('#dialog-message').css('overflow','hidden');
+			$("#dialog-message").dialog('open');
+			$('.ui-widget-overlay').css('height',$('body').height());
+		});
+	});
+	
+	
+	function tabRoleMapping(data) {
+		var roleMappings;
+		#{if '${roleMappings}' != null}
+			roleMappings = ${roleMappings.raw()};
+		#{/if}
+		#{if '${roleMappings}' == null}
+			roleMappings = new Array();
+		#{/if}
+		
+			tableRoleMapping = $('#listGroup #gridRoleMapping').dataTable({
+				aaData: roleMappings,
+				aoColumns:[ {
+								bVisible:false,
+								fnRender: function(obj) {
+									var controls;
+									controls = obj.aData.roleMappingKey;
+									controls += '<input type="hidden" name="mappings[' + obj.iDataRow + '].roleMappingKey" value="' + obj.aData.roleMappingKey + '" />';
+									return controls;
+								}
+							},
+							{
+								fnRender: function(obj) {
+									var controls;
+									controls = obj.aData.groupName;
+									controls += '<input type="hidden" name="mappings[' + obj.iDataRow + '].groupName" value="' + obj.aData.groupName + '" />';
+									return controls;
+								}
+							},
+							{
+								fnRender: function(obj) {
+								 	var controls;
+								 	controls = '<center><input id="deleteButton" type="button" value="Delete" #{if readOnly}disabled="disabled"#{/if} /></center>';
+								 	return controls;
+							 	}
+							}
+							],
+				aaSorting:[[0, 'asc']],
+				bAutoWidth: false,		
+	        	bDestroy: true,
+	        	bFilter: false,
+	        	bInfo: false,
+	        	//bRetrieve:true,
+	        	//bServerSide: true,
+	        	bJQueryUI: true,
+	        	bPaginate: false,
+	        	bSearch: false,
+	        	bLengthChange: false,
+	        	isDisplayLength:10    	
+			});
+			
+			$("#listGroup #gridRoleMapping").removeAttr('style');
+			$('#listGroup #gridRoleMapping tbody tr td').die('click');
+			$('#listGroup #gridRoleMapping tbody tr td').live('click', function(){
+				var rowPos = $(this).parents('tr');
+				var rowPosNumber = tableRoleMapping.fnGetPosition(rowPos[0]);
+				var pos = tableRoleMapping.fnGetPosition(this);
+				cell = tableRoleMapping.fnGetData(this.parentNode);
+				if (pos[1] != 1) {
+					dataMapping = tableRoleMapping.fnGetData(this.parentNode);
+					$("#detailRoleMapping #groupNameText").val(dataMapping.groupName);
+					$("#detailRoleMapping #roleMappingKey").val(dataMapping.roleMappingKey);
+					$("#detailRoleMapping #rowPosition").val(rowPosNumber);
+					$("#errGroupName").html('');
+					$('#detailRoleMapping').dialog('open');
+					$('.ui-widget-overlay').css('height',$('body').height());
+				}
+			});
+	}
+</script>
+#{hidden name:'role.organization.organizationId', value:role?.organization?.organizationId /}
+#{hidden name:'role.roleKey', value:role?.roleKey /}
+<div id="tabs">
+	<ul>
+		<li><a href="#tab-1">Role Detail</a></li>
+		<li><a href="#tab-2">Group</a></li>
+		<li><a href="#tab-3">Menu</a></li>
+		<li><a href="#tab-4">Report</a></li>
+		<li><a href="#tab-5">Worklist</a></li>
+	</ul>
+	<div class="pane" id="tab-1">
+		<p>			
+			#{textBox id:'name', name:'role.roleName', label:'Name', value:role?.roleName, class:"capitalize", width:'300px', required:true, readOnly:readOnly, maxLength:50 /}
+			<span class="error">#{error 'role.roleName' /}</span>
+		</p>
+		<p>
+			#{radioButton id:'isActive', name:'role.isActive', value:((role?.isActive)?'true':'false'), label:'Active', options:operators, readOnly:readOnly /}
+		</p>			
+	</div>
+	<div class="pane" id="tab-2">
+		<div id="listGroup" style="overflow-y:scroll;height:250px">
+		#{hidden id:'roleMappingKey' /}
+		<table id="gridRoleMapping" class="display">
+			<thead>
+				<tr>
+					<th>Key</th>					
+					<th>Member</th>					
+					<th width="100px">Action</th>
+				</tr>
+			</thead>
+			<tbody>
+			 	#{list mappings, as:'mapping'}
+				<tr>
+					<td>
+						${mapping.roleMappingKey}
+					</td>
+					<td>
+						${mapping.groupName}
+					</td>
+					<td>
+						<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} /></center>
+						#{hidden name:'mappings[' + (item_index-1) + '].roleMappingKey', value:mapping?.roleMappingKey /}
+						#{hidden name:'mappings[' + (item_index-1) + '].groupName', value:mapping?.groupName /}
+					</td>	
+				</tr>
+				#{/list}
+			</tbody>
+		</table>
+		</div>
+		#{if (!confirming && mode != 'view')}
+		<br/>
+		<div class="buttons">
+			<input type="button" id="addGroup" value="Add Group" />
+		</div>
+		#{/if}
+		<div id="detailRoleMapping" title="Group Name" class="form">
+		<br />
+			<p>
+			#{hidden id:'rowPosition' /}
+			#{hidden id:'roleMappingKey', name:'mapping.roleMappingKey', value:mapping?.roleMappingKey /}
+			#{textBox id:'groupNameText', name:'mapping.groupName', label:'Group Name', value:mapping?.groupName, class:"capitalize", width:'200px', required:true, readOnly:readOnly, maxLength:100 /}
+			<span id="errGroupName" class="error"></span>
+			</p>
+			<br />
+			<br />
+			<div class="buttons">
+			#{ifnot confirming}
+				<input type="button" id="addGroups" value="Save" />
+				<input type="button" id="cancelGroups" value="Cancel" />
+			#{/ifnot}
+			#{if confirming}
+				<input type="button" id="cancelGroups" value="Close" />
+			#{/if}	
+			</div>
+		</div>		
+	</div>
+	<div class="pane" id="tab-3">
+		<div id="listMenu" >
+		#{hidden id:'menuKey' /}
+		<table id="gridMenu" class="display">
+			<thead>
+				<tr>
+					<th>Key</th>					
+					<th width="100">Program No</th>
+					<th width="500">Path</th>	
+					<th width="80">Action</th>
+				</tr>
+			</thead>
+			<tbody>
+			 	#{list role?.menus, as:'item'}
+				<tr>
+					<td>
+						${item?.menuKey}
+					</td>
+					<td>
+						${item?.menuNumber}
+					</td>
+					<td>
+						${item?.menuBreadCrumb } 
+					</td>
+					<td>
+						<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} /></center>
+						#{hidden name:'menus[' + (item_index-1) + '].menuKey', value:item?.menuKey /}
+						#{hidden name:'menus[' + (item_index-1) + '].menuNumber', value:item?.menuNumber /}
+						#{hidden name:'menus[' + (item_index-1) + '].menuBreadCrumb', value:item?.menuBreadCrumb /}
+					</td>	
+				</tr>
+				#{/list}
+			</tbody>
+		</table>
+		<span id="errMenu" class="error"></span>
+		</div>
+		#{if (!confirming && mode != 'view')}
+		<div class="buttons">
+			<input type="button" id="addMenu" value="Add" />
+		</div>	
+		#{/if}
+	</div>
+	<div class="pane" id="tab-4">
+		<div id="listReport" >
+		#{hidden id:'reportKey' /}
+		<table id="gridReport" class="display">
+			<thead>
+				<tr>
+					<th>Key</th>					
+					<th>Report Name</th>
+					<th width="120">Action</th>
+				</tr>
+			</thead>
+			<tbody>
+			 	#{list role?.reportMappings, as:'item'}
+				<tr>
+					<td>
+						${item?.reportMappingKey}
+					</td>
+					<td>
+						${item?.reportLoader?.reportName}
+					</td>
+					<td>
+						<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} /></center>
+						#{hidden name:'reports[' + (item_index-1) + '].reportMappingKey', value:item?.reportMappingKey /}
+						#{hidden name:'reports[' + (item_index-1) + '].reportLoader.reportKey', value:item?.reportLoader?.reportKey /}
+						#{hidden name:'reports[' + (item_index-1) + '].reportLoader.reportName', value:item?.reportLoader?.reportName /}
+					</td>	
+				</tr>
+				#{/list}
+			</tbody>
+		</table>
+		<span id="errReport" class="error"></span>
+		</div>
+		#{if (!confirming && mode != 'view')}
+		<div class="buttons">
+			<input type="button" id="addReport" value="Add" />
+		</div>	
+		#{/if}
+	</div>
+	<div class="pane" id="tab-5">
+		<div id="listWorkflow" >
+		#{hidden id:'worklistKey' /}
+		<table id="gridWorklist" class="display">
+			<thead>
+				<tr>
+					<th>Key</th>					
+					<th>Worklist Name</th>
+					<th width="120">Action</th>
+				</tr>
+			</thead>
+			<tbody>
+			 	#{list role?.workflowMappings, as:'item'}
+				<tr>
+					<td>
+						${item?.workflowMappingKey}
+					</td>
+					<td>
+						${item?.workflowDetail?.processDefinition}
+					</td>
+					<td>
+						<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} /></center>
+						#{hidden name:'workflowMappings[' + (item_index-1) + '].workflowMappingKey', value:item?.workflowMappingKey /}
+						#{hidden name:'workflowMappings[' + (item_index-1) + '].workflowDetail.workflowDetailKey', value:item?.workflowDetail?.workflowDetailKey /}
+						#{hidden name:'workflowMappings[' + (item_index-1) + '].workflowDetail.processDefinition', value:item?.workflowDetail?.processDefinition /}
+					</td>	
+				</tr>
+				#{/list}
+			</tbody>
+		</table>
+		<span id="errWorklist" class="error"></span>
+		</div>
+		#{if (!confirming && mode != 'view')}
+		<div class="buttons">
+			<input type="button" id="addWorklist" value="Add" />
+		</div>	
+		#{/if}
+	</div>
+	
+</div>
+<div id="dialog-message" title="Message Confirmation">
+	<p>
+	<span class="ui-icon ui-icon-notice" style="float:left; margin:0 7px 50px 0;"></span>
+	Are you sure to delete data ? </p>
+</div>

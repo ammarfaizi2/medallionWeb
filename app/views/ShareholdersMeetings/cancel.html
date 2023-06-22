@@ -1,0 +1,179 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Cancel Company/Shareholders Meeting' /}
+#{set fixData: true /}
+#{set mode: mode /}
+#{script 'lookups.js' /}
+
+<script type="text/javascript">
+	$(function() {
+		$('#MeetingNoOperator').children().eq(0).remove();
+		// Search section
+		$('#accordion').accordion({
+			collapsible: true
+		});
+		$('.buttons button:first').button({
+			icons: {
+				primary: 'ui-icon-search'
+			}
+		}).next().button();	
+		
+		$('#new').click(function() {
+			location.href="@{entry()}";			
+		});
+		
+		$('#issuerCode').lookup({
+				list:'@{Pick.thirdParties()}?type=THIRD_PARTY-ISSUER',
+				get:{
+					url:'@{Pick.thirdParty()}?type=THIRD_PARTY-ISSUER',
+					success: function(data){
+							$('#issuerCode').removeClass('fieldError');
+							$('#issuerCode').val(data.name);
+							$('#issuerKey').val(data.code);
+							$('#issuerDesc').val(data.description);
+							$('#h_issuerDesc').val(data.description);
+					},
+					error: function(data){
+						$('#issuerCode').addClass('fieldError');
+						$('#issuerCode').val('');
+						$('#issuerKey').val('');
+						$('#issuerDesc').val('NOT FOUND');
+						$('#h_issuerDesc').val('');
+					}
+			},
+			description:$('#issuerDesc'),
+			help:$('#issuerHelp')
+		});
+		
+		$('#reset').click(function() {
+			location.href="@{ShareholdersMeetings.cancel()}";		
+		});
+		
+		$('.buttons input:button').button();
+			
+	
+	});
+
+// 	$('#meetingDateFrom').change(function(){
+//         var dateFrom = $(this).datepicker('getDate');
+//         var dateTo = $('#meetingDateTo').datepicker('getDate');
+//         var origin = 'from';
+//         var id = '#meetingDate';
+//         if ((($(this).val()!='') || ($(this).hasClass('fieldError'))) && ($('#meetingDateTo').val()!='')) {
+//             //compareDateFromTo(dateFrom, dateTo, origin, id);
+//             compareDateFromToEqual(dateFrom, dateTo, origin, id);
+//         }
+//     });
+    
+//     $('#meetingDateTo').change(function(){
+//         var dateFrom = $('#meetingDateFrom').datepicker('getDate');
+//         var dateTo = $(this).datepicker('getDate');
+//         var origin = 'to';
+//         var id = '#meetingDate';
+//         if ((($(this).val()!='') || ($(this).hasClass('fieldError'))) && ($('#meetingDateFrom').val()!='')) {
+//             //compareDateFromTo(dateFrom, dateTo, origin, id);
+//             compareDateFromToEqual(dateFrom, dateTo, origin, id);
+//         }
+//     });
+
+// 	function validateSearch() {
+// 		if (($('#meetingDateFrom').val() == '') || ($('#meetingDateTo').val() == '')) {
+// 			if ($('#meetingDateFrom').val() == '') {
+// 				$('#meetingDateFromError').html('required');
+// 			} else {
+// 				$('#meetingDateFromError').html('');
+// 				return true;
+// 			}
+
+// 			if ($('#meetingDateTo').val() == '') {
+// 				$('#meetingDateToError').html('required');
+// 			} else {
+// 				$('#meetingDateToError').html('');
+// 				return true;
+// 			}
+			
+// 			return false;
+// 		} else if (($('#meetingDateFrom').val() != '') && ($('#meetingDateTo').val() != '')) {
+// 			var meetingDateFrom = new Date($('#meetingDateFrom').datepicker('getDate')).getTime();
+// 			var meetingDateTo = new Date($('#meetingDateTo').datepicker('getDate')).getTime();
+// 			if (meetingDateFrom > meetingDateTo){
+// 				$('#meetingDateFrom').addClass('fieldError');
+// 				$('#meetingDateFromError').html('Can not greater than Meeting Date To');
+// 			} else {
+// 				$('#meetingDateFrom').removeClass('fieldError');
+// 				$('#meetingDateFromError').html('');
+// 				return true;
+// 			}
+			
+// 			return false;
+// 		}
+		
+// 		return true;
+// 	}
+</script>
+
+<div id="accordion">
+	<h3><a href="#">Search Meeting</a></h3>
+	<form id="searchForm" class="form">
+		<input id="param" name="params.param" type="hidden" value="${param}"/>
+		#{hidden id:'query', name:'params.query', value:params?.query /}
+		<p>
+			#{textBox id:'meetingDateFrom', name:'params.meetingDateFrom', label:'Meeting Date From', value:params?.meetingDateFrom?.format(appProp.dateFormat), width:'85px', class:'calendar', required:true /}(${appProp.displayDateFormat})
+			<span id="meetingDateFromError" class="error">#{error 'Meeting Date From is' /}</span> 
+			<b>To </b> <span class="req">*</span>
+			#{textBox id:'meetingDateTo', name:'params.meetingDateTo', value:params?.meetingDateTo?.format(appProp.dateFormat), width:'85px', class:'calendar', required:true /}(${appProp.displayDateFormat})
+			<span id="meetingDateToError" class="error">#{error 'Meeting Date To is' /}</span>
+		</p>
+		<p>
+			#{textBox id:'issuerCode', name:'csMeeting.issuer.thirdPartyCode', label:'Issuer Code', value:csMeeting?.issuer?.thirdPartyCode, class:'lookup capitalize', readOnly:readOnly, width:'85px' /}
+			#{button id:'issuerHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'issuerDesc', name:'csMeeting.issuer.thirdPartyName', value:csMeeting?.issuer?.thirdPartyName, readOnly:true, width:'210px' /}
+			#{hidden id:'issuerKey', name:'params.searchThirdPartyKey', value:params?.searchThirdPartyKey /}
+			<span id="issuerCodeError" class="error">#{error 'Issuer Code is' /}</span>
+		</p>
+		<p>
+			#{dropDownList id:'MeetingNoOperator', name:'params.MeetingNoOperator', label:'Meeting No', options:stringOperators, value:params?.MeetingNoOperator /}
+			#{textBox id:'meetingSearchNoOperator', name:'params.meetingSearchNoOperator', value:params?.meetingSearchNoOperator, class:'capitalize' /}
+		</p>
+		<p>
+			<div class="buttons">
+				<input type="button" id="search" value="Search" />				
+				<input type="button" id="reset" value="Reset" />					
+			</div>
+		</p>
+	</form>
+</div>	
+
+<!-- div id="result" style="display:none">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<div class="response"></div>
+</div -->
+
+
+<div id="result" style="display:none">
+	<table id="metingCancel" class="display">
+		<thead>
+			<tr>
+				<!--<th field="auditTrailKey|string|none|left|sort">Key</th>-->
+				<th field="meetingKey|string|none|left|sort">MEETING NO</th>
+				<th field="meetingSubject|string|none|left|sort">MEETING SUBJECT</th>
+				<th field="security.securityType.securityType|string|none|left|sort">SECURITY TYPE</th>
+				<th field="security.securityId|string|none|left|sort">SECURITY CODE</th>
+				<th field="announcementDate|date|date|center|sort">ANOUNCEMENET DATE</th>
+				<th field="meetingDate|date|date|center|sort">MEETING DATE</th>
+				
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+	
+</div>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'ShareholdersMeetings/ShareholdersMeetingsPaging.js' /}
+	$(document).ready(function() {
+		Paging($("#accordion").add("#result"));
+	});
+</script>
+

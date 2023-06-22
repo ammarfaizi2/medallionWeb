@@ -1,0 +1,1451 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Role Maintenance' /}
+#{set id:role?.roleKey /}
+
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{script 'lookups.js' /}
+<script type="text/javascript">
+	$(function() {
+		$('#tabs').tabs();
+		$('#tabs').css('height', '380');
+		$("#addReport").button();
+		$("#addReport").button("option", "disabled", true);
+		$("#addWorklist").button();
+		$("#addWorklist").button("option", "disabled", true);
+		$("#addReportPdi").button();
+		$("#addReportPdi").button("option", "disabled", true);
+		$("#addUploadlist").button();
+		$("#addUploadlist").button("option", "disabled", true);
+		$("#addDownloadlist").button();
+		$("#addDownloadlist").button("option", "disabled", true);
+		
+		$('.buttons input:button').button();
+		$( "#dialog-message1" ).css("display","none");
+		
+		if (('${mode}'=='entry') || (('${mode}'=='edit') && (('${role?.recordStatus?.decodeStatus()}' == 'Reject') || ($("#status").val() == 'R')))) {
+			$('input[name=isActive]').attr("disabled", "disabled");
+		}
+		
+		if (('${confirming}' != 'true')&&('${mode}' == 'entry')){
+			var	role = new Object();
+			role.users = new Array();
+			role.menus = new Array();
+			role.reportMappings = new Array();
+			role.workflowMappings = new Array();
+			role.reportPdiMappings = new Array();
+			role.listUploads = new Array();
+			role.listDownloads = new Array();
+
+			var users = (role.users);
+			var menus = (role.menus);
+			var reportMappings = (role.reportMappings);
+			var workflowMappings = (role.workflowMappings);
+			var reportPdiMappings = (role.reportPdiMappings);
+			var listUploads = (role.listUploads);
+			var listDownloads = (role.listDownloads); 
+			
+			$('input[name=isActive]').attr("disabled", "disabled");
+			
+		}
+		
+		if (('${mode}' == 'edit')||('${confirming}' == 'true')||('${mode}'=='view')) {
+			var role = ${roles.raw()};
+			var users = (role.users);
+			var menus = (role.menus);
+			var reportMappings = (role.reportMappings);
+			var workflowMappings = (role.workflowMappings);
+			var reportPdiMappings = (role.reportPdiMappings);
+			var listUploads = (role.listUploads);
+			var listDownloads = (role.listDownloads); 
+			$('#roleKey').val(role.roleKey);
+			$('#roleName').val(role.roleName);
+			$('#isActiveHidden').val(role.isActive);
+			
+			if ('${menuNumber}'=='${menuNumbers}') $("#addReport").button("option", "disabled", false);
+			if ('${wfSingle}'=='${wfSingles}' || '${wfBatch}'=='${wfBatchs}') $("#addWorklist").button("option", "disabled", false);
+			if ('${RptPdi}'=='${RptPdis}') $("#addReportPdi").button("option", "disabled", false);
+			if ('${menuUpl}'=='${menuUpls}') $("#addUploadlist").button("option", "disabled", false);
+			if ('${menuDwl}'=='${menuDwls}') $("#addDownloadlist").button("option", "disabled", false);
+			
+			/* if (reportMappings != '') $("#addReport").button("option", "disabled", false);
+			if (workflowMappings != '') $("#addWorklist").button("option", "disabled", false);
+			if (reportPdiMappings != '' ) $("#addReportPdi").button("option", "disabled", false);
+			if (listUploads != '' ) $("#addUploadlist").button("option", "disabled", false);
+			if (listDownloads != '' ) $("#addDownloadlist").button("option", "disabled", false); */
+			
+			// disabled isactive if have no key (mode entry)
+			if ('${id}'==''){
+				$('input[name=isActive]').attr("disabled", "disabled");
+			}
+		}
+		
+		var closeDialog = function() {
+			$("#dialog-message").dialog("close");
+		}
+		
+		$('input[name=isActive]').change(function(){
+			$("input[name='role.isActive']").val($("input[name='isActive']:checked").val());
+		});
+		
+		// ================================= START ROLE MAPPING / USER ================================//
+		
+		// == Declare datatable for Group/Role Mapping == //
+		var gridUser = $('#gridUser').dataTable({
+			aaData:users,
+			aoColumns: [   {
+								bVisible:false,
+								mDataProp:'userKey'
+							}, 
+							{
+								
+								fnRender: function(obj) {
+									var controls;
+									controls = obj.aData.userId;
+									controls += '<input type="hidden" name="users[' + obj.iDataRow + '].userId" value="' + obj.aData.userId + '" />';
+									return controls;
+								}
+							},
+							{
+								
+								fnRender: function(obj) {
+									var controls;
+									controls = obj.aData.userName;
+									controls += '<input type="hidden" name="users[' + obj.iDataRow + '].userName" value="' + obj.aData.userName + '" />';
+									return controls;
+								}
+							},
+							{
+					               fnRender: function(obj) {
+					            	   var controls;
+					            	   controls = '<center><input id="deleteButton" type="button" value="Delete" #{if readOnly}disabled="disabled"#{/if} /></center>';
+					            	   controls += '<input type="hidden" name="users[' + obj.iDataRow + '].userKey" value="' + obj.aData.userKey + '" />';
+					            	   //controls += '<input type="hidden" name="roleMappings[' + obj.iDataRow + '].roleMappingKey" value="' + obj.aData.roleMappingKey + '" />';
+					            	   return controls;
+					               }
+					        }
+							],
+			aaSorting: [[1, 'asc']],
+			bAutoWidth: false,
+			bDestroy: true,
+			bJQueryUI: true,
+			bLengthChange: false,
+			sPaginationType: 'full_numbers',
+			bInfo: true,
+			bPaginate: true,
+			iDisplayLength:7
+		});
+		
+		// == Delete Group in Grid == //
+		$('#gridUser tbody tr #deleteButton').live('click', function() {
+			var row = $(this).parents('tr');
+			var rowNumber = gridUser.fnGetPosition(row[0]);
+			var deleteUser = function(){
+				gridUser.fnDeleteRow(rowNumber);
+				var idTable = $("#listUser #gridUser");
+				var trs = $("tr", idTable);
+				$.each(trs, function(idx, data){
+					var hiddens = $("[type=hidden]", $(this));
+						$(hiddens).eq(0).attr("name", "users["+(idx-1)+"].userId");
+						$(hiddens).eq(1).attr("name", "users["+(idx-1)+"].userName");
+						$(hiddens).eq(2).attr("name", "users["+(idx-1)+"].userKey");
+				});
+				$("#dialog-message").dialog("close");
+			}
+			
+			messageAlertYesNo("Are you sure to delete data ?", "ui-icon ui-icon-notice", "Confirmation Message", deleteUser, closeDialog);
+			/* $("#dialog-message1").dialog({
+				autoOpen:false,
+				height:120,
+				width:250,
+				modal:true,
+				resizable : false,
+				buttons: {
+					"Yes": function() {
+						gridUser.fnDeleteRow(rowNumber);
+						var idTable = $("#listUser #gridUser");
+						var trs = $("tr", idTable);
+						$.each(trs, function(idx, data){
+							var hiddens = $("[type=hidden]", $(this));
+								$(hiddens).eq(0).attr("name", "users["+(idx-1)+"].userId");
+								$(hiddens).eq(1).attr("name", "users["+(idx-1)+"].userName");
+								$(hiddens).eq(2).attr("name", "users["+(idx-1)+"].userKey");
+						});
+						
+						$("#dialog-message1").dialog("close");
+					},
+					"No ": function() {
+						$("#dialog-message1").dialog("close");
+					}	
+				}
+			});
+			$('#dialog-message1').css('overflow','hidden');
+			$("#dialog-message1").dialog('open'); */
+		});
+		
+		// Process lookup Group and Place into grid == /
+		$('#userKey').lookup({
+			list: '@{Pick.users()}',
+			get: {
+				url: '@{Pick.user()}',
+				success: function(data) {
+					var rows = gridUser.fnGetNodes().length;
+					var found = false;
+					// Check duplicate row
+					for (i = 0; i < rows; i++) {
+						var cell = gridUser.fnGetData(i);
+						if (data.code == cell.userKey) {
+							$('#errUser').html('User "'+ data.description +'" is already exist !');
+							found = true;
+							break;
+						} else {
+							$('#errUser').html('');
+						}
+						
+					}
+					// If no duplicate, then add new row
+					if (!found) {
+						var user = new Object();
+						//roleMap.user = new Object();
+						//roleMap.roleMappingKey = "";
+						user.userKey = data.code;
+						user.userId = data.userId;
+						user.userName = data.description;
+						gridUser.fnAddData(user);
+					}
+					$('#userKey').val('');
+				}
+			},
+			help: $('#addUser')
+		});		
+	
+		// ===================================== END ROLE MAPPING / USER =============================================//
+		
+		// ================================================= START MENU ===============================================//
+	
+		// ==  Declare datatable for Menu == //
+		var gridMenu = $('#gridMenu').dataTable({
+			aaData : menus,
+			aoColumns: [{
+							  bVisible:false,
+							  mDataProp:'menuKey'
+						  },
+						  {
+							  fnRender: function(obj) {
+								  var controls;
+								  controls = obj.aData.menuNumber;
+								  controls += '<input type="hidden" name="menus[' + obj.iDataRow + '].menuNumber" value="' + obj.aData.menuNumber + '" />';
+								  return controls;
+							  }
+						  },
+						  {
+							  fnRender: function(obj) {
+								  var controls;
+								  controls = obj.aData.menuBreadCrumb;
+								  controls += '<input type="hidden" name="menus[' + obj.iDataRow + '].menuBreadCrumb" value="' + obj.aData.menuBreadCrumb + '" />';
+								  return controls;
+							  }
+						  },
+						  {
+							  fnRender: function(obj) {
+				            	   var controls;
+				            	   controls = '<center><input id="deleteButton" type="button" value="Delete" #{if readOnly}disabled="disabled"#{/if} /></center>';
+				            	   controls += '<input type="hidden" name="menus[' + obj.iDataRow + '].menuKey" value="' + obj.aData.menuKey + '" />';
+				            	   return controls;
+				               }
+						  }
+						  ],
+			aaSorting: [[1, 'asc']],
+			bAutoWidth: false,
+			bJQueryUI: true,
+			bLengthChange: false,
+			sPaginationType: 'full_numbers',
+			bInfo: true,
+			bPaginate: true,
+			iDisplayLength:7
+
+		});
+
+		// == Process lookup Menu and place into grid == //
+		$('#menuKey').lookup({
+			list: '@{Pick.menus()}',
+			get: {
+				url: '@{Pick.menu()}',
+				success: function(data) {
+					var rows = gridMenu.fnGetNodes().length;
+					var found = false;
+					// Check duplicate row
+					
+					for (i = 0; i < rows; i++) {
+						var cell = gridMenu.fnGetData(i);
+						
+						if (data.code == cell.menuKey) {
+							$("#errMenu").html('Menu with Program No "' + data.number + '" is already exist !');
+							found = true;
+							break;
+						} else {
+							$("#errMenu").html('');
+						}
+					}
+					// If no duplicate, then add new row
+					if (!found) {
+						var menuList = new Object();
+						menuList.menuKey = data.code;
+						menuList.menuNumber = data.number;
+						menuList.menuBreadCrumb = data.description;
+						gridMenu.fnAddData(menuList);
+					}
+					if (data.number == '${menuNumbers}') $("#addReport").button('option', 'disabled', false);
+					if ((data.number == '${wfSingles}')||(data.number == '${wfBatchs}')) $("#addWorklist").button("option", "disabled", false);
+					if (data.number == '${RptPdis}') $("#addReportPdi").button('option', 'disabled', false);
+					if (data.number == '${menuUpls}') $("#addUploadlist").button('option', 'disabled', false);
+					if (data.number == '${menuDwls}') $("#addDownloadlist").button('option', 'disabled', false);
+					
+					$('#menuKey').val('');
+				}
+			},
+			help: $('#addMenu')
+		});
+		
+		// == Delete Menu in Grid == //
+		$('#gridMenu tbody tr #deleteButton').live('click', function() {
+			var row = $(this).parents('tr');
+			var rowNumber = gridMenu.fnGetPosition(row[0]);
+			var rows = gridMenu.fnGetNodes().length;
+			var cell = gridMenu.fnGetData(rowNumber);
+			var deleteMenu = function(){
+				gridMenu.fnDeleteRow(rowNumber);
+				var idTable = $("#listUser #gridUser");
+				var trs = $("tr", idTable);
+				var idTable = $("#listMenu #gridMenu");
+				var trs = $("tr", idTable);
+				$.each(trs, function(idx, data){
+					var hiddens = $("[type=hidden]", $(this));
+					var cell = gridMenu.fnGetData(idx);
+						$(hiddens).eq(0).attr("name", "menus["+(idx-1)+"].menuNumber");
+						$(hiddens).eq(1).attr("name", "menus["+(idx-1)+"].menuBreadCrumb");
+						$(hiddens).eq(2).attr("name", "menus["+(idx-1)+"].menuKey");
+				});
+				
+				var jumlah = 0;
+				
+				for (i=0; i<rows;i++){
+					if (cell.menuNumber=='${wfSingles}'){
+						jumlah = jumlah +1;
+					}else if (cell.menuNumber=='${wfBatchs}'){
+						jumlah = jumlah +1;
+					}
+				}
+				
+	
+				if (cell.menuNumber=='${menuNumbers}') {
+					gridReport.fnClearTable();
+					$("#addReport").button('option', 'disabled', true);
+				}
+				
+				if (jumlah == 1){
+					gridWorklist.fnClearTable();
+					$("#addWorklist").button("option", "disabled", true);
+				}
+				/*if ((cell.menuNumber=='${wfSingles}')||(cell.menuNumber=='${wfBatchs}')) {
+					if ((cell.menuNumber=='${wfSingles}')&&(cell.menuNumber=='${wfBatchs}')) {
+						alert("a");
+						gridWorklist.fnClearTable();
+						$("#addWorklist").button("option", "disabled", true);
+					}else{
+						alert("b");
+					}
+					
+				}*/
+				if (cell.menuNumber=='${RptPdis}') {
+					gridReportPdi.fnClearTable();
+					$("#addReportPdi").button("option", "disabled", true);
+				}
+				if (cell.menuNumber=='${menuUpls}') {
+					gridUpload.fnClearTable();
+					$("#addUploadlist").button("option", "disabled", true);
+				}
+				if (cell.menuNumber=='${menuDwls}') {
+					gridDownload.fnClearTable();
+					$("#addDownloadlist").button("option", "disabled", true);
+				}
+				$("#dialog-message").dialog('close');
+			}
+			
+			messageAlertYesNo("Are you sure to delete data ?", "ui-icon ui-icon-notice", "Confirmation Message", deleteMenu, closeDialog);
+			
+			/* $("#dialog-message1").dialog({
+				autoOpen:false,
+				height:120,
+				width:250,
+				modal:true,
+				resizable : false,
+				buttons: {
+					"Yes": function() {
+						var rows = gridMenu.fnGetNodes().length;
+						var cell = gridMenu.fnGetData(rowNumber);
+						gridMenu.fnDeleteRow(rowNumber);
+						var idTable = $("#listMenu #gridMenu");
+						var trs = $("tr", idTable);
+						$.each(trs, function(idx, data){
+							var hiddens = $("[type=hidden]", $(this));
+							var cell = gridMenu.fnGetData(idx);
+								$(hiddens).eq(0).attr("name", "menus["+(idx-1)+"].menuNumber");
+								$(hiddens).eq(1).attr("name", "menus["+(idx-1)+"].menuBreadCrumb");
+								$(hiddens).eq(2).attr("name", "menus["+(idx-1)+"].menuKey");
+						});
+						
+						$("#dialog-message1").dialog("close");
+
+						if (cell.menuNumber=='RPL001') {
+							gridReport.fnClearTable();
+							$("#addReport").button('option', 'disabled', true);
+						}
+						if ((cell.menuNumber=='WF0000')||(cell.menuNumber=='WF0001')) {
+							gridWorklist.fnClearTable();
+							$("#addWorklist").button("option", "disabled", true);
+						}
+					},
+					"No ": function() {
+						$("#dialog-message1").dialog("close");
+					}	
+				}
+			});
+			$('#dialog-message1').css('overflow','hidden');
+			$("#dialog-message1").dialog('open'); */
+		});
+		
+		// ================================================= END MENU ===============================================//
+		
+		// =============================================== START REPORT =============================================//
+		
+		// == Declare datatable for Report == //
+		var gridReport = $('#gridReport').dataTable({
+			aaData:reportMappings,
+			aoColumns: [{
+							bVisible:false,
+							mDataProp:'reportLoader.reportKey'
+						},
+						{
+							fnRender: function(obj){
+								var controls;
+								controls = obj.aData.reportLoader.reportName;
+								controls += '<input type="hidden" name="reportMappings[' + obj.iDataRow + '].reportLoader.reportName" value="' + obj.aData.reportLoader.reportName + '" />';
+								return controls;
+							}
+						},
+						{
+							fnRender: function(obj) {
+				            	var controls;
+				            	controls = '<center><input id="deleteButton" type="button" value="Delete" #{if readOnly}disabled="disabled"#{/if} /></center>';
+				            	controls += '<input type="hidden" name="reportMappings[' + obj.iDataRow + '].reportMappingKey" value="' + obj.aData.reportMappingKey + '" />';
+				            	controls += '<input type="hidden" name="reportMappings[' + obj.iDataRow + '].reportLoader.reportKey" value="' + obj.aData.reportLoader.reportKey + '" />';
+				            	return controls;
+				            }
+						}
+						],
+			aaSorting: [[1, 'asc']],
+			bAutoWidth: false,
+			bJQueryUI: true,
+			bLengthChange: false,
+			sPaginationType: 'full_numbers',
+			bInfo: true,
+			bPaginate: true,
+			iDisplayLength:7
+		});
+		
+		// == Process lookup report and place into grid == //
+		$('#reportKey').lookup({
+			list: '@{Pick.reportLoaders()}',
+			get: {
+				url: '@{Pick.reportLoader()}',
+				success: function(data) {
+					//alert("data =" +data+" == DATA.NAME = "+data.name)
+					var rows = gridReport.fnGetNodes().length;
+					var found = false;
+					
+					// Check duplicate row
+						var idTable = $("#listReport #gridReport");
+						var trs = $("tr", idTable);
+						$.each(trs, function(idx, xx){
+							var hiddens = $("[type=hidden]", $(this));
+								var cell = $(hiddens).eq(2).attr("name", "reportMappings["+(idx-1)+"].reportLoader.reportKey").val();
+								//alert("CELL = " +cell + " >>> DATA.CODE = " +data.code);
+								if ((data.code == cell) && (cell!='undefined')){
+									$("#errReport").html('Report "' + data.name + '" is already exist !');
+									found = true;
+									return false;
+								} else {
+									$("#errReport").html('');
+								}
+						});
+						
+					// If no duplicate, then add new row
+					if (!found) {
+						var reportMappings = new Object();
+						reportMappings.reportLoader = new Object();
+						reportMappings.reportMappingKey = "";
+						reportMappings.reportLoader.reportKey = data.code;
+						reportMappings.reportLoader.reportName = data.name;
+						gridReport.fnAddData(reportMappings);
+					}
+					$('#reportKey').val('');
+				}
+			},
+			help: $('#addReport')
+		});
+		
+		// == Delete Row Report in Grid == //
+		$('#gridReport tbody tr #deleteButton').live('click', function() {
+			var row = $(this).parents('tr');
+			var rowNumber = gridReport.fnGetPosition(row[0]);
+			var deleteReport = function(){
+				gridReport.fnDeleteRow(rowNumber);
+				var idTable = $("#listReport #gridReport");
+				var trs = $("tr", idTable);
+				$.each(trs, function(idx, data){
+					var hiddens = $("[type=hidden]", $(this));
+						$(hiddens).eq(0).attr("name", "reportMappings["+(idx-1)+"].reportLoader.reportName");
+						$(hiddens).eq(1).attr("name", "reportMappings["+(idx-1)+"].reportMappingKey");
+						$(hiddens).eq(2).attr("name", "reportMappings["+(idx-1)+"].reportLoader.reportKey");
+				});
+				$("#dialog-message").dialog("close");
+			}
+			messageAlertYesNo("Are you sure to delete data ?", "ui-icon ui-icon-notice", "Confirmation Message", deleteReport, closeDialog);
+			/* $("#dialog-message1").dialog({
+				autoOpen:false,
+				height:120,
+				width:250,
+				modal:true,
+				resizable : false,
+				buttons: {
+					"Yes": function() {
+						gridReport.fnDeleteRow(rowNumber);
+						var idTable = $("#listReport #gridReport");
+						var trs = $("tr", idTable);
+						$.each(trs, function(idx, data){
+							var hiddens = $("[type=hidden]", $(this));
+								$(hiddens).eq(0).attr("name", "reportMappings["+(idx-1)+"].reportLoader.reportName");
+								$(hiddens).eq(1).attr("name", "reportMappings["+(idx-1)+"].reportMappingKey");
+								$(hiddens).eq(2).attr("name", "reportMappings["+(idx-1)+"].reportLoader.reportKey");
+						});
+						$("#dialog-message1").dialog("close");
+					},
+					"No ": function() {
+						$("#dialog-message1").dialog("close");
+					}	
+				}
+			});
+			$('#dialog-message1').css('overflow','hidden');
+			$("#dialog-message1").dialog('open'); */
+		});
+		
+		// =============================================== END REPORT =============================================//
+		
+		// ============================================= START WORKLIST ===========================================//
+		
+		// == Declare datatable for Worklist / workflow == // 
+		var gridWorklist = $('#gridWorklist').dataTable({
+			aaData:workflowMappings,
+			aoColumns: [{
+							bVisible:false,
+							mDataProp:'workflowDetail.workflowDetailKey'
+					   },
+					   {
+						   fnRender: function(obj){
+								var controls;
+								controls = obj.aData.workflowDetail.workflowName;
+								controls += '<input type="hidden" name="workflowMappings[' + obj.iDataRow + '].workflowDetail.workflowName" value="' + obj.aData.workflowDetail.workflowName + '" />';
+								controls += '<input type="hidden" name="workflowMappings[' + obj.iDataRow + '].workflowDetail.workflowDetailKey" value="' + obj.aData.workflowDetail.workflowDetailKey + '" />';
+								controls += '<input type="hidden" name="workflowMappings[' + obj.iDataRow + '].workflowDetail.processDefinition" value="' + obj.aData.workflowDetail.processDefinition + '" />';
+								return controls;
+							}
+					   },
+					   {
+							fnRender: function(obj) {
+				            	var controls;
+				            	controls = '<center><input id="deleteButton" type="button" value="Delete" #{if readOnly}disabled="disabled"#{/if} /></center>';
+				            	controls += '<input type="hidden" name="workflowMappings[' + obj.iDataRow + '].workflowMappingKey" value="' + obj.aData.workflowMappingKey + '" />';
+				            	return controls;
+				            }
+						}
+					   ],
+			aaSorting: [[1, 'asc']],
+			bAutoWidth: false,
+			bJQueryUI: true,
+			bLengthChange: false,
+			sPaginationType: 'full_numbers',
+			bInfo: true,
+			bPaginate: true,
+			iDisplayLength:7
+		});
+		
+/* 		var postingRuleApp;
+		var postingProfApp; */
+		$('#worklistKey').lookup({
+			list: '@{Pick.worklists()}',
+			get: {
+				url: '@{Pick.worklist()}',
+				success: function(data) {
+					var rows = gridWorklist.fnGetNodes().length;
+					var found = false;
+					// Check duplicate row
+						for (i = 0; i < rows; i++) {
+							var cell = gridWorklist.fnGetData(i);
+							if (data.code == cell.workflowDetail.workflowDetailKey) {
+								$("#errWorklist").html('Worklist "' + data.description + '" is already exist !');
+								found = true;
+								break;
+							} else {
+								$("#errWorklist").html('');
+							}
+						}
+
+					// If no duplicate, then add new row
+					if (!found) {
+						var worklist = new Object();
+						worklist.workflowDetail = new Object();
+						worklist.workflowMappingKey = "";
+						worklist.workflowDetail.workflowDetailKey = data.code;
+						worklist.workflowDetail.workflowName= data.description;
+						worklist.workflowDetail.processDefinition = data.procDef;
+						//worklist.workflowDetail.activityName = data.activityName;
+						/* if (data.procDef == 'FaPostingProfileMaintenance') {
+							postingProfApp = 'FaPostingProfileMaintenance';
+							alert("After select this approval, Please select Posting Rule Approval");
+							}
+						if (data.procDef == 'FaPostingRuleMaintenance') {
+							postingRuleApp = 'FaPostingRuleMaintenance';
+							alert("After select this approval, Please select Posting Profile Approval");
+						} */
+						
+						gridWorklist.fnAddData(worklist);
+					}
+				
+					$('#worklistKey').val('');
+				}
+			},
+			help: $('#addWorklist')
+		});
+		
+		// Delete row
+		$('#gridWorklist tbody tr #deleteButton').live('click', function() {
+			var row = $(this).parents('tr');
+			var rowNumber = gridWorklist.fnGetPosition(row[0]);
+			var deleteWorkflow = function(){
+				gridWorklist.fnDeleteRow(rowNumber);
+				var idTable = $("#listWorkflow #gridWorklist");
+				var trs = $("tr", idTable);
+				$.each(trs, function(idx, data){
+					var hiddens = $("[type=hidden]", $(this));
+						$(hiddens).eq(0).attr("name", "workflowMappings["+(idx-1)+"].workflowDetail.workflowName");
+						$(hiddens).eq(1).attr("name", "workflowMappings["+(idx-1)+"].workflowDetail.workflowDetailKey");
+						$(hiddens).eq(2).attr("name", "workflowMappings["+(idx-1)+"].workflowDetail.processDefinition");
+						$(hiddens).eq(3).attr("name", "workflowMappings["+(idx-1)+"].workflowMappingKey");
+				});
+				$("#dialog-message").dialog("close");
+			}
+			messageAlertYesNo("Are you sure to delete data ?", "ui-icon ui-icon-notice", "Confirmation Message", deleteWorkflow, closeDialog);
+			/* $("#dialog-message1").dialog({
+				autoOpen:false,
+				height:120,
+				width:250,
+				modal:true,
+				resizable : false,
+				buttons: {
+					"Yes": function() {
+						gridWorklist.fnDeleteRow(rowNumber);
+						var idTable = $("#listWorkflow #gridWorklist");
+						var trs = $("tr", idTable);
+						$.each(trs, function(idx, data){
+							var hiddens = $("[type=hidden]", $(this));
+								$(hiddens).eq(0).attr("name", "workflowMappings["+(idx-1)+"].workflowDetail.workflowName");
+								$(hiddens).eq(1).attr("name", "workflowMappings["+(idx-1)+"].workflowDetail.workflowDetailKey");
+								$(hiddens).eq(2).attr("name", "workflowMappings["+(idx-1)+"].workflowDetail.processDefinition");
+								$(hiddens).eq(3).attr("name", "workflowMappings["+(idx-1)+"].workflowMappingKey");
+						});
+						$("#dialog-message1").dialog("close");
+					},
+					"No ": function() {
+						$("#dialog-message1").dialog("close");
+					}	
+				}
+			});
+			$('#dialog-message1').css('overflow','hidden');
+			$("#dialog-message1").dialog('open'); */
+		});
+		
+		// ============================================= END WORKLIST ===========================================//
+		
+		// ============================================= START REPORT PDI ===========================================//
+		// == Declare datatable for ReportPDI  == // 
+		var gridReportPdi = $('#gridReportPdi').dataTable({
+			aaData:reportPdiMappings,
+			aoColumns: [{
+							bVisible:false,
+							mDataProp:'reportPdi.reportKey'
+					   },
+					   {
+						   fnRender: function(obj){
+								var controls;
+								controls = obj.aData.reportPdi.reportName;
+								controls += '<input type="hidden" name="reportPdiMappings[' + obj.iDataRow + '].reportPdi.reportName" value="' + obj.aData.reportPdi.reportName + '" />';
+								controls += '<input type="hidden" name="reportPdiMappings[' + obj.iDataRow + '].reportPdi.reportKey" value="' + obj.aData.reportPdi.reportKey + '" />';
+								return controls;
+							}
+					   },
+					   {
+							fnRender: function(obj) {
+				            	var controls;
+				            	controls = '<center><input id="deleteButton" type="button" value="Delete" #{if readOnly}disabled="disabled"#{/if} /></center>';
+				            	controls += '<input type="hidden" name="reportPdiMappings[' + obj.iDataRow + '].reportMappingKey" value="' + obj.aData.reportMappingKey + '" />';
+				            	return controls;
+				            }
+						}
+					   ],
+			aaSorting: [[1, 'asc']],
+			bAutoWidth: false,
+			bJQueryUI: true,
+			bLengthChange: false,
+			sPaginationType: 'full_numbers',
+			bInfo: true,
+			bPaginate: true,
+			iDisplayLength:7
+		});
+		
+		$('#reportPdiKey').lookup({
+			list: '@{Pick.reportsPdi()}',
+			get: {
+				url: '@{Pick.reportPdi()}',
+				success: function(data) {
+					//alert("data =" +data+" == DATA.NAME = "+data.name)
+					var rows = gridReportPdi.fnGetNodes().length;
+					var found = false;
+					
+					// Check duplicate row
+						var idTable = $("#listReportPdi #gridReportPdi");
+						var trs = $("tr", idTable);
+						$.each(trs, function(idx, xx){
+							var hiddens = $("[type=hidden]", $(this));
+								var cell = $(hiddens).eq(2).attr("name", "reportPdiMappings["+(idx-1)+"].reportPdi.reportKey").val();
+								//alert("CELL = " +cell + " >>> DATA.CODE = " +data.code);
+								if ((data.code == cell) && (cell!='undefined')){
+									$("#errReportPdi").html('Report "' + data.name + '" is already exist !');
+									found = true;
+									return false;
+								} else {
+									$("#errReportPdi").html('');
+								}
+						});
+						
+					// If no duplicate, then add new row
+					if (!found) {
+						var reportPdiMappings = new Object();
+						reportPdiMappings.reportPdi = new Object();
+						reportPdiMappings.reportMappingKey = "";
+						reportPdiMappings.reportPdi.reportKey = data.code;
+						reportPdiMappings.reportPdi.reportName = data.name;
+						gridReportPdi.fnAddData(reportPdiMappings);
+					}
+					$('#reportPdiKey').val('');
+				}
+			},
+			help: $('#addReportPdi')
+		});
+		
+		$('#gridReportPdi tbody tr #deleteButton').live('click', function() {
+			var row = $(this).parents('tr');
+			var rowNumber = gridReportPdi.fnGetPosition(row[0]);
+			var deleteWorkflow = function(){
+				gridReportPdi.fnDeleteRow(rowNumber);
+				var idTable = $("#listReportPdi #gridReportPdi");
+				var trs = $("tr", idTable);
+				$.each(trs, function(idx, data){
+					var hiddens = $("[type=hidden]", $(this));
+						$(hiddens).eq(0).attr("name", "reportPdiMappings["+(idx-1)+"].reportPdi.reportName");
+						$(hiddens).eq(1).attr("name", "reportPdiMappings["+(idx-1)+"].reportMappingKey");
+						$(hiddens).eq(2).attr("name", "reportPdiMappings["+(idx-1)+"].reportPdi.reportKey");
+				});
+				$("#dialog-message").dialog("close");
+			}
+			messageAlertYesNo("Are you sure to delete data ?", "ui-icon ui-icon-notice", "Confirmation Message", deleteWorkflow, closeDialog);
+			/* $("#dialog-message1").dialog({
+				autoOpen:false,
+				height:120,
+				width:250,
+				modal:true,
+				resizable : false,
+				buttons: {
+					"Yes": function() {
+						gridReportPdi.fnDeleteRow(rowNumber);
+						var idTable = $("#listReportPdi #gridReportPdi");
+						var trs = $("tr", idTable);
+						$.each(trs, function(idx, data){
+							var hiddens = $("[type=hidden]", $(this));
+								$(hiddens).eq(0).attr("name", "reportPdiMappings["+(idx-1)+"].reportPdi.reportName");
+								$(hiddens).eq(1).attr("name", "reportPdiMappings["+(idx-1)+"].reportMappingKey");
+								$(hiddens).eq(2).attr("name", "reportPdiMappings["+(idx-1)+"].reportPdi.reportKey");
+						});
+						$("#dialog-message1").dialog("close");
+					},
+					"No ": function() {
+						$("#dialog-message1").dialog("close");
+					}	
+				}
+			});
+			$('#dialog-message1').css('overflow','hidden');
+			$("#dialog-message1").dialog('open'); */
+		});
+		// ============================================= END REPORT PDI ===========================================//
+		
+		
+		// ============================================= START UPLOAD LIST ========================================//
+		var gridUpload = $('#gridUpload').dataTable({
+			aaData:listUploads,
+			aoColumns: [{
+							bVisible:false,
+							mDataProp:'profile.profileKey'
+					   },
+					   {
+						   fnRender: function(obj){
+								var controls;
+								controls = obj.aData.profile.name;
+								controls += '<input type="hidden" name="listUploads[' + obj.iDataRow + '].profile.name" value="' + obj.aData.profile.name + '" />';
+								controls += '<input type="hidden" name="listUploads[' + obj.iDataRow + '].profile.profileKey" value="' + obj.aData.profile.profileKey + '" />';
+								controls += '<input type="hidden" name="listUploads[' + obj.iDataRow + '].profile.description" value="' + obj.aData.profile.description + '" />';
+								return controls;
+							}
+					   },
+					   {
+							fnRender: function(obj) {
+				            	var controls;
+				            	controls = '<center><input id="deleteButton" type="button" value="Delete" #{if readOnly}disabled="disabled"#{/if} /></center>';
+				            	controls += '<input type="hidden" name="listUploads[' + obj.iDataRow + '].roleMappingKey" value="' + obj.aData.roleMappingKey + '" />';
+				            	return controls;
+				            }
+						}
+					   ],
+			aaSorting: [[1, 'asc']],
+			bAutoWidth: false,
+			bJQueryUI: true,
+			bLengthChange: false,
+			sPaginationType: 'full_numbers',
+			bInfo: true,
+			bPaginate: true,
+			iDisplayLength:7
+		});
+		
+		//sementara
+		$('#uploadKey').lookup({
+			list: '@{Pick.udProfilesTemplete()}',
+			get: {
+				url: '@{Pick.udProfileForRole()}',
+				success: function(data) {
+					var rows = gridUpload.fnGetNodes().length;
+					var found = false;
+					// Check duplicate row
+						for (i = 0; i < rows; i++) {
+							var cell = gridUpload.fnGetData(i);
+							if (data.code == cell.profile.profileKey) {
+								$("#errUploadlist").html('Upload "' + data.name + '" is already exist !');
+								found = true;
+								break;
+							} else {
+								$("#errUploadlist").html('');
+							}
+						}
+
+					// If no duplicate, then add new row
+					if (!found) {
+						var upload = new Object();
+						upload.profile = new Object();
+						upload.roleMappingKey = "";
+						upload.profile.profileKey = data.code;
+						upload.profile.name= data.name;
+						upload.profile.description = data.description;
+						
+						gridUpload.fnAddData(upload);
+					}
+				
+					$('#uploadKey').val('');
+				}
+			},
+			filter:'Upload',
+			help: $('#addUploadlist')
+		});
+		
+		// Delete row
+		$('#gridUpload tbody tr #deleteButton').live('click', function() {
+			var row = $(this).parents('tr');
+			var rowNumber = gridUpload.fnGetPosition(row[0]);
+			var deleteUpload = function(){
+				gridUpload.fnDeleteRow(rowNumber);
+				var idTable = $("#listUpload #gridUpload");
+				var trs = $("tr", idTable);
+				$.each(trs, function(idx, data){
+					var hiddens = $("[type=hidden]", $(this));
+						$(hiddens).eq(0).attr("name", "listUploads["+(idx-1)+"].profile.name");
+						$(hiddens).eq(1).attr("name", "listUploads["+(idx-1)+"].profile.profileKey");
+						$(hiddens).eq(2).attr("name", "listUploads["+(idx-1)+"].profile.description");
+						$(hiddens).eq(3).attr("name", "listUploads["+(idx-1)+"].roleMappingKey");
+				});
+				$("#dialog-message").dialog("close");
+			}
+			messageAlertYesNo("Are you sure to delete data ?", "ui-icon ui-icon-notice", "Confirmation Message", deleteUpload, closeDialog);
+			
+		});
+		
+		// ================================ END UPLOAD LIST ================================================ //
+		
+		// ============================================= START DOWNLOAD LIST ========================================//
+		
+		var gridDownload = $('#gridDownload').dataTable({
+			aaData:listDownloads,
+			aoColumns: [{
+							bVisible:false,
+							mDataProp:'profile.profileKey'
+					   },
+					   {
+						   fnRender: function(obj){
+								var controls;
+								controls = obj.aData.profile.name;
+								controls += '<input type="hidden" name="listDownloads[' + obj.iDataRow + '].profile.name" value="' + obj.aData.profile.name + '" />';
+								controls += '<input type="hidden" name="listDownloads[' + obj.iDataRow + '].profile.profileKey" value="' + obj.aData.profile.profileKey + '" />';
+								controls += '<input type="hidden" name="listDownloads[' + obj.iDataRow + '].profile.description" value="' + obj.aData.profile.description + '" />';
+								return controls;
+							}
+					   },
+					   {
+							fnRender: function(obj) {
+				            	var controls;
+				            	controls = '<center><input id="deleteButton" type="button" value="Delete" #{if readOnly}disabled="disabled"#{/if} /></center>';
+				            	controls += '<input type="hidden" name="listDownloads[' + obj.iDataRow + '].roleMappingKey" value="' + obj.aData.roleMappingKey + '" />';
+				            	return controls;
+				            }
+						}
+					   ],
+			aaSorting: [[1, 'asc']],
+			bAutoWidth: false,
+			bJQueryUI: true,
+			bLengthChange: false,
+			sPaginationType: 'full_numbers',
+			bInfo: true,
+			bPaginate: true,
+			iDisplayLength:7
+		});
+		
+		//sementara
+		$('#downloadKey').lookup({
+			list: '@{Pick.udProfilesTemplete()}',
+			get: {
+				url: '@{Pick.udProfileForRole()}',
+				success: function(data) {
+					var rows = gridDownload.fnGetNodes().length;
+					var found = false;
+					// Check duplicate row
+						for (i = 0; i < rows; i++) {
+							var cell = gridDownload.fnGetData(i);
+							if (data.code == cell.profile.profileKey) {
+								$("#errDownloadlist").html('Download "' + data.name + '" is already exist !');
+								found = true;
+								break;
+							} else {
+								$("#errDownloadlist").html('');
+							}
+						}
+
+					// If no duplicate, then add new row
+					if (!found) {
+						var download = new Object();
+						download.profile = new Object();
+						download.roleMappingKey = "";
+						download.profile.profileKey = data.code;
+						download.profile.name= data.name;
+						download.profile.description = data.description;
+						
+						gridDownload.fnAddData(download);
+					}
+				
+					$('#downloadKey').val('');
+				}
+			},
+			filter:'Download',
+			help: $('#addDownloadlist')
+		});
+		
+		// Delete row
+		$('#gridDownload tbody tr #deleteButton').live('click', function() {
+			var row = $(this).parents('tr');
+			var rowNumber = gridDownload.fnGetPosition(row[0]);
+			var deleteDownload = function(){
+				gridDownload.fnDeleteRow(rowNumber);
+				var idTable = $("#listDownload #gridDownload");
+				var trs = $("tr", idTable);
+				$.each(trs, function(idx, data){
+					var hiddens = $("[type=hidden]", $(this));
+						$(hiddens).eq(0).attr("name", "listDownloads["+(idx-1)+"].profile.name");
+						$(hiddens).eq(1).attr("name", "listDownloads["+(idx-1)+"].profile.profileKey");
+						$(hiddens).eq(2).attr("name", "listDownloads["+(idx-1)+"].profile.description");
+						$(hiddens).eq(3).attr("name", "listDownloads["+(idx-1)+"].roleMappingKey");
+				});
+				$("#dialog-message").dialog("close");
+			}
+			messageAlertYesNo("Are you sure to delete data ?", "ui-icon ui-icon-notice", "Confirmation Message", deleteDownload, closeDialog);
+			
+		});
+		
+		// ============================================= END DOWNLOAD LIST ================================================ //
+		
+		$('#save').click(function() {
+			if ($('#roleName').val()=='') {
+				$('#errRoleName').html('required');
+				return false;
+			}
+
+/* 			if (((postingProfApp=='FaPostingProfileMaintenance')&&(postingRuleApp == undefined)) || 
+				((postingRuleApp=='FaPostingRuleMaintenance')&&(postingProfApp == undefined))) {
+				
+				$('#tabs').tabs("select","tab-5");
+				
+				if ((postingProfApp=='FaPostingProfileMaintenance')&&(postingRuleApp == undefined)) 
+					$('#errWorklist').html("Please select Posting Rule Approval");
+				if ((postingRuleApp=='FaPostingRuleMaintenance')&&(postingProfApp == undefined))
+					$('#errWorklist').html("Please select Posting Profile Approval");
+				
+				return false;
+			}
+ */				
+			var role = new Object();
+			role.organization = new Object();
+			role.organization.organizationId = $('#organizationId').val();
+			role.roleKey = $('#roleKey').val();
+			role.roleName = $('#roleName').val();
+			role.isActive = $("input[name='role.isActive']").val();
+			//role.roleMappings = $('#gridUser').dataTable().fnGetData();
+			role.users = $('#gridUser').dataTable().fnGetData();
+			role.menus = $('#gridMenu').dataTable().fnGetData();
+			role.reportMappings = $('#gridReport').dataTable().fnGetData();
+			role.workflowMappings = $('#gridWorklist').dataTable().fnGetData();
+			role.reportPdiMappings = $('#gridReportPdi').dataTable().fnGetData();
+			role.listUploads = $('#gridUpload').dataTable().fnGetData();
+			role.listDownloads = $('#gridDownload').dataTable().fnGetData();
+			
+			var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Sending data to server ...</div>').appendTo('body');
+			loading.dialog({
+				closeOnEscape: false,
+				draggable: false,
+				modal: true,
+				resizable: false,
+				open:function() {
+					$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+				} 
+			});
+			
+			$.ajax({
+				type: 'POST',
+				url: '@{Roles.save()}?id='+$('#roleKey').val(),
+				data: JSON.stringify(role),
+				contentType: 'application/json; charset=utf-8',
+				dataType: 'json',
+				success: function() {
+					location.href='@{Roles.confirming()}/'+$('#roleKey').val()+'?mode=${mode}';
+				}
+			});
+			
+		});
+		
+		$('#confirm').click(function() {
+			
+			var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Sending data to server ...</div>').appendTo('body');
+			loading.dialog({
+				closeOnEscape: false,
+				draggable: false,
+				modal: true,
+				resizable: false,
+				open:function() {
+					$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+				} 
+			}); 
+			
+			$.ajax({
+				url: '@{Roles.confirm()}/'+$('#roleKey').val(),
+				success: function(data) {
+					checkRedirect(data);
+					console.debug(">>>>>>>>" +data);
+					if (data == "error") {
+						location.href='@{Roles.confirming()}/'+$('#roleKey').val()+'?mode=${mode}';
+					} else {
+						location.href='@{Roles.list()}';
+					}
+					return data;
+				}
+			});
+			/* console.debug(request);
+			console.debug(request.responseText);
+			request.onreadystatechange = function(){
+				if((request.readyState == 4) && (request.status == 200)){
+					if(request.responseText == "error") {
+						//location.href='@{FeeAccruals.back()}/'+$('#feeKey').val()+'?mode=edit'+'?status=${status}';
+						location.href='@{Roles.confirming()}/'+$('#roleKey').val()+'?mode=${mode}';
+				} else {
+						location.href='@{Roles.list()}';
+					}
+				}
+			} */
+		//	return false;
+		});
+		
+		// ====== EVENT BUTTON CANCEL ==== //
+		$('#cancel').click(function() {
+			location.href='@{Roles.list()}';
+			return false;
+		});
+	
+		// ====== EVENT BUTTON BACK =======//
+		$('#back').click(function() {
+			location.href='@{Roles.back()}/'+$('#roleKey').val()+'?mode=edit';
+			return false;
+		});
+		
+		
+	});
+	
+	
+	
+</script>
+<form class="form" id="roleForm">
+#{hidden id:'organizationId', name:'role.organization.organizationId', value:role?.organization?.organizationId /}
+#{hidden id:'roleKey', name:'role.roleKey', value:role?.roleKey /}
+<h3>Role Maintenance</h3>
+#{if flash.error || errors}
+    <div class="error">
+    	Error when saving data!<br/>
+		<li>${flash.error}</li>
+		#{ifErrors}
+			#{errors}
+				 <li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}
+<div id="tabs">
+	<ul>
+		<li><a href="#tab-1">Role Detail</a></li>
+		<li><a href="#tab-2">User</a></li>
+		<li><a href="#tab-3">Menu</a></li>
+		<li><a href="#tab-5">Approval</a></li>
+		<li><a href="#tab-4">Reports</a></li>
+		<li style="display: none;"><a href="#tab-6">Report PDI</a></li>
+		<li><a href="#tab-7">Upload</a></li>
+		<li><a href="#tab-8">Download</a></li>
+	</ul>
+	<div class="pane" id="tab-1">
+		<p>			
+			#{textBox id:'roleName', name:'role.roleName', label:'Name', value:role?.roleName, class:"capitalize", width:'300px', required:true, readOnly:readOnly, maxLength:50 /}
+			<span class="error">#{error 'role.roleName' /}</span>
+			<span id="errRoleName" class="error"></span>
+		</p>
+		<p>
+			#{radioButton id:'isActive', name:'isActive', value:((role?.isActive)?'true':'false'), label:'Active', options:operators, readOnly:readOnly /}
+			#{hidden id:'isActiveHidden', name:'role.isActive', value:((role?.isActive)?'true':'false') /}
+		</p>			
+	</div>
+	<div class="pane" id="tab-2">
+		<!--  div id="listUser" style="overflow-y:scroll;height:250px"-->
+		<div id="listUser">
+		#{hidden id:'userKey' /}
+		<table id="gridUser" class="display">
+			<thead>
+				<tr>
+					<th>Key</th>					
+					<th>User Id</th>
+					<th>Username</th>					
+					<th width="100px">Action</th>
+				</tr>
+			</thead>
+			<tbody>
+			 	#{list role?.users, as:'item'}
+				<tr>
+					<td>
+						${item.userKey}
+					</td>
+					<td>
+						${item.userId}
+					</td>
+					<td>
+						${item.userName}
+					</td>
+					<td>
+						<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} /></center>
+						#{hidden name:'users[' + (item_index-1) + '].userId', value:item?.userId /}
+						#{hidden name:'users[' + (item_index-1) + '].userName', value:item?.userName /}
+						#{hidden name:'users[' + (item_index-1) + '].userKey', value:item?.userKey /}
+					</td>	
+				</tr>
+				#{/list}
+			</tbody>
+		</table>
+		<span id="errUser" class="error"></span>
+		</div>
+		#{if (!confirming && mode != 'view')}
+		<div class="buttons">
+			<input type="button" id="addUser" value="Add" />
+		</div>
+		#{/if}
+	</div>
+	<div class="pane" id="tab-3">
+		<div id="listMenu" >
+		#{hidden id:'menuKey' /}
+		<table id="gridMenu" class="display">
+			<thead>
+				<tr>
+					<th>Key</th>					
+					<th width="100">Program No</th>
+					<th width="500">Path</th>	
+					<th width="80">Action</th>
+				</tr>
+			</thead>
+			<tbody>
+			 	#{list role?.menus, as:'item'}
+				<tr>
+					<td>
+						${item?.menuKey}
+					</td>
+					<td>
+						${item?.menuNumber}
+					</td>
+					<td>
+						${item?.menuBreadCrumb } 
+					</td>
+					<td>
+						<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} /></center>
+						#{hidden name:'menus[' + (item_index-1) + '].menuNumber', value:item?.menuNumber /}
+						#{hidden name:'menus[' + (item_index-1) + '].menuBreadCrumb', value:item?.menuBreadCrumb /}
+						#{hidden name:'menus[' + (item_index-1) + '].menuKey', value:item?.menuKey /}
+					</td>	
+				</tr>
+				#{/list}
+			</tbody>
+		</table>
+		<span id="errMenu" class="error"></span>
+		</div>
+		#{if (!confirming && mode != 'view')}
+		<div class="buttons">
+			<input type="button" id="addMenu" value="Add" />
+		</div>	
+		#{/if}
+	</div>
+	<div class="pane" id="tab-4">
+		<div id="listReport" >
+		#{hidden id:'reportKey' /}
+		<table id="gridReport" class="display">
+			<thead>
+				<tr>
+					<th>Key</th>					
+					<th>Report Name</th>
+					<th width="120">Action</th>
+				</tr>
+			</thead>
+			<tbody>
+			 	#{list role?.reportMappings, as:'item'}
+				<tr>
+					<td>
+						${item?.reportMappingKey}
+					</td>
+					<td>
+						${item?.reportLoader?.reportName}
+					</td>
+					<td>
+						<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} /></center>
+						#{hidden name:'reportMappings[' + (item_index-1) + '].reportLoader.reportName', value:item?.reportLoader?.reportName /}
+						#{hidden name:'reportMappings[' + (item_index-1) + '].reportMappingKey', value:item?.reportMappingKey /}
+						#{hidden name:'reportMappings[' + (item_index-1) + '].reportLoader.reportKey', value:item?.reportLoader?.reportKey /}
+					</td>	
+				</tr>
+				#{/list}
+			</tbody>
+		</table>
+		<span id="errReport" class="error"></span>
+		</div>
+		#{if (!confirming && mode != 'view')}
+		<div class="buttons">
+			<input type="button" id="addReport" value="Add" />
+		</div>	
+		#{/if}
+	</div>
+	<div class="pane" id="tab-5">
+		<div id="listWorkflow" >
+		#{hidden id:'worklistKey' /}
+		<table id="gridWorklist" class="display">
+			<thead>
+				<tr>
+					<th>Key</th>					
+					<th>Worklist Name</th>
+					<th width="120">Action</th>
+				</tr>
+			</thead>
+			<tbody>
+			 	#{list role?.workflowMappings, as:'item'}
+				<tr>
+					<td>
+						${item?.workflowMappingKey}
+					</td>
+					<td>
+						${item?.workflowDetail?.workflowName}
+					</td>
+					<td>
+						<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} /></center>
+						#{hidden name:'workflowMappings[' + (item_index-1) + '].workflowDetail.workflowName', value:item?.workflowDetail?.workflowName /}
+						#{hidden name:'workflowMappings[' + (item_index-1) + '].workflowDetail.workflowDetailKey', value:item?.workflowDetail?.workflowDetailKey /}
+						#{hidden name:'workflowMappings[' + (item_index-1) + '].workflowDetail.processDefinition', value:item?.workflowDetail?.processDefinition /}
+						#{hidden name:'workflowMappings[' + (item_index-1) + '].workflowMappingKey', value:item?.workflowMappingKey /}
+					</td>	
+				</tr>
+				#{/list}
+			</tbody>
+		</table>
+		<span id="errWorklist" class="error"></span>
+		</div>
+		#{if (!confirming && mode != 'view')}
+		<div class="buttons">
+			<input type="button" id="addWorklist" value="Add" />
+		</div>	
+		#{/if}
+	</div>
+	<div class="pane" id="tab-6">
+		<div id="listReportPdi" >
+		#{hidden id:'reportPdiKey' /}
+		<table id="gridReportPdi" class="display">
+			<thead>
+				<tr>
+					<th>Key</th>					
+					<th>Report Name</th>
+					<th width="120">Action</th>
+				</tr>
+			</thead>
+			<tbody>
+			 	#{list role?.reportPdiMappings, as:'item'}
+				<tr>
+					<td>
+						${item?.reportMappingKey}
+					</td>
+					<td>
+						${item?.reportPdi?.reportName}
+					</td>
+					<td>
+						<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} /></center>
+						#{hidden name:'reportPdiMappings[' + (item_index-1) + '].reportPdi.reportName', value:item?.reportPdi?.reportName /}
+						#{hidden name:'reportPdiMappings[' + (item_index-1) + '].reportMappingKey', value:item?.reportMappingKey /}
+						#{hidden name:'reportPdiMappings[' + (item_index-1) + '].reportPdi.reportKey', value:item?.reportPdi?.reportKey /}
+					</td>	
+				</tr>
+				#{/list}
+			</tbody>
+		</table>
+		<span id="errReportPdi" class="error"></span>
+		</div>
+		#{if (!confirming && mode != 'view')}
+		<div class="buttons">
+			<input type="button" id="addReportPdi" value="Add" />
+		</div>	
+		#{/if}
+	</div>
+	<div class="pane" id="tab-7">
+		<div id="listUpload" >
+		#{hidden id:'uploadKey' /}
+		<table id="gridUpload" class="display">
+			<thead>
+				<tr>
+					<th>Key</th>					
+					<th>Description</th>
+					<th width="120">Action</th>
+				</tr>
+			</thead>
+			<tbody>
+			 	#{list role?.listUploads, as:'item'}
+				<tr>
+					<td>
+						${item?.roleMappingKey}
+					</td>
+					<td>
+						${item?.profile?.name}
+					</td>
+					<td>
+						<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} /></center>
+						#{hidden name:'listUploads[' + (item_index-1) + '].profile.name', value:item?.profile?.name /}
+						#{hidden name:'listUploads[' + (item_index-1) + '].profile.profileKey', value:item?.profile?.profileKey /}
+						#{hidden name:'listUploads[' + (item_index-1) + '].profile.description', value:item?.profile?.description /}
+						#{hidden name:'listUploads[' + (item_index-1) + '].roleMappingKey', value:item?.roleMappingKey /}
+					</td>	
+				</tr>
+				#{/list}
+			</tbody>
+		</table>
+		<span id="errUploadlist" class="error"></span>
+		</div>
+		#{if (!confirming && mode != 'view')}
+		<div class="buttons">
+			<input type="button" id="addUploadlist" value="Add" />
+		</div>	
+		#{/if}
+	</div>
+	<div class="pane" id="tab-8">
+		<div id="listDownload" >
+		#{hidden id:'downloadKey' /}
+		<table id="gridDownload" class="display">
+			<thead>
+				<tr>
+					<th>Key</th>					
+					<th>Description</th>
+					<th width="120">Action</th>
+				</tr>
+			</thead>
+			<tbody>
+			 	#{list role?.listDownloads, as:'item'}
+				<tr>
+					<td>
+						${item?.roleMappingKey}
+					</td>
+					<td>
+						${item?.profile?.name}
+					</td>
+					<td>
+						<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} /></center>
+						#{hidden name:'listDownloads[' + (item_index-1) + '].profile.name', value:item?.profile?.name /}
+						#{hidden name:'listDownloads[' + (item_index-1) + '].profile.profileKey', value:item?.profile?.profileKey /}
+						#{hidden name:'listDownloads[' + (item_index-1) + '].profile.description', value:item?.profile?.description /}
+						#{hidden name:'listDownloads[' + (item_index-1) + '].roleMappingKey', value:item?.roleMappingKey /}
+					</td>	
+				</tr>
+				#{/list}
+			</tbody>
+		</table>
+		<span id="errDownloadlist" class="error"></span>
+		</div>
+		#{if (!confirming && mode != 'view')}
+		<div class="buttons">
+			<input type="button" id="addDownloadlist" value="Add" />
+		</div>	
+		#{/if}
+	</div>
+</div>
+<div class="buttons">
+		#{if mode == 'view'}
+		<input type="button" id="cancel" value="Close">
+		#{/if}
+		#{else}
+			#{if (!confirming) }
+				<input type="button" id="save" value="Save">
+				<input type="button" id="cancel" value="Cancel">
+			#{/if}
+			#{if confirming}
+				<input type="button" id="confirm" value="Confirm">
+				<input type="button" id="back" value="Back">
+			#{/if}
+		#{/else}
+</div>
+</form>
+<div id="dialog-message1" title="Message Confirmation">
+	<p>
+	<span class="ui-icon ui-icon-notice" style="float:left; margin:0 7px 50px 0;"></span>
+	Are you sure to delete data ? </p>
+</div>

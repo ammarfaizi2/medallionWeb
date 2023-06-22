@@ -1,0 +1,178 @@
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('#new').remove();
+		$('.buttons input:button').button();
+		
+		var html = $("#main");
+		clearAllDefineButton();
+		dividenDetailGrid();
+		//totalUnitAndNetAmount();
+
+		html.id("btnProcess").click(function(){
+			var id = html.id("dispatchPro").val();
+			if (id) location.href='@{process()}/' + id; 
+		});
+		
+		html.id("btnCancel").click(function(){
+			location.href='@{list()}'; 
+		});
+
+		html.id("clearAll").click(function(){
+			tableDividen.fnClearTable();
+			$('#fundActionTab').tabs("select", "tab-1");
+			$('#proccess').button("enable");
+			$('.master').attr("disabled", false);
+			$('#tradeUnit').val("");
+			$('#tradeNetAmount').val("");
+			$('#calculate').val(false);
+			$('#currency').attr("disabled", true);
+			
+			$('#navDate').attr("disabled", false);
+			$('#postDate').attr("disabled", false);
+			$('#paymentDate').attr("disabled", false);
+			if ($('#divType').val() == "") {
+				$('#navDate').attr("disabled", true);
+				$('#paymentDate').attr("disabled", true);
+				$('#postDate').attr("disabled", true);
+			}
+
+			if ($('#divType').val() == "By Cash") {
+				$('#navDate').attr("disabled", true);
+				$('#postDate').attr("disabled", true);
+			}
+
+			if ($('#divType').val() == "By Reinvestment") {
+				$('#paymentDate').attr("disabled", true);
+			}
+
+			$("#ratioPerUnitBy").attr("disabled", true);
+			$("#ratio").attr("disabled", true);
+
+			if ($('#ratioPerUnit').val() == "RATIO_PER_UNIT") {
+				$("#amount").attr("disabled", true);
+				$("#ratioPerUnitBy").attr("disabled", false);
+				$("#ratio").attr("disabled", false);
+			}
+
+			$('#fundActionKey').attr("disabled", true);
+
+			return false;
+		});
+	});
+
+	function dividenDetailGrid() {
+		//DataTables profile section
+		tableDividen = 
+			$('#dividenGrid').dataTable({
+				aoColumnDefs: [
+					{bVisible:false, aTargets:[0]},
+					{bSortable:false,aTargets:[1,2,3,4,5]}
+				],					
+				bAutoWidth:false,
+				bFilter:false,
+				bInfo:false,
+				bJQueryUI:true,
+				bSearch:true,
+				bFilter:true,
+				bLengthChange:false
+			});
+		$('#dividenGrid tbody tr').die('click');
+	}
+
+	function clearAllDefineButton() {
+		$("#clearAll").button();
+		$("#clearAll").css('width', '100px');
+	}
+</script>
+
+<div id='pagingMain' style="overflow-y:scroll;height:380px;overflow-x:scroll;width:930px">
+	<table id="tblSummary" class="display">
+		<thead>
+			<tr>
+				<th field="rgInvestmentaccount.accountNumber|string|none|left|sort">Account No</th>
+				<th field="rgInvestmentaccount.name|string|none|left|sort">Account Name</th>
+				<th field="availabelUnit|number|decimal2|right|sort">Unit Balance</th>
+				<th field="amount|number|decimal2|right|sort">Amount</th>
+				<th field="price|number|decimal2|right|sort">Price</th>
+				<th field="unit|number|decimal2|right|sort">Unit</th>
+			</tr>
+		</thead>
+	</table>
+</div>
+
+<div style="display:none; overflow-y:scroll;height:380px;overflow-x:scroll;width:930px">
+	<table id="dividenGrid" class="display">
+		#{hidden id:'dispatchPro', value:id/}
+		<thead>
+			<tr>
+				<th>Account No</th>
+				<th>Account Name</th>
+				<th>Unit Balance</th>
+				<th>Amount</th>
+				<th>Price</th>
+				<th>Unit</th>
+			</tr>
+		</thead>
+		<tbody>
+			#{list trades, as:'trade'}
+			<tr>
+				<td>${trade?.rgInvestmentaccount?.accountNumber}</td>
+				<td>${trade?.rgInvestmentaccount?.name}</td>
+				<td align="right" name="unitCell">${trade?.availabelUnit?.format('#,##0.########')}</td>
+				#{if (taskId != null) }
+					<td align="right" name="amountCell">${trade?.amount?.format('#,##0.######')}</td>
+				#{/if}
+				#{else}
+					<td align="right" name="amountCell">${trade?.amount?.format('#,##0.######')}</td>
+				#{/else}
+				<td align="right" name="priceCell">${trade?.price?.format('#,##0.##########')}</td>
+				#{if trade?.type == 'Cash FundAction'}
+					<td align="right" name="unitCell">${trade?.unit?.format('#,##0.########')}</td>
+				#{/if}
+				#{else}
+					<td align="right" name="unitCell">
+						${trade?.unit?.format('#,##0.########')}
+					</td>
+				#{/else}
+			</tr>
+			#{/list}
+		</tbody>
+	</table>
+</div>
+<div id="calc" style="display: none;">
+	<hr style="border-color:#A6C9E2">
+	<button id="clearAll">Reset</button>
+	<span width="600px;" style="margin-left:150px"><b>Total :&nbsp;&nbsp;&nbsp;&nbsp;Unit</b></span>	
+	<span></span>
+	#{textBox id:'tradeUnit', class:'numeric', readOnly:true, width:'230px', name:'unitCell', value:trade?.totUnit?.format('#,##0.########') /}
+	<span style="margin-left:50px"><b>Amount</b></span>
+	<span></span>
+	#{textBox id:'tradeNetAmount', class:'numeric', readOnly:true, width:'230px', name:'amountCell', value:trade?.totNetAmt?.format('#,##0.########') /}</span>
+	#{hidden id:'tradeNetAmountStripped', name:'tradeNetAmountStripped', value:trade?.totNetAmt /}
+	<!-- for cancel dividen -->
+	#{hidden id:'totalAmountForCancel', name:'fa.sumTotalAmount', value:fa?.sumTotalAmount /}
+	<hr style="border-color:#A6C9E2">
+</div>
+
+<div id="noncalc">
+	<hr style="border-color:#A6C9E2">
+	<input type="button" id="pagingClearAll" value="Reset"/>
+	<span width="600px;" style="margin-left:150px"><b>Total :&nbsp;&nbsp;&nbsp;&nbsp;Unit</b></span>	
+	<span></span>
+	#{textBox id:'ptradeUnit', class:'numeric', readOnly:true, width:'230px', value:total?.totUnit?.format('#,##0.########') /}
+	<span style="margin-left:50px"><b>Amount</b></span>
+	<span></span>
+	#{textBox id:'ptradeNetAmount', class:'numeric', readOnly:true, width:'230px', value:total?.totNetAmt?.format('#,##0.########') /}</span>
+	#{hidden id:'ptradeNetAmountStripped', value:trade?.totNetAmt /}
+	<!-- for cancel dividen -->
+	#{hidden value:fa?.sumTotalAmount /}
+	<hr style="border-color:#A6C9E2">
+</div>
+
+<script type="text/javascript">
+#{include 'RegistrySubscription/Util.js' /}
+	#{include 'RegistryFundAction/Paging.js' /}
+	$(document).ready(function() {
+		Paging($("#pagingMain"));
+	});
+</script>

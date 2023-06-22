@@ -1,0 +1,168 @@
+#{set mode: mode /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{script 'date.format.js' /}
+#{script 'lookups.js' /}
+#{script 'validation/numericOnly.js' /}
+#{set chargeOverrideKey:chargeOverride?.chargeOverrideKey /}
+<h3>Charge Profile : <span id="code"></span> </h3>
+<script type="text/javascript">
+	$(function() {
+		$('#chargeOverrideForm #overrideTaxCode').lookup({
+			list:'@{Pick.taxMasters()}',
+			get:{
+				url:'@{Pick.taxMaster()}',
+				success: function(data) {
+							$('#chargeOverrideForm #overrideTaxCode').removeClass('fieldError');
+							$('#chargeOverrideForm #overrideTaxKey').val(data.code);
+							$('#chargeOverrideForm input#overrideTaxCode').val(data.taxCode);
+							$('#chargeOverrideForm #overrideTaxName').val(data.description);
+							$('#h_taxName').val(data.description);
+							$("#overrideTaxCodeError").html("");
+						},
+				error: function() {
+						$('#chargeOverrideForm #overrideTaxCode').addClass('fieldError');
+						$('#chargeOverrideForm #overrideTaxKey').val('');
+						$('#chargeOverrideForm #overrideTaxCode').val('');
+						$('#chargeOverrideForm #overrideTaxName').val('NOT FOUND');
+						$('#h_taxName').val('');
+					}
+			},
+			key:$('#chargeOverrideForm #overrideTaxKey'),
+			help:$('#chargeOverrideForm #overrideTaxCodeHelp'),
+			nextControl:$('#chargeOverrideForm #overrideTierValue')
+		});
+		
+		$('#newTierData').button();
+		$('#tabsOverrideTier').tabs();
+		$('#tabsOverrideTier').css('height','250');
+		$('#tabsOverrideTier').css('width','900');
+		$('#saveOverwiteCharge').button();
+		$('#cancelOverwiteCharge').button();
+		$('#addOverrideTier').button();
+		$('#addOverrideTier').button('enable');
+		$('#cancelOverrideTier').button();
+		$(".btn").css("width", "100px");
+		
+
+	//detail Tier
+		$( "#detailChargeOverrideTier" ).dialog({
+			autoOpen:false,
+			modal:true,
+			heigth:'600px',
+			width:'500px',
+			resizable:false
+		});
+	
+		$('#chargeOverrideForm #overrideTaxCode').blur(function(){
+			if ($('#chargeOverrideForm #overrideTaxCode').val() == '') {
+				$('#chargeOverrideForm #overrideTaxKey').val('');
+				$('#chargeOverrideForm #overrideTaxCode').val('');
+				$('#chargeOverrideForm #overrideTaxName').val('');	
+			}
+		})
+		
+	});
+
+</script>
+
+<style type="text/css">
+  #errmsg { color:red; }
+</style>
+
+<form id="chargeOverrideForm" class="form">
+<table>
+<tr>
+	<td>
+	<div id="profileMaster">
+	#{hidden id:'chargeOverrideKey', name:'chargeOverride.chargeOverrideKey', value:chargeOverride?.chargeOverrideKey /}
+	#{hidden id:'masterChargeKey', name:'chargeOverride.chargeMaster.chargeKey', value:chargeOverride?.chargeMaster?.chargeKey /}
+	#{hidden id:'masterChargeCode', name:'chargeOverride.chargeMaster.chargeCode', value:chargeOverride?.chargeMaster?.chargeCode /}
+	#{hidden id:'masterDescription', name:'chargeOverride.chargeMaster.description', value:chargeOverride?.chargeMaster?.description /}
+	#{hidden id:'custodyAccountKey', name:'chargeOverride.account.custodyAccountKey', value:chargeOverride?.account?.custodyAccountKey /}
+	#{hidden id:'rowNumber' /}
+	#{hidden id:'rowPosition' /}
+	#{hidden id:'tieringType' /}
+	#{hidden id:'valueType' /}
+	#{hidden id:'chargeType' /}
+	#{hidden id:'chargeType' /}
+	<ul>
+		<li>
+			#{dropDownList id:'chargeCategory', name:'chargeCategory', label:'Charges Category', options:chargeCategory, readOnly:true, required:true /} 
+		</li>
+		<li>
+			#{textBox id:'chargeCode', name:'chargeCode', label:'Charges Code', class:'capitalize', readOnly:true, required:true /}
+		</li>
+		<li>
+			#{dropDownList id:'invoiceCharge', name:'master.invoiceCharge.lookupId', label:'Charges Group', options:invoiceCharge, readOnly:true, required:true /}
+		</li>
+		<li>
+			#{textBox id:'chargeDescription', name:'chargeDescription', label:'Description', class:'capitalize', required:true, readOnly:true, width:'250px' /}
+		</li>
+
+		<li>
+			#{textBox id:'minimumValue',label:'Minimum Value', value:chargeOverride?.minimumValue, format:'#,##0.####', required:true,readOnly:readOnly,class:'disabledForChargeTypeManual numeric clearFieldValue' /}
+			#{hidden id:'minimumValueStripped', name:'chargeOverride.minimumValue', value:chargeOverride?.minimumValue /}
+			&nbsp;<span id="minimumValueError" class="error"></span>
+		</li>
+		<li>
+			#{textBox id:'maximumValue', label:'Maximum Value', value:chargeOverride?.maximumValue, format:'#,##0.####', readOnly:readOnly,class:'disabledForChargeTypeManual numeric clearFieldValue' /}
+			#{hidden id:'maximumValueStripped',  name:'chargeOverride.maximumValue', value:chargeOverride?.maximumValue /}
+			#{checkBox id:'isChecked', name:'chargeOverride.isChecked', value:(( chargeOverride?.isChecked)?'true':'false'), readOnly:readOnly /} Max
+			&nbsp;<span id="maximumValueError" class="error"></span>
+		</li>
+		<li>			
+			#{textBox id:'overrideTaxCode', name:'chargeOverride.taxMaster.taxCode', label:'Tax Code', value:chargeOverride?.taxMaster?.taxCode, class:'capitalize', required:true, readOnly:readOnly, width:'86' /}
+			#{hidden id:'overrideTaxKey', name:'chargeOverride.taxMaster.taxKey', value:chargeOverride?.taxMaster?.taxKey  /}
+			#{button id:'overrideTaxCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'overrideTaxName', name:'chargeOverride.taxMaster.description', value:chargeOverride?.taxMaster?.description, readOnly:true, width:'150' /}
+			&nbsp;<span id="overrideTaxCodeError" class="error"></span>
+		</li>
+	</ul>
+	</div>
+	</td>
+</tr>
+</table>
+
+<p> </p>
+<div id="tabsOverrideTier">
+	<ul>
+		<li><a href="#tabsOverrideTier-1">Charge Override Tiers</a></li>
+	</ul>
+	<div class="pane" id="tabsOverrideTier-1">	
+		<div id="listTier" style="overflow-y:scroll;height:120px">
+			 &nbsp;<h4><span id="nullError" class="error"></span></h4>
+			#{include 'ChargeOverrides/grid_override_tier.html' /}
+		</div>
+		<br/>
+		<div class="buttons">
+			#{ifnot (confirming) || (mode=='view')}
+				<button id="newTierData">New Data</button>
+			#{/ifnot}
+		</div>	
+	</div>
+</div>
+<div id="detailChargeOverrideTier" title="Detail Charge Override Tiers">
+	#{include 'ChargeOverrides/detail_override_tier.html' /}
+	<div class="button">
+		#{if (((mode=='view'))||(confirming)) }
+			<button id="cancelOverrideTier" class="btn">Close</button>				
+		#{/if}
+		#{else}
+			<button id="addOverrideTier" class="btn">Save</button>
+			<button id="cancelOverrideTier" class="btn">Cancel</button>
+		#{/else}
+		
+	</div>
+</div>
+</form>
+<br>
+<div class="button">	
+		#{if (((mode=='view'))||(confirming)) }
+			#{button id:'cancelOverwiteCharge',name:'cancelOverwiteCharge', width:'100px', value:'Close' /}				
+		#{/if}
+		#{else}
+			#{button id:'saveOverwiteCharge',name:'saveOverwiteCharge', width:'100px', value:'Save'   /} 		
+			#{button id:'cancelOverwiteCharge',name:'cancelOverwiteCharge', width:'100px', value:'Cancel' /}
+		#{/else}
+</div>
+

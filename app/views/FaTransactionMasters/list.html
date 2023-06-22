@@ -1,0 +1,83 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'FA Transaction Master' /}
+#{set fixData: true /}
+#{set mode: mode /}
+
+<script type="text/javascript">
+	$(function() {
+		// DECLARE CLASS BUTTONS	
+		$('.buttons button').button();
+		//=====================
+			
+		// ACTION BUTTON ADD
+		$('#add').click(function() {
+			location.href='@{entry()}';
+		})
+		//=====================
+		
+		// ACTION BUTTON SYNC
+		$('#sync').click(function() {
+			//alert("SYNC ACTION !!");
+			var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Sync data to Transaction Template ...</div>').appendTo('body');;
+			loading.dialog({
+				closeOnEscape: false,
+				draggable: false,
+				modal: true,
+				resizable: false,
+				open:function() {
+					$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+				} 
+			});
+			location.href='@{sync()}';
+		})
+		//=====================
+	});
+	function doEdit(data) {
+		if ((data[3] == "New") || (data[3] == "Updated")) {
+			view(data[0]);
+			return false;
+		} else {
+			return true;
+		}
+	}
+</script>
+#{hidden id:'count', value:count /}
+<table id="grid" class="display">
+	<thead>
+		<tr>
+			<th>key</th>
+			<th width="50px">Transaction Code</th>
+			<th width="200px">Description</th>
+			<th width="50px">Status</th>
+			<th width="50px">Active</th>
+		</tr>
+	</thead>
+	<tbody>
+		#{list items:faTransactionMasters, as:'faTransactionMaster'}
+		<tr>
+			<td>${faTransactionMaster?.transactionMasterKey} </td>
+			<td>${faTransactionMaster?.transactionCode} </td>
+			<td>${faTransactionMaster?.transactionDescription}</td>
+			<td>
+				${faTransactionMaster?.recordStatus?.decodeStatus()}
+			</td>
+			<td>
+				${(faTransactionMaster?.isActive)? 'Yes':'No'}
+			</td>
+		</tr>
+		#{/list}
+	</tbody>
+</table>
+
+<div class="buttons">
+	<button id="add">Add</button>
+	<button id="sync", style="margin:5px;">Sync</button>
+</div>
+<span style="margin-left:10em;" class="error">*Notes : Sync button is for sync with Custody Transaction Template</span>
+
+
+	
+
+	
+
+

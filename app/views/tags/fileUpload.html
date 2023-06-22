@@ -1,0 +1,47 @@
+#{if _label}
+<label>${_label.raw()} #{if _required}<span class="req">*</span>#{/if}
+</label>
+#{/if}
+
+<input
+#{if _name}
+name="${_name}"
+#{/if}
+
+#{if _id}
+id="${_id}"
+#{/if}
+
+#{if _disabled}
+disabled="${_disabled}"
+#{/if}
+
+#{if _form }
+form="${_form}"
+#{/if}
+
+#{if _accept }
+accept="${_accept}"
+#{/if}
+
+#{if _autofocus }
+autofocus="${_autofocus}"
+#{/if}
+
+#{if _required }
+required="${_required}"
+#{/if}
+
+#{if _multiple }
+multiple="${_multiple}"
+#{/if}
+
+#{if _width}
+	style="width: ${_width}" 
+#{/if}
+
+#{if _class}
+	class="${_class}" 
+#{/if}
+
+type="file" />

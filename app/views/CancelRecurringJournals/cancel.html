@@ -1,0 +1,119 @@
+#{extends 'templates/main.html' /}
+
+<script type="text/javascript">
+	$(function() {
+		$('#cancel').button();
+		$('#cancelRecurringJournal').button();
+		
+		var backToList = function() {
+			location = "@{list()}";
+		}
+		
+		var closeDialogMessage = function() {
+			$("dialog-message").dialog('close');
+		}
+
+		$('#cancelledDate').change(function() {
+            var dateFrom = $('#effectiveDateFrom').datepicker('getDate');
+            var dateTo = $('#effectiveDateTo').datepicker('getDate');
+            var dateNow = $('#cancelledDate').datepicker('getDate');
+            var errorMsg = 'Cancel date should be in effective date period';
+            var id = '#canceledDate';
+            var validPeriod = true;
+            
+            if ((($(this).val()!='') || ($(this).hasClass('fieldError'))) && ($('#canceledDate').val()!='')) {
+            	validPeriod = compareDateOnPeriod(dateFrom, dateTo, dateNow);
+            }
+
+            if (!validPeriod){
+            	$("#cancelledDateError").html(errorMsg);
+                $('#cancelRecurringJournal').button('disable');
+            }  else {
+                $('#cancelRecurringJournal').button('enable');
+            }
+        });
+		
+		$('#cancelRecurringJournal').click(function() {
+			$("#cancelledDateError").html("");
+			
+	        if (($('#cancelledDate').val()=='')) {
+	            
+	            if ($('#cancelledDate').val()=='') {
+	                $("#cancelledDateError").html("Required");
+	            }
+
+	            return false;
+	        }
+	        
+	        if ($('#cancelledDate').val()!=='') {
+	            $("#cancelledDateError").html("");
+	        }
+	        
+			var action = "@{cancel()}?key=${faRecurring?.recurringKey}";
+			var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+			loading.dialog({
+				closeOnEscape: false,
+				draggable: false,
+				modal: true,
+				resizable: false,
+				open:function() {
+					$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+				}
+			});
+			
+			//$.post(action, function(data, status, xhr) {
+			$.post(action, $('#recurringJournalForm').serialize(), function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+// 					if(data.recurringStatus == 'C') {
+						//alert("Cancel Successfully for recurring No #" + data.transactionNo);
+						messageAlertOk("Cancel Successfully for Recurring No #" + data.recurringNo, "ui-icon ui-icon-circle-check", "Notification", backToList);
+// 					} else {
+// 						messageAlertOk("Please re-posting Recurring No #" + data.recurringNo + " from " + data.cancelDate, "ui-icon1 ui-icon-alert", "Warning Message", closeDialogMessage);
+// 					}
+				} else {
+					//alert(data.error);
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+				}
+			});
+		});
+		
+		if ($.browser.msie){
+	        $("#remaksCancelled[maxlength]").bind('input propertychange', function() {
+	            var maxLength = $(this).attr('maxlength');  
+	            if ($(this).val().length > maxLength) {  
+	                $(this).val($(this).val().substring(0, maxLength));  
+	            }  
+	        });
+	    }	
+			
+		$('#cancel').click(function() {
+			location.href="@{list()}";
+		});
+		
+		$('#dvNeedCorrection').css("display","none");
+		$('#dvNeedCancel').css("display","");
+	});	
+</script>
+<h2>Cancel Recurring Journal</h2>
+#{if flash.error || errors}
+    <div class="error">
+        Error when saving data!<br/>
+        <li>${flash.error}</li>
+        #{ifErrors}
+            #{errors}
+                 <li>${error.key} ${error}</li>
+            #{/errors}
+        #{/ifErrors}
+    </div>
+#{/if}
+<div id="detail">
+	#{include 'RecurringJournals/detail.html' /}	
+</div>
+<div id="actions" class="buttons">
+    <input type="button" id="cancelRecurringJournal" value="Save" />
+	<input type="button" id="cancel" value="Cancel" />
+</div>
+
+#{hidden id:'key', name:'faRecurring.recurringKey', value:faRecurring?.recurringKey /}

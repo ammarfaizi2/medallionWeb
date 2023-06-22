@@ -1,0 +1,122 @@
+#{set readOnly:((mode!='edit'&& mode!='entry') || confirming) /}
+#{set id: transaction?.transactionKey /}
+#{script 'lookups.js', characterset:'utf-8'/}
+
+<script type="text/javascript">
+
+	$(function() {			
+		
+		$('#settlementDate').datepicker();
+		$('.calendar').datepicker();
+
+		if ($.browser.msie){
+			$("#remarksCancel[maxlength]").bind('input propertychange', function() {
+		        var maxLength = $(this).attr('maxlength');  
+		        if ($(this).val().length > maxLength) {  
+		            $(this).val($(this).val().substring(0, maxLength));  
+		        }  
+		    });
+		}
+	});
+
+
+</script>
+
+#{if flash.error || errors}
+    <div class="error">
+    	Error when saving data!<br/>
+		#{ifErrors}
+			#{errors}
+				 <li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}
+<form id="miscellaneousChargeForm" class="form" method="POST">
+#{hidden id:'taxRate', name:'charge.taxMaster.taxRate', value:charge?.taxMaster?.taxRate /}
+#{hidden id:'chargeFrequency', name:'charge.chargeMaster.chargeFrequency.lookupCode', value:charge?.chargeMaster?.chargeFrequency?.lookupCode /}
+#{hidden id:'saveChargeFrequency', name:'charge.chargeFrequency', value:charge?.chargeFrequency /}
+#{hidden id:'securityType', name:'transaction.security.securityType.securityType', value:transaction?.security?.securityType?.securityType /}
+#{hidden id:'minValueCharge', name:'charge.chargeMaster.minimumValue', value:charge?.chargeMaster?.minimumValue /}
+#{hidden id:'maxValueCharge', name:'charge.chargeMaster.maximumValue', value:charge?.chargeMaster?.maximumValue /}
+#{hidden id:'transactionKey',name:'transaction.transactionKey',value:transaction?.transactionKey /}
+#{hidden id:'transactionDate',name:'transaction.transactionDate',value:transaction?.transactionDate?.format(appProp.dateFormat) /}
+
+<table>
+<tr>
+	<td>
+		<div>
+			<ul>
+				<li>
+					#{textBox id:'transactionNo', name:'transaction.transactionNumber', label:'Transaction No', value:transaction?.transactionNumber, class:'capitalize', readOnly:true, width:'120px' /}
+				</li>
+				<li>      
+					#{textBox id:'settlementDate', name:'transaction.settlementDate', label:'Date', value:transaction?.settlementDate?.format(appProp.dateFormat), class:'calendar',width:'120px', required:true, readOnly:true /} (${appProp.displayDateFormat})
+					<span id="settlementDateError" class="error">#{error 'Transaction Date is' /}</span>
+				</li>
+				<li>			
+					#{textBox id:'accountNo', name:'transaction.account.accountNo', label:'Account No', width:'120px', value:transaction?.account?.accountNo,required:true, class:'capitalize',readOnly:true /}
+					#{hidden id:'accountKey', name:'transaction.account.custodyAccountKey', value:transaction?.account?.custodyAccountKey /}
+					#{button id:'accountNoHelp', value:'?', class:'small', readOnly:true /}
+					#{textBox id:'accountNoDesc', name:'transaction.account.name', value:transaction?.account?.name, readOnly:true, width:'241.5px' /}
+					<span class="error">#{error 'Account No is' /}</span>
+				</li>
+				<li>		
+					#{textBox id:'chargeCode', name:'charge.chargeMaster.chargeCode', label:'Charge Code', width:'120px', value:charge?.chargeMaster?.chargeCode,  class:'capitalize',required:true,readOnly:true /} 
+					#{hidden id:'chargeKey', name:'charge.chargeMaster.chargeKey', value:charge?.chargeMaster?.chargeKey /}	
+					#{button id:'chargeCodeHelp', value:'?', class:'small', readOnly:true /}
+				 	#{textBox id:'chargeCodeDesc', name:'charge.chargeMaster.description', value:charge?.chargeMaster?.description, readOnly:true, width:'241.5px' /}
+				 	<span class="error">#{error 'Charge Code is' /}</span>
+				</li>
+				<li>
+					 #{textBox id:'currency', name:'charge.chargeMaster.currency.currencyCode', label:'Currency', value:charge?.chargeMaster?.currency?.currencyCode, class:'capitalize', width:'120px', readOnly:true /}
+				</li>
+				<li>
+					#{textBox id:'chargeAmount', label:'Charge Value',value:charge?.chargeValue,  format:'#,##0.####', class:'numeric',width:'120px', required:true ,readOnly:true /}
+					#{hidden id:'chargeAmountStripped', name:'charge.chargeValue', value:charge?.chargeValue /}
+					<span class="error">#{error 'Charge Value is' /}</span>
+					<span id="errChargeAmount" class="error"></span>
+				</li>
+				<li>
+					#{hidden id:'taxKey', name:'charge.taxMaster.taxKey', value:charge?.taxMaster?.taxKey /}
+					<span class="error">#{error 'Tax Code is' /}</span>
+				</li>
+				
+				<li>
+					#{hidden id:'transactionTemplate', name:'transaction.transactionTemplate.transactionCode', label:'Transaction Code', value:transaction?.transactionTemplate?.transactionCode, class:'capitalize',required:true, readOnly:readOnly, width:'120px' /}
+					#{hidden id:'transactionTemplateKey', name:'transaction.transactionTemplate.transactionTemplateKey', value:transaction?.transactionTemplate?.transactionTemplateKey, class:'settlement' /}
+				
+					#{hidden id:'taxAmount', name:'charge.taxAmount', value:charge?.taxAmount /}	
+					#{hidden id:'totalCharge', name:'transaction.totalFee', value:transaction?.totalFee /}
+				</li>
+				<li>
+					#{textBox id:'refNo', name:'transaction.reference', label:'External Reference', value:transaction?.reference, class:'capitalize', readOnly:true, width:'120px',maxLength:50 /}
+				</li>
+				<li>
+					#{textArea id:'remarks', name:'transaction.description', label:'Remarks', value:transaction?.description, class:'capitalize', readOnly:true, width:'390px', maxLength:240 /}
+				</li>
+			</ul>
+		</div>
+	</td>
+	<td>
+		<div id="dvCancel">
+		<fieldset style="width: 350px;">
+			<ul>
+				<li>
+					#{textBox id:'cancelledDate', name:'transaction.cancelledDate', label:'Cancel Date', value:transaction?.cancelledDate?.format(appProp.dateFormat), class:'calendar',width:'120px', required:true, readOnly:readOnly /} (${appProp.displayDateFormat})
+					<span id="cancelledDateError" class="error">#{error 'Cancel Date is' /}</span>
+				</li>
+				<li id="liRemarksCorrection">
+					#{textArea id:'remarksCancel',label:'Remarks', name:'transaction.remaksCancel', value:transaction?.remaksCancel, class:'capitalize', width:'165px', maxLength:165, readOnly:readOnly /}
+					<span id="remarksCorrectionError" class="error">#{error 'Remarks Correction is' /}</span>
+				</li>
+			</ul>
+		</fieldset>
+		</div>
+	</td>
+</tr>
+</table>
+
+	
+</p>
+</form>

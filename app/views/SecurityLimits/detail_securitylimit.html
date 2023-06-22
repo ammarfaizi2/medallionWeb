@@ -1,0 +1,16 @@
+<form id="securityLimitForm" class="form">
+	#{hidden id:'rowPosition'/}
+	#{hidden id:'oldSecurityTypeKey' /}
+	#{hidden id:'newSecurityTypeKey' /}
+	#{hidden id:'securityLimitDetail', name:'securityLimitDetail.securityLimitDetail', value:securityLimitDetail?.securityLimitDetail /}
+		<br>
+		<b><span id="errDetailSecLimitGlobal" class="error"></span></b>
+		<div id="divTypeSecurityLimit">
+			<p>
+				#{textBox id:'securityType', name:'securityLimitDetail.securityType.securityType', label:'Security Type', value:securityLimitDetail?.securityType?.securityType, readOnly:readOnly, required:true, width:'100px' , class:'capitalize' /}
+				#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'securityTypeDesc', name:'securityLimitDetail.securityType.description', value:securityLimitDetail?.securityType?.description, readOnly:true, width:'350px' /}
+				<span id="securityTypeError" class="error"></span>
+			</p>
+		</div>
+</form>

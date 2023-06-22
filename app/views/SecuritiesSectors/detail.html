@@ -1,0 +1,140 @@
+#{if mode == 'edit' || mode == 'entry' || sector?.status == 'O ' || sector?.status == 'N ' || sector?.status == 'U '}
+	#{set pageTitle: 'Positive Securities Sector' /}
+#{/if}
+#{else}
+	#{set pageTitle: 'Positive Securities Sector Approval' /}
+#{/else}
+
+#{set id:sector?.sectorLimitKey /}
+
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{script 'lookups.js' /}
+
+<style type="text/css">
+  .errmsg { color:red; }
+  #header {padding-top:8px;}
+</style>
+
+<script type="text/javascript">
+	#{include 'SecuritiesSectors/ScSector.js' /}
+
+	function doSave(){
+		/* if (tableSector.fnGetNodes().length < 1){
+			$('#errSectorDetail').html("*Error saving! Make sure there is a minimum of one data in 'Securities Sector Detail'");
+			return false;
+		} */
+		
+		return true;
+	};
+	
+	function doEdit(data) {
+		if ((data[9] == "New") || (data[9] == "Updated")) {
+			view(data[0]);
+			return false;
+		} else {
+			return true;
+		}
+	}
+</script>
+
+<form id="sectorForm" class="form" method="POST">
+	#{hidden id:'dispatch', value:mode /}
+	#{hidden id:'sectorLimitKey', name:'sector.sectorLimitKey', value:sector?.sectorLimitKey /}
+	#{hidden id:'status', name:'sector.status', value:sector?.status /}
+	<p>
+		#{textBox id:'ruleCode', name:'sector.complianceRule.ruleCode', label:'Rule Code', value:sector?.complianceRule?.ruleCode, class:'capitalize', required:true, readOnly:((mode=='entry') ? confirming : true ), width:'120px' /}
+		#{hidden id:'ruleId', name:'sector.complianceRule.ruleId', value:sector?.complianceRule?.ruleId /}
+		#{button id:'ruleHelp', value:'?', class:'small', readOnly:((mode=='entry') ? confirming : true ) /}
+		<span id="ruleCodeError" class="error">#{error 'Rule Code' /}</span>
+	</p>
+	<p>
+		#{textArea id:'ruleDesc', name:'sector.complianceRule.description', label:'Description', value:sector?.complianceRule?.description, readOnly:true, width:'318px', maxLength:'255' /}
+	</p>
+	<p>
+		#{radioButton id:'isActive', name:'isActive', value:((sector?.active)?'true':'false'), label:'Active', options:operators, readOnly:readOnly /}
+		#{hidden id:'active', name:'sector.active', value:((sector?.active)?'true':'false') /} 
+	</p>		
+	<br/>
+	<b><span id="errSectorDetail" class="error"></span></b>
+	<p></p>	
+	<table id="gridSector" class="display" >
+		<thead>
+			<tr>
+				<th width="15%" align="center">Sector</th>
+				<th width="35%" align="center">Description</th>
+				<th width="15%" align="center">Min (%)</th>
+				<th width="15%" align="center">Max (%)</th>
+				<th width="20%" align="center">Action</th>
+			</tr>
+		</thead>
+		<tbody>
+		#{list sector.sectorDetails, as:'sectorDetails'}
+			<tr>
+				<td align="left">${sectorDetails?.sectorLookup?.lookupCode}</td>
+				<td align="left">${sectorDetails?.sectorLookup?.lookupDescription}</td>
+				<td align="left">${sectorDetails?.minimumRange}</td>
+				<td align="left">${sectorDetails?.maximumRange}</td>
+				<td>
+					#{hidden name:'sectorDetails[' + (sectorDetails_index-1) + '].sectorLookup.lookupCode', value:sectorDetails?.sectorLookup?.lookupCode /}
+					#{hidden name:'sectorDetails[' + (sectorDetails_index-1) + '].sectorLookup.lookupDescription', value:sectorDetails?.sectorLookup?.lookupDescription /}
+					#{hidden name:'sectorDetails[' + (sectorDetails_index-1) + '].minimumRange', value:sectorDetails?.minimumRange /}
+					#{hidden name:'sectorDetails[' + (sectorDetails_index-1) + '].maximumRange', value:sectorDetails?.maximumRange /}
+					#{hidden name:'sectorDetails[' + (sectorDetails_index-1) + '].sectorLimitDetail', value:sectorDetails?.sectorLimitDetail /}
+					#{hidden name:'sectorDetails[' + (sectorDetails_index-1) + '].sectorLookup.lookupId', value:sectorDetails?.sectorLookup?.lookupId /}
+					#{hidden name:'sectorDetails[' + (sectorDetails_index-1) + '].limited', value:sectorDetails?.limited /}
+					<center>#{button  id:'deleteButton', value:'Delete', readOnly:readOnly/}</center>
+				</td> 
+			</tr>
+		#{/list}
+		</tbody>
+	</table>
+	<div class="buttons">
+		#{button  id:'btnNewSectorDetail', value:'New Data', readOnly:readOnly/} 
+	</div>
+</form>
+<form></form>
+<input type="hidden" id="dummy" />
+<div id="detailSector" title="Positive Securities Sector">
+	<form id="dialogSectorForm" class="form">
+		#{hidden id:'rowPosition'/}
+		#{hidden id:'oldSector' /}
+		#{hidden id:'newSector' /}
+		#{hidden id:'sectorLimitDetail', name:'sectorDetail.sectorLimitDetail', value:sectorDetail?.sectorLimitDetail /}
+		<br>
+		<b><span id="errDetailSectorGlobal" class="error"></span></b>
+		<p>
+			#{textBox id:'sectorLookupCode', name:'sectorDetail.sectorLookup.lookupCode', label:'Sector', value:sectorDetail?.sectorLookup?.securityType, width:'90px', readOnly:readOnly, class:'capitalize', required:true, maxLength:50/}
+			#{hidden id:'sectorLookup', name:'sectorDetail.sectorLookup.lookupId', value:sectorDetail?.sectorLookup?.lookupId /}
+			#{button  id:'sectorLookupHelp', value:'?', class:'small', readOnly:readOnly/}
+			#{textBox id:'sectorLookupDesc', name:'sectorDetail.sectorLookup.lookupDescription', value:sectorDetail?.sectorLookup?.lookupDescription, readOnly:true, width:'245px' /}
+			<span id="sectorLookupError" class="error">#{error 'Sector is' /}</span> 
+		</p>
+		<p>
+			#{checkBox id:'limited', name:'sectorDetail.limited', label:'', readOnly:readOnly, value:sectorDetail?.limited /}<b>Set limit for this sector</b>
+		</p>
+		<p>
+			#{textBox id:'minimumRange', name:'minimumRange', label:'Minimum', value:sectorDetail?.minimumRange, format:'#,##0.####', class:'percent', required:true, readOnly:readOnly, width:'86'/}
+			#{hidden id:'minimumRangeStripped', name:'sectorDetail.minimumRange', value:sectorDetail?.minimumRange /} 
+			%
+			&nbsp;<span id="minimumRangeError" class="error"></span>
+		</p>
+		<p>
+			#{textBox id:'maximumRange', name:'maximumRange', label:'Maximum', value:sectorDetail?.maximumRange, format:'#,##0.####', class:'percent', required:true, readOnly:readOnly, width:'86'/}
+			#{hidden id:'maximumRangeStripped', name:'sectorDetail.maximumRange', value:sectorDetail?.maximumRange /} 
+			%
+			&nbsp;<span id="maximumRangeError" class="error"></span>
+		</p>
+		<p>&nbsp;</p>
+		#{if readOnly}
+			<div class="buttons">
+				<button id="btnCloseSector">Close</button>
+			</div>
+		#{/if}
+		#{else}
+			<div class="buttons">
+				<button id="btnSaveSector">Save</button>
+				<button id="btnCancelSector">Cancel</button>
+			</div>
+		#{/else}
+	</form>
+</div>

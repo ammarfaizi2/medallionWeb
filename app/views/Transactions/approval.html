@@ -1,0 +1,460 @@
+#{extends 'templates/main.html' /}
+
+<script type="text/javascript">
+	$(function() {
+		$('.buttons input:button').button();
+
+		/* function approveSettlementPrematch(isApproveYes){
+			var action = "@{approveSettlementPrematch()}?keyId=${transaction?.transactionKey}&taskId=${taskId}&maintenanceLogKey=${maintenanceLogKey}&isApproveYes="+isApproveYes;
+			loading.dialog('open');
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+				} else {
+					loading.dialog('close');
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+				}
+			});
+		} */
+		
+		function checkIntSwift() {
+	    	var xhr = $.ajax({
+				type: 'POST',
+				url: '@{Transactions.getSwiftStatus2()}?transactionKey=${transaction?.transactionKey}',
+				contentType: 'application/json; charset=utf-8',
+				dataType: 'json',
+				async: false
+			});
+	    	
+	    	return xhr.responseText;
+		}
+		
+		function approveSettlementPrematch(isApproveYes){
+			var action = "@{approveSettlementPrematch()}?keyId=${transaction?.transactionKey}&taskId=${taskId}&maintenanceLogKey=${maintenanceLogKey}&isApproveYes="+isApproveYes;
+			loading.dialog('open');
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				
+				//var swiftStsDesc = checkIntSwift();
+				var resultCheck = checkIntSwift();
+				var arrResultCheck = resultCheck.split("|");
+				var swiftStsDesc = arrResultCheck[0];				
+				var statusTransFer = arrResultCheck[1];
+				if(statusTransFer == "0"){
+					statusTransFer = "";
+				}
+				var swiftSts = "";
+				if (swiftStsDesc != "NULL") {
+					if (swiftStsDesc == "Delivered") {
+						swiftSts = "No duplicate SWIFT message. SWIFT Message already "+swiftStsDesc;
+					}else{
+						swiftSts = "No duplicate SWIFT message. SWIFT Message already ["+swiftStsDesc+"]";	
+					}
+				}
+				
+				if (data.status == 'success') {
+					messageAlertOk(data.message+"<br>"+swiftSts, "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+				} else {
+					loading.dialog('close');
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+				} 
+				
+				
+			});
+		}
+
+		function validateRemarkCorrection() {
+			if ($("input[name='transaction.needCorrection']:checked").val() == 'true') {
+				if (($('#remarkCorrection').val() == '') || ($('#remarkCorrection').val() == null)) {
+					$('#remarkCorrectionError').html('Required');
+				} else {
+					$('#remarkCorrectionError').html('');
+					return true;
+				}
+				return false;
+			}
+			return true;
+		}
+		
+		function validateSoldQuantity() {
+			var quantity = parseFloat($('#quantityStripped').val());
+			var avaiQuantity = parseFloat($('#holdingQuantityStripped').val());
+			
+			console.log("Quantity = "+quantity);
+			console.log("avaiQuantity = "+avaiQuantity);
+ 			if ($('#holdingQuantity').val() !== '') {
+				if (avaiQuantity < quantity) {
+					$('#errQuantity').html('Sold Quantity cannot be more than Available Trx Quantity');
+				} else {
+					$('#errQuantity').html('');
+					return true;
+				}
+				return false;
+			}
+			return true;
+		}
+		
+		var backToWorkList = function() {
+			loading.dialog('open');
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			};
+		}
+		
+		var closeDialogMessage = function() {
+			$("#dialog-message").dialog('close');
+			return false;
+		}
+		
+		var continueComplianceApprove = function() {
+			$("#dialog-message").dialog("close");
+			actionApprove();
+		}
+		
+		var stopComplianceApprove = function() {
+			$("#dialog-message").dialog("close");
+		}
+		
+		function checkComplianceApprove(){
+			var transDesc = $("#transactionCodeDesc").val();
+			
+			var isUpload = $("#isUpload").val();
+			
+			if(isUpload!=null && isUpload=="true"){
+				actionApprove();
+			} else if(transDesc.includes("RVP") || transDesc.includes("RFOP")){
+				$.get("@{Transactions.checkComplianceSyariah()}?custodyAccountKey="+$("#accountNoKey").val()+"&securityKey="+$("#securityKey").val(), function(data) {
+					checkRedirect(data);
+					var res = data.valid;
+					
+					if(res=="0"){
+						messageAlertYesNo("Security not allowed, do you want to continue ?", "ui-icon ui-icon-notice", "Confirmation Message",continueComplianceApprove, stopComplianceApprove);
+					}else{
+						actionApprove();
+					}
+				});
+			}else{
+				actionApprove();
+			}
+		}
+		
+		function actionApprove(){
+			$("#dialog-message").dialog('close');
+			var resultValidateSoldQuantity = validateSoldQuantity();
+			if (!resultValidateSoldQuantity) {
+				return;
+			}
+			
+			var askManually = $("#adjustmentManual").val();
+			
+			if (askManually == 'true') {
+				var div = $("<div title='Confirmation'><p><span class='ui-icon ui-icon-alert' style='float:left; margin:12px 12px 20px 0;'></span>Coupon adjustment need to process by manually, do you want to continue ?</p></div>")
+
+				 $(div).dialog({
+					resizable: false,
+					height: "auto",
+					width: 400,
+					modal: true,
+					buttons: {
+						"Yes": function() { 
+								var action = "@{approve()}?taskId=${taskId}&maintenanceLogKey=${maintenanceLogKey}&operation=${operation}"+"";
+								var postData = {
+									"correction": $('#remarkCorrection').val(),
+									"warningMsg": $('#warningMsg').val(),
+									"warningMsg2": $('#warningMsg2').val()
+								};
+								loading.dialog('open');
+								$.post(action, postData, function(data, status, xhr) {
+						    		checkRedirect(data);
+									loading.dialog('close');
+									if (data.status == 'success') {
+										messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+									} else {
+										loading.dialog('close');
+										messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+									}
+								});
+								$(this).dialog("close");
+							},
+				        "No": function() {
+				        	$(this).dialog("close"); 
+				        }
+				    }
+				});
+				
+				return false;
+			}else{
+				var action = "@{approve()}?taskId=${taskId}&maintenanceLogKey=${maintenanceLogKey}&operation=${operation}"+"";
+				var postData = {
+					"correction": $('#remarkCorrection').val(),
+					"warningMsg": $('#warningMsg').val(),
+					"warningMsg2": $('#warningMsg2').val()
+				};
+				loading.dialog('open');
+				$.post(action, postData, function(data, status, xhr) {
+		    		checkRedirect(data);
+					loading.dialog('close');
+					if (data.status == 'success') {
+						messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+					} else if(data.status == 'warning'){
+						var div = $("<div title='Confirmation'><p><span class='ui-icon ui-icon-alert' style='float:left; margin:12px 12px 20px 0;'></span>Security not Allowed, do you want to continue ?</p></div>")
+						
+						$(div).dialog({
+							resizable: false,
+							height: "auto",
+							width: 400,
+							modal: true,
+							buttons: {
+								"Yes": function() { 
+									$('#warningMsg').val(true);
+									$(this).dialog("close");
+									$('#approve').click();
+									},
+						        "No": function() {
+						        	$(this).dialog("close"); 
+						        }
+						    }
+						});
+					} else if(data.status == 'warning2'){
+						var div = $("<div title='Confirmation'><p><span class='ui-icon ui-icon-alert' style='float:left; margin:12px 12px 20px 0;'></span>Net Proceed from file upload is not match Settlement Amount, do you want to continue ?</p></div>")
+						
+						$(div).dialog({
+							resizable: false,
+							height: "auto",
+							width: 400,
+							modal: true,
+							buttons: {
+								"Yes": function() { 
+									$('#warningMsg2').val(true);
+									$(this).dialog("close");
+									$('#approve').click();
+									},
+						        "No": function() {
+						        	$(this).dialog("close"); 
+						        }
+						    }
+						});
+					} else {
+						loading.dialog('close');
+						messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+					}
+				});
+			}
+		}	
+		
+		$('#approve').click(function() {
+			checkComplianceApprove();
+		});
+		
+/*		$('#reject').click(function() {
+			var action = "@{reject()}?keyId=${transaction?.transactionKey}&taskId=${taskId}";
+			$.post(action, function(data, status, xhr) {
+				if (data.status == 'success') {
+					alert(data.message);
+					location = "@{Approvals.list()}";
+				} else {
+					loading.dialog('close');
+					alert(data.error);
+				}
+			});
+		});
+*/
+		// ACTION BUTTON REJECT
+		$('#reject').click(function() {
+			var resultValidateCorrection = validateRemarkCorrection();
+			if (!resultValidateCorrection) {
+				return;
+			}
+			
+			var action = "@{reject()}?taskId=${taskId}&maintenanceLogKey=${maintenanceLogKey}&operation=${operation}"+"";
+			var postData = {
+				"correction": $('#remarkCorrection').val(),
+				"csno": $('#transactionNo').val()
+			};
+			loading.dialog('open');
+			$.post(action, postData, function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+					//alert("Transaction No : '${transaction?.transactionNumber}' is " + data);
+				} else {
+					loading.dialog('close');
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+					//alert(data.error);
+				}
+			});
+		});
+		//===============
+		var allowApproveYes = function() {
+			allowApprove(true);
+		}
+
+		var allowApproveNo = function() {
+			allowApprove(false);
+		}
+
+		var allowApprove = function(isApproveYes){
+			console.log("isApproveYes = " +isApproveYes);
+			if(!$("#inhouseReference").isEmpty() || !$("#settlementAmountAdj").isEmpty()){
+				var settlementAmountAdj;
+				if($("#settlementAmountAdj").isEmpty()){
+					settlementAmountAdj = '';
+				} else {
+					settlementAmountAdj = $('#settlementAmountAdj').autoNumericGet();
+				}				
+				var a = "@{validateSettlementPrematch()}?param="
+						+$('#inhouseReference').val()+"|"
+						+settlementAmountAdj+"|"
+						+$('#custodyTransactionCode').val()+"|"
+						+$("#settlementAgentCode").val()+"|"
+						+$("#quantity").autoNumericGet()+"|"
+						+$("#securityId").val()+"|"
+						+$("#transactionKey").val()+"|"
+						+$("#settlementAmount").autoNumericGet()+"|"
+						+$("#currencyCode").val()+"|"
+						+$("#price").autoNumericGet();
+				$.post(a, function(data, status, xhr) {
+		    		//checkRedirect(data);
+					if (data.message != null) {
+						messageAlertOk(data.message, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+						return false;
+					} else {
+						//sukses
+						approveSettlementPrematch(isApproveYes);
+					}
+				});
+			} else {
+				//sukses
+				approveSettlementPrematch(isApproveYes);
+			}
+		}
+
+		//approveSettlementPrematch	
+		$('#approveSettlementPrematch').click(function() {
+			var trxStlQty;
+			var trxPortQty;
+			if (('${transaction.actualSettledQuantity}'==null)||('${transaction.actualSettledQuantity}'=='')){
+				trxStlQty = 0;
+			} else {
+				trxStlQty = '${transaction.actualSettledQuantity}';
+			}
+			
+			if (('${transaction.portfolioQuantity}'==null)||('${transaction.portfolioQuantity}'=='')){
+				trxPortQty = 0;
+			} else {
+				trxPortQty = '${transaction.portfolioQuantity}';
+			}
+			var quantity = parseFloat($('#quantityStripped').val());
+			var settleQuantity = parseFloat(trxStlQty);
+			var portoQuantity = parseFloat(trxPortQty);
+			var currentDate = $('#currentDate').datepicker('getDate');
+			var settlementDate = $('#settlementDate').datepicker('getDate');
+			// 1. validasi holding not enough
+			if (($('#holdingRefs').val()!='') && ((quantity > settleQuantity) || (quantity > portoQuantity))) {
+				console.log( "quantity:"+quantity );
+				console.log( "settleQuantity:"+settleQuantity );
+				console.log( "portoQuantity:"+portoQuantity );
+				messageAlertOk("Sold Quantity cannot be more than Available Trx Quantity", "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+				return false;
+			} 
+			// 2. validasi sub account must registered on depository
+ 			else if (($('#isSentToDepository').val()=='true') && '${validateAccount}'=='true') {
+            	messageAlertOk("Sub Account for this Depository not found", "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+            	return false;
+            }
+			// 3. validasi counter party must member of depository
+            else if (($('#isSentToDepository').val()=='true') && '${validateThirdParty}' == 'true') {
+            	messageAlertOk("This Counter Party is not member of "+$('#depositoryDesc').val(), "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+            	return false;
+            }
+			// 4. warn message when application date greater than settlement date
+            else if (currentDate.getTime() > settlementDate.getTime()) {
+ 				messageAlertYesNoCancel("Do you want to continue this settlement on "+$('#currentDate').val()+"?", "ui-icon ui-icon-notice", "Confirmation Message",allowApproveYes, allowApproveNo, closeDialogMessage)
+ 			}
+			// 5.validasi application date must greather than settlement date
+ 			else if (currentDate.getTime() < settlementDate.getTime()) {
+ 				messageAlertOk("Settlement Date must be equal with Current Bussiness Date", "ui-icon1 ui-icon-circle-close", "Error Message",closeDialogMessage);
+ 			}
+            else{
+				allowApprove(false);
+			}
+						
+		});
+
+		//Reject SettlementPrematch
+		$('#rejectSettlementPrematch').click(function() {
+			var action = "@{rejectSettlementPrematch()}?keyId=${transaction?.transactionKey}&maintenanceLogKey=${maintenanceLogKey}&taskId=${taskId}";
+			loading.dialog('open');
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+					//alert(data.message);
+					//location = "@{Approvals.list()}";
+				} else {
+					loading.dialog('close');
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+					//alert(data.error);
+				}
+			});
+		});
+		//===============
+
+			$('#closeWorkflow').click(function() {
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			}
+		});
+		
+		if ($("input[name='transaction.needCorrection']:checked").val() == 'true') {
+			$('#approve').button({disabled: true});
+			$('p[id=pRemarkCorrection] label span').html(" *");
+		} else {
+			$('#approve').button({disabled: false});
+			$('p[id=pRemarkCorrection] label span').html("");
+		}
+		$('#needCorrection').removeAttr('disabled');
+		$('#remarkCorrection').removeAttr('disabled');
+		
+		$('input[name=transaction.needCorrection]').change(function(){
+			if ($("input[name='transaction.needCorrection']:checked").val() == 'true') {
+				$('#approve').button({disabled: true});
+				$('p[id=pRemarkCorrection] label span').html(" *");
+			} else {
+				$('#approve').button({disabled: false});
+				$('p[id=pRemarkCorrection] label span').html("");
+			}
+			
+			$('#needCorrection').removeAttr('disabled');
+			$('#remarkCorrection').removeAttr('disabled');
+		});
+	});
+</script>
+<h2>Transaction Approval</h2>
+<div id="detail">
+	#{include 'Transactions/detail.html' /}
+</div>
+
+#{hidden id:'from', name:'from', value:from /}	
+
+<div id="actions" class="buttons">
+#{if param == 'settlement-prematch-view'}
+	<input type="button" id="approveSettlementPrematch" value="Approve" />
+	<input type="button" id="rejectSettlementPrematch" value="Reject" />
+	<input type="button" id="closeWorkflow" value="Cancel" />			
+#{/if}
+#{else}
+	<input type="button" id="approve" value="Approve" />
+	<input type="button" id="reject" value="Reject" />
+	<input type="button" id="closeWorkflow" value="Cancel" />			
+#{/else}
+</div>

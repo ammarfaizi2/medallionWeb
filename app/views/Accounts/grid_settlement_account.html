@@ -1,0 +1,75 @@
+<script type="text/javascript">
+$(function(){
+	if (('${confirming}'=='true')||('${mode}'=='view')){
+		$('input[name=account.settlementAccount.bankAccountKey]').attr("disabled","disabled");
+	}
+	
+	$('input[name=netting]').change(function(){
+		$("input[name='account.netting']").val($("input[name='netting']:checked").val());
+	});
+	
+});
+</script>
+#{radioButton id:'netting', name:'netting', value:((account?.netting)?'true':'false'), label:'Netting', options:operators, readOnly:readOnly /}
+#{hidden id:'nettingHidden', name:'account.netting', value:account?.netting /}
+<table id="gridSettlementAccount" class="display">
+	<thead>
+		<tr>
+			<th>Key</th>
+			<th width="150px">Account No</th>
+			<th>Bank Name</th>
+			<th>Beneficiary Name</th>
+			<th>Waive Bank Charges</th>
+			
+			<th width="80px">Default</th>
+			<th width="80px">Action</th>
+		</tr>
+	</thead>
+	<tbody>
+	 	#{list account?.bankAccounts, as:'bankAccount'}
+		<tr>
+			<td>${bankAccount?.bankAccountKey}</td>
+			<td>${bankAccount?.accountNo}</td>	
+			<td>${bankAccount?.bankCode?.thirdPartyName}</td>
+			<td>${bankAccount?.name}</td>
+			<td>${bankAccount?.paymentCharge}</td>
+			<td>
+				<center>
+					<input type='radio' id='radio${bankAccount?.bankAccountKey} name='account.settlementAccount.bankAccountKey' value='${bankAccount?.bankAccountKey}'#{if account?.settlementAccount?.bankAccountKey == bankAccount?.bankAccountKey}checked='checked' #{/if} />
+				</center>				
+			</td>
+			<td>
+				<span>
+					<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} /></center>
+				</span> 
+				#{hidden name:'bankAccountss[' + (bankAccount_index-1) + '].bankAccountKey', value:bankAccount?.bankAccountKey /}
+				#{hidden name:'bankAccountss[' + (bankAccount_index-1) + '].accountNo', value:bankAccount?.accountNo /}
+				#{hidden name:'bankAccountss[' + (bankAccount_index-1) + '].name', value:bankAccount?.name /}
+				#{hidden name:'bankAccounts[' + (bankAccount_index-1) + '].bankCode.thirdPartyCode', value:bankAccount?.bankCode?.thirdPartyCode /}
+				#{hidden name:'bankAccounts[' + (bankAccount_index-1) + '].paymentCharge', value:bankAccount?.paymentCharge /}
+				<!--  
+				#{hidden name:'bankAccounts[' + (bankAccount_index-1) + '].bankCode.thirdPartykey', value:bankAccount?.bankCode?.thirdPartyKey /}
+				
+				-->
+			
+			</td>
+		</tr>
+		#{/list}
+	</tbody>
+	<tfoot style="display:none">
+		<tr>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td>
+				<input type="hidden" id="bankAccountKey" />
+				<input type="hidden" id="accountNo" />
+				<input type="hidden" id="name" />
+				<input type="hidden" id="bankCodeKey" />
+				<input type="hidden" id="bankCode" />
+				<input type="hidden" id="default" />
+			</td>
+		</tr>
+	</tfoot>
+</table>
+

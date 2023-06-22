@@ -1,0 +1,44 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Security Type Maintenance' /}
+
+<script type="text/javascript">
+
+	function doEdit(data) {
+		if ((data[4] == "New") || (data[4] == "Updated")) {
+			view(data[0]);
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+</script>
+
+<table class="display">
+	<thead>
+		<tr>
+			<th></th>			
+			<th width="120px">Security Type</th>
+			<th>Description</th>
+			<th width="120px">Security Class</th>
+			<th width="100px">Status</th>
+			<th width="100px">Active</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:securityTypes, as:'securityType'}  
+		
+			<tr>
+				<td>${securityType?.securityType}</td>
+				<td class="capitalize">${securityType?.securityType}</td>
+				<td class="capitalize">${securityType?.description}</td>
+				<td class="capitalize">${securityType?.securityClass.lookupCode}</td>
+				<td>${securityType?.recordStatus?.decodeStatus()}</td>	
+				<td>${(securityType?.isActive)? 'Yes':'No' }</td>		
+		</tr>
+	 #{/list}	
+     </tbody>
+</table>
+	
+
+

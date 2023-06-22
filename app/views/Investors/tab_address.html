@@ -1,0 +1,121 @@
+<style>
+.subpane { height: 270px }
+</style>
+<div id="addresses">
+	<ul class="tabs">
+		<li><a href="#address-1">Home Address</a></li>
+		<li><a href="#address-2">Work Address</a></li>
+		<li><a href="#address-3">Correspondence</a></li>
+	</ul>
+	<div class="subpane" id="address-1">
+		<ul>
+			<li>
+				#{textArea id:'address1', name:'customer.address1', label:'Address', value:'', readOnly:readOnly, width:'300px' /}
+			</li>
+			<li>
+				#{textBox id:'address1City', name:'customer.address1City', label:'City', value:'', width:'300px',readOnly:readOnly /}
+			</li>
+			<li>
+				#{textBox id:'address1CountryCode', name:'customer.address1CountryCode', label:'Country', value:'', readOnly:readOnly, width:'50px' /}
+				#{hidden id:'address1Country', name:'customer.address1Country', value:'' /}
+				#{button id:'address1CountryHelp', value:'?', class:'small', readOnly:readOnly /}	
+				#{textBox id:'address1CountryDesc', name:'customer.address1CountryDesc', value:'', readOnly:true, width:'220px' /}
+			</li>
+			<li>
+				#{textBox id:'address1StateCode', name:'address1State.lookupCode', label:'State', value:'', readOnly:readOnly, width:'50px' /}
+				#{hidden id:'address1State', name:'customer.address1State', value:'' /}
+				#{button id:'address1StateHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'address1StateDesc', name:'address1State.lookupDescription', value:'', readOnly:true, width:'220px' /}
+			</li>
+			<li>
+				#{textBox id:'address1AreaCode', name:'address1Area.lookupCode', label:'Area', value:'', readOnly:readOnly, width:'50px' /}
+				#{hidden id:'address1Area', name:'customer.address1Area', value:'' /}
+				#{button id:'address1AreaHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'address1AreaDesc', name:'address1Area.lookupDescription', value:'', readOnly:true, width:'220px' /}				
+			</li>
+			<li>
+				#{textBox id:'customer_address1SubArea', name:'customer.address1SubArea', label:'Sub Area', value:'', readOnly:readOnly, width:'300px' /}
+			</li>
+			<li>
+				#{textBox id:'customer_address1ZipCode', name:'customer.address1ZipCode', label:'Zip Code', value:'', readOnly:readOnly, width:'300px' /}
+			</li>
+			<li>
+				#{textBox id:'customer_address1Phone1', name:'customer.address1Phone1', label:'Phone 1', value:'', readOnly:readOnly, width:'300px' /}
+			</li>
+			<li>
+				#{textBox id:'customer_address1Phone2', name:'customer.address1Phone2', label:'Phone 2', value:'', readOnly:readOnly, width:'300px' /}
+			</li>
+			<li>
+				#{textBox id:'customer_address1Phone3', name:'customer.address1Phone3', label:'Phone 3', value:'', readOnly:readOnly, width:'300px' /}
+			</li>
+		</ul>
+	</div>
+	<div class="subpane" id="address-2">
+		<ul>
+			<li>
+				#{textArea id:'address2', name:'customer.address2', label:'Address', value:'', readOnly:readOnly, width:'300px' /}
+			</li>
+			<li>
+				#{textBox id:'address2City', name:'customer.address2City', label:'City', value:'', readOnly:readOnly, width:'300px' /}
+			</li>
+			<li>
+				#{textBox id:'address2Country', name:'customer.address2Country', label:'Country', value:'', readOnly:readOnly, width:'300px' /}
+			</li>
+			<li>
+				#{textBox id:'address2State', name:'customer.address2State', label:'State', value:'', readOnly:readOnly, width:'300px' /}
+			</li>
+			<li>
+				#{textBox id:'address2Area', name:'customer.address2Area', label:'Area', value:customer?.address2Area, readOnly:readOnly, width:'300px' /}
+			</li>
+			<li>
+				#{textBox id:'address2SubArea', name:'customer.address2SubArea', label:'Sub Area', value:customer?.address2SubArea, readOnly:readOnly, width:'300px' /}
+			</li>
+			<li>
+				#{textBox id:'address2ZipCode', name:'customer.address2ZipCode', label:'Zip Code', value:customer?.address2ZipCode, readOnly:readOnly, width:'300px' /}
+			</li>
+			<li>
+				#{textBox id:'address2Phone1', name:'customer.address2Phone1', label:'Phone 1', value:customer?.address2Phone1, readOnly:readOnly, width:'300px' /}
+			</li>
+			<li>
+				#{textBox id:'address2Phone2', name:'customer.address2Phone2', label:'Phone 2', value:customer?.address2Phone2, readOnly:readOnly, width:'300px' /}
+			</li>
+			<li>
+				#{textBox id:'address2Phone3', name:'customer.address2Phone3', label:'Phone 3', value:customer?.address2Phone3, readOnly:readOnly, width:'300px' /}
+			</li>
+		</ul>
+	</div>
+	<div class="subpane" id="address-3">
+		<ul>
+			<li>
+				#{textArea id:'address3', name:'customer.address3', label:'Address', value:customer?.address3, readOnly:readOnly, width:'300px' /}
+			</li>
+			<li>
+				#{textBox id:'address3City', name:'customer.address3City', label:'City', value:customer?.address3City, readOnly:readOnly, width:'300px' /}
+			</li>
+			<li>
+				#{textBox id:'address3Country', name:'customer.address3Country', label:'Country', value:customer?.address3Country, readOnly:readOnly, width:'300px' /}
+			</li>
+			<li>
+				#{textBox id:'address3State', name:'customer.address3State', label:'State', value:customer?.address3State, readOnly:readOnly, width:'300px' /}
+			</li>
+			<li>
+				#{textBox id:'address3Area', name:'customer.address3Area', label:'Area', value:customer?.address3Area, readOnly:readOnly, width:'300px' /}
+			</li>
+			<li>
+				#{textBox id:'address3SubArea', name:'customer.address3SubArea', label:'Sub Area', value:customer?.address3SubArea, readOnly:readOnly, width:'300px' /}
+			</li>
+			<li>
+				#{textBox id:'address3ZipCode', name:'customer.address3ZipCode', label:'Zip Code', value:customer?.address3ZipCode, readOnly:readOnly, width:'300px' /}
+			</li>
+			<li>
+				#{textBox id:'address3Phone1', name:'customer.address3Phone1', label:'Phone 1', value:customer?.address3Phone1, readOnly:readOnly, width:'300px' /}
+			</li>
+			<li>
+				#{textBox id:'address3Phone2', name:'customer.address3Phone2', label:'Phone 2', value:customer?.address3Phone2, readOnly:readOnly, width:'300px' /}
+			</li>
+			<li>
+				#{textBox id:'address3Phone3', name:'customer.address3Phone3', label:'Phone 3', value:customer?.address3Phone3, readOnly:readOnly, width:'300px' /}
+			</li>
+		</ul>			
+	</div>
+</div>

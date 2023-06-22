@@ -1,0 +1,8 @@
+#{if _label}<label #{if _labelwidth}style="width:${_labelwidth}"#{/if}>${_label.raw()} #{if _required}<span class="req">*</span>#{/if}</label>#{/if}
+#{if _readOnly}
+<input #{if _id}id="${_id}"#{/if} #{if _password}type="password"#{/if}#{else}type="text"#{/else} #{if _format}value="${_value?.format(_format)}"#{/if}#{else}value="#{if _displayValue}${_displayValue}#{/if}#{else}${_value}#{/else}"#{/else} #{if _width}style="width:${_width}"#{/if}  #{if _class}class="${_class}"#{/if} #{if _binder}binder="${_binder}"#{/if} disabled="disabled" #{if _style}style="${_style}"#{/if}/>
+<input #{if _id}id="h_${_id}"#{/if} #{if _name}name="${_name}"#{/if} type="hidden" value="${_value}" #{if _binder}binder="${_binder}"#{/if} /> 
+#{/if}
+#{else}
+	<input #{if _id}id="${_id}"#{/if} #{if _name}name="${_name}"#{/if} #{if _password}type="password"#{/if}#{else}type="text"#{/else} #{if _format}value="${_value?.format(_format)}"#{/if}#{else}value="${_value}"#{/else} #{if _width}style="width:${_width}"#{/if}  #{if _class}class="${_class}"#{/if} #{if _tabIndex}tabindex="${_tabIndex}"#{/if} #{if _maxLength}maxlength="${_maxLength}"#{/if} #{if _binder}binder="${_binder}"#{/if} #{if _dataold}data-old="${_dataold}"#{/if}  #{if _style}style="${_style}"#{/if}/>
+#{/else}

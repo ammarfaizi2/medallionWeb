@@ -1,0 +1,32 @@
+<table id="gridReportMappingDetail" class="display">
+	<thead>
+		<tr>
+			<!-- <th>Row Number</th> -->
+			<th>COA No</th>
+			<th>Account Name</th>
+			<th>P(+) / M(-)</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list faReportMapDetails, as:'faReportMapDetail'}
+		<tr>
+			<!-- <td>
+				${faReportMapDetail?.id?.rowNumber}
+			</td> -->
+			<td>
+				${faReportMapDetail?.faCoaMaster?.coaCode}
+			</td>
+			<td>
+				${faReportMapDetail?.faCoaMaster?.description}
+			</td>
+			<td>
+				${faReportMapDetail?.reportPosition?.lookupDescription}
+			</td>
+			<td>
+			<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} /></center>
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>

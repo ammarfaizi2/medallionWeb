@@ -1,0 +1,98 @@
+
+<script type="text/javascript">
+$(function(){
+	/* $('#cancelTaxTier').click(function() {
+		$("#detailTaxTier").dialog('close');
+		$("#tierValueError").html("");
+		$("#tierValue").removeClass('fieldError');
+		return false;
+	}); */
+	
+	$('#taxTierForm #taxCodeIntDetail').change(function(){
+		if ($('#taxTierForm #taxCodeIntDetail').val()==''){
+			$('#taxTierForm #taxKeyIntDetail').val('');
+			$('#taxTierForm #taxCodeIntDetail').val('');
+			$('#taxTierForm #taxDescIntDetail').val('');
+			$('#taxTierForm #rateIntDetail').val('');
+			$('#taxTierForm #rateIntDetailStripped').val('');
+		}
+	});
+	
+	$('#taxTierForm #taxCodeIntDetail').lookup({
+		
+		list:'@{Pick.taxMasters()}',
+		
+		get:{
+			
+			url:'@{Pick.taxMaster()}',
+			success: function(data) {
+						$('#taxTierForm #taxCodeIntDetail').removeClass('fieldError');
+						$('#taxTierForm #taxKeyIntDetail').val(data.code);
+						$('#taxTierForm input#taxCodeIntDetail').val(data.taxCode);
+						$('#taxTierForm #taxDescIntDetail').val(data.description);
+						$('#taxTierForm #rateIntDetail').val(data.taxRate);
+						$('#taxTierForm #rateIntDetailStripped').val(data.taxRate);
+						$('#h_taxDesc').val(data.description);
+					},
+			error: function() {
+					$('#taxTierForm #taxCodeIntDetail').addClass('fieldError');
+					$('#taxTierForm #taxKeyIntDetail').val('');
+					$('#taxTierForm #taxCodeIntDetail').val('');
+					$('#taxTierForm #rateIntDetail').val('');
+					$('#taxTierForm #rateIntDetailStripped').val('');
+					$('#taxTierForm #taxDescIntDetail').val('NOT FOUND');
+					$('#h_taxDescIntDetail').val('');
+				}
+		},
+		key:$('#taxTierForm #taxKeyIntDetail'),
+		description:$('#taxTierForm #taxDescIntDetail'),
+		help:$('#taxTierForm #taxCodeHelpIntDetail')
+	});
+});
+</script>
+<form>
+</form>
+<form id="taxTierForm" class="form">
+<p>
+	#{hidden id:'rowPositionIntDetail' /}
+	#{hidden id:'oldMaxRange' /}
+	#{hidden id:'newMaxRange' /}
+	#{hidden id:'taxProfileCodeIntDetail', name:'txProfRuleIntDetail.id.taxProfileCode', value:taxTier?.id?.taxProfileCode /}
+	#{hidden id:'securityTypeCodeIntDetail', name:'txProfRuleIntDetail.id.securityTypeCode', value:taxTier?.id?.securityTypeCode /}
+	#{hidden id:'tieringTypeCodeIntDetail', name:'txProfRuleIntDetail.id.tieringTypeCode', value:taxTier?.id?.tieringTypeCode /}
+	#{hidden id:'effectiveDateFromCodeIntDetail', name:'txProfRuleIntDetail.id.effectiveDateFromCode', value:taxTier?.id?.effectiveDateFromCode /}
+	#{hidden id:'effectiveDateToCodeIntDetail', name:'txProfRuleIntDetail.id.effectiveDateToCode', value:taxTier?.id?.effectiveDateToCode /}
+	#{hidden id:'taxKeyCodeIntDetail', name:'txProfRuleIntDetail.id.taxKey', value:txProfRuleIntDetail?.id?.taxKey /}
+</p>
+
+&nbsp;<span id="tierValueError" class="error"></span>
+<p>
+	#{textBox id:'amountIntDetail', name:'amount', label:'Amount', value:txProfRuleIntDetail?.amount, format:'#,##0.####', class:'numeric', required:true, readOnly:readOnly, width:'100px'/}
+	#{hidden id:'amountIntDetailStripped', name:'taxTier.amount', value:txProfRuleIntDetail?.amount /}
+	<span id="errAmount" class="error"></span>
+</p>
+<p>			
+	#{textBox id:'taxCodeIntDetail', name:'txProfRuleIntDetail.taxMaster.taxCode', label:'Tax Code', value:txProfRuleIntDetail?.taxMaster?.taxCode, class:'capitalize', required:true, readOnly:readOnly, width:'100px' /}
+	#{hidden id:'taxKeyIntDetail', name:'txProfRuleIntDetail.taxMaster.taxKey', value:txProfRuleIntDetail?.taxMaster?.taxKey  /}
+	#{button id:'taxCodeHelpIntDetail', value:'?', class:'small', readOnly:readOnly /}
+	#{textBox id:'taxDescIntDetail', name:'txProfRuleIntDetail.taxMaster.description', value:txProfRuleIntDetail?.taxMaster?.description, readOnly:true, width:'150px' /}
+	<span id="errTaxCode" class="error"></span>
+</p>
+<p>
+	#{textBox id:'rateIntDetail', name:'rate', label:'Rate(%)', value:txProfRuleIntDetail?.rate, format:'#,##0.####', class:'numeric', required:false, readOnly:true, width:'100px'/}
+	#{hidden id:'rateIntDetailStripped', name:'txProfRuleIntDetail.rate', value:txProfRuleIntDetail?.rate /} <span id="percent">%</span>
+</p>
+<p>
+	<div class="buttons">
+		#{if (mode=='entry' || mode == 'edit')&& (!(confirming))}
+				<button id="addTaxTier">Save</button>
+				<button id="cancelTaxTier">Cancel</button>
+		#{/if}
+		#{else}
+			#{if confirming || mode=='view' }
+			<button id="cancelTaxTier">Close</button>
+		#{/if}
+		#{/else}
+	</div>
+</p>
+</form>

@@ -1,0 +1,237 @@
+
+<script type="text/javascript">
+	$(function() {	
+		$('.subpane').css('height','450' );
+		//$('#accounts').tabs();
+		
+		if ('${mode}' == 'view'){
+			if ($('#param').val() == 'customer-inquiry') {
+				$("#accounts").tabs("select", "#invt-account");
+			}
+		}
+		
+		$("div[id$='cust-account']").css("display", "");
+		$("div[id$='bank-account']").css("display", "");
+		$("div[id$='invt-account']").css("display", "");
+
+		$("li[id$='li-cust-account']").css("display", "");
+		$("li[id$='li-bank-account']").css("display", "");
+		$("li[id$='li-invt-account']").css("display", "");
+		
+		if ((/register-cust/i.test('${param}')) && ('${mode}' == 'view')){
+			$("div[id$='bank-account']").css("display", "none");
+			$("div[id$='invt-account']").css("display", "none");
+	
+			$("li[id$='li-bank-account']").css("display", "none");
+			$("li[id$='li-invt-account']").css("display", "none");
+			
+			//for bugs in datatable, not direcly show, link must be click
+			$('a[href*="cust-account"]').trigger('click');
+		} else if ((/register-bank/i.test('${param}')) && ('${mode}' == 'view')){
+			$("div[id$='cust-account']").css("display", "none");
+			$("div[id$='invt-account']").css("display", "none");
+			//$("div[id$='bank-account']").css("display", "");
+	
+			$("li[id$='li-cust-account']").css("display", "none");
+			$("li[id$='li-invt-account']").css("display", "none");
+			
+			//for bugs in datatable, not direcly show, link must be click
+			$('a[href*="bank-account"]').trigger('click');
+			
+			//var tabOpts = { selected: 1};
+			//$('#accounts').tabs(tabOpts);
+		} else if ((/register-invt/i.test('${param}')) && ('${mode}' == 'view')){
+			$("div[id$='bank-account']").css("display", "none");
+			$("div[id$='cust-account']").css("display", "none");
+			//$("div[id$='invt-account']").css("display", "");
+	
+			$("li[id$='li-bank-account']").css("display", "none");
+			$("li[id$='li-cust-account']").css("display", "none");
+			
+			//for bugs in datatable, not direcly show, link must be click
+			$('a[href*="invt-account"]').trigger('click');
+		} 
+		
+	});
+		
+
+</script>
+
+<div id="accounts">
+	<ul class="tabs">
+		<li id="li-cust-account"><a href="#cust-account">Custody Account</a></li>
+		<li id="li-bank-account"><a href="#bank-account">Bank Account</a></li>
+		<!-- <li id="li-invt-account"><a href="#invt-account">Investment Account</a></li> -->
+	</ul>
+	
+	<div class="subpane" id="cust-account" style="overflow-y:scroll;height:400px">
+		<table id="grid-cust-account" class="display">
+			<thead>
+				<tr>
+					<th>Key</th>
+					<th width="100px">Custody Account</th>
+					<th width="200px">Name</th>
+					<th width="100px">Balance</th>
+					<th width="50px">Active</th>
+				</tr>
+			</thead>
+			<tbody>
+			#{list items:customer?.accounts, as:'account'}
+				<tr>
+					<td>
+						${account?.custodyAccountKey}
+					</td>
+					<td>
+						${account?.accountNo}
+					</td>
+					<td>
+						${account?.name}
+					</td>		
+					<td align="right">
+						#{if account?.balance != null}
+								${(account?.balance?:0).format('##,##0.##')}
+						#{/if}
+					</td>
+					<td>
+						<span>
+							${(account?.isActive)? 'Yes':'No' }
+						</span>
+						#{hidden id:'custodyAccountKey', name:'accounts[' + (account_index-1) + '].custodyAccountKey', value:account?.custodyAccountKey /}
+						#{hidden id:'accountNo', name:'accounts[' + (account_index-1) + '].accountNo', value:account?.accountNo /}
+						#{hidden id:'name', name:'accounts[' + (account_index-1) + '].name', value:account?.name /}
+						#{hidden id:'balance', name:'accounts[' + (account_index-1) + '].balance', value:account?.balance /}
+					</td>						
+				</tr>
+			#{/list}
+			</tbody>
+			<tfoot style="display:none">
+				<tr>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td>
+						<input type="hidden" id="custodyAccountKey" />
+						<input type="hidden" id="accountNo" />
+						<input type="hidden" id="name" />	
+						<input type="hidden" id="balance" />
+					</td>
+				</tr>
+			</tfoot>
+		</table>		
+	</div>
+	
+	<div class="subpane" id="bank-account" style="overflow-y:scroll;height:400px">
+		<table id="grid-bank-account" class="display">
+			<thead>
+				<tr>
+					<th width="100px">Key</th>
+					<th width="100px">AccountNo</th>
+					<th width="200px">Bank Name</th>
+					<th width="200px">Beneficiary Name</th>
+					<th width="100px" style="display:none">Balance</th>
+					<!-- <th width="50px">Status</th> -->
+					<th width="50px">Active</th>
+				</tr>
+			</thead>
+			<tbody>
+			#{list items:customer?.bankAccounts.sort(), as:'bankAccount'}
+				<tr>
+					<td>
+						${bankAccount?.bankAccountKey}
+					</td>
+					<td>
+						${bankAccount?.accountNo}
+					</td>
+					<td>
+						${bankAccount?.bankCode?.thirdPartyName}
+					</td>	
+					<td>
+						${bankAccount?.name}
+					</td>		
+					<td align="right" style="display:none">
+						#{if bankAccount?.balance != null}
+							${bankAccount?.balance?.format('##,###.##')}
+						#{/if}
+					</td>
+					<!-- <td>
+						${bankAccount?.recordStatus}
+					</td>	 -->	
+					<td>
+						<span>
+							${(bankAccount?.isActive)? 'Yes':'No' }
+						</span>
+						#{hidden id:'bankAccountKey', name:'bankAccounts[' + (bankAccount_index-1) + '].bankAccountKey', value:bankAccount?.bankAccountKey /}
+						#{hidden id:'bankaccountNo', name:'bankAccounts[' + (bankAccount_index-1) + '].accountNo', value:bankAccount?.accountNo /}
+						#{hidden id:'bankName', name:'bankAccounts[' + (bankAccount_index-1) + '].name', value:bankAccount?.name /}
+						#{hidden id:'bankBalance', name:'bankAccounts[' + (bankAccount_index-1) + '].balance', value:bankAccount?.balance /}
+					</td>
+				</tr>
+			#{/list}
+			</tbody>
+			<tfoot style="display:none">
+				<tr>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td>
+						<input type="hidden" id="bankAccountKey" />
+						<input type="hidden" id="bankAccountNo" />
+						<input type="hidden" id="bankName" />	
+						<input type="hidden" id="bankBalance" />
+					</td>
+				</tr>
+			</tfoot>
+		</table>				
+	</div>
+	
+	<!-- <div class="subpane" id="invt-account">
+		<div id="investment-account" style="overflow-y:scroll;height:410px">
+			<table id="grid-invt-account" class="display">
+				<thead>
+					<tr>
+						<th>Key</th>
+						<th width="100px">Investment Account</th>
+						<th width="200px">Fund Name</th>
+						<th width="100px">Balance</th>
+						<th width="50px">Active</th>
+					</tr>
+				</thead>
+				<tbody>
+				#{list items:invs, as:'inv'}
+					<tr>
+						<td>
+							${inv.accountNumber}
+						</td>
+						<td>
+							${inv.accountNumber}
+						</td>
+						<td>
+							${inv.rgProduct?.name}
+						</td>		
+						<td align="right">
+							${inv.balanceAmount?.format('##,###.##')}
+						</td>
+						<td>
+							<span>
+								${(inv.active)? 'Yes':'No' }
+							</span>
+							#{hidden id:'amountRoundValue', name:'invs.['+ (inv_index-1) + '].rgProduct.amountRoundValue', value:inv?.rgProduct?.amountRoundValue /}
+							#{hidden id:'amountRoundType', name:'invs.['+ (inv_index-1) + '].rgProduct.amountRoundType', value:inv?.rgProduct?.amountRoundType /}
+							#{hidden id:'unitRoundValue', name:'invs.['+ (inv_index-1) + '].rgProduct.unitRoundValue', value:inv?.rgProduct?.unitRoundValue /}
+							#{hidden id:'unitRoundType', name:'invs.['+ (inv_index-1) + '].rgProduct.unitRoundType', value:inv?.rgProduct?.unitRoundType /}
+							#{hidden id:'priceRoundValue', name:'invs.['+ (inv_index-1) + '].rgProduct.priceRoundValue', value:inv?.rgProduct?.priceRoundValue /}
+							#{hidden id:'priceRoundType', name:'invs.['+ (inv_index-1) + '].rgProduct.priceRoundType', value:inv?.rgProduct?.priceRoundType /}
+						</td>	
+					</tr>
+				#{/list}
+				</tbody>
+			</table>
+		</div>
+	</div> -->
+</div>
+
+
+<div id="detailAccount">
+</div>

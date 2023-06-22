@@ -1,0 +1,505 @@
+#{set id: account?.custodyAccountKey /}
+
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{script 'lookups.js' /}
+
+<script type="text/javascript">	
+
+	$(function() {
+		
+		var chargeProf = '${account?.chargeProfile?.name}';
+		var isDefault = '${account?.chargeProfile?.isDefault}';
+		var isDcProfile = '${account?.dcProfil}';
+		var isCharge = '${account?.isCharge}';
+		var isSyariah = '${account?.principal}';
+		var isKPD = '${account?.isKPD}';
+		
+		if(('${confirming}' == 'true') || ('${mode}'=='view')){
+			
+			if(isDefault == true || isDefault == 'true' || chargeProf == null || chargeProf == '' || isDcProfile == true || isDcProfile == 'true'){
+				$.ajax({
+					url: '@{getChargeProfileDefault()}',
+					success: function(data) {
+
+						checkRedirect(data);
+						$('#chargeProfileKey').val(data.chargeProfileKey);
+						$('#chargeProfile').val(data.name);
+						$('#chargeProfileDesc').val(data.description);
+						if(isCharge == true || isCharge == 'true'){
+							$('#lChargeProf').val($('#chargeProfile').val());
+						}
+					}
+				});
+				$("#dcProfil1").attr('checked',true);
+				$("#dcProfil2").attr('checked',false);
+				$("#dcProfilHidden").val(true);
+				
+			}else{
+				$('#lChargeProf').val(chargeProf);
+				$("#dcProfil2").attr('checked',true);
+				$("#dcProfil1").attr('checked',false);
+				$("#dcProfilHidden").val(false);
+				
+			}
+			
+			if(isCharge == true || isCharge == 'true'){
+				$('#tabs').tabs('enable', 4);
+				$("#isCharge").attr('checked',true);
+				$("#isChargeHidden").val(true);
+				
+			}else{
+				$('#tabs').tabs('disable', 4);
+				$("#isCharge").attr('checked',false);
+				$("#isChargeHidden").val(false);
+			}
+			
+			if (isSyariah == true || isSyariah == 'true' ) {
+				$("#principal").attr('checked',true);
+				$("#principal").val(true);
+			}else {
+				$("#principal").attr('checked',false);
+				$("#principal").val(false);
+			}
+			
+			if (isKPD == true || isKPD == 'true' ) {
+				$("#isKPD").attr('checked',true);
+				$("#isKPD").val(true);
+			}else {
+				$("#isKPD").attr('checked',false);
+				$("#isKPD").val(false);
+			}
+			
+		}else{
+			
+			if (('${account?.blocked}'=='true') || ('${account?.blocked}'==true)){
+				$('#reason').attr("disabled", false);
+				$('#cBlocked label').html("Blocking Reason <span class=\"req\">*</span>");
+			}else{
+				$('#reason').attr("disabled", "disabled");
+				$('#cBlocked label').html("Blocking Reason");
+			}
+			
+			if ($('#customerType').val()=='CUSTOMER_TYPE-I' ){
+				$('#cName label').html("Customer Name");
+				$('#principal').attr("disabled", "disabled");
+			}else{
+				if ('${dataEntry}' != 'true') {
+					$('#cName label').html("Company Name");
+					$('#principal').attr("disabled", "");
+				}
+			}
+			
+			if('${mode}'=='entry'){
+				$('#accountHolderName').val('${account.customer.customerName}');	
+			}
+			
+			if(isDefault == true || isDefault == 'true' || chargeProf == null || chargeProf == ''){
+				
+				$('#tabs').tabs('disable', 4);
+				$("#dcProfil1").attr('checked',true);
+				$("#dcProfilHidden").val(true);
+				$("#isCharge").attr('checked',false);
+				$("#isChargeHidden").val(false);
+				$('#chargeProfile').attr("disabled", "disabled");
+				$('#chargeProfileHelp').attr("disabled", "disabled");
+				$.ajax({
+					url: '@{getChargeProfileDefault()}',
+					success: function(data) {
+
+						checkRedirect(data);
+						$('#chargeProfileKey').val(data.chargeProfileKey);
+						$('#chargeProfile').val(data.name);
+						$('#chargeProfileDesc').val(data.description);
+						if(isCharge == true || isCharge == 'true'){
+							$('#lChargeProf').val($('#chargeProfile').val());
+						}
+					}
+				});
+			}else{
+				
+				
+				$("#dcProfil2").attr('checked',true);
+				$("#dcProfilHidden").val(false);
+				
+			}
+			
+			if(isCharge == true || isCharge == 'true'){
+				$('#tabs').tabs('enable', 4);
+				$("#isCharge").attr('checked',true);
+				$("#isChargeHidden").val(true);
+				$('#lChargeProf').val(chargeProf);
+			}
+			
+			if($("input[name=dcProfil]")[0].checked == true){
+				$('#chargeProfile').attr("disabled", "disabled");
+				$('#chargeProfileHelp').attr("disabled", "disabled");
+				
+				$("#dcProfilHidden").val(true);
+			}else{
+				
+				$('#chargeProfile').attr("disabled", false);
+				$('#chargeProfileHelp').attr("disabled", false);
+				$("#dcProfilHidden").val(false);
+			}
+			
+			if (isSyariah == true || isSyariah == 'true' ) {
+				$("#principal").attr('checked',true);
+				$("#principal").val(true);
+			}
+			
+			if (isKPD == true || isKPD == 'true' ) {
+				$("#isKPD").attr('checked',true);
+				$("#isKPD").val(true);
+			}
+			
+		}
+		
+		
+		
+		
+		
+		//$('#tabsSecurityPrice').tabs();
+		//$('#tabsSecurityPrice').css('width','400' );
+		$('#detailOverride').css('display','none');
+		$('#branchNo').lookup({
+			list:'@{Pick.branches()}',
+			get:{
+				url:'@{Pick.branch()}',
+				success: function(data){
+					$('#branchNo').removeClass('fieldError');
+					$('#branchKey').val(data.code);
+					$('#branchName').val(data.description);
+					$('#h_branchName').val(data.description);
+				},
+				error: function(data){
+					$('#branchNo').addClass('fieldError');
+					$('#branchKey').val('');
+					$('#branchNo').val('');
+					$('#branchName').val('NOT FOUND');
+					$('#h_branchName').val('');
+				}
+			},
+			description:$('#branchName'),
+			help:$('#branchHelp')
+		});
+
+		$('#currency').lookup({
+			list:'@{Pick.currencies()}',
+			get:{
+				url:'@{Pick.currency()}',
+				success: function(data){
+					$('#currency').removeClass('fieldError');
+					$('#currencyCode').val(data.code);
+					$('#currencyDesc').val(data.description);
+					$('#h_currencyDesc').val(data.description);
+				},
+				error: function(data){
+					$('#currency').addClass('fieldError');
+					$('#currencyCode').val('');
+					$('#currency').val('');
+					$('#currencyDesc').val('NOT FOUND');
+					$('#h_currencyDesc').val('');
+				}
+			},
+			description:$('#currencyDesc'),
+			help:$('#currencyHelp')
+		});
+
+		$('#chargeProfile').blur(function() {
+			
+			if ($('#chargeProfile').val() == "") {
+				
+				$('#chargeProfile').removeClass('fieldError');
+				$('#h_chargeProfileDesc').val('');
+				$('#chargeProfileKey').val('');
+				$("#isCharge").attr('checked',false);
+				$("#isChargeHidden").val(false);
+				$('#tabs').tabs('disable', 4);
+			}else{
+				
+			}
+		});
+		
+		$('#txProfile').lookup({
+			list:'@{Pick.txProfiles()}',
+			get:{
+				url:'@{Pick.txProfile()}',
+				success: function(data){
+					$('#txProfile').removeClass('fieldError');
+					$('#taxProfileCode').val(data.code);
+					$('#txProfileDesc').val(data.description);
+					$('#h_txProfileDesc').val(data.description);
+				},
+				error: function(data){
+					$('#txProfile').removeClass('fieldError');
+					$('#taxProfileCode').val('');
+					$('#txProfile').val('');
+					$('#txProfileDesc').val('NOT FOUND');
+					$('#h_txProfileDesc').val('');
+				}
+			},
+			description:$('#txProfileDesc'),
+			help:$('#txProfileHelp')
+			
+		});
+		
+		//$('#costMethodCode').lookup({
+		//	list:'@{Pick.lookups()}?group=COST_METHOD',
+		//	get:'@{Pick.lookup()}?group=COST_METHOD',
+		//	key:$('#costMethod'),
+		//	description:$('#costMethodDescription'),
+		//	help:$('#costMethodHelp'),
+		//	nextControl:$('#payingAgent')
+		//});
+		
+		$('#custBank').blur(function() {
+			if ($('#custBank').val() == "") {
+				$('#custBank').removeClass('fieldError');
+				$('#custBank').val('');
+				$('#custBankKey').val('');
+				$('#custBankDesc').val('');
+				$('#h_custBankDesc').val('');
+			}
+		});
+		
+		$('#custBank').lookup({
+			list:'@{Pick.thirdPartyByTypeCustodians()}',
+			get:{
+				url:'@{Pick.thirdPartyByTypeCustodian()}',
+				success: function(data){
+					$('#custBank').removeClass('fieldError');
+					$('#custBankKey').val(data.code);
+					$('#custBank').val(data.name);
+					$('#custBankDesc').val(data.description);
+					$('#h_custBankDesc').val(data.description);
+				},
+				error: function(data){
+					$('#custBank').addClass('fieldError');
+					$('#custBank').val('');
+					$('#custBankKey').val('');
+					$('#custBankDesc').val('NOT FOUND');
+					$('#h_custBankDesc').val('');
+				}
+			},
+			description:$('#custBankDesc'),
+			help:$('#custBankHelp')
+		});
+
+		if (('${mode}'=='entry')||(('${mode}'=='edit')&&('${account?.recordStatus?.decodeStatus()}'=='Reject'))){
+			$('input[name=isActive]').attr("disabled", "disabled");
+		}
+		
+		$('input[name=isActive]').change(function(){
+			
+			
+			if ('${mode}'=='edit'){
+				
+				$("input[name='account.isActive']").val($("input[name='isActive']:checked").val());
+				
+				if($("input[name='isActive']:checked").val()==false || $("input[name='isActive']:checked").val() == 'false'){
+					
+					if($('#accountNo').val()==''|| $('#accountNo').val()==null){
+						$('#errActive').html('Account No must be filled');
+					} else{
+						$.get("@{Accounts.getPortfolio()}", {'accountNo':$('#accountNo').val()}, function(data){
+							checkRedirect(data);
+							if(data==false || data == 'false'){
+								$('#errActive').html('');
+								$("input[name='account.isActive']").val($("input[name='isActive']:checked").val());
+							}else{
+								$('#errActive').html('Can not change to In Active');
+								$("input[name='account.isActive']").val(true);
+								$("input[name=isActive]")[0].checked = true;
+							}
+						});
+					}
+				} else {
+					if($('#accountNo').val()==''|| $('#accountNo').val()==null){
+						$('#errActive').html('Account No must be filled');
+					} else{
+						$.get("@{Accounts.isCustomerActive()}", {'accountNo':$('#accountNo').val()}, function(data){
+							checkRedirect(data);
+							if(data==true || data == 'true'){
+								$('#errActive').html('');
+								$("input[name='account.isActive']").val($("input[name='isActive']:checked").val());
+							}else{
+								$('#errActive').html('Customer is not active');
+								$("input[name='account.isActive']").val(false);
+								$("input[name=isActive]")[1].checked = true;
+							}
+						});
+					}
+				}
+			}
+		});
+		
+		$('#principal').change(function(){
+			$("#principal").attr('checked', $('#principal').is(':checked'));
+			$("#principalHidden").val($('#principal').is(':checked'));
+		});
+		
+		$('#isKPD').change(function(){
+			$("#isKPD").attr('checked', $('#isKPD').is(':checked'));
+			$("#isKPDHidden").val($('#isKPD').is(':checked'));
+		});
+		
+		$('input[name=blocked]').change(function(){
+			$("input[name='account.blocked']").val($("input[name='blocked']:checked").val());
+			$('#reason').val('');
+			$('#errBlocked').html('');
+			if($("input[name=blocked]")[0].checked == true){
+				$('#reason').attr("disabled", false);
+				$('#cBlocked label').html("Blocking Reason <span class=\"req\">*</span>");
+				
+			    if($.browser.msie)
+			    {
+			        $("#reason[maxlength]").bind('input propertychange', function() {
+			            var maxLength = $(this).attr('maxlength');
+			            if ($(this).val().length > maxLength) {  
+			                $(this).val($(this).val().substring(0, maxLength));  
+			            };
+			        });
+			    };
+			}else{
+				$('#reason').attr("disabled", "disabled");
+				$('#cBlocked label').html("Blocking Reason ");
+			}
+		});		
+		
+	});
+</script>
+
+<div id="bank-account-detail">
+	<!-- form id="accountForm" class="form"-->		
+		<ul>
+			<li>
+				#{hidden id:'cif', name:'account.customer.customerKey', label:'CIF', value:account?.customer?.customerKey, required:true, readOnly:true, width:'100px' /}
+				<span class="error">#{error 'account.customer.customerKey' /}</span>
+				#{hidden id:'customerType', name:'account.customer.customerType.lookupId', value:account?.customer?.customerType?.lookupId, class:'capitalize', required:false, readOnly:true,  width:'350px' /}
+				
+			</li>
+			<li>
+				#{hidden id:'clientNo', name:'account.custodyAccountKey', label:'Client No', value:account?.custodyAccountKey, required:true, class:'capitalize numberOnly', readOnly:true,  width:'100px' /}
+				<span class="error">#{error 'account.custodyAccountKey' /}</span>
+			</li>
+			<li>
+				#{textBox id:'fullNo', name:'account.customer.customerNo', label:'Customer No', value:account?.customer?.customerNo, required:false, readOnly:true,  class:'capitalize', width:'200px' /}
+			</li>
+			<li id="cName">
+				#{textBox id:'fullName', name:'account.customer.customerName', label:'Customer Name', value:account?.customer?.customerName, class:'capitalize', required:false, readOnly:true,  width:'350px' /}
+				<span class="error">#{error 'account.customer.customerName' /}</span>
+			</li>
+			<li>
+				<table>
+					<tr>
+						<td>
+							#{textBox id:'accountNo', name:'account.accountNo', label:'Account Code', value:account?.accountNo,class:'capitalize', readOnly:readOnly, width:'200px' , required:true,maxLength:'50' /}
+							<span class="error">#{error 'Account Code is' /}</span>
+							<span id="errAccountNo" class="error"></span>
+						</td>
+						<td>
+							#{checkBox id:'principal', name:'principal', value:account?.principal, label:' ', readOnly:readOnly/} Syariah
+							#{hidden id:'principalHidden', name:'account.principal', value:((account?.principal)?'true':'false') /}
+						</td>
+					</tr>
+					<tr>
+						<td>
+							#{textBox id:'accountHolderName', name:'account.name', label:'Account Name', value:account?.name, readOnly:readOnly, class:'capitalize',width:'350px' ,required:true, maxLength:'100' /}
+							<span class="error">#{error 'Account Name is' /}</span>
+							<span id="errAccountName" class="error"></span>	
+						</td>
+						<td>
+							#{checkBox id:'isKPD', name:'isKPD', value:account?.isKPD, label:' ', readOnly:readOnly/} KPD
+							#{hidden id:'isKPDHidden', name:'account.isKPD', value:((account?.isKPD)?'true':'false') /}
+						</td>
+					</tr>
+				</table>
+			</li>
+			<li>
+				#{textBox id:'securityAccNo', name:'account.securityAccNo', label:'SID No', value:account?.securityAccNo, readOnly:readOnly, width:'200px', class:'capitalize', maxLength:'50' /}
+			</li>
+			<li>
+				<fieldset style="width: 730px">
+				<div id="listCharge">
+					#{radioButton id:'dcProfil', name:'dcProfil', value:((account?.dcProfil)?'true':'false'), label:'Default Charge Profile', options:operators, readOnly:readOnly /}
+					#{hidden id:'dcProfilHidden', name:'account.dcProfil', value:((account?.dcProfil)?'true':'false') /}
+					<p>
+					#{textBox id:'chargeProfile', name:'account.chargeProfile.name', label:'Charge Profile', class:'capitalize',value:account?.chargeProfile?.name, required:true, readOnly:readOnly, width:'100px' /}
+					#{hidden id:'chargeProfileKey', name:'account.chargeProfile.chargeProfileKey', value:account?.chargeProfile?.chargeProfileKey /}
+					#{button id:'chargeProfileHelp', value:'?', class:'small', readOnly:readOnly /}
+					#{textBox id:'chargeProfileDesc', name:'account.chargeProfile.description', value:account?.chargeProfile?.description, readOnly:true, width:'222px' /}
+					<span id="errChargeProfile" class="error"></span>
+					</p>
+					<p>
+					#{checkBox id:'isCharge', name:'isCharge', value:account?.isCharge, label:' ', readOnly:readOnly/} Overwrite Charges
+					#{hidden id:'isChargeHidden', name:'account.isCharge', value:((account?.isCharge)?'true':'false') /}
+					</p>
+				</div>
+				</fieldset>
+			</li>
+			<li>
+				<fieldset style="width: 730px">
+				<div id="listBlockAcc">
+					#{radioButton id:'blocked', name:'blocked', value:((account?.blocked)?'true':'false'), label:'Block this Account', options:operators, readOnly:readOnly /}
+					#{hidden id:'blockedHidden', name:'account.blocked', value:((account?.blocked)?'true':'false') /}
+					
+					<p id="cBlocked">
+					#{textArea id:'reason', name:'account.blockedRemark', value:account?.blockedRemark, label:'Blocking Reason', width:'250px', class:'capitalize', maxLength:200, rows:'5', readOnly:readOnly/}
+					<span id="errBlocked" class="error"></span>
+					</p>
+					
+				</div>
+				</fieldset>
+			</li>			
+			<li>
+				<table style="width: 1000px">
+					<tr>
+						<td>
+							#{radioButton id:'danaJaminanYN', name:'account?.isFundGuarantee', value:((account?.isFundGuarantee)?'true':'false'), label:'Dana Jaminan Y/N', options:operators, readOnly:readOnly /}
+							#{hidden id:'danaJaminanYNHidden', name:'account.isFundGuarantee', value:((account?.isFundGuarantee)?'true':'false')/}
+							<span id="errDanaJaminanYN" class="error"></span>	
+						</td>
+						<td>
+							#{dropDownList id:'portfolioReport', label:'', name:'account.portfolioReport.lookupId', options:portfolioReport, value:account?.portfolioReport?.lookupId, required:true, readOnly:readOnly, width:'220px' /}
+        						<span id="portfolioReportError" class="error">*</span>
+        						#{hidden id:'portfolioReportCode', name:'account.portfolioReport.lookupCode', value:account?.portfolioReport?.lookupCode /}
+        						#{hidden id:'portfolioReportDescription', name:'account.portfolioReport.lookupDescription', value:account?.portfolioReport?.lookupDescription /}	
+						</td>
+					</tr>
+				</table>				
+			</li>
+			<li id="danaJaminanTypeId">
+				#{dropDownList id:'danaJaminanType', label:'Dana Jaminan Type', name:'account.fundGuaranteeType.lookupId', options:fundGuaranteeType, value:account?.fundGuaranteeType?.lookupId, required:true, readOnly:readOnly, width:'100px' /}
+        		#{hidden id:'danaJaminanTypeCode', name:'account.fundGuaranteeType.lookupCode', value:account?.fundGuaranteeType?.lookupCode /}
+        		#{hidden id:'danaJaminanTypeDescription', name:'account.fundGuaranteeType.lookupDescription', value:account?.fundGuaranteeType?.lookupDescription /}
+        		<span id="danaJaminanTypeError" class="error">#{error 'Dana Jaminan Type is' /}</span>
+			</li>
+			<li>
+				#{radioButton id:'isActive', name:'isActive', value:((account?.isActive)?'true':'false'), label:'Active', options:operators, readOnly:readOnly /}
+				#{hidden id:'isActiveHidden', name:'account.isActive', value:((account?.isActive)?'true':'false') /}
+				<span id="errActive" class="error"></span>
+			</li>
+			<li>
+				#{hidden id:'branchNo', name:'account.branch.branchNo', label:'Branch No', value:account?.branch?.branchNo /}
+				#{hidden id:'branchKey', name:'account.branch.branchKey', value:account?.branch?.branchKey /}
+				#{hidden id:'branchHelp', value:'?', class:'small' /}
+				#{hidden id:'branchName', name:'account.branch.name', value:account?.branch?.name /}
+				
+			</li>
+			<li>
+				#{hidden id:'costMethod', name:'account.costMethod.lookupId', value:account?.costMethod?.lookupId /}
+			</li>
+			<li>
+				#{hidden id:'custBank', name:'account.custodianBank.thirdPartyCode', label:'Cust. Bank', class:'capitalize',value:account?.custodianBank?.thirdPartyCode/}
+				#{hidden id:'custBankKey', name:'account.custodianBank.thirdPartyKey', value:account?.custodianBank?.thirdPartyKey /}
+				#{hidden id:'custBankHelp', value:'?', class:'small' /}
+				#{hidden id:'custBankDesc', name:'account.custodianBank.thirdPartyName', value:account?.custodianBank?.thirdPartyName/}
+				
+			</li>
+			<li>
+				#{hidden id:'currencyProfile', name:'account.currencyProfile.lookupId', value:account?.currencyProfile?.lookupId /}
+			</li>
+		</ul>
+ 	<!-- /form-->
+</div>
+<br />

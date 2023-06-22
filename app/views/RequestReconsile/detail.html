@@ -1,0 +1,65 @@
+#{extends 'templates/main.html' /}
+#{script 'lookups.js' /}
+#{script 'generaldateformat.js' /}
+
+<h2>Request For Reconsile</h2>
+<form id="reconsileForm" class="form" method="POST">
+	<div id="accordion">
+			#{hidden id:'msgid', name:'cBestMessage.msgid', value:cBestMessage?.msgid /}
+			<p>
+				#{textBox id:'valuedate', name:'cBestMessage.data.valuedate', readOnly:readOnly, label:'Value Date', value:cBestMessage?.data?.valuedate, class:'calendar', required:'true' /}&nbsp;&nbsp;(dd/mm/yyyy)
+				<span id="valuedateError" class="error"></span>
+			</p>
+			<p>
+				#{button id:'process', value:'Process', class:'buttons ui-button ui-widget ui-state-default ui-corner-all'/}
+				#{button id:'reset', value:'Reset', class:'buttons ui-button ui-widget ui-state-default ui-corner-all' /}
+			</p>
+	</div>
+</form>
+
+<script type="text/javascript">	
+	$(function() {
+		var closeDialogMessage = function() {
+			$("#dialog-message").dialog("close");
+		}
+		
+		function validateSaveReconsile() {
+			if (($('#valuedate').val() == '') || ($('#valuedate').val() == null)) {
+				$('#valuedateError').html('Required');
+			} else {
+				$('#valuedateError').html('');
+				return true;
+			}
+			return false;
+		}
+		
+		$('#reset').click(function(){
+			// reset all field
+			$('#valuedate').val('');
+			return false;
+		});
+		
+		$('#process').click(function() {
+			var resultValidate = validateSaveReconsile();
+			if (!resultValidate) {
+				return;
+			}
+			loading.dialog('open');
+			$.post("@{save()}", $('#reconsileForm').serialize(), function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				var backToEntry = function() {
+					location = "@{entry()}";
+				}
+				console.log( data );
+				if (data.status == 'success') {
+					messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Notification", backToEntry);
+					return;
+				} else {
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+					return;
+				}
+			});
+		});
+	});
+</script>

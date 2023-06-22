@@ -1,0 +1,404 @@
+<style type="text/css">
+  .primary { margin-top:-0.8em;}
+</style>
+
+<!--[if IE]>
+	<style type="text/css">
+	  .primary { margin-top:-2.2em;}
+	</style>
+<![endif]-->
+
+<script type="text/javascript">
+$(function(){
+	$('#customerCategory').children().eq(0).remove();
+	
+	if ($('#middleName').val()==''){
+		$('p[id=pLastName] label span').html('');
+	}
+	$('#firstName').blur(function(){
+		$('#customerName').val($(this).val() + " " +$('#middleName').val() + " " +$('#lastName').val());
+		$('#customerNameHide').val($.trim($('#customerName').val()));
+	});
+	
+	$('#middleName').blur(function(){
+		$('#customerName').val($('#firstName').val() + " " +$(this).val() + " " +$('#lastName').val());
+		$('#customerNameHide').val($.trim($('#customerName').val()));
+		if ($(this).val()!=''){
+			$('p[id=pLastName] label span').html(' *');
+		} else {
+			$('p[id=pLastName] label span').html('');
+		}
+	});
+	
+	$('#lastName').blur(function(){
+		$('#customerName').val($('#firstName').val() + " " +$('#middleName').val() + " " +$(this).val());
+		$('#customerNameHide').val($.trim($('#customerName').val()));
+	});
+	
+	
+	$('#jointDate').change(function(){
+		var jointDate = $(this).datepicker('getDate');
+		var currentDate = $('#currentDate').datepicker('getDate');
+		console.log("current Date = " +currentDate.getTime());
+		if (jointDate!=null) {
+			if ('${mode}'=='entry'){
+				if (!$(this).hasClass('fieldError')){
+					if (jointDate.getTime() > currentDate.getTime()){
+						$(this).addClass('fieldError');
+						$('#jointDateError').html("Can not greater than Application Date");
+					}
+				}
+				
+			}
+			if ('${mode}'=='edit'){
+				if (!$(this).hasClass('fieldError')){
+					var lastModifDate = $('#lastModifDate').datepicker('getDate');
+					if (jointDate.getTime() > lastModifDate.getTime()) {
+						$(this).addClass('fieldError');
+						$('#jointDateError').html("Can not greater than Last Update");
+					} else
+					
+					if (jointDate.getTime() > currentDate.getTime()) {
+						$(this).addClass('fieldError');
+						$('#jointDateError').html("Can not greater than Application Date");
+					}
+				}
+			}
+		}
+	});
+	
+	
+	$('#customerCategory').change(function(){
+		mandatoryDirectIndirect();
+	});
+	mandatoryDirectIndirect();
+	
+	$('#custRetailFlag1').add($('#custRetailFlag2')).click(function(){
+		console.log('custRetailFlag1 click');
+		custRetailOfStatus();
+	});
+	custRetailOfStatus();
+	
+	/* if ($('#oriBankAccountInvoice').val()!=''){
+		$('#currencyCode').disabled();
+		$('#currencyCodeHelp').disabled();
+	} */
+	
+	$('#currencyCode').lookup({
+		list:'@{Pick.currencies()}',
+		get:{
+			url:'@{Pick.currency()}',
+			success: function(data) {
+				$('#currencyCode').removeClass('fieldError');
+				$('#currencyCode').val(data.code);
+				$('#currencyCodeHide').val(data.code);
+				$('#currencyCodeDesc').val(data.description);
+				$('#h_currencyCodeDesc').val(data.description);
+				
+			},
+			error: function(data) {
+				$('#currencyCode').addClass('fieldError');
+				$('#currencyCodeHide').val('');
+				$('#currencyCodeDesc').val('NOT FOUND');
+				$('#currencyCode').val('');
+				$('#h_currencyCodeDesc').val('');
+				
+			}
+		},
+		description:$('#currencyCodeDesc'),
+		help:$('#currencyCodeHelp')
+	});
+	
+	$('#currencyCode').change(function(){
+		if ($(this).val()==''){
+			$('#currencyCode').val('');
+			$('#currencyCodeDesc').val('');
+			$('#currencyCode').val('');
+			$('#h_currencyCodeDesc').val('');
+		}
+	});
+	
+	$("#currencyCode").change().blur();
+	
+	$('#taxProfile').lookup({
+		list:'@{Pick.txProfiles()}',
+		get:{
+			url:'@{Pick.txProfile()}',
+			success: function(data) {
+				$('#taxProfile').removeClass('fieldError');
+				$('#taxProfile').val(data.code);
+				$('#taxProfileDesc').val(data.description);
+				$('#h_taxProfileDesc').val(data.description);
+				
+			},
+			error: function(data) {
+				$('#taxProfile').addClass('fieldError');
+				$('#taxProfileDesc').val('NOT FOUND');
+				$('#taxProfile').val('');
+				$('#h_taxProfileDesc').val('');
+				
+			}
+		},
+		description:$('#taxProfileDesc'),
+		help:$('#taxProfileHelp')
+	});
+	
+	$('#taxProfile').change(function(){
+		if ($(this).val()==''){
+			$('#taxProfile').val('');
+			$('#taxProfileDesc').val('');
+			$('#taxProfile').val('');
+			$('#h_taxProfileDesc').val('');
+		}
+	});
+	
+	$('#lkpbuId').lookup({
+		list:'@{Pick.lookups()}?group=LKPBU_CODE',
+		get:{
+			url:'@{Pick.lookup()}?group=LKPBU_CODE',
+			success: function(data) {
+				$('#lkpbuId').removeClass('fieldError');
+				$('#lkpbuKey').val(data.code);
+				$('#lkpbuDesc').val(data.description);
+				$('#h_lkpbuDesc').val(data.description);
+				
+			},
+			error: function(data) {
+				$('#lkpbuId').addClass('fieldError');
+				$('#lkpbuDesc').val('NOT FOUND');
+				$('#lkpbuId').val('');
+				$('#lkpbuKey').val('');
+				$('#h_lkpbuDesc').val('');
+				
+			}
+		},
+		description:$('#lkpbuDesc'),
+		help:$('#lkpbuHelp')
+	});
+	
+	$('#lkpbuId').change(function(){
+		if ($(this).val()==''){
+			$('#lkpbuId').val('');
+			$('#lkpbuDesc').val('');
+			$('#lkpbuId').val('');
+			$('#h_lkpbuDesc').val('');
+		}
+	});
+	
+	$('#custRetailOf').lookup({
+		list:'@{Pick.thirdParties()}?type=THIRD_PARTY-RETAIL',
+		get:{
+			url:'@{Pick.thirdParty()}?type=THIRD_PARTY-RETAIL',
+			success: function(data){
+				$('#custRetailOf').removeClass('fieldError');
+				$('#custRetailOfKey').val(data.code);
+				$('#custRetailOfDesc').val(data.description);
+				$('#h_custRetailOfDesc').val(data.description);
+			},
+			error: function(data){
+				$('#custRetailOf').addClass('fieldError');
+				$('#custRetailOfKey').val('');
+				$('#custRetailOf').val('');
+				$('#custRetailOfDesc').val('NOT FOUND');
+				$('#h_custRetailOfDesc').val('');
+			}
+		},
+		description:$('#custRetailOfDesc'),
+		help:$('#custRetailOfHelp')
+	});
+	
+	$('#custRetailOf').change(function(){
+		if ($(this).val()==''){
+			$('#custRetailOfKey').val('');
+			$('#custRetailOf').val('');
+			$('#custRetailOfDesc').val('');
+			$('#h_custRetailOfDesc').val('');
+		}
+	});
+	
+});
+
+function custRetailOfStatus() {
+	var disabled = $('#custRetailFlag1').attr("disabled");
+	if (disabled != 'disabled') {
+		var yescon = $('#custRetailFlag1').checked();
+		var nocon = $('#custRetailFlag2').checked();
+		
+		if (yescon == 'true' && nocon == 'false') {
+			if((('${mode}'=='entry')&&(!'${confirming}'))||(('${mode}'=='edit')&&(!'${confirming}'))){
+				$('#custRetailOf').enabled();
+				$('#custRetailOfHelp').enabled();
+				$('#externalCifNo').enabled();
+				$('#chkCashProjection').disabled();
+				$('#chkCashProjection').removeAttr('checked');
+			}
+			$("p[atr=custRetailMandatory] label span").html(" *");
+			$("p[atr=custRetailNotMandatory] label span").html(" ");
+		}
+		if (nocon == 'false' && yescon == 'false') {
+			$('#custRetailOf').disabled();
+			$('#custRetailOfHelp').disabled();
+			$('#custRetailOf').val('');
+			$('#custRetailOfKey').val('');
+			$('#custRetailOfDesc').val('');
+			$('#externalCifNo').disabled();
+			$('#externalCifNo').val('');
+			$("p[atr=custRetailMandatory] label span").html("");
+			$("p[atr=custRetailNotMandatory] label span").html(" *");
+			if((('${mode}'=='entry')&&(!'${confirming}'))||(('${mode}'=='edit')&&(!'${confirming}'))){
+				$('#chkCashProjection').enabled();
+			} 
+		}
+	}
+}
+
+function mandatoryDirectIndirect(){
+	if ($('#customerCategory').val()=='${directCat}'){
+		$('#directId').disabled();
+		$('#directId').val('');
+		$('li[id=pDirectId] label span').html('');
+		$('p[id=pDirectId] label span').html('');
+		$('li[atr=mandatoryDirect] label span').html(' *');
+		$('td[atr=mandatoryDirect] label span').html(' *');
+		$('p[atr=mandatoryDirect] label span').html(' *');
+		$('.asset1Mandatory').html(' *');
+		
+	}
+	
+	if ($('#customerCategory').val()=='${indirectCat}'){
+		if((('${mode}'=='entry')&&(!'${confirming}'))||(('${mode}'=='edit')&&(!'${confirming}'))){
+			$('#directId').enabled();
+		}
+		$('li[id=pDirectId] label span').html(' *');
+		$('p[id=pDirectId] label span').html(' *');
+		$('li[atr=mandatoryDirect] label span').html('');
+		$('td[atr=mandatoryDirect] label span').html('');
+		$('p[atr=mandatoryDirect] label span').html('');
+		$('.asset1Mandatory').html('');
+	}
+	
+	if($("#customerNo").val()=='')$("#customerNo").val('**AUTO**');
+}
+
+</script>
+
+<table>
+	<tr>
+		<td valign="top">
+			#{hidden id:'customerKey', name:'customer.customerKey', label:'CIF', value:customer?.customerKey, required:true, readOnly:true, width:'100px' /}
+			<p>
+				#{dropDownList id:'customerType', name:'customer.customerType.lookupId', label:'Customer Type', value:customer?.customerType?.lookupId, options:customerTypes, readOnly:((mode=='entry') ? confirming :true), required:true /}
+				<span class="error">#{error 'Customer Type in tab Main is' /}</span>
+			</p>
+			<p>
+				#{textBox id:'customerNo', name:'customer.customerNo', label:'Customer Code', value:customer?.customerNo, required:false, readOnly:true, width:'307px', maxLength:20, class:'capitalize all' /}
+				<span class="error">#{error 'Customer Code in tab Main is' /}</span>
+			</p>
+				
+			<p class="individual_only primary">
+				#{textBox id:'firstName', name:'customer.firstName', label:'First Name', value:customer?.firstName, readOnly:readOnly, required:true, width:'307px', maxLength:30, class:'individual capitalize noSpace specialField' /}
+				<!-- #{hidden id:'firstNameHide', name:'customer.firstName', value:customer?.firstName /} -->
+				<span class="error">#{error 'First Name in tab Main is' /}</span>
+			</p>
+			<p class="individual_only primary">
+				#{textBox id:'middleName', name:'customer.middleName', label:'Middle Name', value:customer?.middleName, readOnly:readOnly, width:'307px', maxLength:30, class:'individual capitalize specialField' /}
+				<!-- #{hidden id:'middleNameHide', name:'customer.middleName', value:customer?.middleName /} -->
+			</p>
+			<p id="pLastName" class="individual_only primary">
+				#{textBox id:'lastName', name:'customer.lastName', label:'Last Name', value:customer?.lastName, required:true, readOnly:readOnly, width:'307px', maxLength:30, class:'individual capitalize noSpace specialField' /}
+				<!-- #{hidden id:'lastNameHide', name:'customer.lastName', value:customer?.lastName /} -->
+				<span class="error">#{error 'Last Name in tab Main is' /}</span>
+			</p>
+			<p class="individual_only primary">
+				#{textBox id:'customerName', name:'customerName', label:'Customer Name', value:customer?.customerName, required:false, readOnly:true, width:'307px', maxLength:100, class:'capitalize individual' /}
+				#{hidden id:'customerNameHide', name:'customer.customerName', value:customer?.customerName, class:'individual' /}
+				<span class="error">#{error 'Full Name in tab Main is' /}</span>
+			</p>
+			
+			<p class="corporate_only primary">
+				#{textBox id:'corporateName', name:'customer.customerName', label:'Company Name', value:customer?.customerName, required:true, readOnly:readOnly, width:'307px', maxLength:100, class:'capitalize corporate specialField' /}
+				<span class="error">#{error 'Company Name in tab Main is' /}</span>
+			</p>
+			
+			<p class="primary">
+				#{dropDownList id:'customerCategory', name:'customer.customerCategory.lookupId', label:'Customer Category', value:customer?.customerCategory?.lookupId, require:true, options:customerCategory, required:true, readOnly:readOnly /}
+				<span class="error">#{error 'Customer Category in tab Main is' /}</span>
+			</p>
+			<p id="pDirectId" class="primary">
+				#{textBox id:'directId', name:'customer.directId', label:'Direct SID', value:customer?.directId, required:true, readOnly:readOnly, width:'307px', maxLength:15, class:'capitalize' /}
+				<span class="error">#{error 'Direct SID in tab Main is' /}</span>
+			</p>
+			<p class="primary">
+				#{radioButton id:'custRetailFlag', name:'customer.custRetailFlag', value:((customer?.custRetailFlag)?'true':'false'), label:'Customer Retail[Y/N]', options:yesNo, readOnly:readOnly /}
+			</p>
+			<p atr="custRetailMandatory" class="primary">	
+				#{textBox id:'custRetailOf', name:'customer.customerGroup.thirdPartyCode', label:'Customer Retail Of', value:customer?.customerGroup?.thirdPartyCode, required:true, readOnly:readOnly, width:'55px', class:'capitalize' /}
+				#{hidden id:'custRetailOfKey', name:'customer.customerGroup.thirdPartyKey', value:customer?.customerGroup?.thirdPartyKey /}
+				#{button id:'custRetailOfHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'custRetailOfDesc', name:'customer.customerGroup.thirdPartyName', value:customer?.customerGroup?.thirdPartyName, readOnly:true, width:'218px' /}
+				<span class="error">#{error 'Customer Retail Of in tab Main is' /}</span>
+			</p>
+			<p atr="custRetailMandatory" class="primary">
+				#{textBox id:'externalCifNo', name:'customer.externalNo', label:'External CIF No.', value:customer?.externalNo, readOnly:readOnly, width:'307px', maxLength:50, required:true, class:'capitalize' /}
+				<span class="error">#{error 'External CIF No. in tab Main is' /}</span>
+			</p>
+			<p class="primary">		
+				#{textBox id:'currencyCode', name:'currencyCode', label:'Currency', value:customer?.currency?.currencyCode, required:true, readOnly:readOnly, width:'55px', class:'capitalize all' /}
+				#{hidden id:'currencyCodeHide', name:'customer.currency.currencyCode', value:customer?.currency?.currencyCode /}
+				#{button id:'currencyCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'currencyCodeDesc', name:'customer.currency.description', value:customer?.currency?.description, readOnly:true, width:'218px', class:'all' /}
+				<span class="error">#{error 'Currency in tab Main is' /}</span>
+			</p>
+			<p class="primary">	
+				#{textBox id:'taxProfile', name:'customer.taxProfile.taxProfileCode', label:'Tax Profile', value:customer?.taxProfile?.taxProfileCode, required:true, readOnly:readOnly, width:'55px', class:'capitalize all' /}
+				#{button id:'taxProfileHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'taxProfileDesc', name:'customer.taxProfile.description', value:customer?.taxProfile?.description, readOnly:true, width:'218px', class:'all' /}
+				<span class="error">#{error 'Tax Profile in tab Main is' /}</span>
+			</p>
+			<p class="primary">			
+				#{textBox id:'lkpbuId', name:'customer.lkpbu.lookupCode', label:'APOLO Code', value:customer?.lkpbu?.lookupCode, required:true, readOnly:readOnly, width:'80px', class:'capitalize corporate' /}
+				#{hidden id:'lkpbuKey', name:'customer.lkpbu.lookupId', value:customer?.lkpbu?.lookupId, class:'corporate' /}
+				#{button id:'lkpbuHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'lkpbuDesc', name:'customer.lkpbu.lookupDescription', value:customer?.lkpbu?.lookupDescription, readOnly:true, width:'216px', class:'corporate' /}
+				<span class="error">#{error 'APOLO Code in tab Main is' /}</span>
+			</p>
+			<p class="primary">
+				#{textBox id:'cisNoCore', name:'customer.cisNo', label:'CIS No. (Core Banking)', value:customer?.cisNo, readOnly:readOnly, width:'307px', maxLength:50, class:'capitalize all' /}
+			</p>
+			<p class="primary">
+				#{radioButton id:'isActive', name:'customer.isActive', value:((customer?.isActive)?'true':'false'), label:'Active', options:yesNo, readOnly:readOnly /}
+				<span id="errActive" class="error"></span>
+			</p>
+			
+		</td>
+		<td valign="top">
+			<p class="primary">
+				#{textBox id:'jointDate', name:'customer.jointDate', value:customer?.jointDate?.format(appProp.dateFormat), label:'Join Date', class:'calendar', readOnly:readOnly, required:true /} (${appProp.displayDateFormat})
+				<span class="error">#{error 'Joint Date in tab Main is' /}</span>
+			</p>
+			<p class="primary">
+			<span style="margin-left: 150px" id="jointDateError" class="error">#{error 'Joint Date is' /}</span>
+			</p>
+			<p class="primary">
+				<b>Last Update</b>
+				<span style="margin-left: 80px">${customer?.lastModifDateWithTime}</span>
+				#{hidden id:'lastModifDate', name:'customer.lastModifDate', value:customer?.lastModifDate, class:'calendar' /}
+				#{hidden id:'lastModifDateWithTime', name:'customer.lastModifDateWithTime', value:customer?.lastModifDateWithTime /}
+			</p>
+			<p class="primary">
+				 #{checkBox id:'flagNoChageData', name:'customer.flagNoChangeData' , value:customer?.flagNoChangeData, readOnly:((mode=='edit') ? confirming : true ), class:'all' /}
+				 Existing data is already correct, no changes required
+			</p>
+			<p class="primary" id="pCashprojection">
+				#{checkBox id:'chkCashProjection', name:'customer.cashProjection' , value:customer?.cashProjection, readOnly:((mode=='edit') ? confirming : true ), class:'all' /} 
+				Cash Projection required
+			</p>
+			<p>
+				#{textBox id:'amlKey', name:'customer.amlCustomer.amlId', label:'AML Key', value:customer?.amlCustomer?.amlId, readOnly:(mode=='edit' || param == 'dedupe' || mode=='view' || confirming), width:'75px', class:'capitalize all' /}
+				#{hidden id:'amlKeyHidden', name:'amlKey' /}
+				#{button id:'getAmlKey', value:'Get AML', readOnly:(mode=='edit' || param == 'dedupe' || mode=='view' || confirming) /}
+			</p>
+		</td>
+	</tr>
+</table>
+			

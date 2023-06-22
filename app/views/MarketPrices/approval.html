@@ -1,0 +1,78 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Market Price Approval' /}
+
+<script type="text/javascript">
+	$(function() {
+		
+		$('.buttons input:button').button();
+		$('#close').hide();
+		var backToWorkList = function() {
+			loading.dialog('open');
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			};
+		}
+
+		$('#approve').click(function() {
+			var action = "@{approve()}?taskId=${taskId}&maintenanceLogKey=${maintenanceLogKey}&operation=${operation}";
+			loading.dialog('open');
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					messageAlertOk("Market Price '${marketPrice?.marketPriceKey}' is Approved", "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+				} else if (data.status == 'error'){
+					messageAlertOk("Market Price '${marketPrice?.marketPriceKey}' can not approve ", "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);	
+				}
+			});			
+		});
+		$('#reject').click(function() {
+			var action = "@{reject()}?taskId=${taskId}&maintenanceLogKey=${maintenanceLogKey}&operation=${operation}";
+			loading.dialog('open');
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					messageAlertOk("Market Price '${marketPrice?.marketPriceKey}' is Rejected", "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+				}else{
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+				}
+			});
+		});
+		$('#cancel').click(function(){
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			}
+		})
+		//$(".buttons").css("display","none");
+		//$("#approval-actions").css("display","block");
+	});
+	
+
+</script>
+
+<div id="detail">
+	<form id="form" class="form">
+		#{include 'MarketPrices/detail.html' /}
+	</form>
+</div>	
+
+	
+<span id="approval-actions">
+	#{hidden id:'taskId', name:'taskId', value:taskId /}
+	#{hidden id:'maintenanceLogKey', name:'maintenanceLogKey', value:maintenanceLogKey /}
+	#{hidden id:'operation', name:'operation', value:operation /}
+	#{hidden id:'from', name:'from', value:from /}	
+</span>
+
+<div id="actions" class="buttons">
+
+	<input type="button" id="approve" value="Approve" />
+	<input type="button" id="reject" value="Reject" />
+	<input type="button" id="cancel" value="Cancel" />			
+
+</div>

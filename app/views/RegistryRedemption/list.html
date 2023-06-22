@@ -1,0 +1,50 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Subscription' /}
+
+<script type="text/javascript">
+	function doEdit(data) {
+		if ((data[9] == "New") || (data[9] == "Updated")) {
+			view(data[0]);
+			return false;
+		} else {
+			return true;
+		}
+	}
+</script>
+<table class="display">
+	<thead>
+		<tr>
+			<th>TransactionKey</th>
+			<th>Fund Code</th>
+			<th>Invst Acct</th>
+			<th>Trade Date</th>
+			<th>Good Fund Date</th>
+			<th>Nav Date</th>
+			<th>Post Date</th>
+			<th>SA Code</th>
+			<th>Remarks</th>
+			<th>Status</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list reds, as:'red'}
+		<tr>
+			<td>${red?.tradeKey}</td>
+			<td>${red?.rgInvestmentaccount?.rgProduct?.productCode}</td>
+			<td>${red?.rgInvestmentaccount?.accountNumber}</td>
+			<td>${red?.tradeDate?.format('MM/dd/yyyy')}</td>
+			<td>${red?.goodfundDate?.format('MM/dd/yyyy')}</td>
+			<td>${red?.navDate?.format('MM/dd/yyyy')}</td> 
+			<td>${red?.postDate?.format('MM/dd/yyyy')}</td>		
+			<td>${red?.rgInvestmentaccount?.thirdPartyBySaCode?.thirdPartyName}</td>
+			<td>${red?.remark}</td>
+			<td align="center">
+				${red?.tradeStatus?.decodeStatus()}
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>
+	
+
+

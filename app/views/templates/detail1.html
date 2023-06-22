@@ -1,0 +1,186 @@
+#{extends 'templates/main.html' /}
+
+<script type="text/javascript">
+	$(function() {
+		$('.buttons button').button();
+		#{if mode == 'view'}
+			$('#close').click(function() {
+				//history.back();
+				var resume = true;
+				if (typeof doClose == 'function') { 
+					resume = doClose();
+				} 
+				//if (typeof cancelCustAcct == 'function') {
+				//	resume = cancelCustAcct();
+				//}
+				#{if isPartial}
+					if (resume) location.href='@{listpartial()}#{if group}/${group}#{/}';
+				#{/if}
+				#{else}
+					if (resume) location.href='@{list()}#{if group}/${group}#{/}';
+				#{/else}
+			});
+		#{/if}
+		#{else}
+			#{if confirming}
+				$('#confirm').click(function() {
+					var resume = true;
+					if (typeof doConfirm == 'function') { 
+						resume = doConfirm();
+					}
+					if (resume) submit('@{confirm()}?mode=${mode}#{if group}&group=${group}#{/}#{if param}&param=${param}#{/}#{if isPartial}&isPartial=${isPartial}#{/}');
+				});
+				$('#back').click(function() {
+					var resume = true;
+					if (typeof doBack == 'function') { 
+						resume = doBack();
+					}
+					if (resume) location.href='@{back(id)}?mode=${mode}#{if status}&status=${status}#{/}#{if group}&group=${group}#{/}#{if param}&param=${param}#{/}#{if from}&from=${from}#{/}#{if isPartial}&isPartial=${isPartial}#{/}';
+					return false;
+				});
+			#{/if}
+			#{else}	
+				$('#save').click(function() {
+					if(($('#paymentChargeOverwrite').hasClass('fieldError'))){
+						return false;
+					}else{
+						var resume = true;
+						if (typeof doSave == 'function') { 
+							resume = doSave();
+						}
+						if (resume) submit('@{save()}?mode=${mode}#{if group}&group=${group}#{/}#{if isPartial}&isPartial=${isPartial}#{/}');
+					}
+				});
+				$('#cancel').click(function() {
+					var resume = true;
+					if (typeof doCancel == 'function') { 
+						resume = doCancel();
+					} 
+					//if (typeof cancelCustAcct == 'function') {
+					//	resume = cancelCustAcct();
+					//}
+					
+					#{if isPartial}
+						if (resume) location.href='@{listpartial()}#{if group}/${group}#{/}';
+					#{/if}
+					#{else}
+						if (resume) location.href='@{list()}#{if group}/${group}#{/}';
+					#{/else}
+					
+				});
+			#{/else}
+			#{if canDelete}
+				$('#delete').click(function() {
+					deleteThis();
+				});
+			#{/if}
+		#{/else}
+	});
+	
+	#{if mode != 'view'}
+		function submit(action, id) {
+			//loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Processing...</div>').appendTo('body');
+			/* loading.dialog({
+				closeOnEscape: false,
+				draggable: false,
+				modal: true,
+				resizable: false,
+				open:function() {
+					$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+				} 
+			}); */
+			//loadingDialog(loading);
+			loading.dialog('open');
+			$('#form').attr('action', action);
+			$('#form').submit();
+		}
+		function success(data, xhr) {
+			if (data) {
+				$(document).html(data);
+			} else
+			#{if confirming}
+				location.href='@{list()}#{if group}/${group}#{/}';
+			#{/if}
+			#{else}
+				location.href='@{confirming(id)}#{if group}?group=${group}#{/}';
+			#{/else}			
+		}
+		function error() {
+			loading.dialog('close');
+			// TODO need to update this
+			alert('error on server');
+		}
+		#{if canDelete}
+			function deleteThis() {
+				if (confirm('Are you sure you want to delete this record?')) {
+					$.post('@{delete(id)}', function(response, status, xhr) {
+			    		checkRedirect(response);
+						if (status == 'success') {
+							if (response) {
+								alert(response);
+							} else {
+								location.href='@{list()}#{if group}/${group}#{/}';
+							}
+						}
+					});
+				}
+			}
+		#{/if}
+	#{/if}
+</script>
+
+<h2>#{get 'pageTitle'}Set Page Title Here!#{/}</h2>
+
+<!--  #{if flash.error || errors}
+    <div class="error">
+    	Error when saving data!<br/>
+		<li>${flash.error}</li>
+		#{ifErrors}
+			#{errors}
+				 <li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}
+-->
+
+#{if flash.error || errors}
+    <div class="error">
+    	<b>Error when saving data!</b><br/><br/>
+    	#{if flash.error}
+<li>${flash.error}</li>
+		#{/if}
+		#{ifErrors}
+			#{errors}
+<li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}
+
+
+<FORM id="form" class="form" accept-charset="utf-8" encType="multipart/form-data" method="post">
+	#{doLayout /}
+</form>
+<p></p>
+#{if param == null}
+	<div class="buttons">
+		#{if mode == 'view'}
+			<button id="close" type="button">Close</button>
+		#{/if}
+		#{else}
+			#{if confirming}
+				<button id="confirm" type="button">Confirm</button>
+				<button id="back" type="button">Back</button>
+			#{/if}
+			#{else}	
+				<button id="save" type="button">Save</button>
+				<button id="cancel" type="button">Cancel</button>
+				#{if canDelete && mode != 'entry'}
+					<span class="filler"></span>
+					<button id="delete" type="button">Delete</button>
+				#{/if}
+			#{/else}
+		#{/else}
+	</div>
+#{/if}

@@ -1,0 +1,256 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'CTP Entry' /}
+#{set readOnly: ((mode != 'edit' && mode != 'entry') || confirming ) /}
+ 
+#{if flash.error || errors}
+    <div class="error">
+    	<b>Error when saving data!</b><br/><br/>
+    	#{if flash.error}
+<li>${flash.error}</li>
+		#{/if}
+		#{ifErrors}
+			#{errors}
+<li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}
+#{script 'date.js', characterset:'utf-8' /}
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+#{script 'transaction.js' /}
+
+<script type="text/javascript">
+	var holidays = [												
+                #{list items:holidays, as:'holiday'}
+					${holiday.id.calendarDate.time},
+                #{/list}
+                ];
+	
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'Transactions/yieldByEIR.js' /}
+	#{include 'Transactions/calculateYield.js' /}
+	#{include 'CtpTransaction/csCtpTransaction.js' /}
+	#{include 'CtpTransaction/detail.js' /}
+	
+	
+</script>
+<style type="text/css">
+	#remaks {height: 50px;}
+	#remarkCorrection {height: 50px;}
+	textarea {resize:none;}
+</style>
+<form id="transactionForm" class="form" method="POST">
+	#{hidden id:'adjustmentManual', name:'transaction.adjustmentManual', value:transaction?.adjustmentManual /}
+	#{hidden id:'hasInterest', name:'transaction.transactionTemplate.securityType.hasInterest', value:transaction?.transactionTemplate?.securityType?.hasInterest /}
+	#{hidden id:'cbestMessageType', name:'transaction.security.securityType.cbestMessageType.lookupId', value:transaction?.security?.securityType?.cbestMessageType?.lookupId /}
+	#{hidden id:'isFraction', name:'transaction.security.isFraction', value:transaction?.security?.isFraction /}
+	#{hidden id:'fractionRatioSource', name:'transaction.security.fractionRatioSource', value:transaction?.security?.fractionRatioSource /}
+	#{hidden id:'fractionRatioTarget', name:'transaction.security.fractionRatioTarget', value:transaction?.security?.fractionRatioTarget /}
+	#{hidden name:'mode', value:mode /}
+	#{hidden name:'param', value:param /}
+	#{hidden id:'isreload', name:'isreload', value:isreload /}
+	#{hidden id:'custodyTransactionCode', name:'transaction.transactionTemplate.portfolioTransaction.custodyTransactionCode', value:transaction?.transactionTemplate?.portfolioTransaction?.custodyTransactionCode /}
+	#{hidden id:'priceUnit', name:'transaction.transactionTemplate.securityType.priceUnit', value:transaction?.transactionTemplate?.securityType?.priceUnit /}
+	#{hidden id:'discounted', name:'transaction.transactionTemplate.securityType.isDiscounted', value:transaction?.transactionTemplate?.securityType?.isDiscounted /}
+	#{hidden id:'portfolioTransactionKey', name:'transaction.transactionTemplate.portfolioTransaction.transactionMasterKey', value:transaction?.transactionTemplate?.portfolioTransaction?.transactionMasterKey /}
+	#{hidden id:'transactionTypeId', name:'transaction.transactionTemplate.portfolioTransaction.transactionType.lookupId', value:transaction?.transactionTemplate?.portfolioTransaction?.transactionType?.lookupId /}
+	#{hidden id:'defaultCorebanking', name:'transaction.transactionTemplate.defaultCorebanking', value:transaction?.transactionTemplate?.defaultCorebanking /}
+	#{hidden id:'frequency', name:'transaction.security.frequency.lookupId', value:transaction?.security?.frequency?.lookupId /}
+	#{hidden id:'minTrxQuantity', name:'transaction.security.minTrxQuantity', value:transaction?.security?.minTrxQuantity /}
+	#{hidden id:'isPrice', name:'transaction.transactionTemplate.securityType.isPrice', value:transaction?.transactionTemplate?.securityType?.isPrice /}
+	#{hidden id:'settTransKey', name:'transaction.transactionTemplate.settlementTransaction.transactionTemplateKey', value:transaction?.transactionTemplate?.settlementTransaction?.transactionTemplateKey /}
+	#{hidden id:'settlementNumber', name:'transaction.settlementNumber', value:transaction?.settlementNumber /}
+	#{hidden id:'cashTransCode', name:'transaction.transactionTemplate.settlementTransaction.cashTransaction.bankTransactionCode', value:transaction?.transactionTemplate?.settlementTransaction?.cashTransaction?.bankTransactionCode /}
+	#{hidden id:'cashTransCodeSett', name:'transaction.transactionTemplate.cashTransaction.bankTransactionCode', value:transaction?.transactionTemplate?.cashTransaction?.bankTransactionCode /}
+	#{hidden id:'valuationTrade', name:'transaction.valuationTrade', value:transaction?.valuationTrade /}
+	#{hidden id:'valuationAFS', name:'transaction.valuationAFS', value:transaction?.valuationAFS /}
+	#{hidden id:'valuationHTM', name:'transaction.valuationHTM', value:transaction?.valuationHTM /}
+	#{hidden id:'amortizationTrade', name:'transaction.amortizationTrade', value:transaction?.amortizationTrade /}
+	#{hidden id:'amortizationAFS', name:'transaction.amortizationAFS', value:transaction?.amortizationAFS /}
+	#{hidden id:'amortizationHTM', name:'transaction.amortizationHTM', value:transaction?.amortizationHTM /}
+	#{hidden id:'valuationMethod' /}
+	#{hidden id:'amortizationMethod' /}
+	#{hidden id:'viewClassification', name:'transaction.viewClassification', value:transaction?.viewClassification /}
+	#{hidden id:'yieldPorto', name:'transaction.yieldPorto', value:transaction?.yieldPorto /}
+	#{hidden id:'parPrice', name:'transaction.security.parUnitValue', value:transaction?.security?.parUnitValue /}
+	#{hidden id:'depositoryCode', name:'transaction.security.depositoryCode.lookupId', value:transaction?.security?.depositoryCode?.lookupId /}
+	#{hidden id:'dailyPortfolioFlag', name:'transaction.dailyPortfolioFlag', value:transaction?.dailyPortfolioFlag /}
+	#{hidden id:'source', name:'transaction.source', value:transaction?.source /}
+	#{hidden id:'sumOfChargeNetAmount', name:'sumOfChargeNetAmount', value:sumOfChargeNetAmount /}
+	#{hidden id:'securityClass', name:'transaction.transactionTemplate.securityType.securityClass.lookupCode', value:transaction?.transactionTemplate?.securityType?.securityClass?.lookupCode /} <!-- security class is doubled assign from below -->
+	#{hidden id:'securityClassId', name:'transaction.transactionTemplate.securityType.securityClass.lookupId', value:transaction?.transactionTemplate?.securityType?.securityClass?.lookupId /}
+	#{hidden id:'ctpRequired', name:'transaction.transactionTemplate.securityType.ctpRequired', value:transaction?.transactionTemplate?.securityType?.ctpRequired /}
+	#{hidden id:'marketOfRisk', name:'transaction.security.marketOfRisk.lookupId', value:transaction?.security?.marketOfRisk?.lookupId /}
+	#{hidden id:'prematchRequiredTemp', name:'transaction.transactionTemplate.defPrematch', value:transaction?.transactionTemplate?.defPrematch /}
+	
+	#{hidden id:'holdingType', name:'transaction.transactionTemplate.securityType.holdingType.lookupId', value:transaction?.transactionTemplate?.securityType?.holdingType?.lookupId /}
+	#{hidden id:'customerKey' /}
+	
+	#{hidden id:'blockedAccount', name:'blockedAccount', value:blockedAccount /}
+	#{hidden id:'expiredDate', name:'transaction.security.expiredDate', value:transaction?.security?.expiredDate?.format(appProp.dateFormat) , class:'calendar'/}
+	#{hidden id:'isExpiredDate', name:'transaction.security.isExpire', value:transaction?.security?.isExpire /}
+	#{hidden id:'postingDate', name:'transaction.postingDate', value:transaction?.postingDate?.format(appProp.dateFormat) /}
+	#{hidden id:'transactionStatus', name:'transaction.transactionStatus', value:transaction?.transactionStatus /}
+	#{hidden id:'createdBy', name:'transaction.createdBy', value:transaction?.createdBy /}
+	#{hidden id:'createdDate', name:'transaction.createdDate', value:transaction?.createdDate?.format(appProp.dateFormat) /}
+	#{hidden id:'currentDate', name:'currentDate', value:currentDate, class:'calendar' /}
+	#{hidden id:'warningMsg', name:'warningMsg', value:false /}
+	#{hidden id:'warningMsg2', name:'warningMsg2', value:false /}
+	#{hidden id:'firstCouponDate', name:'transaction.security.firstCouponDate', value:transaction?.security?.firstCouponDate?.format(appProp.dateFormat) /}
+	#{hidden id:'issueDate', name:'transaction.security.issueDate', value:transaction?.security?.issueDate?.format(appProp.dateFormat) /}
+	
+	#{hidden id:'nextPaymentDateHidden', name:'transaction.nextPaymentDate', class:'calendar', value:transaction?.nextPaymentDate?.format(appProp.dateFormat) /}
+	#{hidden id:'accrualBase', name:'transaction.security.accrualBase.lookupId', value:transaction?.security?.accrualBase?.lookupId /}
+	#{hidden id:'yearBase', name:'transaction.security.yearBase.lookupId', value:transaction?.security?.yearBase?.lookupId /}
+	
+	#{hidden id:'seqCtpId', name:'ctpTransaction.seqCtpId', value:ctpTransaction?.seqCtpId /}
+	#{hidden id:'settlementAgentKey', name:'transaction.settlementAgent.thirdPartyKey', value:transaction?.settlementAgent?.thirdPartyKey /}
+	
+	#{hidden id:'holdingQuantityStripped', name:'transaction.holdingQuantity', value:transaction?.holdingQuantity /}
+	#{hidden id:"accountNoKey", name:'transaction.account.custodyAccountKey', value:transaction?.account?.custodyAccountKey /}
+	#{hidden id:'quantityStripped', name:'transaction.quantity', value:transaction?.quantity /}
+	#{hidden id:'inHouseReference', name:'transaction.inhouseReference', value:transaction?.inhouseReference /}
+	
+	#{hidden id:'ctpTransactionKey', name:'ctpTransaction.transaction.transactionKey', value:ctpTransaction?.transaction?.transactionKey /}
+	
+	#{hidden id:'transactionRefDate', name:'ctpTransaction.transactionRefDate', value:ctpTransaction?.transactionRefDate /}
+	#{hidden id:'settlementRefDate', name:'ctpTransaction.settlementRefDate', value:ctpTransaction?.settlementRefDate /}
+	
+<div class="mainEntry">
+	<div class="leftTrx" style="width:60%;float:left;">
+		
+		<p>
+			#{textBox id:'ctp', name:'ctpTransaction.ctp', label:'CTP Report', value:ctpTransaction?.ctp, required:true, width:'200px', readOnly:readOnly /}
+			#{hidden id:'ctpReport', name:'ctpTransaction.ctpReport', value:ctpTransaction?.ctpReport /}
+			<span id="ctpError" class="error">#{error 'ctp is' /}</span>
+		</p>
+		<p>
+			#{textBox id:'transactionDeliverer', name:'ctpTransaction.transactionNumberDeliverer', value:ctpTransaction?.transactionNumberDeliverer, label:'Transaction No <br/>Deliverer', class:'capitalize', width:'200px', readOnly:readOnly /}
+			#{button id:'transactionDelivererHelp', value:'?', class:'small', readOnly:readOnlyPrematch /}
+			
+			#{hidden id:'transactionNumber', name:'transaction.transactionNumber', value:transaction?.transactionNumber /}
+			#{hidden id:'transactionKey', name:'transaction.transactionKey', value:transaction?.transactionKey /}
+			&nbsp;&nbsp;&nbsp;&nbsp;
+			#{checkBox id:'chkIsInHouse', name:'chkIsInHouse', readOnly:readOnly/} In House Reference
+			<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<span id="transactionDelivererError" class="error">#{error 'Transaction Deliverer is' /}</span>
+			
+		</p>
+		<p> 
+			#{dropDownList id:'dropdownReportType', name:'dropdownReportType', label:'Report Type', value:ctpTransaction?.reportType?.lookupId, options:reportTypes, required:true,  width:'200px', readOnly:readOnly /}
+			#{hidden id:'reportType', name:'ctpTransaction.reportType.lookupId', value:ctpTransaction?.reportType?.lookupId /}
+			<span id="reportTypeError" class="error">#{error 'Report Type is' /}</span>
+		</p>
+		<p>
+			#{textBox id:'transactionCode', name:'ctpTransaction.transactionTypeCode', label:'Transaction Code', value:ctpTransaction?.transactionTypeCode, class:'capitalize', required:true, readOnly:readOnly, width:'100px' /}
+			<span id="transactionCodeError" class="error">#{error 'Transaction Code is' /}</span>
+		</p>
+		<p>
+			#{textBox id:'securityId', name:'ctpTransaction.securityCode', label:'Security Code', value:ctpTransaction?.securityCode, required:true, class:'capitalize', readOnly:readOnly, width:'100px' /}
+			<span id="securityIdError" class="error">#{error 'Security Code is' /}</span>
+		</p>
+		<p> 
+			#{dropDownList id:'dropdownCtpTransactionType', name:'dropdownCtpTransactionType', label:'Transaction Type', value:ctpTransaction?.transactionType?.lookupId, options:transactionTypes, required:true,  width:'200px' /}
+			#{hidden id:'ctpTransactionTypeTemp', name:'ctpTransactionTypeTemp' /}
+			#{hidden id:'ctpTransactionType', name:'ctpTransaction.transactionType.lookupId', value:ctpTransaction?.transactionType?.lookupId /}
+			<span id="ctpTransactionTypeError" class="error">#{error 'Transaction Type is' /}</span>
+		</p>
+		<p>
+			#{textBox id:'counterPartyCode', name:'ctpTransaction.broker', label:"Broker", value:ctpTransaction?.broker, class:'capitalize', readOnly:readOnly, width:'200px', required:true /}
+			<span id="counterPartyCodeError" class="error">#{error 'Broker is' /}</span>
+		</p>
+		<p>
+			#{textBox id:'price', label:'Price', value:ctpTransaction?.price, format:'#,##0.###############', class:'numeric', required:true, width:'200px', readOnly:readOnly /}
+			#{hidden id:'priceStripped', name:'ctpTransaction.price', value:ctpTransaction?.price /}
+			<span id="percentage">%</span><span id="priceError" class="error">#{error 'Price is' /}</span>
+		</p>
+		<p>
+			#{textBox id:'yield', label:'Yield', value:ctpTransaction?.yield, format:'#,##0.####', class:'numeric', readOnly:readOnly, width: '200px' /}
+			#{hidden id:'yieldStripped', name:'ctpTransaction.yield', value:ctpTransaction?.yield /}
+		</p>
+		<p>
+			#{textBox id:'netAmount',  label:'<i>Quantity</i>', value:ctpTransaction?.netAmount, format:'#,##0.000000000', required:true, class:'numeric', readOnly:readOnly /}&nbsp;bio
+			#{hidden id:'netAmountStripped', name:'ctpTransaction.netAmount', value:ctpTransaction?.netAmount /}
+			<span id="netAmountError" class="error">#{error 'Nominal is' /}</span>
+		</p>
+		<p>
+			#{textBox id:'tradeDate', name:'ctpTransaction.tradeDate', value:ctpTransaction?.tradeDate, label:'Trade Date', class:'calendar', required:true, readOnly:readOnly /}
+			<span id="tradeDateError" class="error">#{error 'Transaction Date is' /}</span>
+			#{textBox id:'tradeTime', name:'ctpTransaction.tradeTime', value:ctpTransaction?.tradeTime, readOnly:readOnly, width:'68px' /}
+			#{hidden id:'transactionDate', name:'transaction.transactionDate', value:transaction?.transactionDate?.format(appProp.dateFormat) /} 
+			<span id="tradeTimeError" class="error">#{error 'Transaction Time is' /}</span>
+		</p>
+		<p>
+			#{textBox id:'settlementDate', name:'ctpTransaction.settlementDate', label:'Settlement Date', value:ctpTransaction?.settlementDate, class:'calendar', required:true, readOnly:readOnly /}
+			<span id="settlementDateError" class="error">#{error 'Settlement Date is' /}</span>
+		</p>
+			<p id="pRemarkDeliver">
+				#{textBox id:'remarkDeliver',label:'Remark Deliverer', name:'ctpTransaction.remarkDeliver', value:ctpTransaction?.remarkDeliver, class:'capitalize', readOnly:readOnly, width:'200px', maxLength:300 /}
+			</p>
+			<p id="pReferenceDeliver">
+				#{textBox id:'referenceDeliver', label:'Reference Deliverer', name:'ctpTransaction.referenceDeliver', value:ctpTransaction?.referenceDeliver, readOnly:readOnly, maxLength:300 /}
+			</p>
+			<p id="pCounterPartyDeliver">
+				#{textBox id:'counterPartyDeliverer',label:'Counterparty Deliverer', name:'ctpTransaction.counterPartyDeliverer', value:ctpTransaction?.counterPartyDeliverer, class:'capitalize', readOnly:readOnly, width:'200px' /}
+			</p>
+			<p id="pTransactingPartiesCodeDeliverer">
+				#{textBox id:'transactingPartiesCodeDeliverer', name:'ctpTransaction.transactingPartiesCodeDeliverer', label:'Transacting Parties Code Deliverer', value:ctpTransaction?.transactingPartiesCodeDeliverer, class:'capitalize', readOnly:readOnly, width:'200px', maxLength:30 /}
+			</p>
+			<p id="pTransactingPartiesNameDeliverer">
+				#{textBox id:'transactingPartiesNameDeliverer', name:'ctpTransaction.transactingPartiesNameDeliverer', label:'Transacting Parties <br/>Code Name Deliverer', value:ctpTransaction?.transactingPartiesNameDeliverer, class:'capitalize', readOnly:readOnly, width:'200px', maxLength:30 /}
+			</p>
+			<p id="pLateReasonType">
+			<p> 
+				#{dropDownList id:'dropdownLateReasonType', name:'dropdownLateReasonType', label:'Late Reason Type', value:ctpTransaction?.lateReasonType?.lookupId, options:lateReasonTypes,  width:'200px', readOnly:readOnly /}
+				#{hidden id:'lateReasonType', name:'ctpTransaction.lateReasonType.lookupId', value:ctpTransaction?.lateReasonType?.lookupId /}
+			</p>
+			</p>
+			<p id="pLateReason">
+				#{textBox id:'lateReason', label:'Late Reason', name:'ctpTransaction.lateReason', value:ctpTransaction?.lateReason, class:'capitalize', readOnly:readOnly, width:'200px', maxLength:100 /}
+			</p>		
+		</div>
+		<div class="rightBuyCell" style="float:left;overflow:auto;">
+					
+		<div id="forReceiver">
+						
+			<p>
+				#{textBox id:'ctpNo', labelwidth:'120px',label:'CTP Reference', name:'transaction.ctpNo', value:transaction?.ctpNo, width:'200px',readOnly:readOnly /}
+			</p>
+			<p>																	
+				#{textBox id:'transactionReceiver', name:'ctpTransaction.transactionNumberReceiver', labelwidth:'120px', value:ctpTransaction?.transactionNumberReceiver, label:'Transaction No <br/>Receiver', class:'capitalize', width:'200px', readOnly:readOnly /}
+				#{button id:'transactionReceiverHelp', value:'?', class:'small', readOnly:readOnly /}
+				<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				
+				<span id="transactionReceiverError" class="error">#{error 'Transaction Receiver is' /}</span>
+			</p>
+			<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
+			<p id="pRemarkReceiver">
+				#{textBox id:'remarkReceiver',labelwidth:'120px',label:'Remark Receiver', name:'ctpTransaction.remarkReceiver', value:ctpTransaction?.remarkReceiver, class:'capitalize', readOnly:readOnly, width:'200px', maxLength:300 /}
+			</p>
+			<p id="pReferenceReceiver">
+				#{textBox id:'referenceReceiver',labelwidth:'120px', label:'Reference Receiver', name:'ctpTransaction.referenceReceiver', value:ctpTransaction?.referenceReceiver, readOnly:readOnly, maxLength:300 /}
+			</p>
+			<p id="pCounterPartyReceiver">
+				#{textBox id:'counterPartyReceiver',labelwidth:'120px',label:'Counterparty Receiver', name:'ctpTransaction.counterPartyReceiver', value:ctpTransaction?.counterPartyReceiver, class:'capitalize', readOnly:readOnly, width:'200px' /}
+			</p>
+			<p id="pTransactingPartiesCodeReceiver">
+				#{textBox id:'transactingPartiesCodeReceiver', name:'ctpTransaction.transactingPartiesCodeReceiver',labelwidth:'120px', label:'Transacting Parties <br/>Code Receiver', value:ctpTransaction?.transactingPartiesCodeReceiver, class:'capitalize', readOnly:readOnly, width:'200px', maxLength:30 /}
+			</p>
+			<p id="pTransactingPartiesNameReceiver">
+				#{textBox id:'transactingPartiesNameReceiver', name:'ctpTransaction.transactingPartiesNameReceiver',labelwidth:'120px', label:'Transacting Parties <br/>Code Name Receiver', value:ctpTransaction?.transactingPartiesNameReceiver, class:'capitalize', readOnly:readOnly, width:'200px', maxLength:30 /}
+			</p>
+		</div>
+		
+		</div>
+	<div class="divclear"></div>
+</div>
+<p><b><span id="errGlobal" class="error"></span></b></p>
+	
+</form>
+<input type="hidden" id="dummy" />
+
+<script type="text/javascript">
+#{include 'CtpTransaction/csCtpTransaction.js' /}
+</script>

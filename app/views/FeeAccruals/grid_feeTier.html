@@ -1,0 +1,44 @@
+#{hidden id:'tierFeeKey' /}
+<table id="gridFeeTier" class="display">
+	<thead>
+		<tr>
+			<th>Key</th>
+			<th>NAV</th>
+			<th>Tiering Amount</th>
+			<th>Value</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list faFeeDetail?.faFeeTiers, as:'faFeeTier'}
+		<tr>
+			<td>
+				${faFeeTier?.id?.tierSequence}
+			</td>
+			<td>
+				${faFeeTier?.tierMaximumRange}
+			</td>
+			<td>
+				#{if faFeeTier?.tierMaximumRange}
+				${faFeeTier?.tierMaximumRange}
+				#{/if}
+				#{else}
+				MAX
+				#{/else}
+										
+			</td>
+			<td>
+				${faFeeTier?.tierValue}
+			</td>
+			<td>
+			#{hidden id:'tierMaximumRange', name:'faFeeTiers[' + (faFeeTier_index-1) + '].tierMaximumRange', value:faFeeTier?.tierMaximumRange /}
+			#{hidden id:'tierValue', name:'faFeeTiers[' + (faFeeTier_index-1) + '].tierValue', value:faFeeTier?.tierValue /}
+			#{hidden id:'tierRowNumber', name:'faFeeTiers[' + (faFeeTier_index-1) + '].id.rowNumber', value:faFeeTier?.id?.rowNumber /}
+			#{hidden id:'tierFeeKey', name:'faFeeTiers[' + (faFeeTier_index-1) + '].id.feeKey', value:faFeeTier?.id?.feeKey /}
+			#{hidden id:'tierSequence', name:'faFeeTiers[' + (faFeeTier_index-1) + '].id.tierSequence', value:faFeeTier?.id?.tierSequence /}
+			<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled="disabled"#{/if}/></center>
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>

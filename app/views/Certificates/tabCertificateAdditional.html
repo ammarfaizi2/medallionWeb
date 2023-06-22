@@ -1,0 +1,165 @@
+<script>
+	$(function(){
+	    var closeDialogMessage = function() {
+			$("dialog-message").dialog('close');
+		}
+	    
+		if (!$('#isAttached').is(':checked')){
+			$('#attachFile').disabled();
+			$('p[id=pAttachFile] label span').html('');
+		}
+		$('#isAttached').change(function(){
+			if (!$('#isAttached').is(':checked')){
+				$('#attachFile').disabled();
+				if ($.browser.msie) {
+					$('#attachFile').replaceWith($('#attachFile').clone(true));
+				} else {
+					$('#attachFile').val('');
+				}
+				$('p[id=pAttachFile] label span').html('');
+			} else {
+				$('#attachFile').enabled();
+				$('p[id=pAttachFile] label span').html(' *');
+			}
+		});
+		
+		if ((('${mode}' !== 'entry') || ('${confirming}' !== 'true')) && ($('#isAttached').is(':checked'))) {
+			$('#isAttached').val(true);
+			$("input[name='isAttached']").attr('checked', 'checked');
+			$('#attachFile').enabled();
+		} else if (('${mode}' === 'entry') && ('${confirming}' !== 'true')) {
+			$("input[name='isAttached']").removeAttr('checked');
+			$('#attachFile').disabled();
+		}
+		
+		$('#downloadCertificate').click(function() {
+			var downloadFileChecked = true;
+			loading.dialog('open');
+			$.get("@{Certificates.attachmentDownload()}", {'downloadfile':'${certificate?.certificateKey}'}, function(data) {
+				checkRedirect(data);
+	    		if(data == "not"){
+	    			loading.dialog('close');	
+		    		messageAlertOk("File Not Exist", "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+	    		}
+			});
+			loading.dialog('close');			
+		});
+	})
+</script>
+<div style="height:250px">	
+<p>
+<table>
+	<thead>
+		<tr>
+			<th width="5px">No</th>
+			<th>Description</th>
+			<th>Reference No</th>
+			<th>Reference Date</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>1</td>
+			<td>
+				#{textBox id:'refRemark1', name:'certificate.refRemark1', value:certificate?.refRemark1, readOnly:readOnly, width:'500px', class:'capitalize' /}
+				<span id="refRemark1Error" class="error">#{error 'Remark 1 is' /}</span>
+			</td>
+			<td>
+				#{textBox id:'refNo1', name:'certificate.refNo1', value:certificate?.refNo1, required:true, readOnly:readOnly, width:'150px', class:'capitalize' /}
+				<span id="refNo1Error" class="error">#{error 'Ref No 1 is' /}</span>
+			</td>
+			<td>
+				#{textBox id:'refDate1', name:'certificate.refDate1', value:certificate?.refDate1?.format(appProp.dateFormat), readOnly:readOnly, class:'calendar' /}
+				<span id="refDate1Error" class="error">#{error 'Ref Date 1 is' /}</span>
+			</td>
+		</tr>
+		<tr>
+			<td>2</td>
+			<td>
+				#{textBox id:'refRemark2', name:'certificate.refRemark2', value:certificate?.refRemark2, readOnly:readOnly, width:'500px', class:'capitalize' /}
+				<span id="refRemark2Error" class="error">#{error 'Remark 2 is' /}</span>
+			</td>
+			<td>
+				#{textBox id:'refNo2', name:'certificate.refNo2', value:certificate?.refNo2, required:true, readOnly:readOnly, width:'150px', class:'capitalize' /}
+				<span id="refNo2Error" class="error">#{error 'Ref No 2 is' /}</span>
+			</td>
+			<td>
+				#{textBox id:'refDate2', name:'certificate.refDate2', value:certificate?.refDate2?.format(appProp.dateFormat), readOnly:readOnly, class:'calendar' /}
+				<span id="refDate2Error" class="error">#{error 'Ref Date 2 is' /}</span>
+			</td>
+		</tr>
+		<tr>
+			<td>3</td>
+			<td>
+				#{textBox id:'refRemark3', name:'certificate.refRemark3', value:certificate?.refRemark3, readOnly:readOnly, width:'500px', class:'capitalize' /}
+				<span id="refRemark3Error" class="error">#{error 'Remark 3 is' /}</span>
+			</td>
+			<td>
+				#{textBox id:'refNo3', name:'certificate.refNo3', value:certificate?.refNo3, required:true, readOnly:readOnly, width:'150px', class:'capitalize' /}
+				<span id="refNo3Error" class="error">#{error 'Ref No 3 is' /}</span>
+			</td>
+			<td>
+				#{textBox id:'refDate3', name:'certificate.refDate3', value:certificate?.refDate3?.format(appProp.dateFormat), readOnly:readOnly, class:'calendar' /}
+				<span id="refDate3Error" class="error">#{error 'Ref Date 3 is' /}</span>
+			</td>
+		</tr>
+		<tr>
+			<td>4</td>
+			<td>
+				#{textBox id:'refRemark4', name:'certificate.refRemark4', value:certificate?.refRemark4, readOnly:readOnly, width:'500px', class:'capitalize' /}
+				<span id="refRemark4Error" class="error">#{error 'Remark 4 is' /}</span>
+			</td>
+			<td>
+				#{textBox id:'refNo4', name:'certificate.refNo4', value:certificate?.refNo4, required:true, readOnly:readOnly, width:'150px', class:'capitalize' /}
+				<span id="refNo4Error" class="error">#{error 'Ref No 4 is' /}</span>
+			</td>
+			<td>
+				#{textBox id:'refDate4', name:'certificate.refDate4', value:certificate?.refDate4?.format(appProp.dateFormat), readOnly:readOnly, class:'calendar' /}
+				<span id="refDate4Error" class="error">#{error 'Ref Date 4 is' /}</span>
+			</td>
+		</tr>
+		<tr>
+			<td>5</td>
+			<td>
+				#{textBox id:'refRemark5', name:'certificate.refRemark5', value:certificate?.refRemark5, readOnly:readOnly, width:'500px', class:'capitalize' /}
+				<span id="refRemark5Error" class="error">#{error 'Remark 5 is' /}</span>
+			</td>
+			<td>
+				#{textBox id:'refNo5', name:'certificate.refNo5', value:certificate?.refNo5, required:true, readOnly:readOnly, width:'150px', class:'capitalize' /}
+				<span id="refNo5Error" class="error">#{error 'Ref No 5 is' /}</span>
+			</td>
+			<td>
+				#{textBox id:'refDate5', name:'certificate.refDate5', value:certificate?.refDate5?.format(appProp.dateFormat), readOnly:readOnly, class:'calendar' /}
+				<span id="refDate5Error" class="error">#{error 'Ref Date 5 is' /}</span>
+			</td>
+		</tr>
+		
+	</tbody>
+</table>
+</p>
+<p>&nbsp;</p>
+<p id="pAttachFile">				
+				<label>Attach Document<span class="req"> *</span></label>
+				#{hidden id:'attachmentFileHidden', name:'certificate.fileAttachment', value:certificate?.fileAttachment/}
+				#{checkBox id:'isAttached', name:'certificate.attached', value:certificate?.attached, readOnly:readOnly /}
+				
+				#{if ((!confirming)&&(mode=='entry')) ||((!confirming)&&(!approval))}
+					#{fileUpload id:'attachFile', name:'attachment', value:attachment, class:'all' /}
+					<span class="error">#{error 'Attach Document in tab Additional is' /}</span>
+					${certificate?.fileAttachment} 
+				#{/if}
+				#{else}
+					#{textBox id:'attachmentFile', name:'attachment',  value:attachement, readOnly:readOnly, width:'200px', required:true /}
+				#{/else}
+				#{if ((!confirming))}
+				#{if ((!certificate?.fileAttachment?.trim().equals("")) && (certificate?.fileAttachment != null) && (!approval))}
+					&nbsp;&nbsp;
+					Download it <a id="downloadCertificate" href="@{attachmentDownload()}/${certificate?.certificateKey}">here</a>
+				#{/if}
+				#{/if}
+				<!-- #{if ((certificate?.fileAttachment != null) && (!confirming) && (mode!='entry'))} 
+					#{button id:'generateFile', value:'generate file', readOnly:readOnly/}
+				#{/if} -->
+</p>
+
+</div>

@@ -1,0 +1,78 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle:'Tax Profile' /}
+
+<script type="text/javascript">
+	$(function() {
+		$('#backTaxRule').button();
+		$('.buttons button').button();	
+		
+		$('#backTaxRule').insertAfter("#new");
+		
+		$('#backTaxRule').click(function() {
+			location.href='@{TaxProfiles.edit(taxProfileCode)}';
+		})
+		
+	});
+	
+	function doEntry() {
+		location.href='@{TaxProfileRules.entry()}?taxProfileCode=${taxProfileCode}';
+	}
+	
+	function doEdit(data) {
+		//alert("alert "+data[2]+" : "+data[0]+" : "+data[1]);
+		if ((data[3] == "New") || (data[3] == "Updated")) {
+			//alert("view");
+			
+			//view(data[0]);
+			location.href='@{TaxProfileRules.view()}?taxProfileCode='+data[0]+'&securityType='+data[1];
+			return false;
+		} else {
+			location.href='@{TaxProfileRules.edit()}?taxProfileCode='+data[0]+'&securityType='+data[1];
+		}
+	}
+		
+	
+</script>
+<form class="form">
+	<p>
+		#{textBox id:'taxProfileCode', name:'taxProfile.taxProfileCode', label:'Tax Profile Code', value:taxProfile?.taxProfileCode, class:'capitalize', required:true, readOnly:true, maxLength:50 /}
+	</p>
+	<p>
+		#{textBox id:'taxProfileDesc', name:'taxProfile.description', label:'Description', value:taxProfile?.description,  class:'capitalize',required:true, readOnly:true, width:'300px', maxLength:100 /}
+	</p>
+</form>
+<table id="grid" class="display">
+#{hidden id:'taxProfileKey', name:'taxProfileCode', value:taxProfileCode /}
+				
+	<thead>
+		<tr>
+			<th>Key</th>
+			<th>Security Type</th>	
+			<th>Description</th>
+			<th width="50px">Status</th>
+			<th>Active</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:taxProfileRules, as:'taxSetup'}
+		<tr>
+			<td>
+				${taxSetup?.id?.taxProfileCode}
+			</td> 
+			<td>
+				${taxSetup?.securityType?.securityType}
+			</td>
+			<td>
+				${taxSetup?.securityType?.description}
+			</td>
+			<td>
+				${taxSetup?.recordStatus?.decodeStatus()}
+			</td>
+			<td>
+				${taxSetup?.active ? 'Yes' : 'No'}
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>
+<button class="buttons", id="backTaxRule", style="margin:5px;">Back</button>

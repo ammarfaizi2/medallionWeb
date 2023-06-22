@@ -1,0 +1,180 @@
+#{extends 'templates/main.html' /}
+#{set param: param /}
+
+<script type="text/javascript">
+	$(function() {
+		
+		var closeDialogMessage = function() {
+			$("#dialog-message").dialog("close");
+		}
+		
+		var directToEntry = function() {
+			var url = "";
+			if ('${origin}' == '${cancelDepositoBreakOriginated}') {
+				url = "@{CancelDepositoBreaks.entry()}";
+			} else if ('${origin}' == '${depositoBreakOriginated}') {
+				url = "@{DepositoBreaks.entry()}";
+			}
+			return url;
+		}
+		
+		var directToList = function() {
+			var url = "";
+			if ('${origin}' == '${cancelDepositoBreakOriginated}') {
+				url = "@{CancelDepositoBreaks.list()}";
+			} else if ('${origin}' == '${depositoBreakOriginated}') {
+				url = "@{DepositoBreaks.list()}";
+			}
+			return url;
+		}
+		
+		var directToSave = function() {
+			var action = "";
+			if($('#depositoNo').val() !='')
+				$('#depositoKey').val($('#depositoKeyAdd').val());
+			if ('${origin}' == '${cancelDepositoBreakOriginated}') {
+				action = "@{CancelDepositoBreaks.save()}?mode=${mode}";
+			} else if ('${origin}' == '${depositoBreakOriginated}') {
+				action = "@{DepositoBreaks.save()}?mode=${mode}";
+			}
+			return action;
+		}
+		
+		var directToConfirm = function() {
+			var action = "";
+			if ('${origin}' == '${cancelDepositoBreakOriginated}') {
+				action = "@{CancelDepositoBreaks.confirm()}?mode=${mode}";
+			} else if ('${origin}' == '${depositoBreakOriginated}') {
+				action = "@{DepositoBreaks.confirm()}?mode=${mode}";
+			}
+			return action;
+		}
+		
+		var directToBack = function() {
+			var url = "";
+			if ('${origin}' == '${cancelDepositoBreakOriginated}') {
+				url = "@{CancelDepositoBreaks.back()}?id=${deposito?.depositoKey}&param=${param}&mode=${mode}";
+			} else if ('${origin}' == '${depositoBreakOriginated}') {
+				var isReload = $("#isreload").val();
+				url = "@{DepositoBreaks.back()}?id=${deposito?.depositoKey}&param=${param}&mode=${mode}&isreload="+isReload+"";
+			}
+			return url;
+		}
+		
+		var backToEntry = function() {
+			loading.dialog('open');
+			var url = directToEntry();
+			
+			location = url;
+		}
+		var backToList = function() {
+			loading.dialog('open');
+			var url = directToList();
+			
+			location = url;
+		}
+		// Action buttons 
+		$('#save').click(function() {
+			$(".cancel").remove();
+			var length = $('#chargeList').dataTable().fnGetNodes().length; 
+			var resume = true;
+			if(typeof doSave == 'function') {
+				resume = doSave();
+			} 
+			if (resume){
+			#{ifnot flash.error || errors}
+				if ('${origin}' == '${depositoBreakOriginated}') {
+					var isReload = $("#isreload").val();
+					if (isReload == false || isReload == 'false') {
+						messageAlertOk("You must load Charge to be able to continue!", "ui-icon1 ui-icon-alert", "Warning Message", closeDialogMessage);
+						return false;
+					}
+				}
+			#{/ifnot}
+
+			var action = directToSave();
+			
+			loading.dialog('open');
+			$('#depositoBreakForm').attr('action', action);
+			$('#depositoBreakForm').submit();
+			return false;
+			}
+		});
+		
+		$('#confirm').click(function() {
+			$(".cancel").remove();
+			var action = directToConfirm();
+			
+			loading.dialog('open');
+			$.post(action, $('#depositoBreakForm').serialize(), function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					
+					if ('${mode}' == 'entry') {
+						messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Notification", backToList);
+					}
+					else if ('${mode}' == 'edit') {
+						messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Notification", backToList);
+					}
+					
+				} else {
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+				}
+			});
+		});
+		
+		$('#back').click(function() {
+			var url = directToBack();
+			
+			location.href = url;
+		});
+		
+		$('#clear').click(function() {
+			var url = directToEntry();
+			
+			location.href = url;
+		});
+		
+		if ('${mode}'=='edit'){
+			$('#clear').css('display', 'none');
+		}
+		
+		$('#cancel').click(function(){
+			var url = directToList();
+			var vFrom = '${from}';
+			
+			if (vFrom == '') {
+				location.href = url;
+			} else if (vFrom == '${depositoInquiryOriginated}' || vFrom == '${depositoInquiryFullRedeem}') {
+				location.href="@{InquiryDeposito.view}?id=${deposito?.depositoKey}"
+			} 
+			
+		});
+		
+		if ('${origin}' == '${cancelDepositoBreakOriginated}') {
+			$('#cancelDepositoBreak').css("display","");
+		} else if ('${origin}' == '${depositoBreakOriginated}') {
+			$('#cancelDepositoBreak').css("display","none");
+		}
+	});	
+</script>
+
+<div id="detail">
+	#{include 'DepositoBreaks/detail.html' /}	
+</div>
+
+<div id="actions" class="buttons">
+	#{if confirming}
+		<input type="button" id="confirm" value="Confirm" />
+		<input type="button" id="back" value="Back" />
+	#{/if}
+	#{elseif ((mode == 'entry') || (mode == 'edit')) && (!confirming)}
+		<input type="button" id="save" value="Save" />
+		<input type="button" id="clear" value="Clear" />
+		<input type="button" id="cancel" value="Cancel"/>
+	#{/elseif}
+	#{else}
+		<input type="button" id="cancel" value="Close" />
+	#{/else}
+</div>

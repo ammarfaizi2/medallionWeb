@@ -1,0 +1,57 @@
+<p></p>
+<div id="tabsBankAccount">
+	<ul>
+		<li><a href="#tabBank-1">SUB</a></li>
+		<li><a href="#tabBank-2">RED</a></li>
+	</ul>
+	<div class="pane" id="tabBank-1">
+		<div id="listBankAccountSub" style="overflow-y:scroll;max-height:400px;">               
+		    <table id="bankAccountTableSub" class="display">
+		        <thead>
+		            <tr>
+		                <th>Account No</th>
+		                <th>Bank Name</th>
+		                <th>Beneficiary Name</th>
+		                <th>Default</th>
+		                <th>Action</th>
+		            </tr>
+		        </thead>
+		        <tbody>
+		        </tbody>
+		    </table>
+		</div>
+		<div class="buttons">
+		    #{ifnot confirming}
+		        <button id="newBankDialogSub" #{if readOnly}disabled="disabled"#{/if}>New Data</button>
+		    #{/ifnot}
+		    #{hidden id:'bankAccountKeyDefSub', name:'prd.bankAccountSub.bankAccountKey', value:prd?.bankAccountSub?.bankAccountKey /}  
+		    #{hidden id:'defaultProductBankAccountSub', name:'prd.defaultProductBankAccountSub', value:prd?.defaultProductBankAccountSub /}
+		    <span id="btnBankAccountAddErrorSub" class="error"><span></span>#{error 'Bank Account is' /}</span>
+		</div>
+	</div>
+	<div class="pane" id="tabBank-2">
+		<div id="listBankAccountRed" style="overflow-y:scroll;max-height:400px;">               
+		    <table id="bankAccountTableRed" class="display">
+		        <thead>
+		            <tr>
+		                <th>Account No</th>
+		                <th>Bank Name</th>
+		                <th>Beneficiary Name</th>
+		                <th>Default</th>
+		                <th>Action</th>
+		            </tr>
+		        </thead>
+		        <tbody>
+		        </tbody>
+		    </table>
+		</div>
+		<div class="buttons">
+		    #{ifnot confirming}
+		        <button id="newBankDialogRed" #{if readOnly}disabled="disabled"#{/if}>New Data</button>
+		    #{/ifnot}
+		    #{hidden id:'bankAccountKeyDefRed', name:'prd.bankAccount.bankAccountKey', value:prd?.bankAccount?.bankAccountKey /}  
+		    #{hidden id:'defaultProductBankAccountRed', name:'prd.defaultProductBankAccountRed', value:prd?.defaultProductBankAccountRed /}
+		    <span id="btnBankAccountAddErrorRed" class="error"><span></span>#{error 'Bank Account is' /}</span>
+		</div>
+	</div>
+</div>

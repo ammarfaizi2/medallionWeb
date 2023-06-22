@@ -1,0 +1,50 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Portofolio Valuation Process' /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)||(mode=='view')) /}
+
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+
+<script type="text/javascript">
+	 function doEdit(data) {
+		return false;
+	} 
+</script> 
+
+<form id="custodyEndOfDayReProcessForm" class="form" method="POST" name="custodyEndOfDayReProcess">
+	<p>&nbsp;</p>
+	<p>			
+		#{textBox id:'custInvt', name:'eod.rgInvtAcct.accountNumber', label:'Account No', value:eod?.rgInvtAcct?.accountNumber, width:'120px', readOnly:readOnly, class:'capitalize', required:true/}
+		#{hidden  id:'custInvtKey', value:eod?.rgInvtAcct?.accountNumber /}
+		#{button  id:'custInvtHelp', value:'?', class:'small', readOnly:readOnly/}
+		#{textBox id:'custInvtDesc', name:'eod.rgInvtAcct.name', value:eod?.rgInvtAcct?.name, readOnly:true, width:'340px' /}
+	</p>
+	<p>&nbsp;</p>
+	<p>			
+		#{textBox id:'fromDate', name:'eod.fromDate', label:'Periode', value:eod?.fromDate?.format(appProp.dateFormat), class:'calendar', readOnly:false, required:true/} <b>&nbsp;s/d&nbsp;</b>
+		#{textBox id:'toDate', name:'eod.toDate', value:eod?.toDate?.format(appProp.dateFormat), class:'calendar', readOnly:false, required:true/}(${appProp.displayDateFormat})
+	</p>
+	<p>&nbsp;</p>
+	<div class="buttons">
+		#{button  id:'btnProcess', value:'Process', readOnly:false/} 
+		#{button  id:'btnReset', value:'Reset', readOnly:false/}
+	</div>
+	<p>&nbsp;</p>
+	<p>
+		<textarea id='log' rows="10" cols="125" readonly="readonly">
+#{list logs, as:'log'}${log}
+#{/list}
+		</textarea>
+	</p>
+</form>
+	
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'CustodyEndOfDayReprocess/CustodyEndOfDayReProcess.js' /}
+	$(document).ready(function() {
+		$('#new').remove();
+		$('.buttons input:button').button();
+		CustodyEndOfDayReProcess($("#custodyEndOfDayReProcessForm"));
+	});	
+</script>
+

@@ -1,0 +1,127 @@
+<script type="text/javascript">
+	$(function(){
+		
+		/* $('#bankCode').lookup({
+			list:'@{Pick.thirdParties()}?type=THIRD_PARTY-BANK',
+			get:{
+				url:'@{Pick.thirdParty()}?type=THIRD_PARTY-BANK',
+				success: function(data) {
+					if (data) {
+						$('#bankCode').removeClass('fieldError');
+						$('#bankCodeKey').val(data.code);
+						$('#bankCodeName').val(data.description);
+						$('#h_bankCodeName').val(data.description);
+						$("#bankCodeError").html("");
+					}
+				},
+				error : function(data) {
+					$('#bankCode').addClass('fieldError');
+					$('#bankCodeName').val('NOT FOUND');
+					$('#bankCode').val('');
+					$('#bankCodeKey').val('');
+					$('#h_bankCodeName').val('');
+				}
+			},
+			key:$('#bankCodeKey'),
+			description:$('#bankCodeName'),
+			help:$('#bankCodeHelp')
+		}); */
+		
+		$('#bankCode').dynapopup2({key:'bankCodeKey', help:'bankCodeHelp', desc:'bankCodeName'},'PICK_GN_THIRD_PARTY', "THIRD_PARTY-BANK", "null", 
+				function(data){
+					if (data) {
+						$('#bankCode').removeClass('fieldError');
+						$('#bankCodeKey').val(data.code);
+						$('#bankCodeName').val(data.description);
+						$('#h_bankCodeName').val(data.description);
+						$("#bankCodeError").html("");
+					}
+				},
+				function(data){
+					$('#bankCode').addClass('fieldError');
+					$('#bankCodeName').val('NOT FOUND');
+					$('#bankCode').val('');
+					$('#bankCodeKey').val('');
+					$('#h_bankCodeName').val('');
+				}
+		);
+		
+		$('#currency').lookup({
+			list:'@{Pick.currencies()}',
+			get:{
+				url:'@{Pick.currency()}',
+				success: function(data) {
+					if (data) {
+						$('#currency').removeClass('fieldError');
+						$('#currencyCode').val(data.code);
+						$('#currencyDesc').val(data.description);
+						$('#h_currencyDesc').val(data.description);
+					}
+				},
+				error : function(data) {
+					$('#currency').addClass('fieldError');
+					$('#currencyDesc').val('NOT FOUND');
+					$('#currency').val('');
+					$('#currencyCode').val('');
+					$('#h_currencyDesc').val('');
+				}
+			},
+			key:$('#currencyCode'),
+			description:$('#currencyDesc'),
+			help:$('#currencyHelp')
+		});
+		
+		if ($.browser.msie){
+			$("#description[maxlength]").bind('input propertychange', function() {  
+		        var maxLength = $(this).attr('maxlength');  
+		        if ($(this).val().length > maxLength) {  
+		            $(this).val($(this).val().substring(0, maxLength));  
+		        }
+		    });
+		}
+		
+	});
+	
+</script>
+<style type="text/css">
+  .errmsg { color:red; }
+  textarea { resize:none; height: 50px;}
+</style>
+<form></form>
+<form id="bankAccountDetailForm" class="form">
+<span id="errmsgNull" class="errmsg" ></span>
+	#{hidden id:'rowPosition' /}
+	#{hidden id:'bankAccountKey', name:'bankAccount.bankAccountKey', value:bankAccount?.bankAccountKey /}
+	#{hidden id:'bicCode', name:'bankAccount.bicCode', value:bankAccount?.bicCode /}
+	
+	<p>
+		#{textBox id:'bAccountNo', name:'bankAccount.accountNo', label:'Account No', value:bankAccount?.accountNo, required:true, readOnly:readOnly, width:'100px', maxLength:'50', class:'capitalize' /}
+		<span id="bAccountNoError" class="error">#{error 'Account No is' /}</span>
+	</p>
+	
+	<p>
+		#{textBox id:'bankCode', name:'bankAccount.bankCode.thirdPartyCode', label:'Bank Code', value:bankAccount?.bankCode?.thirdPartyCode, readOnly:readOnly, width:'56px', maxLength:'25', class:'capitalize', required:true /}
+		#{hidden id:'bankCodeKey', name:'bankAccount.bankCode.thirdPartyKey', value:bankAccount?.bankCode?.thirdPartyKey /}
+		#{button id:'bankCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'bankCodeName', name:'bankAccount.bankCode.thirdPartyName', value:bankAccount?.bankCode?.thirdPartyName, readOnly:true, width:'222px' /}
+		<span id="bankCodeError" class="error"></span>
+	</p>
+	
+	<p>	
+	 	#{textBox id:'accountHolderName', name:'bankAccount.name', label:'Beneficiary Name', value:bankAccount?.name, required:true, readOnly:readOnly, width:'306px', maxLength:'100', class:'capitalize' /}  
+		&nbsp; <span id="accountHolderNameError" class="error"></span>
+	</p>	
+	<p>			
+		#{textBox id:'currency', name:'bankAccount.currency.currencyCode', label:'Currency', value:bankAccount?.currency?.currencyCode, class:'capitalize', required:true, readOnly:readOnly, width:'56px', maxLength:'25' /}
+		#{button id:'currencyHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'currencyDesc', name:'bankAccount.currency.description', value:bankAccount?.currency?.description, readOnly:true, width:'222px' /}
+		&nbsp; <span id="currencyError" class="error"></span>
+	</p>
+	<p>
+		#{textBox id:'branch', name:'bankAccount.branch', label:'Branch', value:bankAccount?.branch, readOnly:readOnly, width:'306px', maxLength:'50', class:'capitalize' /}
+		<span id="branchError" class="error"></span>
+	</p>
+	<p>
+		#{textArea id:'description', name:'bankAccount.description', value:bankAccount?.description, label:'Description', readOnly:readOnly, class:'capitalize', width:'306px', maxLength:200  /}
+	</p>
+</form>

@@ -1,0 +1,253 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle:'Cancel Corporate Action Announcement' /}
+#{script 'lookups.js' /}
+
+<script type="text/javascript">
+$(function(){
+	$('.buttons input:button').button();
+	
+	$('#root').accordion({
+		collapsible: true
+	});
+	
+	$('#actionCode').change(function(){
+		if ($(this).val()==''){
+			$('#actionCodeKey').val('');
+			$('#actionCodeDesc').val('');
+			$('#h_actionCodeDesc').val('');
+		}
+	});
+	
+	$('#actionCode').lookup({
+		list:'@{Pick.actionTemplates()}',
+		get:{
+			url:'@{Pick.actionTemplate()}',
+			success: function(data){
+				$('#actionCode').removeClass('fieldError');
+				$('#actionCodeKey').val(data.code);
+				$('#actionCodeDesc').val(data.description);
+				$('#h_actionCodeDesc').val(data.description);
+				
+				$('#actionSecType').val(data.securityType);
+				$('#actionCodeError').html('');
+				
+				$('#securityType').val(data.securityType);
+				$('#securityTypeId').val(data.securityType);
+				$('#securityTypeName').val(data.securityTypeDesc);
+				$('#h_securityTypeName').val(data.securityTypeDesc);
+			},
+			error: function(data){
+				$('#actionCode').addClass('fieldError');
+				$('#actionCodeKey').val('');
+				$('#actionCode').val('');
+				$('#actionCodeDesc').val('NOT FOUND');
+				$('#h_actionCodeDesc').val('');
+				
+				$('#securityType').val('');
+				$('#securityTypeId').val('');
+				$('#securityTypeName').val('');
+				$('#h_securityTypeName').val('');
+			}
+		},
+		description:$('#actionCodeDesc'),
+		help:$('#actionCodeHelp')
+	});
+	
+	$('#securityType').change(function(){
+		if ($(this).val()==''){
+			$('#securityTypeId').val('');
+			$('#securityTypeName').val('');
+			$('#h_securityTypeName').val('');
+			
+			$('#securityCode').val('');
+			$('#securityCodeId').val('');
+			$('#securityCodeName').val('');
+			$('#h_securityCodeName').val('');
+			
+		}else{
+			
+			if ($(this).val().toLowerCase() !=  $('#actionSecType').val().toLowerCase()) {
+				$(this).val('');
+				$('#securityTypeId').val('');
+				$('#securityTypeName').val('');
+				$('#h_securityTypeName').val('');
+				
+				$('#securityCode').val('');
+				$('#securityCodeId').val('');
+				$('#securityCodeName').val('');
+				$('#h_securityCodeName').val('');
+			}
+		}
+	});
+	
+	$('#securityType').lookup({
+		list:'@{Pick.securityTypesUnique()}',
+		get:{
+			url:'@{Pick.securityType()}',
+			success: function(data){
+				$('#securityType').removeClass('fieldError');
+				$('#securityTypeId').val(data.code);
+				$('#securityTypeName').val(data.description);
+				$('#h_securityTypeName').val(data.description);
+				
+				$('#securityTypeError').html('');
+				
+				$('#securityCode').removeClass('fieldError');
+				$('#securityCode').val('');
+				$('#securityCodeId').val('');
+				$('#securityCodeName').val('');
+				$('#h_securityCodeName').val('');
+				
+				},
+			error: function(data){
+				$('#securityType').addClass('fieldError');
+				$('#securityType').val('');
+				$('#securityTypeId').val('');
+				$('#securityTypeName').val('NOT FOUND');
+				$('#h_securityTypeName').val('');
+			}
+		},
+		description:$('#securityTypeName'),
+		filter:$('#actionSecType'),
+		help:$('#securityTypeHelp'),
+		nextControl:$('#securityCode')
+	});
+	
+	$('#securityCode').change(function(){
+		if ($(this).val()==''){
+			$('#securityCode').val('');
+			$('#securityCodeId').val('');
+			$('#securityCodeName').val('');
+			$('#h_securityCodeName').val('');
+		}
+	});
+	
+	$('#securityCode').lookup({
+		list:'@{Pick.securities()}',
+		get:{
+			url:'@{Pick.security()}',
+			success: function(data){
+				$('#securityCode').removeClass('fieldError');
+				$('#securityCodeId').val(data.code);
+				$('#securityCodeName').val(data.description);
+				$('#h_securityCodeName').val(data.description);
+				
+				$('#securityCodeError').html('');
+			},
+			error: function(data){
+				$('#securityCode').addClass('fieldError');
+				$('#securityCode').val('');
+				$('#securityCodeId').val('');
+				$('#securityCodeName').val('NOT FOUND');
+				$('#h_securityCodeName').val('');
+			}
+		},
+		description:$('#securityCodeName'),
+		filter:$('#securityType'),
+		help:$('#securityCodeHelp')
+	});
+	
+	$('#announecementDateFrom').change(function(){
+		var dateFrom = $(this).datepicker('getDate');
+		var dateTo = $('#announecementDateTo').datepicker('getDate');
+		var origin = 'from';
+		var id = '#announecementDate';
+		if ((($(this).val()!='') || ($(this).hasClass('fieldError'))) && ($('#announecementDateTo').val()!=''))
+			compareDateFromToEqual(dateFrom, dateTo, origin, id);
+			//compareDateFromTo(dateFrom, dateTo, origin, id);
+	});
+	
+	$('#announecementDateTo').change(function(){
+		var dateFrom = $('#announecementDateFrom').datepicker('getDate');
+		var dateTo = $(this).datepicker('getDate');
+		var origin = 'to';
+		var id = '#announecementDate';
+		if ((($(this).val()!='') || ($(this).hasClass('fieldError'))) && ($('#announecementDateFrom').val()!=''))
+			compareDateFromToEqual(dateFrom, dateTo, origin, id);
+			//compareDateFromTo(dateFrom, dateTo, origin, id);
+	});
+	
+	$('#announcementNoOperator').children().eq(0).remove();
+	
+	$('#reset').click(function() {
+		location.href="@{list()}";		
+	});
+});
+
+function doEdit(data) {
+	return false;
+}
+</script>
+
+<div id="root">
+	<h3><a href="#">Search Announcement</a></h3>
+	<form id="searchForm" class="form">
+		<input id="param" name="params.param" type="hidden" value="${param}"/>
+		#{hidden id:'query', name:'params.query', value:params?.query /}
+		#{hidden id:'actionSecType' /}
+		<p>
+			#{textBox id:'actionCode',width:'100px', name:'', label:'Action Code', value:'', required:true, class:'capitalize' /}
+			#{hidden id:'actionCodeKey', name:'params.actionCode', value:params.actionCode /}
+			#{button id:'actionCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'actionCodeDesc', name:'', readOnly:true, width:'200px' /}
+			<span id="actionCodeError" class="error"></span>
+		</p>
+		<p>
+			#{textBox id:'securityType',width:'100px', name:'', label:'Security Type', value:'',required:true, class:'capitalize' /}
+			#{hidden id:'securityTypeId', name:'params.securityType', value:params?.securityType /}
+			#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'securityTypeName', name:'transaction.transactionTemplate.securityType.description', value:transaction?.transactionTemplate?.securityType?.description, readOnly:true, width:'200px' /}
+			<span id="securityTypeError" class="error"></span>
+		</p>
+		<p>
+			#{textBox id:'securityCode',width:'100px', name:'', label:'Security Code', value:'',required:true, class:'capitalize' /}
+			#{hidden id:'securityCodeId', name:'params.securityCode', value:params?.securityCode /}
+			#{button id:'securityCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'securityCodeName', name:'transaction.security.description', value:transaction?.security?.description, readOnly:true, width:'200px' /}
+			<span id="securityCodeError" class="error"></span>
+		</p>
+		<p>
+			#{textBox id:'announecementDateFrom', name:'params.dateFrom', label:'Announcement Date', value:params?.dateFrom?.format(appProp.dateFormat), width:'100px', required:false, class:'calendar' /}
+			(${appProp.displayDateFormat})
+			<span id="announecementDateFromError" class="error"></span> 
+			<b>To</b>
+			#{textBox id:'announecementDateTo', name:'params.dateTo', value:params?.dateTo?.format(appProp.dateFormat), width:'100px', required:true, class:'calendar' /}
+			(${appProp.displayDateFormat})
+			<span id="announecementDateToError" class="error"></span>
+		</p>
+		<p>
+			#{dropDownList id:'announcementNoOperator', name:'params.corporateNoOperator', label:'Announcement No', options:operators, value:params.corporateNoOperator /}
+			#{textBox id:'announcementSearchNo', name:'params.corporateSearchNo', value:params.corporateSearchNo, width:'132px', class:'capitalize numberOnly' /}
+		</p>
+		<p>
+			<div class="buttons">
+				<input type="button" id="search" value="Search" />				
+				<input type="button" id="reset" value="Reset" />					
+			</div>
+		</p>
+	</form>
+</div>
+<div id="result" style="display:block;">
+	<table id="tableannouncement" class="display">
+		<thead>
+			<tr>
+				<th width="50px" field="corporateAnnouncementCode|string|none|left|sort">Announcement #</th>
+				<th width="250px" field="description|string|none|left|sort">Subject</th>
+				<th width="80px" field="announcementDate|date|date|center|sort">Announcement Date</th>
+				<th width="80px" field="recordingDate|date|date|center|sort">Recording Date</th>
+				<th width="80px" field="distributionDate|date|date|center|sort">Distribution Date</th>
+				<th width="100px" field="status|string|decodeData|left|sort">Status</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+</div>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'CancelCorporateAnnouncements/Paging.js' /}
+	$(document).ready(function() {
+		Paging($("#main"));
+	});
+</script>

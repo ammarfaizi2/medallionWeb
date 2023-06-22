@@ -1,0 +1,192 @@
+<style type="text/css">
+  .primary { margin-top:-0.8em;}
+</style>
+
+<script type="text/javascript">
+$(function(){
+	
+	$('#jointDate').change(function(){
+		var jointDate = $(this).datepicker('getDate');
+		var currentDate = $('#currentDate').datepicker('getDate');
+		
+		if (jointDate!=null) {
+			if ('${mode}'=='entry'){
+				if (!$(this).hasClass('fieldError')){
+					if (jointDate.getTime() > currentDate.getTime()){
+						$(this).addClass('fieldError');
+						$('#jointDateError').html("Can not greater than Application Date");
+					}
+				}
+				
+			}
+			if ('${mode}'=='edit'){
+				if (!$(this).hasClass('fieldError')){
+					var lastModifDate = $('#lastModifDate').datepicker('getDate');
+					if (lastModifDate != null) {
+						if (jointDate.getTime() > lastModifDate.getTime()) {
+							$(this).addClass('fieldError');
+							$('#jointDateError').html("Can not greater than Last Update");
+						}
+					} else if (jointDate.getTime() > currentDate.getTime()) {
+						$(this).addClass('fieldError');
+						$('#jointDateError').html("Can not greater than Application Date");
+					}
+				}
+			}
+		}
+	});
+	
+	if($('#sendToEmail').is(':checked'))
+	{
+		$('#emStar').css("visibility","visible");
+	}else{
+		$('#emStar').css("visibility","hidden");
+	}
+	
+	$('#sendToEmail').click(function(){
+		if($('#sendToEmail').is(':checked'))
+		{
+			$('#emStar').css("visibility","visible");
+		}else{
+			$('#emStar').css("visibility","hidden");
+		}
+	});
+	
+	if($('#sendToPost').is(':checked'))
+	{
+		$('#emPostal').css("visibility","visible");
+	}else{
+		$('#emPostal').css("visibility","hidden");
+	}
+	
+	$('#sendToPost').click(function(){
+		if($('#sendToPost').is(':checked'))
+		{
+			$('#emPostal').css("visibility","visible");
+		}else{
+			$('#emPostal').css("visibility","hidden");
+		}
+	});
+	
+	
+	$('#emailContact').first().blur(function(){
+	    var $email = this.value;
+	    validateEmail($email);
+	});
+
+	function validateEmail(email) {
+	    var emailReg = /^([\w-\.*]+@([\w-]+\.)+[\w-]{2,4})?$/;
+	    if (!emailReg.test(email)) {
+	    	$('#emailContactError').text('Invalid Email Format');
+	    	$('#emailContact').addClass('fieldError');
+	    } else {
+	    	$('#emailContactError').text('');
+	    	$('#emailContact').removeClass('fieldError');
+	    }
+	}
+});
+
+
+</script>
+
+<table>
+	<tr>
+		<td valign="top">
+			<p>
+				#{dropDownList id:'customerType', name:'customer.customerType.lookupId', label:'Investor Type', value:customer?.customerType?.lookupId, options:customerTypes, readOnly:((mode=='entry') ? confirming :true), required:true, width:'114px' /}
+				<span class="error">#{error 'Investor Type is' /}</span>
+			</p>
+			<p>
+				#{textBox id:'customerNo', name:'customer.customerNo', label:'Investor No', value:customer?.customerNo, required:true, readOnly:((mode=='entry') ? confirming : true ), width:'110px', maxLength:20, readOnly:true, class:'capitalize' /}
+				<span class="error">#{error 'Investor No is' /}</span>
+			</p>
+			<p>
+				#{textBox id:'customerName', name:'customer.customerName', label:'Investor Name', value:customer?.customerName, required:true, readOnly:readOnly, width:'307px', maxLength:100, class:'capitalize' /}
+				<span class="error">#{error 'Investor Name is' /}</span>
+			</p>
+			<p>
+				#{textBox id:'externalCifNo', name:'customer.externalNo', label:'SID No', value:customer?.externalNo, readOnly:readOnly, width:'307px', maxLength:50, class:'capitalize' /}
+				<span class="error">#{error 'External CIF No is' /}</span>
+			</p>
+		</td>
+		<td valign="top">
+			<p>
+				#{textBox id:'jointDate', name:'customer.jointDate', value:customer?.jointDate?.format(appProp.dateFormat), label:'Join Date', class:'calendar', readOnly:readOnly, required:true /} (${appProp.displayDateFormat})				
+			</p>
+			<p>
+				<span id="jointDateError" class="error">#{error 'Joint Date is' /}</span>
+			</p>
+			<p>
+				#{textBox id:'lastModifDate', name:'recordModifiedDate', value:customer?.recordModifiedDate?.format('dd/MM/yyyy hh:ss'), label:'Last Update', class:'calendar', readOnly:true /}
+				#{hidden id:'lastModifDateHidden', name:'customer.recordModifiedDate', value:customer?.recordModifiedDate?.format('dd/MM/yyyy hh:ss') /}
+				<span class="error">#{error 'Last Update is' /}</span>
+			</p>
+		</td>
+	</tr>
+</table>
+
+<br/>
+
+<fieldset>
+	<legend><b>Correspondence Address</b></legend>
+		<p>			
+			#{textBox id:'addressExt1', name:'customer.cfContact.addressExt1', label:'Address', value:customer?.cfContact?.addressExt1, readOnly:readOnly, class:'capitalize', width:'300px', maxLength:150, required:true /}
+			<span id="addressExt1Error" class="errorMessage">#{error 'Address in Correspondence Address is' /}</span>
+		</p>
+		<p>			
+			#{textBox id:'addressExt2', name:'customer.cfContact.addressExt2', label:' ', value:customer?.cfContact?.addressExt2, readOnly:readOnly, class:'capitalize', width:'300px', maxLength:40 /}
+		</p>
+		<p>			
+			#{textBox id:'addressExt3', name:'customer.cfContact.addressExt3', label:' ', value:customer?.cfContact?.addressExt3, readOnly:readOnly, class:'capitalize', width:'300px', maxLength:35 /}		
+		</p>
+		<p>			
+			#{textBox id:'address1ZipCode', name:'customer.cfContact.address1ZipCode', label:'Postal Code', value:customer?.cfContact?.address1ZipCode, readOnly:readOnly, class:'capitalize', width:'80px', maxLength:50 /}
+<!-- 			<span id="emPostal" style="margin-left:-165px;font-weight:bold;color:red;">*</span> -->
+			<span id="address1ZipCodeError" class="errorMessage">#{error 'Postal Code in Correspondence Address is' /}</span>
+		</p>
+		<p>
+			#{textBox id:'address1CountryCode', name:'customer.cfContact.address1Country.lookupCode', label:'Country', value:customer?.cfContact?.address1Country?.lookupCode,  class:'capitalize', readOnly:readOnly, width:'80px' /}
+			#{hidden id:'address1Country', name:'customer.cfContact.address1Country.lookupId', value:customer?.cfContact?.address1Country?.lookupId /}
+			#{button id:'address1CountryHelp', value:'?', class:'small', readOnly:readOnly /}	
+			#{textBox id:'address1CountryDesc', name:'customer.cfContact.address1Country.lookupDescription', value:customer?.cfContact?.address1Country?.lookupDescription, readOnly:true, width:'193px' /}
+			<span id="address1CountryCodeError" class="errorMessage"></span>
+			&nbsp;&nbsp;&nbsp;&nbsp;
+			#{textBox id:'address1Phone1', name:'customer.cfContact.address1Phone1', label:'Phone', value:customer?.cfContact?.address1Phone1, readOnly:readOnly, width:'170px', maxLength:50 /}
+			<span id="address1Phone1Error" class="error errorMessage"></span>
+		</p>
+		<p>
+			#{textBox id:'address1StateCode', name:'customer.cfContact.address1State.lookupCode', label:'State', value:customer?.cfContact?.address1State?.lookupCode, class:'capitalize', readOnly:readOnly, width:'80px' /}
+			#{hidden id:'address1State', name:'customer.cfContact.address1State.lookupId', value:customer?.cfContact?.address1State?.lookupId /}
+			#{button id:'address1StateHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'address1StateDesc', name:'customer.cfContact.address1State.lookupDescription', value:customer?.cfContact?.address1State?.lookupDescription, readOnly:true, width:'193px' /}&nbsp;<span class="errmsg"></span>
+			<span id="address1StateCodeError" class="errorMessage"></span>
+			&nbsp;&nbsp;
+			#{textBox id:'address1Phone2', name:'customer.cfContact.address1Phone2', label:'Mobile Phone', value:customer?.cfContact?.address1Phone2, readOnly:readOnly, width:'170px', maxLength:50 /}
+		</p>
+		<p>
+			#{textBox id:'address1AreaCode', name:'customer.cfContact.address1Area.lookupCode', label:'Area', value:customer?.cfContact?.address1Area?.lookupCode, class:'capitalize', readOnly:readOnly, width:'80px' /}
+			#{hidden id:'address1Area', name:'customer.cfContact.address1Area.lookupId', value:customer?.cfContact?.address1Area?.lookupId /}
+			#{button id:'address1AreaHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'address1AreaDesc', name:'customer.cfContact.address1Area.lookupDescription', value:customer?.cfContact?.address1Area?.lookupDescription, readOnly:true, width:'193px' /}&nbsp;<span class="errmsg"></span>
+			<span id="address1AreaCodeError" class="errorMessage"></span>
+			&nbsp;&nbsp;
+			#{textBox id:'address1Phone3', name:'customer.cfContact.address1Phone3', label:'Fax Number', value:customer?.cfContact?.address1Phone3, readOnly:readOnly, width:'170px', maxLength:50 /}			
+		</p>
+		<span id="emStar" style="margin:2px 0 0 98px;position:absolute; font-weight:bold;color:red;">*</span>
+		<p>		
+			#{textBox id:'emailContact', name:'customer.cfContact.email', label:'Email Address', value:customer?.cfContact?.email, readOnly:readOnly, width:'300px', maxLength:225, class:'all email' /}
+			ex: sample@email.com
+			<span id="emailContactError" class="error">#{error 'Email is' /}</span>
+		</p>
+		
+		<p>
+			#{checkBox id:'sendToPost', label:'Statement Via', name:'customer.sendToPost', value:customer?.sendToPost, readOnly:readOnly /} Post
+			&nbsp;&nbsp;
+			#{checkBox id:'sendToEmail', name:'customer.sendToEmail', value:customer?.sendToEmail, readOnly:readOnly /} Email
+			<span id="sendToPostError" class="error errorMessage">#{error 'Statement Via is' /}</span>
+		</p>
+</fieldset>
+<br/>
+	#{radioButton id:'isActive', name:'isActive', value:((customer?.isActive)?'true':'false'), label:'Active', options:yesNo, readOnly:readOnly /}
+	#{hidden id:'isActiveHidden', name:'customer.isActive', value:((customer?.isActive)?'true':'false') /}
+			

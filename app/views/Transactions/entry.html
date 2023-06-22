@@ -1,0 +1,431 @@
+#{if viewFrom != 'viewSingleBacth'}
+	#{extends 'templates/main.html' /}
+#{/if}
+#{set param: param /}
+
+<script type="text/javascript">
+	$(function() {
+		function saveSettlePrematch(){
+			var a = "@{Transactions.validateThirdParty()}?param="
+				+$("#transactionKey").val()+"|"
+				+$("#settlementAgentKey").val()+"|"
+				+$("input[name='transaction.sentToInterface']").val()+"|"
+				+$('#depositoryDesc').val();
+			$.post(a, function(data, status, xhr) {
+	    		//checkRedirect(data);
+				if (data.message != null) {
+					messageAlertOk(data.message, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+					return false;
+				} else {
+					/* if ($('#sentToInterface2').is(":checked") && $('#matchStatus').val() == ''){
+					messageAlertOk("Match Status must be filled.", "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+					$('#matchStatus').focus();
+					return false;
+					} */
+					
+					$("#transferMethod").removeAttr("disabled");
+					$("#dTransferType" ).removeAttr( "disabled");
+					var action = "@{Transactions.saveSettlePrematch()}";
+					loading.dialog('open');
+					$('#transactionForm').attr('action', action);
+					$('#transactionForm').submit();
+				}
+			});
+		}
+
+		var closeDialogMessage = function() {
+			$("#dialog-message").dialog("close");
+		}
+		
+		var continueCompliance = function() {
+			$("#dialog-message").dialog("close");
+			actionSave();
+		}
+		
+		var stopCompliance = function() {
+			$("#dialog-message").dialog("close");
+		}
+
+		function checkCompliance(){
+			var transDesc = $("#transactionCodeDesc").val();
+			
+			if(transDesc.includes("RVP") || transDesc.includes("RFOP")){
+				$.get("@{Transactions.checkComplianceSyariah()}?custodyAccountKey="+$("#accountNoKey").val()+"&securityKey="+$("#securityKey").val(), function(data) {
+					checkRedirect(data);
+					var res = data.valid;
+					
+					if(res=="0"){
+						messageAlertYesNo("Security not allowed, do you want to continue ?", "ui-icon ui-icon-notice", "Confirmation Message",continueCompliance, stopCompliance);
+					}else{
+						actionSave();
+					}
+				});
+			}else{
+				actionSave();
+			}
+		}
+		
+		// Action buttons 
+		$('#save').click(function() {
+			checkCompliance();
+		});
+		
+		function actionSave(){
+			$(".cancel").remove();
+			var length = $('#chargeList').dataTable().fnGetNodes().length; 
+			var resume = true;
+			
+			if(typeof doSave == 'function') {
+				resume = doSave();
+			}
+			
+			var isReload = $("#isreload").val();
+			if (resume){
+				#{ifnot flash.error || errors}
+				if (isReload == false || isReload == 'false') {
+						messageAlertOk("You must load Charge to be able to continue!", "ui-icon1 ui-icon-alert", "Warning Message", closeDialogMessage);
+						return false;
+					}
+				#{/ifnot}
+				$('#h_effectiveDate').val($('#effectiveDate').val());
+				$('#h_maturityDate').val($('#maturityDate').val());
+				
+				if(!checkAccInterest())return false;
+	
+				// do ajax call synchronize, if getProcessManualCouponAdjustment true, maka lakukan popup ?
+	
+				$("#adjustmentManual").val(0);
+				
+				var askManually = $().fetchSync(
+					"@{Transactions.getProcessManualCouponAdjustment()}", 
+					{'securityKey':$('#securityKey').val(), 'securityClass':$('#securityClass').val(), 'accruedInterest':$("#accruedInterest").val(), 'settlementDate':$('#settlementDate').val()});
+				
+				if (askManually) {
+					var div = $("<div title='Confirmation'><p><span class='ui-icon ui-icon-alert' style='float:left; margin:12px 12px 20px 0;'></span>Coupon adjustment need to process by manually, do you want to continue ?</p></div>")
+				
+					$(div).dialog({
+						resizable: false,
+						height: "auto",
+						width: 400,
+						modal: true,
+						buttons: {
+							"Yes": function() { 
+									$(this).dialog("close");
+									
+									$("#adjustmentManual").val(1);
+									
+									var action = "@{save()}";
+									loading.dialog('open');
+									$('#transactionForm').attr('action', action);
+									$('#transactionForm').submit();
+								},
+					        "No": function() {
+					        	$(this).dialog("close"); 
+					        	$("#adjustmentManual").val(0);
+					        }
+					    }
+					});
+					
+					return false;
+				}else{
+					var action = "@{save()}";
+					loading.dialog('open');
+					$('#transactionForm').attr('action', action);
+					$('#transactionForm').submit();
+				}
+			}
+		}
+		
+		$('#confirm').click(function() {
+			$(".cancel").remove();
+			var action = "@{confirm()}";
+			loading.dialog('open');
+			$.post(action, $('#transactionForm').serialize(), function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				var backToSettlementPrematch = function() {
+					loading.dialog('open');
+					location = "@{settlementPrematch()}";
+				}
+				var backToEntry = function() {
+					loading.dialog('open');
+					location = "@{entry()}";
+				}
+				var backToList = function() {
+					loading.dialog('open');
+					location = "@{list()}";
+				}
+				if (data.status == 'success') {
+					if (!!data.prematch && data.prematch == 'yes'){
+						messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Notification", backToSettlementPrematch);
+					} else {
+						if ('${mode}' == 'entry') {
+							messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Notification", backToEntry);
+						}
+						else if ('${mode}' == 'edit') {
+							messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Notification", backToList);
+						}
+					}
+				}else if(data.status == 'warning'){
+					var div = $("<div title='Confirmation'><p><span class='ui-icon ui-icon-alert' style='float:left; margin:12px 12px 20px 0;'></span>Security not Allowed, do you want to continue ?</p></div>")
+					
+					$(div).dialog({
+						resizable: false,
+						height: "auto",
+						width: 400,
+						modal: true,
+						buttons: {
+							"Yes": function() { 
+								$('#warningMsg').val(true);
+								$(this).dialog("close");
+								$('#confirm').click();
+								},
+					        "No": function() {
+					        	$(this).dialog("close"); 
+					        }
+					    }
+					});
+				}else {
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+				}
+			});
+		});
+		
+		$('#back').click(function() {
+			if ('${backSettlement}' == 'true') {
+				location.href="@{settlement()}";			
+			} else {
+				var isReload = $("#isreload").val();
+				location.href = "@{back()}?transactionKey=${transaction?.transactionKey}&settlement=${settlement}&param=${param}&mode=${mode}&isreload="+isReload+"";
+			}
+		});
+		$('#clear').click(function() {
+			location.href="@{entry()}";			
+		});
+		if ('${mode}'=='edit'){
+			$('#clear').css('display', 'none');
+		}
+		$('#cancel').click(function(){
+			location.href="@{list()}";
+		});
+		
+		$('#close').click(function(){
+			location.href="@{settlementPrematch()}";
+		});
+		
+		$('#saveSettle').click(function(){
+			$(".cancel").remove();
+			$('#dailyPortfolioFlag').val('${dailyPortfolioFlag}');
+			
+// 			if ( ((!$("#autoPrematchType").is(":checked")) && ($('#matchStatus').val()=='')) || (($('#matchStatus').val()=='${matchU}')&&($("#remarkForPrematch").val()=='')) ||
+// 					(($('#ctpRequired').val()=='true') && ($('#marketOfRisk').val() == '${countryId}') && ($('#ctpNo').val()==''))) {	
+			
+			if (($("#settlementAgentCode").val()=='') || ((!$("#autoPrematchType").is(":checked")) && ($('#matchStatus').val()=='')) || (($('#matchStatus').val()=='${matchU}')&&($("#remarkForPrematch").val()=='')) || 
+				 (($('input[name="transaction.sentToInterface"]').val()=='true') && (($('#ctpRequired').val()=='true') && ($('#depositoryCode').val() == '${depositoryCbest}' || $('#depositoryCode').val() == '${depositoryBis}') && ($('#ctpNo').val()=='') ))) {   
+				
+				if ((!$("#autoPrematchType").is(":checked")) && ($('#matchStatus').val()=='')){
+					$('#matchStatus').focus();
+					$('#matchStatusError').html("Required");
+				} else {
+					$('#matchStatusError').html("");
+				}
+				
+				if (($('#matchStatus').val()=='${matchU}')&&($("#remarkForPrematch").val()=='')){
+					$('#remarkForPrematch').focus();
+					$('#remarkForPrematchError').html("Required");
+				} else {
+					$('#remarkForPrematchError').html("");
+				}
+
+				if ($("#settlementAgentCode").val()==''){
+					$('#settlementAgentCode').focus();
+					$('#settlementAgentCodeError').html("Required");
+				} else {
+					$('#settlementAgentCodeError').html("");
+				}
+
+				if (($('input[name="transaction.sentToInterface"]').val()=='true') && (($('#ctpRequired').val()=='true') && ($('#depositoryCode').val() == '${depositoryCbest}' || $('#depositoryCode').val() == '${depositoryBis}') && ($('#ctpNo').val()==''))) {
+					$('#ctpNo').focus();
+					$('#ctpNoError').html('Required');
+				} else {
+					$('#ctpNoError').html("");
+				}
+				return false;
+			}
+
+			if($('#custodyTransactionCode').val() != "RVP" && $('#custodyTransactionCode').val() != "DVP"
+				&& $('#settlementPurpose').isEmpty()){
+				$('#settlementPurpose').focus();
+				$('#settlementPurposeForPrematchError').html("Purpose is Required");
+				return false;
+			} else {
+				$('#settlementPurposeForPrematchError').html("");
+			}
+
+			var valid = true;
+			if(($("#settlementAmountStripped").val() != 0) && $("#transferMethod").val() == ""){
+				$('#transferMethod').focus();
+				$('#transferMethodError').html("Required");
+				valid = false;
+			} else {
+				$('#transferMethodError').html("");
+			}
+
+			if(($("input[name='transaction.sentToInterface']").val() =='true'
+			 	&& $('#depositoryCode').val() == '${depositoryCbest}'
+					&& $("#cbestMessageType").val() == "${cbestOtb}") && $('#yieldPrematch').val() == ""){
+				$('#yieldPrematch').focus();
+				$('#yieldPrematchError').html("Required");
+				valid = false;
+			} else {
+				$('#yieldPrematchError').html("");
+			}
+			
+			if( $('#depositoryCode').val() == '${depositoryCbest}' && $('#dropdowncounterPartyType').val() == ''
+				&& $("#cbestMessageType").val() == '${cbestOtb}' && $('input[name="transaction.sentToInterface"]').val()=='true' 
+				&& '${param}' == 'settlement-prematch'){
+					$('#dropdowncounterPartyType').focus();
+					$('#counterPartyTypeError').html("Required");
+					return false;
+			}
+
+			if(!valid) return false;
+
+			if(($('#settlementPurpose').val() == '${EXCH}') && $('#settlementReference').isEmpty()){
+				$('#settlementReference').focus();
+				$('#settlementReferenceForPrematchError').html("Reference is Required");
+				return false;
+			} else {
+				$('#settlementReferenceForPrematchError').html("");
+			}
+
+			if(($('#settlementPurpose').val() == '${NONEXCHG}') && $('#settlementReasonCode').isEmpty()){
+				$('#settlementReasonCode').focus();
+				$('#settlementReasonCodeForPrematchError').html("Reason is Required");
+				return false;
+			} else {
+				$('#settlementReasonCodeForPrematchError').html("");
+			}
+
+			if(($('#settlementReasonKey').val() == '${OTHR}') && $('#descriptionForPrematch').isEmpty()){
+				$('#descriptionForPrematch').focus();
+				$('#descriptionForPrematchError').html("Description is Required");
+				return false;
+			} else {
+				$('#descriptionForPrematchError').html("");
+			}
+
+			$('#ctpNoError').html("");
+			if ($('input[name="transaction.sentToInterface"]').val()=='true'){
+				var currentDate = $('#currentDate').datepicker('getDate');
+				var settlementDate = $('#settlementDate').datepicker('getDate');
+				if (currentDate.getTime() > settlementDate.getTime()){
+					messageAlertOk("Settlement Date must greater than Application Date", "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+					return false;	
+				}
+				
+				if ('${validateAccount}'=='true'){
+					messageAlertOk("Sub Account for this Depository not found", "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+					return false;
+				}
+
+				/*if ('${validateThirdParty}' == 'true'){
+					messageAlertOk("This Counter Party is not member of "+$('#depositoryDesc').val(), "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+					return false;
+				}*/
+			}
+			
+			if($("#dropdowncounterPartyType").val() != "" && $('#txtCounterPartyTypeDesc').val() == ""){
+					messageAlertOk("This Counter Party is not member of "+$('#depositoryDesc').val(), "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+					return false;
+			}
+
+			if("${transferMethodFile}" == $("#transferMethod").val()){
+				if($("#bankAccountNo").isEmpty() || $("#settlementAccount").isEmpty()){
+					messageAlertOk("Customer and Custodian Bank cannot null", "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+					return false;
+				}
+			}
+			
+			/* alert($("#cashTransCode").val())
+			alert($("#defaultCorebanking").val()) */
+			if($("#cashTransCode").val() == "" && $("#defaultCorebanking").val() == "true"){
+				messageAlertOk("Invalid Cash Transaction", "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+				return false;
+			}
+			
+			var valid = true;
+			var a = "@{Transactions.validateSettlementDuplicate()}?param="
+				+$("#transactionKey").val();
+			$.post(a, function(data, status, xhr) {
+	    		//checkRedirect(data);
+	    		console.log("data.message = "+data.message);
+				if (data.message != null) {
+					messageAlertOk(data.message, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+					valid=false;
+				}
+			});
+
+			if(!$("#inhouseReference").isEmpty() || !$("#settlementAmountAdj").isEmpty()){
+				var settlementAmountAdj;
+				if($("#settlementAmountAdj").isEmpty()){
+					settlementAmountAdj = '';
+				} else {
+					settlementAmountAdj = $('#settlementAmountAdj').autoNumericGet();
+				}				
+				var a = "@{Transactions.validateSettlementPrematch()}?param="
+						+$('#inhouseReference').val()+"|"
+						+settlementAmountAdj+"|"
+						+$('#custodyTransactionCode').val()+"|"
+						+$("#settlementAgentCode").val()+"|"
+						+$("#quantity").autoNumericGet()+"|"
+						+$("#securityId").val()+"|"
+						+$("#transactionKey").val()+"|"
+						+$("#settlementAmount").autoNumericGet()+"|"
+						+$("#currencyCode").val()+"|"
+						+$("#price").autoNumericGet();
+				$.post(a, function(data, status, xhr) {
+		    		//checkRedirect(data);
+					if (data.message != null) {
+						messageAlertOk(data.message, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+						return false;
+					} else {
+						//sukses
+						saveSettlePrematch();
+					}
+				});
+			} else {
+				//sukses
+				if(valid) saveSettlePrematch();
+			}
+		});
+	});
+</script>
+<h2>Transaction Entry</h2>
+<div id="detail">
+	#{include 'Transactions/detail.html' /}	
+</div>
+#{if viewFrom != 'viewSingleBacth'}
+<div id="actions" class="buttons">
+	#{if mode == 'view'}
+		#{if transaction?.prematchStatus?.lookupId == '${prematchP}' || transaction?.prematchStatus?.lookupId == '${prematchW}' }
+			<input type="button" id="close" value="Back" />
+		#{/if}
+		#{else}
+			<input type="button" id="saveSettle" value="Save" />
+			<input type="button" id="close" value="Back" />
+		#{/else}
+	#{/if}
+	#{else}	
+		#{if confirming}
+			<input type="button" id="confirm" value="Confirm" />
+			<input type="button" id="back" value="Back" />
+		#{/if}
+		#{else}
+			<input type="button" id="save" value="Save" />
+			<input type="button" id="clear" value="Clear" />
+			<input type="button" id="cancel" value="Cancel"/>
+		#{/else}
+	#{/else}	
+</div>
+#{/if}

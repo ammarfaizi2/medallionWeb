@@ -1,0 +1,214 @@
+#{if contact?.isCustomer == true }	
+	#{set readOnlyIsCustomer: true /}
+#{/if}
+#{else}
+	#{set readOnlyIsCustomer: readOnly /}
+#{/else}
+#{script 'validation/numericOnly.js' /}
+
+<script type="text/javascript">	
+$(function() {
+	//$('#addressType').trigger('change');
+	$('#accordionContact').accordion({
+		collapsible: false,
+		autoHeight: false 
+	});
+	
+});
+
+
+</script>
+
+<form id="contactForm" class="form">
+#{hidden id:'rowPosition' /}
+#{hidden id:'oldContactType' /}
+#{hidden id:'newContactType' /}
+#{hidden id:'contactKey', name:'contact.contactKey', value:contact?.contactKey /}
+#{hidden id:'isCustomer', name:'contact.isCustomer', value:contact?.isCustomer /}
+	<div>
+		<p class="corporate_only">
+			#{dropDownList id:'contacTypeCorp', name:'contact.addressType.lookupId', label:'Contact Person', value:contact?.addressType?.lookupId, options:contactType, readOnly:readOnly, width:'145px', required:true /}
+			#{hidden id:'contactTypeDescCorp', name:'contact.addressType.lookupDescription', value:contact?.addressType?.lookupDescription /}			
+			<span id="contacTypeCorpError" class="errorMessage"></span>
+			<span id="duplicateErrorMessageCorp" class="error errorMessage"></span>
+		</p>
+	
+	</div>
+	<div class="corporate_only">		
+		<p>
+			#{textBox id:'firstNameCorp', name:'firstName', label:'First Name', value:contact?.firstName, readOnly:readOnly, width:'300px', maxLength:30, class:'capitalize noSpace specialField', required:true /}
+			<span id="firstNameCorpError" class="errorMessage"></span>
+		</p>
+		<p>
+			#{textBox id:'middleNameCorp', name:'middleName', label:'Middle Name', value:contact?.middleName, readOnly:readOnly, width:'300px', maxLength:30, class:'capitalize specialField' /}
+		</p>
+		<p id="pLastNameCorp">
+			#{textBox id:'lastNameCorp', name:'lastName', label:'Last Name', value:contact?.lastName, readOnly:readOnly, width:'300px', maxLength:30, class:'capitalize noSpace specialField', required:true/}
+			<span id="lastNameCorpError" class="errorMessage"></span>
+		</p>
+	</div>
+		
+	<div>
+		<p>
+			#{textBox id:'contactName', name:'contactName', label:'Contact Name', value:contact?.contactName, readOnly:true, class:'isCustomer capitalize', width:'300px', maxLength:100 /}
+			#{hidden id:'contactNameHide', name:'contact.contactName', value:contact?.contactName /}
+			<span id="errmsgContactName" class="errorMessage"></span>
+		</p>
+		<p>
+			#{textBox id:'contactPosition', name:'contcat.contactPosition', label:'Position', value:contact?.contactPosition, readOnly:readOnlyIsCustomer, class:'isCustomer capitalize specialField', width:'300px', maxLength:100, required:true /}
+			<span id="contactPositionError" class="errorMessage"></span>
+		</p>
+		<p id="pContactNpwpNo">
+			#{textBox id:'contactNpwpNo', name:'contact.npwp', value:contact?.npwp, label:'NPWP Number', required:true, readOnly:readOnly,class:'capitalize', maxLength:100 /}
+			<span id="contactNpwpNoError" class="errorMessage"></span>
+		</p>
+		<p>
+			#{textBox id:'contactNpwpRegDate', name:'contact.npwpDate', value:contact?.npwpDate?.format(appProp.dateFormat), required:false,label:'NPWP Registration Date', readOnly:readOnly, class:'calendar' /} (${appProp.displayDateFormat})
+			<span id="contactNpwpRegDateError" class="errorMessage"></span>
+		</p>
+		<br />
+		<fieldset>
+			<legend><b>Identification ID</b></legend>
+				<div>
+					<table table width="100%">
+						<tr>
+							<td width="280px">
+							</td>
+							<td align="center">
+								<label>Identification Number</label>
+							</td>
+							<td align="center">
+								<label>Expiry Date</label>
+							</td>
+						</tr>
+						<tr>
+							<td id="identificationType1Li" >
+								#{dropDownList id:'identificationType1', name:'contact.identificationType1.lookupId', label:'Identification 1', value:contact?.identificationType1?.lookupId, options:identificationTypes, readOnly:readOnlyIsCustomer, class:'isCustomer dropdown', required:true /}
+							</td>
+							<td align="center">
+								#{textBox id:'identification1No', name:'contact.identification1No', value:contact?.identification1No, readOnly:readOnlyIsCustomer, width:'218px', class:'isCustomer identificationNo identificationNo capitalize', maxLength:50 /}	
+							</td>
+							<td align="center">
+								#{textBox id:'identification1ExpiryCon', name:'contact.identification1Expiry', value:contact?.identification1Expiry?.format(appProp.dateFormat), readOnly:readOnlyIsCustomer, class:'calendar isCustomer expiryDate', maxLength:10 /}
+							</td>
+						</tr>
+						<tr>
+							<td><span id="errmsgIDType1" class="errorMessage"></span></td> 
+							<td align="center"><span id="identification1NoError" class="errorMessage"></span></td> 
+							<td align="center"><span id="identification1ExpiryConError" class="errorMessage"></span></td>
+						</tr>
+						<tr>
+							<td>
+								#{dropDownList id:'identificationType2', name:'contact.identificationType2.lookupId', label:'Identification 2', value:contact?.identificationType2?.lookupId, options:identificationTypes, readOnly:readOnlyIsCustomer, class:'isCustomer dropdown' /}
+							</td>
+							<td align="center">
+								#{textBox id:'identification2No', name:'contact.identification2No', value:contact?.identification2No, readOnly:readOnly, width:'218px', class:'isCustomer identificationNo capitalize', maxLength:50 /}
+							</td>
+							<td align="center">
+								#{textBox id:'identification2ExpiryCon', name:'contact.identification2Expiry', value:contact?.identification2Expiry?.format(appProp.dateFormat), readOnly:readOnlyIsCustomer, class:'calendar isCustomer expiryDate', maxLength:10 /}
+							</td>
+						</tr>
+						<tr>
+							<td><span id="errmsgIDType2" class="errorMessage"></span></td> 
+							<td align="center"><span id="identification2NoError" class="errorMessage"></span></td> 
+							<td align="center"><span id="identification2ExpiryConError" class="errorMessage"></span></td>
+						</tr>
+						<tr>
+							<td>
+								#{dropDownList id:'identificationType3', name:'contact.identificationType3.lookupId', label:'Identification 3', value:contact?.identificationType3?.lookupId, options:identificationTypes, readOnly:readOnlyIsCustomer, class:'isCustomer dropdown' /}
+							</td>
+							<td align="center">
+								#{textBox id:'identification3No', name:'contact.identification3No', value:contact?.identification3No, readOnly:readOnlyIsCustomer, width:'218px', class:'isCustomer identificationNo capitalize', maxLength:50 /}
+							</td>
+							<td align="center">
+								#{textBox id:'identification3ExpiryCon', name:'contact.identification3Expiry', value:contact?.identification3Expiry?.format(appProp.dateFormat), readOnly:readOnlyIsCustomer, class:'calendar isCustomer expiryDate', maxLength:10 /}
+							</td>
+						</tr>
+						<tr>
+							<td><span id="errmsgIDType3" class="errorMessage"></span></td> 
+							<td align="center"><span id="identification3NoError" class="errorMessage"></span></td> 
+							<td align="center"><span id="identification3ExpiryConError" class="errorMessage"></span></td>
+						</tr>
+						<tr>
+							<td>
+								#{dropDownList id:'identificationType4', name:'contact.identificationType4.lookupId', label:'Identification 4', value:contact?.identificationType4?.lookupId, options:identificationTypes, readOnly:readOnlyIsCustomer, class:'isCustomer dropdown' /}
+							</td>
+							<td align="center">
+								#{textBox id:'identification4No', name:'contact.identification4No', value:contact?.identification4No, readOnly:readOnlyIsCustomer, width:'218px', class:'isCustomer identificationNo capitalize', maxLength:50 /}
+							</td>
+							<td align="center">
+								#{textBox id:'identification4ExpiryCon', name:'contact.identification4Expiry', value:contact?.identification4Expiry?.format(appProp.dateFormat), readOnly:readOnlyIsCustomer, class:'calendar isCustomer expiryDate', maxLength:10 /}
+							</td>
+						</tr>
+						<tr>
+							<td><span id="errmsgIDType4" class="errorMessage"></span></td> 
+							<td align="center"><span id="identification4NoError" class="errorMessage"></span></td> 
+							<td align="center"><span id="identification4ExpiryConError" class="errorMessage"></span></td>
+						</tr>
+					</table>
+				</div>	
+		</fieldset>			
+		<!-- <br />
+		<p class="default">
+			#{dropDownList id:'sameAsDefault', name:'contact.sameAs.lookupId', label:'Same As', value:contact?.sameAs?.lookupId, options:addressTypeCorp, readOnly:readOnly, width:'145px', class:'dropdown' /}
+			#{hidden id:'sameAsDescDefault', name:'contact.sameAs.lookupDescription', value:contact?.sameAs?.lookupDescription /}	
+			<span id="sameAsDefaultError" class="error errorMessage"></span>		
+		</p>
+		<p class="corporate_only">
+			#{dropDownList id:'sameAsCorp', name:'contact.sameAs.lookupId', label:'Same As', value:contact?.sameAs?.lookupId, options:addressTypeCorp, readOnly:readOnly, width:'145px', class:'dropdown' /}
+			#{hidden id:'sameAsDescCorp', name:'contact.sameAs.lookupDescription', value:contact?.sameAs?.lookupDescription /}	
+			<span id="sameAsCorpError" class="error errorMessage"></span>		
+		</p>
+		<p class="individual_only">
+			#{dropDownList id:'sameAsInd', name:'contact.sameAs.lookupId', label:'Same As', value:contact?.sameAs?.lookupId, options:addressTypeInd, readOnly:readOnly, width:'145px', class:'dropdown' /}
+			#{hidden id:'sameAsDescInd', name:'contact.sameAs.lookupDescription', value:contact?.sameAs?.lookupDescription /}	
+			<span id="sameAsIndError" class="error errorMessage"></span>		
+		</p>
+		<p>			
+			#{textArea id:'address1', name:'contact.address1', label:'Address', value:contact?.address1, readOnly:readOnlyIsCustomer, class:'capitalize sameAs', width:'300px', maxLength:225 /}
+		</p>
+		<p>			
+			#{textBox id:'address1City', name:'contact.address1City', label:'City', value:contact?.address1City, readOnly:readOnly,  class:'capitalize sameAs', width:'300px', maxLength:100 /}
+		</p>
+		<p>
+			#{textBox id:'address1CountryCode', name:'contact.address1Country.lookupCode', label:'Country', value:contact?.address1Country?.lookupCode, dataold:contact?.address1Country?.lookupCode, class:'capitalize sameAs', readOnly:readOnly, width:'50px' /}
+			#{hidden id:'address1Country', name:'contact.address1Country.lookupId', value:contact?.address1Country?.lookupId, class:'sameAs' /}
+			#{button id:'address1CountryHelp', value:'?', class:'small', readOnly:readOnlyIsCustomer /}	
+			#{textBox id:'address1CountryDesc', name:'contact.address1Country.lookupDescription', value:contact?.address1Country?.lookupDescription, readOnly:true, width:'216px' /}
+		</p>
+		<p>
+			#{textBox id:'address1StateCode', name:'contact.address1State.lookupCode', label:'State', value:contact?.address1State?.lookupCode, dataold:contact?.address1State?.lookupCode, class:'capitalize sameAs', readOnly:readOnly, width:'50px' /}
+			#{hidden id:'address1State', name:'contact.address1State.lookupId', value:contact?.address1State?.lookupId, class:'sameAs', /}
+			#{button id:'address1StateHelp', value:'?', class:'small', readOnly:readOnlyIsCustomer /}
+			#{textBox id:'address1StateDesc', name:'contact.address1State.lookupDescription', value:contact?.address1State?.lookupDescription, readOnly:true, width:'216px' /}&nbsp;<span class="errmsg"></span>
+		</p>
+		<p>
+			#{textBox id:'address1AreaCode', name:'contact.address1Area.lookupCode', label:'Area', value:contact?.address1Area?.lookupCode, class:'capitalize sameAs', readOnly:readOnly, width:'50px' /}
+			#{hidden id:'address1Area', name:'contact.address1Area.lookupId', value:contact?.address1Area?.lookupId, class:'sameAs', /}
+			#{button id:'address1AreaHelp', value:'?', class:'small', readOnly:readOnlyIsCustomer /}
+			#{textBox id:'address1AreaDesc', name:'contact.address1Area.lookupDescription', value:contact?.address1Area?.lookupDescription, readOnly:true, width:'216px' /}&nbsp;<span class="errmsg"></span>				
+		</p>
+		<p>			
+			#{textBox id:'emailContact', name:'contact.email', label:'Email Address', value:contact?.email, readOnly:readOnly, width:'300px', maxLength:225, class:'email' /}
+			ex: alan@simian.co.id
+			<span id="emailContactError" class="error"></span>
+		</p>
+		<p>			
+			#{textBox id:'address1ZipCode', name:'contact.address1ZipCode', label:'Zip Code', value:contact?.address1ZipCode, readOnly:readOnly, class:'capitalize sameAs', width:'300px', maxLength:50 /}
+		</p>
+		<p>			
+			#{textBox id:'address1Phone1', name:'contact.address1Phone1', label:'Phone', value:contact?.address1Phone1, readOnly:readOnly, class:'numberOnly sameAs', width:'300px', maxLength:50 /}
+			<span id="address1Phone1Error" class="error errorMessage"></span>
+		</p>
+		<p>			
+			#{textBox id:'address1Phone2', name:'contact.address1Phone2', label:'Mobile Phone', value:contact?.address1Phone2, readOnly:readOnly, class:'numberOnly sameAs', width:'300px', maxLength:50 /}
+			<span id="address1Phone2Error" class="error errorMessage"></span>
+		</p>
+		<p>			
+			#{textBox id:'address1Phone3', name:'contact.address1Phone3', label:'FAX', value:contact?.address1Phone3, readOnly:readOnly, class:'numberOnly sameAs', width:'300px', maxLength:50 /}
+		</p>
+		<p>			
+			#{textBox id:'remarks', name:'contact.remarks', label:'Remarks', value:contact?.remarks, readOnly:readOnly, width:'300px', maxLength:225, class:'capitalize' /}
+		</p> -->
+	</div>	
+</form>

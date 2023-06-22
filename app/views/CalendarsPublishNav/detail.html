@@ -1,0 +1,355 @@
+#{extends 'templates/main.html' /}
+#{script 'lookups.js' /}
+
+<style>
+.holiday a {
+	color: black !important;
+}
+
+.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
+    color: #2E6E9E;
+    
+}
+
+#daysErrorMessage {
+	color: red;
+	margin-left:6px;
+}
+</style>
+
+<script type="text/javascript">
+	
+ 		
+ 	var publishDates = [														// holidays Array declaration 
+ 	   	//1304182800000, 		//2011-5-1,
+ 	   	//1304960400000,		//2011-5-10,
+ 	   	//1305392400000			//2011-5-15
+ 	   	//1305478800000
+ 	   	//
+ 	   	#{list items:publishDates, as:'publishDate'}
+ 	    	#{if publishDate_isLast}
+ 	    		${publishDate.id.publishDate.time}
+ 	    	#{/if}
+ 	    	#{else}
+ 	    		${publishDate.id.publishDate.time},
+ 	    	#{/else}
+ 	    #{/list}
+ 	];
+ 	// end of declarattion
+ 	//alert(${year});
+	
+	
+			
+ 	$(function() {
+		
+		$("#year").val('${year}');
+		$("#key").val('${key}');
+		
+		$('#list #detail').css("display","none");							// disable dialog list 
+		
+		$('#dialog-confirm').css("display","none");							// disable dialog confirm
+		
+		$("#reset").click(function(){										// reset function
+			var days = [];
+			resetCalendar(days);
+		});
+		// end of function
+		
+		//$('#calHolder').css("display","none");
+		//alert(${started} == true);
+		if (${started} == true){
+			$('#selYear').css("display","none");
+			$('#calHolder').css("display","");
+			
+		}else{
+			$('#calHolder').css("display","none");
+			$('#selYear').css("display","");
+		}
+		
+		// FUND CODE VALIDATION
+		$("#select").click(function(){
+			if (($('#fundCode').val() == "") || ($('#year').val() == "")) {
+				if ($('#fundCode').val() == "") {
+					//alert("Fund Code Not Null");
+					$('#fundCode').addClass('fieldError');
+					$('#fundCodeErrMsg').html("Required");
+				}
+				if ($('#year').val() == "") {
+					$('#year').addClass('fieldError');
+					$('#yearErrMsg').html("Required");
+				}
+				return false;
+			}
+		});
+			
+		$("#save").click(function(){										// save function with dialog
+			$("#dialog-confirm").dialog({
+				resizable: false,
+				height:130,
+				modal: true,
+				buttons: {
+					Yes: function() {
+						var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Sending data to server ...</div>').appendTo('body');;
+						loading.dialog({
+							closeOnEscape: false,
+							draggable: false,
+							modal: true,
+							resizable: false,
+							open:function() {
+								$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+							} 
+						});			
+						location.href="@{list()}";
+						$.post('@{CalendarsPublishNav.confirm()}', {'dates':publishDates,'year':$('#year').val(), 'key':$('#key').val()});
+					},
+					Cancel: function() {
+						$( this ).dialog( "close" );
+					}
+				}
+			});
+		});
+		// end of function
+		
+		$("#back").click(function(){
+			location.href="@{CalendarsPublishNav.list()}";
+		});
+		
+		$('#swd').click(function(){ 										// set working days onClick function
+			//var days = [0, 1, 2, 3, 4, 5, 6];
+			//resetCalendar(days);
+			$('#list #detail').css('overflow','hidden');
+			$('#list #detail').dialog("destroy");
+			$('#daysErrorMessage').html("");
+			$( "#detail" ).dialog({
+				resizable: false,
+				height: 160,
+				width: 700,
+				modal: true,
+				buttons: {
+					"Set Days" : function() {								// set days function in dialog buttons
+						
+						var  //ckDay=[0,1,2,3,4,5,6]; 						// create a litteral array
+							 ckDay=[];
+												
+							if($("#sunday").is(":checked")){
+								//$(this).css("color","blue");
+								//ckDay.splice(0,1);
+								ckDay.push(0);
+								
+								//var day0 = [0];
+								//resetCalendar(day0)
+								//alert(" minggu : " + $("#sunday").is(":checked"));
+							}
+							if ($("#monday").is(":checked")){
+								//ckDay.splice(0,1);
+								ckDay.push(1);
+								//resetCalendar(day1)
+								//alert(" senin : " + $("#monday").is(":checked"));
+							}
+							if ($("#tuesday").is(":checked")){
+								//ckDay.splice(0,1);
+								ckDay.push(2);
+								//alert(" selasa : " + $("#tuesday").is(":checked"));
+							}
+							if ($("#wednesday").is(":checked")){
+								//ckDay.splice(0,1);
+								ckDay.push(3);
+								//	alert(" rabu : " + $("#wednesday").is(":checked"));
+							}
+							if ($("#thursday").is(":checked")){
+								//ckDay.splice(0,1);
+								ckDay.push(4);
+								//alert(" kamis : " + $("#thursday").is(":checked"));
+							}
+							if ($("#friday").is(":checked")){
+								//ckDay.splice(0,1);
+								ckDay.push(5);
+								//alert(" jumat : " + $("#friday").is(":checked"));
+							}
+							if ($("#saturday").is(":checked")){
+								//ckDay.splice(0,1);
+								ckDay.push(6);
+								//alert(" sabtu : " + $("#saturday").is(":checked"));
+							}
+						//	alert(ckDay);
+						
+						if (ckDay == "") {
+							$('#daysErrorMessage').html("Choose the days");								
+							return false;
+						}
+						
+						resetCalendar(ckDay);
+											
+						$( this ).dialog( "close" );						// close button
+						
+					},
+					
+					Cancel: function() {									// cencel function in dialog buttons
+						$( this ).dialog( "close" );
+					}
+				}							
+			});
+		});
+		// end of function
+		
+		// DATEPICKER SHOW ALL MONTHS
+		$("#datepicker").datepicker({										// call JQueryUI datapicker
+			//$( "#datepicker" ).datepicker({ disabled: true });
+			numberOfMonths: [3,4],
+			stepMonths: 12,
+			showButtonPanel: false,
+			hideIfNoPrevNext: true,
+			minDate: new Date(${year}, 0, 1),
+			maxDate: new Date(${year}, 11, 31),
+			beforeShowDay: isHoliday,
+			onSelect: function(dateText, inst) {
+				var found = false;
+				var date = $.datepicker.parseDate('mm/dd/yy', dateText);
+				for (i = 0; i < publishDates.length; i++) {
+					var holiday = new Date(publishDates[i]);
+					if (holiday.getTime() == date.getTime()) {
+						publishDates.splice(i, 1);
+						found = true;
+						break;
+					}
+				}
+				if (!found) {
+					publishDates.push(date.getTime());
+				}				
+				$("#datepicker").datepicker('refresh');
+			}
+		});
+		
+		$('#fundCode').change(function(){
+			if ($('#fundCode').val() == "") {
+				$('#fundCode').val("");
+				$('#fundKey').val("");
+				$('#fundCodeDesc').val("");
+				$('#h_fundCodeDesc').val("");
+			}
+		});
+		
+		$('#year').change(function(){
+			$('#year').removeClass('fieldError');
+			$('#yearErrMsg').html("");
+		});
+		
+		// FUND SETUP LOOKUP
+		$('#fundCode').lookup({
+			list : '@{Pick.faFundSetups()}',
+			get : {
+				url: '@{Pick.faFundSetup()}',
+				success: function(data) {
+						$('#fundCode').removeClass('fieldError');
+						$('#fundKey').val(data.code);
+						$('#fundCodeDesc').val(data.description);
+						$('#h_fundCodeDesc').val(data.description);
+						$('#key').val(data.code);
+						$('#fundCodeErrMsg').html('');
+				},
+				error: function(data) {
+						$('#fundCode').addClass('fieldError');
+						$('#fundCodeDesc').val('NOT FOUND');
+						$('#fundCode').val('');
+						$('#fundKey').val('');
+						$('#h_fundCodeDesc').val('');
+				}
+			},				
+			key:$('#fundKey'),
+			help : $('#fundCodeHelp')
+		});
+		
+ 	});
+ 	
+	function isHoliday(date) {												// isHoliday function
+		//console.debug( 'check:' + date);
+		for (i = 0; i < publishDates.length; i++) {
+			//var holiday = new Date(holidays[i]);
+			if (date.getTime() == publishDates[i]) {
+				//console.debug( 'isHoliday:' + date);
+				return [true, 'holiday'];
+			}
+		}
+		//console.debug( 'notHoliday:' + date);
+		return [true, ''];
+	}
+	// end of function
+	
+	
+		function resetCalendar(days) {										// resetCalendar function
+			publishDates = new Array();
+			var start = $('#datepicker').datepicker('option', 'minDate');
+			var end = $('#datepicker').datepicker('option', 'maxDate');
+			for (i = start; i <= end; ) {
+				for (j = 0; j < days.length; j++)
+					if (i.getDay() == days[j]) {
+						publishDates.push(i.getTime());
+						break;
+					}
+				i.setTime(i.getTime() + 24*60*60*1000);
+			}
+		// end of function
+		
+								
+		//for (i = 0; i < holidays.length; i++) 
+		//	console.debug( 'holiday: ' + new Date(holidays[i]));
+		$("#datepicker").datepicker('option', 'minDate', new Date(${year}, 0, 1));
+		$("#datepicker").datepicker('option', 'maxDate', new Date(${year}, 11, 31));
+		$("#datepicker").datepicker('refresh');
+
+	}
+
+</script>
+
+<style type="text/css">
+	#year {margin-left: 8em;}
+	#fcHolder {margin-left: 2em}
+	#syHolder {margin-left: 1.9em; margin-top:-0.8em;}
+</style>
+
+<div id="selYear">
+	<p id="fcHolder" class="form">
+		#{textBox id:'fundCode', name:'faPublishSchedule.faMaster.fundCode', label:'Fund Code', value:faPublishSchedule?.faMaster?.fundCode, class:'capitalize', required:true, readOnly:readOnly, width:'85px' /}
+		#{hidden id:'fundKey', name:'faPublishSchedule.faMaster.fundKey', value:faPublishSchedule?.faMaster?.fundKey /}
+		#{button id:'fundCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'fundCodeDesc', name:'faPublishSchedule.faMaster.fundCode' , value:faPublishSchedule?.faMaster?.fundCode, class:'capitalize', required:true, readOnly:true, width:'300px' /}
+		<span id="fundCodeErrMsg" class="error"></span>
+	</p>
+	<form action="@{list}" class="form">
+		#{hidden id:'key', name:'key', value:faPublishSchedule?.faMaster?.fundKey /}
+		<p id=syHolder>		
+			<b>Select Year</b>
+			#{dropDownList id:'year', name:'year', options:years, value:'', readOnly:readOnly, width:'89px'/}
+			<input id="select" type="submit" value="Select"/>
+			<span id="yearErrMsg" class="error"></span>
+		</p>
+	</form>
+</div>
+
+
+<div id="calHolder">
+	<div id="datepicker"></div>
+	<div class="buttons">
+		<button id="save">Save</button>
+		<button id="reset">Reset</button>
+		<button id="swd">Set Days</button>
+		<button id="back">Back</button>
+	</div>
+</div>
+
+<div id="list">
+	#{include 'CalendarsPublishNav/grid.html' /}
+</div>
+
+<div id="dialog-confirm" title="Confirmation Save">
+	<p>Are you sure to continue save ? </p>
+</div>
+
+
+
+
+
+
+
+
+

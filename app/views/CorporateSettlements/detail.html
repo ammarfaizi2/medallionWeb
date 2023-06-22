@@ -1,0 +1,186 @@
+#{extends 'templates/list1.html' /}
+#{if taskId==''}
+	#{set pageTitle: 'Corporate Action Settlement Entry' /}
+#{/if}
+#{else}
+	#{set pageTitle: 'Corporate Action Settlement Approval' /}
+#{/else}
+#{set id:entitlement?.entitlementKey /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{set fixData: true /}
+#{script 'lookups.js' /}
+#{script 'date.format.js' /}
+#{script 'validation/numericOnly.js' /}
+
+#{if flash.error || errors}
+    <div class="error">
+    	<b>Error when saving data!</b><br/><br/>
+    	#{if flash.error}
+<li>${flash.error}</li>
+		#{/if}
+		#{ifErrors}
+			#{errors}
+<li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}
+
+#{script 'external/Util.js' /}
+<script type="text/javascript">
+	$(function() {
+		#{include 'RegistrySubscription/Util.js' /}
+		#{include 'CorporateSettlements/casettlement.js' /}	
+
+		if($("#transferMethod").val()==null||$("#transferMethod").val()==""){
+			$("#transferMethod").val('${viaInterface}');
+		}
+	});
+	
+	function doView(data) {
+		return false;
+	}
+
+	function doEdit(data) {
+		return false;
+	}
+	
+</script>
+
+<style type="text/css">
+  #errmsg {color:red;}
+  textarea {resize:none; height: 50px;}
+</style>
+
+<form id="CorporateSettlementForm" class="form" method="post">
+<input type="hidden" id="dummyQty" />
+<input type="hidden" id="dummySettle" />
+#{hidden id:'corporateAnnouncementKey', name:'entitlement.corporateAnnouncement.corporateAnnouncementKey', value:entitlement?.corporateAnnouncement?.corporateAnnouncementKey /}
+#{hidden id:'currentDate', name:'currentDate', value:currentDate?.format(appProp.dateFormat), class:'calendar' /}
+#{hidden id:'transBatchKey', name:'entitlement.transactionBatch.transactionBatchKey', value:entitlement?.transactionBatch?.transactionBatchKey /}
+#{hidden id:'taxObject', name:'entitlement.corporateAnnouncement.actionTemplate.taxObject.lookupId', value:entitlement?.corporateAnnouncement?.actionTemplate?.taxObject?.lookupId /}
+	<p>
+		#{textBox id:'settlementNo', name:'', label:'Settlement No', value:'', class:'capitalize master', width:'120px', readOnly:true /}
+	</p>
+	<p>      
+		#{textBox id:'corporateAnnouncementCode', name:'entitlement.corporateAnnouncement.corporateAnnouncementCode', label:'Announcement No', value:entitlement?.corporateAnnouncement?.corporateAnnouncementCode, class:'capitalize master', width:'120px', readOnly:true /} 
+	</p>
+	<p>      
+		#{textBox id:'entitlementKey', name:'entitlement.entitlementKey', label:'Entitlement No', value:entitlement?.entitlementKey, class:'capitalize master', width:'120px', readOnly:true /} 
+	</p>
+	<p>			
+		#{textBox id:'description', name:'entitlement.corporateAnnouncement.description', label:'Subject', width:'350px',value:entitlement?.corporateAnnouncement?.description, class:'capitalize master', readOnly:true /}
+		<span class="error">#{error 'Subject is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'securityType', name:'entitlement.corporateAnnouncement.securityType.securityType', label:'Security Type', dataold:entitlement?.corporateAnnouncement?.securityType?.securityType, class:'capitalize master', value:entitlement?.corporateAnnouncement?.securityType?.securityType, required:true, readOnly:readOnly, width:'85px' /}
+		#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:true  /}
+		#{textBox id:'securityTypeDesc', name:'entitlement.corporateAnnouncement.securityType.description', value:entitlement?.corporateAnnouncement?.securityType?.description, readOnly:true, width:'234px' /}
+		<span class="error">#{error 'Security Type is' /}</span>		
+	</p>
+	<p>
+		#{textBox id:'securityCode', name:'entitlement.corporateAnnouncement.security.securityId', label:'Security Code', class:'capitalize master', value:entitlement?.corporateAnnouncement?.security?.securityId, readOnly:true, width:'85px' /}
+		#{button id:'securityCodeHelp', value:'?', class:'small', readOnly:true /}
+		#{textBox id:'securityCodeDesc', name:'entitlement.corporateAnnouncement.security.description', value:entitlement?.corporateAnnouncement?.security?.description, readOnly:true, width:'234px' /}
+		#{hidden id:'securityKey', name:'entitlement.corporateAnnouncement.security.securityKey', value:entitlement?.corporateAnnouncement?.security?.securityKey /}
+		<span class="error">#{error 'Security Code is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'actionCode', name:'entitlement.corporateAnnouncement.actionTemplate.actionCode', label:'Action Code', class:'capitalize master', value:entitlement?.corporateAnnouncement?.actionTemplate?.actionCode, required:true, readOnly:readOnly, width:'85px' /}
+		#{button id:'actionCodeHelp', value:'?', class:'small', readOnly:true /}
+		#{textBox id:'actionCodeDesc', name:'entitlement.corporateAnnouncement.actionTemplate.description', value:entitlement?.corporateAnnouncement?.actionTemplate?.description, readOnly:true, width:'234px' /}
+		#{hidden id:'actionCodeKey', name:'entitlement.corporateAnnouncement.actionTemplate.actionTemplateKey', value:entitlement?.corporateAnnouncement?.actionTemplate?.actionTemplateKey /}
+		<span class="error">#{error 'Action Code is' /}</span>
+	</p>
+	<p>			
+		#{textBox id:'distributionDate', name:'entitlement.corporateAnnouncement.distributionDate', label:'Distribution Date', value:entitlement?.corporateAnnouncement?.distributionDate?.format(appProp.dateFormat),required:true , readOnly:readOnly, class:'calendar master' /} (${appProp.displayDateFormat})
+		<span id="distributionDateError" class="error">#{error 'Entitlement Date is' /}</span>
+	</p>
+	<p>
+		#{dropDownList id:'transferMethod', name:'entitlement.transferMethod.lookupId', label:'Fund Transfer Method', value:entitlement?.transferMethod?.lookupId, options:transferMethods, required:true, class:'dropdown' /}
+		<span id="transferMethodError" class="error">#{error 'Transfer Method is' /}</span>
+	</p>
+<br>
+<table id="grid" class="display" >
+	<thead>
+		<tr>
+			<th style="width: 50px"></th>
+			<th style="width: 50px">Txn #</th>
+			<th style="width: 350px">Account No</th>
+			<th style="width: 350px">Account Name</th>
+			<th style="width: 350px">Description</th>
+			<th style="width: 350px">Quantity</th>
+			<th style="width: 350px">Settlement Amount</th>
+		</tr>
+	</thead>
+	<tbody >
+		#{list transLists, as:'transList'}
+			<tr>
+				<td>
+					${transList?.reference}
+				</td>
+				<td>
+				 	${transList?.transactionNumber}
+				</td>
+				<td>
+					${transList?.account?.accountNo}
+				</td>
+				<td >
+					${transList?.account?.name}
+				</td>
+				
+				<td >
+					${transList?.transactionTemplate?.description}
+				</td>
+				<td align="right">
+					#{if transList.quantity != null}
+						${transList?.quantity.format('##,##0.00')}
+					#{/if}
+				</td>
+				<td align="right">
+					#{if transList.settlementAmount != null}
+						${transList?.settlementAmount.format('##,##0.00')}
+					#{/if}
+					
+					#{hidden name:'transactions[' + (transList_index-1) + '].transactionKey', value:transList?.transactionKey /}
+					#{hidden name:'transactions[' + (transList_index-1) + '].reference', value:transList?.reference /}
+					#{hidden name:'transactions[' + (transList_index-1) + '].transactionNumber', value:transList?.transactionNumber /}
+					#{hidden name:'transactions[' + (transList_index-1) + '].account.custodyAccountKey', value:transList?.account?.custodyAccountKey /}
+					#{hidden name:'transactions[' + (transList_index-1) + '].account.accountNo', value:transList?.account?.accountNo /}
+					#{hidden name:'transactions[' + (transList_index-1) + '].account.name', value:transList?.account?.name /}
+					#{hidden name:'transactions[' + (transList_index-1) + '].transactionTemplate.transactionTemplateKey', value:transList?.transactionTemplate?.transactionTemplateKey /}
+					#{hidden name:'transactions[' + (transList_index-1) + '].transactionTemplate.description', value:transList?.transactionTemplate?.description /}
+					#{hidden name:'transactions[' + (transList_index-1) + '].quantity', value:transList?.quantity /}
+					#{hidden name:'transactions[' + (transList_index-1) + '].settlementAmount', value:transList?.settlementAmount /}
+					#{hidden name:'transactions[' + (transList_index-1) + '].taxOnInterest', value:transList?.taxOnInterest /}
+				</td>
+			</tr>
+		#{/list}
+	</tbody>
+</table>
+	
+
+
+<hr style="border-color:#A6C9E2">
+
+		Total Number of transaction : <input type="text" id="counTrans" value='${entitlement?.sizeOfTransaction}' disabled="disabled" style="text-align: right;width: 100px" />
+		&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+		<!-- &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; -->
+		Total Amount : <input type="text" id="sumQty" value='${entitlement?.sumOfQuantity.format("##,##0.00")}' class="numeric" disabled="disabled" /> &nbsp; &nbsp;
+		<input type="text" id="sumSettle" value='${entitlement?.sumOfSettlementAmount.format("##,##0.00")}' class="numeric" disabled="disabled" /> 
+		#{hidden name:'entitlement.sizeOfTransaction', value:entitlement?.sizeOfTransaction /}
+		#{hidden name:'entitlement.sumOfQuantity', value:entitlement?.sumOfQuantity /}
+		#{hidden name:'entitlement.sumOfSettlementAmount', value:entitlement?.sumOfSettlementAmount /}
+<hr style="border-color:#A6C9E2">
+</form>
+<div class="buttons">
+	#{ifnot confirming}
+		<input type="button" id="settle" value="Settle" />
+		<input type="button" id="cancel" value="Cancel" />
+	#{/ifnot}
+	#{else}
+		<input type="button" id="confirm" value="Confirm" />
+		<input type="button" id="back" value="Back" />
+	#{/else}
+</div>
+

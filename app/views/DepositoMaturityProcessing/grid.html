@@ -1,0 +1,94 @@
+<script type="text/javascript">
+$(document).ready(function(){
+	
+	// This is the hack for IE
+	if ($.browser.msie) {
+	  $('#notInList').click(function() {
+	    this.blur();
+	    this.focus();
+	  });
+	}
+
+	$("#process").button();
+ });
+ 
+
+</script>
+
+<h3>Search results</h3>
+
+#{if customers}
+<table id="grid" class="display">
+	<thead>
+		<tr>		
+			<th>Customer Key</th>
+			<th width="50px">Approve</th>
+			<th width="50px">Reject</th>
+			<th width="100px">Bilyet No</th>
+			<th width="150px">Bilyet Acc</th>
+			<th width="150px">Transaction No</th>
+			<th width="100px">Custody Acc</th>
+			<th width="100px">Maturity Instraction</th>
+			<th width="100px">Period Of Interest</th>
+			<th width="100px">Interest Amount</th>
+			<th width="100px">Tax on Interest Amount</th>
+			<th width="100px">Net Interest Amount</th>
+			<th width="100px">Bank Name</th>
+			<th width="100px">Rekening No</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:customers, as:'customer'}
+		<tr>
+			<td>
+				${customer.customerKey}
+			</td>
+			<td>
+				#{checkBox id:'approve', name:'approve',value:"" /}   
+			</td>
+			<td>
+				#{checkBox id:'reject', name:'reject',value:"" /}
+			</td>
+			<td>
+				${customer.identification1No}
+			</td>
+			<td>
+				
+			</td>
+			<td>
+				${customer.customerName}
+			</td>
+			
+			
+			<td>
+				${customer.customerNo}
+			</td>
+			<td>
+			</td>
+			<td>
+			</td>
+			<td>
+			</td>
+			<td>
+			</td>
+			<td>
+			</td>
+			<td>
+			</td>
+			<td>
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>
+
+		
+
+#{/if}
+#{else}
+<div>No record found</div>
+#{/else}
+<br>
+<div>
+	#{button id:'process',name:'process', value:'Process',class:'buttons' /} 			
+</div>

@@ -1,0 +1,1242 @@
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+
+#{script 'date.format.js' /}
+#{script 'lookups.js' /}
+#{script 'validation/numericOnly.js' /}
+
+<script type="text/javascript">
+	$(function() {
+	//	$('.error').hide();
+		$('#tabsTier').tabs();
+		$('#newTierData').button();
+		$('#cancelTier').button();
+		$('#addTier').button();
+		//$('#nPeriodAct').button();
+		//$('.numeric').numeric();
+		
+		setMandatory();
+		
+		var data = new Object();
+		tabTier(data);
+		
+		if (('${mode}'=='entry')||(('${keyHelp}'=='')&&('${confirming}'!='true'))||(('${mode}'=='edit')&&(('${master?.recordStatus?.decodeStatus()}'=='Reject')||($("#status").val() == 'R' )))){
+			$('input[name=isActive]').attr("disabled", "disabled");
+		}
+		
+		if (('${mode}'=='edit')&&($('#masterChargeKey').val()!='')){
+			$('#hiddenChargeCode').val($('#chargeCode').val());
+			$('#chargeCode').attr("disabled", "disabled");
+		}
+		
+		if (('${mode}'=='edit')&&($('#masterChargeKey').val()=='')&&('${confirming}'!='true')){
+			$('#chargeCode').attr("disabled", false);
+		}		
+		$('input[name=isActive]').change(function(){
+			$("input[name='master.isActive']").val($("input[name='isActive']:checked").val());
+		});
+		
+		$('#chargeCode').change(function(){
+			$('#hiddenChargeCode').val($('#chargeCode').val());
+		})
+		#{ifnot flash.error || errors}
+		if (('${confirming}'!='true')&&('${mode}' == 'entry')){
+			var dataTier = new Object();
+			dataTier.taxMaster = new Object();
+			dataTier.id = new Object();
+			dataTier.id.rowNumber = 0;
+			dataTier.tierMaximumRange = null;
+			dataTier.tierValue = null;
+			dataTier.taxMaster.taxCode = "";
+			dataTier.taxMaster.taxKey = "";
+			dataTier.taxMaster.description = "";
+			dataTier.id.chargeKey = $('#detailTier #tierForm #chargeKey').val();
+			tableTier.fnAddData(dataTier);
+		}
+		#{/ifnot}
+		$('#periods').css('width','400');
+		$('#periods').css('height','auto');
+		$('#tabsTier').css('width','890');
+
+		$( "#dialog-message-1" ).css("display","none");
+		
+		// ======================= ALL PROCESS IN MAIN FORM =====================================//
+		$('#taxCodeMaster').lookup({
+			list:'@{Pick.taxMasters()}',
+			get:{
+				url:'@{Pick.taxMaster()}',
+				success: function(data) {
+							$('#taxCodeMaster').removeClass('fieldError');
+							$('#taxKeyMaster').val(data.code);
+							$('#taxCodeMaster').val(data.taxCode);
+							$('#taxCodeMasterHidden').val(data.taxCode);
+							$('#taxNameMaster').val(data.description);
+							$('#h_taxNameMaster').val(data.description);
+							$('#errmsgTax').html('');
+							
+							changeTaxGrid();
+							
+						},
+				error: function() {
+						$('#taxCodeMaster').addClass('fieldError');
+						$('#taxKeyMaster').val('');
+						$('#taxCodeMaster').val('');
+						$('#taxCodeMasterHidden').val('');
+						$('#taxNameMaster').val('NOT FOUND');
+						$('#h_taxNameMaster').val('');
+					}
+			},
+			key:$('#taxKeyMaster'),
+			description:$('#taxNameMaster'),
+			help:$('#taxCodeHelpMaster'),
+			nextControl:$('#tierValueMaster')
+		});
+		
+		$('#taxCodeMaster').blur(function(){
+			$('#taxCodeMasterHidden').val($('#taxCodeMaster').val());
+			$('#tierForm #taxCode').val($('#taxCodeMaster').val());
+			$('#tierForm #taxKey').val($('#taxKeyMaster').val());
+			$('#tierForm #taxName').val($('#taxNameMaster').val());
+		});
+		
+		//default enable/disable
+		if ($("#chargeCategory").val() == '${chargeCategorySafekeepingFee}'){
+			$("#masterChargeType").attr("disabled", "disabled");
+			$('#masterChargeFrequency').val('${chargeFrequencyMonthly}');
+			$("#masterChargeFrequency").attr("disabled", "disabled");
+			$('#masterChargeFrequencyHidden').val($('#masterChargeFrequency').val());
+			$.get('@{Pick.taxMaster}', {'code':'${noTaxValue}'}, function(data) {
+				checkRedirect(data);
+				$('#taxCodeMaster').val(data.taxCode);
+				$('#taxCodeMasterHidden').val(data.taxCode);
+				$('#taxKeyMaster').val(data.code);
+				$('#taxNameMaster').val(data.description);
+				$('#h_taxNameMaster').val(data.description);
+				changeTaxGrid();
+			});
+	        $('#taxCodeMaster').attr('disabled', true);
+	        $('#taxCodeHelpMaster').attr('disabled', true);
+			if ($("#masterValueType").val() == "CHARGE_VALUE-F"){
+	 			
+				$("#masterBaseCalculationField").attr('disabled','disabled');
+				}
+		} else if ($("#chargeCategory").val() == '${chargeCategoryEntitlement}') {
+			//$('#masterChargeFrequency').val('${chargeFrequencyMonthly}');
+			//$('#masterChargeFrequency').attr('disabled', true);
+			$('#masterChargeFrequencyHidden').val($('#masterChargeFrequency').val());
+			$.get('@{Pick.taxMaster}', {'code':'${noTaxValue}'}, function(data) {
+				checkRedirect(data);
+				$('#taxCodeMaster').val(data.taxCode);
+				$('#taxCodeMasterHidden').val(data.taxCode);
+				$('#taxKeyMaster').val(data.code);
+				$('#taxNameMaster').val(data.description);
+				$('#h_taxNameMaster').val(data.description);
+				changeTaxGrid();
+			});
+	        $('#taxCodeMaster').attr('disabled', true);
+	        $('#taxCodeHelpMaster').attr('disabled', true);
+		} else {
+			setMandatory();
+			if ($("#masterChargeType").val() == "CHARGE_TYPE-M") {
+			$(".disabledForChargeTypeManual").attr('disabled','disabled');
+			$("#isChecked").attr('disabled', 'disabled');
+			$("#newTierData").button("option", "disabled", true);
+			}
+			 else {
+		 	
+		 		if (($("#masterValueType").val() != "CHARGE_VALUE-F")&&($("#masterTieringType").val()=="CHARGE_CALCULATION-P")){
+		 		$("#masterBaseCalculationField").attr('disabled','disabled');
+				}
+			}
+		}
+		
+		//action Charge Type
+		$("#masterChargeType").change(function() {
+			setMandatory();
+			if ($("#masterChargeType").val() == "CHARGE_TYPE-M") {
+				var row = $('#listTier #gridTier').dataTable().fnGetNodes().length;
+				$("#masterChargeTypeHidden").val($("#masterChargeType").val());
+				$(".disabledForChargeTypeManual").val("");
+				
+				$(".disabledForChargeTypeManual").attr('disabled','disabled');
+				$("input[name=master.isChecked]").attr("checked", false);
+				$("#isChecked").attr('disabled', 'disabled');
+				
+				$("#masterTieringType").val('CHARGE_CALCULATION-S');
+				$("#masterTieringTypeHidden").val($("#masterTieringType").val());
+				if ($("#masterTieringTypeHidden").val() == "CHARGE_CALCULATION-S"){
+					$("#newTierData").button("option", "disabled", true);
+					if (row > 1) {
+						$('#save').button("option","disabled",true);
+						$("#errmsgTierValueNull").html("Warning to save! Tiering Type 'Single Value' can't more than one tier");
+					} else {
+						$('#save').button("option","disabled",false);
+						$("#errmsgTierValueNull").html("");
+					}
+				}
+/*				if ($("#masterTieringTypeHidden").val() != "CHARGE_CALCULATION-S"){
+					alert("not single");
+					$("#newTierData").button("option", "disabled", false);
+					$('#save').button("option","disabled",false);
+				} */
+				$('#masterMinimumValue').val('0');
+				$('#masterMinimumValueStripped').val($('#masterMinimumValue').val());
+				$("input[name='isChecked']").attr("checked", true);
+				$("input[name='master.isChecked']").val($("input[name='isChecked']").val());
+				
+				$("#masterMaximumValue").attr("disabled", true);
+				$("#masterMaximumValue").val("");
+				$('#masterMaximumValueStripped').val("");
+				$('#mandatoryMax label').html("Maximum Value");
+				
+				$("#newTierData").button("option", "disabled", true);
+			} else {
+					$("#masterChargeTypeHidden").val("");
+					$("#masterChargeTypeHidden").val($("#masterChargeType").val());
+					$("#isChecked").attr('disabled', false);
+					
+					$(".disabledForChargeTypeManual").attr('disabled', false);
+					$("#masterTieringType").val('');
+					$("#masterTieringTypeHidden").val($("#masterTieringType").val());
+					$('#masterMinimumValue').val('');
+					$('#masterMinimumValueStripped').val($('#masterMinimumValue').val());
+					$("#newTierData").button("option", "disabled", false);
+					$('#save').button("option","disabled",false);
+					if ($("input[name='isChecked']:checked").val() == "true"){
+						
+						$("#masterMaximumValue").attr("disabled", true);
+						$("#masterMaximumValue").val("");
+						$('#mandatoryMax label').html("Maximum Value");
+					}else{
+						$('#mandatoryMax label').html("Maximum Value <span class=\"req\">*</span>");
+					}
+					$("#errmsgTierValueNull").html("");
+					
+				}
+		});		
+		
+		
+		//action Charge Value				
+		$("#masterValueType").change(function() {
+			if ($("#masterValueType").val() == "CHARGE_VALUE-F"){
+				$("#masterBaseCalculationFieldHidden").val("");
+				$("#masterBaseCalculationField").val("");
+				$("#masterBaseCalculationField").attr('disabled', 'disabled');
+			} else { 
+				if ($("#masterValueType").val() == "CHARGE_VALUE-P"){
+					tableTier.fnClearTable();
+					var dataTier = new Object();
+					dataTier.taxMaster = new Object();
+					dataTier.id = new Object();
+					dataTier.id.rowNumber = 0;
+					dataTier.tierMaximumRange = "";
+					dataTier.tierValue = "";
+					dataTier.taxMaster.taxCode = "";
+					dataTier.taxMaster.taxKey = "";
+					dataTier.taxMaster.description = "";
+					dataTier.id.chargeKey = $('#detailTier #tierForm #chargeKey').val();
+					tableTier.fnAddData(dataTier);
+					$("#masterTieringType").val("");
+					$("#masterBaseCalculationField").attr('disabled', false);
+				}
+			}
+		//	} else {
+				$("#masterTieringType").val("");
+				$("#masterBaseCalculationField").attr('disabled', false);
+			//}
+		});
+		
+		if ($("#masterTieringTypeHidden").val() == "CHARGE_CALCULATION-S"){
+			$("#newTierData").button("option", "disabled", true);
+		}
+		//action Tiering Type
+		$("#masterTieringType").change(function() {
+			$("#masterTieringTypeHidden").val($("#masterTieringType").val());
+			var row = $('#listTier #gridTier').dataTable().fnGetNodes().length;
+			if ($("#masterTieringTypeHidden").val() == "CHARGE_CALCULATION-S"){
+				$("#newTierData").button("option", "disabled", true);
+				if (row > 1) {
+					$('#save').button("option","disabled",true);
+					$("#errmsgTierValueNull").html("Warning to save! Tiering Type 'Single Value' can't more than one tier");
+				} else {
+					$('#save').button("option","disabled",false);
+					$("#errmsgTierValueNull").html("");
+				}
+			}
+			if ($("#masterTieringTypeHidden").val() != "CHARGE_CALCULATION-S"){
+				$("#newTierData").button("option", "disabled", false);
+				$('#save').button("option","disabled",false);
+				$("#errmsgTierValueNull").html("");
+			}
+	/*		if ($("#masterValueType").val() == "CHARGE_VALUE-F"){
+				 $("#masterBaseCalculationField").attr('disabled', 'disabled');
+			} 
+	*/		if (($("#masterValueType").val() != "CHARGE_VALUE-F")&&($("#masterTieringTypeHidden").val()=="CHARGE_CALCULATION-P")){
+				$("#masterTierComparisonField").val("");	
+				$("#masterBaseCalculationField").attr('disabled', 'disabled');
+			}
+			if (($("#masterValueType").val() != "CHARGE_VALUE-F")&&($("#masterTieringTypeHidden").val()!="CHARGE_CALCULATION-P")){
+				$("#masterBaseCalculationField").attr('disabled', false);
+			}
+		});	
+		
+		
+		//action Charge Tier Comparison	
+		$("#masterTierComparisonField").change(function() {
+			if (($("#masterValueType").val() != "CHARGE_VALUE-F")&&($("#masterTieringType").val()=="CHARGE_CALCULATION-P")){		
+			 	$("#masterBaseCalculationField").val($("#masterTierComparisonField").val());
+			 	$("#masterBaseCalculationFieldHidden").val($("#masterBaseCalculationField").val());
+			} else {
+				$("#masterBaseCalculationField").val();
+			 	$("#masterBaseCalculationFieldHidden").val($("#masterBaseCalculationField").val());
+			}
+		})		
+	
+		
+		// set default isChecked for Max Value
+		if ($("input[name='isChecked']:checked").val() == "true"){
+			
+			$("#masterMaximumValue").attr("disabled", true);
+			$("#masterMaximumValue").val("");
+			$('#mandatoryMax label').html("Maximum Value");
+		}else{
+			$('#mandatoryMax label').html("Maximum Value <span class=\"req\">*</span>");
+		}
+		
+		
+		//default for charge category safekeeping fee
+		if ($("#chargeCategory").val() == "CHARGE_CATEGORY-S") {
+			$("#safekeepingFee").show();
+		}
+		
+		
+		//function for action Charge Category
+		function adjustChargeCategory() {
+			var chargeCategory; 
+			chargeCategory = $('#chargeCategory').val();
+	    	if (chargeCategory === '${chargeCategorySafekeepingFee}'){
+	    		$("#safekeepingFee").show();
+				$('#safekeepingFee').css("display","");
+	        	$("#masterChargeType").val("");
+		        $("#masterChargeType").attr("disabled", "disabled");
+		        $("#masterChargeType").val("CHARGE_TYPE-C");
+		        $("#masterChargeTypeHidden").val($("#masterChargeType").val());
+		        $("#masterChargeFrequency").val('${chargeFrequencyMonthly}');
+		        $("#masterChargeFrequency").attr("disabled", "disabled");
+		        $("#masterChargeFrequencyHidden").val($("#masterChargeFrequency").val());
+		        $.get('@{Pick.taxMaster}', {'code':'${noTaxValue}'}, function(data) {
+					checkRedirect(data);
+					$('#taxCodeMaster').val(data.taxCode);
+					$('#taxCodeMasterHidden').val(data.taxCode);
+					$('#taxKeyMaster').val(data.code);
+					$('#taxNameMaster').val(data.description);
+					$('#h_taxNameMaster').val(data.description);
+					changeTaxGrid();
+				});
+		        $('#taxCodeMaster').attr('disabled', true);
+		        $('#taxCodeHelpMaster').attr('disabled', true);
+		        $(".disabledForChargeTypeManual").attr('disabled', false);
+		      	$(".clearFieldValue").val("");
+		      	$("#tabsTier").tabs("disable",1);
+		      	$("#masterMaximumValueStripped").val("");
+		      	$("#masterMinimumValueStripped").val("");
+		      	$('#masterMaximumValue').removeClass('fieldError');
+		      	$('#errmsg').hide();
+		    } else if (chargeCategory === '${chargeCategoryEntitlement}') {
+		    	$('#safekeepingFee').hide();
+				$('#safekeepingFee').css("display","none");
+		        $("#masterChargeType").attr("disabled", false);
+		        $("#masterChargeType").val('');
+		        $("#masterChargeTypeHidden").val($("#masterChargeType").val());
+		    	$("#masterChargeFrequency").val('${chargeFrequencyMonthly}');
+				//$('#masterChargeFrequency').attr('disabled', true);
+		        $("#masterChargeFrequencyHidden").val($("#masterChargeFrequency").val());
+		        $.get('@{Pick.taxMaster}', {'code':'${noTaxValue}'}, function(data) {
+					checkRedirect(data);
+					$('#taxCodeMaster').val(data.taxCode);
+					$('#taxCodeMasterHidden').val(data.taxCode);
+					$('#taxKeyMaster').val(data.code);
+					$('#taxNameMaster').val(data.description);
+					$('#h_taxNameMaster').val(data.description);
+					changeTaxGrid();
+				});
+		        $('#taxCodeMaster').attr('disabled', true);
+		        $('#taxCodeHelpMaster').attr('disabled', true);
+			} else {
+	    		$("#safekeepingFee").hide();
+	    		$("#masterChargeType").val("");
+	    		$("#masterChargeTypeHidden").val("");
+	        	$("#masterChargeFrequency").val("");
+	        	$("#masterChargeFrequencyHidden").val("");
+				$('#taxCodeMaster').val('');
+				$('#taxCodeMasterHidden').val('');
+				$('#taxKeyMaster').val('');
+				$('#taxNameMaster').val('');
+				$('#h_taxNameMaster').val('');
+		        $('#taxCodeMaster').attr('disabled', false);
+		        $('#taxCodeHelpMaster').attr('disabled', false);
+	    		$("#masterChargeType").attr("disabled", false);
+	        	$("#masterChargeFrequency").attr("disabled", false);
+	        	$(".clearFieldValueForSkfee").val("");
+	        	$("#enablePeriod").hide();
+	        	$("#tabsTier").tabs("select", 0);
+	        	$('#gridPeriods').dataTable().fnClearTable();
+	        	$("#tabsTier").tabs("disable",1);
+	        	$(".disabledForChargeTypeManual").attr('disabled', false);
+	        	$(".clearFieldValue").val("");
+	    	}
+		};
+
+	//	$("#yearBase").attr("disabled","disabled");
+		//set default for Year Base
+	//	if (('${confirming}'!='true')&&('${mode}' == 'entry')){
+			if ($("#masterValueType").val() != "CHARGE_VALUE-P"){
+				$("#yearBase").attr("disabled","disabled");
+				$("#tierForm #percentage").hide();
+				$("#gridTier #percentage").hide();
+			} 
+		/*	else {
+				$("#yearBase").attr("disabled","disabled");
+				$("#tierForm #percentage").hide();
+				$("#gridTier #percentage").hide();
+			}*/
+	//	}
+
+		
+		//function action for enable field Year Base
+		function enableYearBase() {
+			var valueType;
+			valueType = $("#masterValueType").val();
+			if (/CHARGE_VALUE-P/i.test(valueType)){
+				$("#yearBase").attr("disabled",false);
+				$('label[id=lblYearBase] span').html(' *');
+				$("#tierForm #percentage").show();
+				$("#gridTier #percentage").show();
+			} else {
+				$("#yearBase").val("");
+				$("#yearBase").attr("disabled", "disabled");
+				$('label[id=lblYearBase] span').html('');
+				$("#tierForm #percentage").hide();
+				$("#gridTier #percentage").hide();
+			}
+		}
+
+		//set default for Price Used
+//		if ($("#masterBaseCalculationField").val() == "BASE_CALCULATION-N"){
+//			$("#priceUsed").attr("disabled",false);
+//		} else {
+//			$("#priceUsed").attr("disabled","disabled");
+//		}
+			
+		//function action for enable field Price Used
+//		$("#priceUsed").attr("disabled", "disabled");
+//		function enablePriceUsed() {
+//			var baseCalculationField; 
+//			baseCalculationField = $('#masterBaseCalculationField').val(); 
+//	    	if (/BASE_CALCULATION-N/i.test(baseCalculationField)){
+//	    		$("#priceUsed").attr("disabled", false);
+//	    	} else {
+//	    		$("#priceUsed").val("");
+//	        	$("#priceUsed").attr("disabled", "disabled");
+//	    	}
+//		};
+		
+		//set default for enable period
+		$("#tabsTier").tabs("disable",1);
+		if ($("#methodSkfee").val() == "METHOD_SKFEE-H") {
+			$("#enablePeriod").show();
+			$("#tabsTier").tabs("enable",1);
+		}
+		//function action for enable field Number of Period
+		function enableNumberOfPeriod() {
+			var methodSkfee;
+			methodSkfee = $('#methodSkfee').val();
+			if (/METHOD_SKFEE-H/i.test(methodSkfee)){
+				$("#enablePeriod").show();
+				$("#tabsTier").tabs("enable",1);
+			} else {
+				$("#enablePeriod").hide();
+				$("#nPeriod").val("");
+				$("#nPeriodStripped").val("");
+				$("#tabsTier").tabs("disable",1);
+				$('#gridPeriods').dataTable().fnClearTable();
+			}
+		};
+		
+		$('#chargeCategory').change(function(){
+			adjustChargeCategory();
+			setMandatory();
+		});
+	//	$('#masterBaseCalculationField').change(enablePriceUsed);
+		$('#masterValueType').change(enableYearBase);
+		$('#methodSkfee').change(enableNumberOfPeriod);
+		
+		$('#masterChargeFrequency').change(function(){
+			if ($('#masterChargeFrequency').val() === '${chargeFrequencyMonthly}') {
+				$.get('@{Pick.taxMaster}', {'code':'${noTaxValue}'}, function(data) {
+					checkRedirect(data);
+					$('#taxCodeMaster').val(data.taxCode);
+					$('#taxCodeMasterHidden').val(data.taxCode);
+					$('#taxKeyMaster').val(data.code);
+					$('#taxNameMaster').val(data.description);
+					$('#h_taxNameMaster').val(data.description);
+				});
+		        $('#taxCodeMaster').attr('disabled', true);
+		        $('#taxCodeHelpMaster').attr('disabled', true);
+			} else {
+		        $('#taxCodeMaster').attr('disabled', false);
+		        $('#taxCodeHelpMaster').attr('disabled', false);
+				$('#taxCodeMaster').val('');
+				$('#taxCodeMasterHidden').val('');
+				$('#taxKeyMaster').val('');
+				$('#taxNameMaster').val('');
+				$('#h_taxNameMaster').val('');
+			}
+		});
+		
+		//validate max and min value
+		$("#masterMaximumValue").blur(function(){
+			var el = $(this);
+			var max = parseFloat($('#masterMaximumValueStripped').val());
+			var min = parseFloat($('#masterMinimumValueStripped').val());
+
+			el.removeClass('fieldError');
+			
+			$("#errmsg").html("");
+			if (max == ""){
+				el.removeClass('fieldError');
+			}
+			if (min > max){
+				el.addClass('fieldError');
+				$("#errmsg").html("Max Value must be greather than Min Value").show();
+			} 
+			
+			if ($('#masterMaximumValue').val() != ''){
+			//	$('#masterMaximumValueStripped').val(($('#masterMaximumValue').val()));
+			//	alert("MAX value >>" +($('#masterMaximumValueStripped').val()));
+			}
+			
+			
+		});
+		
+		$("#masterMinimumValue").blur(function(){
+			var max = parseFloat($('#masterMaximumValueStripped').val());
+			var min = parseFloat($('#masterMinimumValueStripped').val());
+
+			$("#masterMaximumValue").removeClass('fieldError');
+			
+			$("#errmsg").html("");
+			if (max == ""){
+				el.removeClass('fieldError');
+			}
+			if (min > max){
+				$("#masterMaximumValue").addClass('fieldError');
+				$("#errmsg").html("Max Value must be greather than Min Value").show();
+			} 
+			
+		});
+
+		//action checkbox for max value
+		$("input[name='isChecked']").change(function () {
+			var el = $("#masterMaximumValue");
+			if (($("input[name='isChecked']:checked").val() == "true")||($("#masterMaximumValue").hasClass('fieldError'))){
+				$("input[name='master.isChecked']").val($("input[name='isChecked']").val());
+					el.removeClass('fieldError');
+					$("#errmsg").hide();
+				$("#masterMaximumValue").attr("disabled", true);
+				$("#masterMaximumValue").val("");
+				$('#masterMaximumValueStripped').val("");
+				$('#mandatoryMax label').html("Maximum Value ");
+			} else {
+				$("input[name='master.isChecked']").val(false);
+				$("#masterMaximumValue").attr("disabled", false);
+				$('#mandatoryMax label').html("Maximum Value <span class=\"req\">*</span>");
+			}
+		});
+		
+		$('#currency').lookup({
+			list:'@{Pick.currencies()}',
+			get:{
+				url:'@{Pick.currency()}',
+				success: function(data) {
+					$('#currency').removeClass('fieldError');
+					$('#currency').val(data.code);
+					$('#currencyDesc').val(data.description);
+					$('#h_currencyDesc').val(data.description);
+				},
+				error: function(data) {
+					$('#currency').addClass('fieldError');
+					$('#currencyDesc').val('NOT FOUND');
+					$('#currency').val('');
+					$('#h_currencyDesc').val('');
+				}
+			},
+			description:$('#currencyDesc'),
+			help:$('#currencyHelp')
+		});
+		
+		$('#currency').change(function(){
+			if ($(this).val()==''){
+				$('#currency').val('');
+				$('#currencyDesc').val('');
+				$('#h_currencyDesc').val('');
+			}
+		});
+		
+		// ======================= END - ALL PROCESS IN MAIN FORM =================================//
+		
+		//================================ START TAB PERIOD =====================================//	
+		// DataTables Period
+		var tablePeriods = 
+			$('#gridPeriods').dataTable({
+				aoColumns: [ 
+							 null,
+				             null
+						    ],
+				bJQueryUI:true,
+				aaSorting:[[0,'asc']],
+				bFilter:false,
+				bPaginate:false,
+				bInfo:false
+				
+			});
+		$('#gridPeriods').removeAttr('style');
+	
+		
+		// action button for tab period 
+		$('#nPeriodAct').click(function() {
+			var el = $('#nPeriod');
+			var nPeriod = $('#nPeriodStripped').val();
+		
+			if ((nPeriod < 1)||(nPeriod > 31)){
+				el.addClass('fieldError');
+				$("#errmsgPeriod").html("Allowed Value 1-31");
+				return false;
+			} else {
+				el.removeClass('fieldError');
+				$("#errmsgPeriod").html("");
+			}
+			$("#tabsTier").tabs("select", 1);  
+			$('#gridPeriods').dataTable().fnClearTable();
+			for (i=0; i<nPeriod; i++){
+			$('#gridPeriods').dataTable().fnAddData([
+									    i+1,
+		        			        	"<center><input type='text' onkeypress='return isNumberKey(event)' id='periodRow' name='periods[" + i + "]' class='numeric' maxLength='2'/></center>"
+		        			        	]);
+          	}
+		});	
+
+		$('#nPeriod').blur(function(){
+			if ($("#nPeriod").val()!= 0) {
+				$('#nPeriod').removeClass('fieldError');
+				$('#errmsgPeriod').html('');
+			}
+		});
+		
+		// validate value period in tab
+		$('#gridPeriods tbody tr #periodRow').live('blur', function() {
+			var el = $(this);
+			var aRow = el.parents('tr');
+			var aPos = $('#gridPeriods').dataTable().fnGetPosition(aRow[0]);
+			var node = $('#gridPeriods').dataTable().fnGetNodes(aPos);
+			var rowPeriod = $('#periodRow', node).val();
+			if ( rowPeriod < 1 || rowPeriod > 31){
+				el.addClass('fieldError');
+			} else {
+				el.removeClass('fieldError');
+			}
+
+			//validate cannot same value in grid period	
+			var length = $('#gridPeriods').dataTable().fnGetNodes().length;
+			var a=0;
+			for (i=a ; i<length-1 ; i++){
+				var nodes = $('#gridPeriods').dataTable().fnGetNodes(i);
+				var period = $('#periodRow', nodes).val();
+				if (aPos == i){
+					a = a+1;
+				} else {
+					if(rowPeriod == period){
+						//alert(rowPeriod+ " not allowed");
+						el.addClass('fieldError');
+					}
+					
+				}
+				a = a+1;
+			}
+		
+		});
+		
+		//================================ END TAB PERIOD =====================================//
+		
+		//================================ START TAB TIER =====================================//
+	
+		//==== DELETE TIER ROW ====//
+		$('#listTier #gridTier tbody tr #deleteButton').live('click', function() {
+		
+			var row = $(this).parents('tr');
+			var rowNumber = tableTier.fnGetPosition(row[0]);
+			var deleteChargeTier = function() {
+				tableTier.fnDeleteRow(rowNumber);
+				var idTable = $("#listTier #gridTier");
+				var trs = $("tr", idTable);
+				$.each(trs, function(idx, data){
+					var hiddens = $("[type=hidden]", $(this));
+						$(hiddens).eq(0).attr("name", "tiers["+(idx-1)+"].tierMaximumRange");
+						$(hiddens).eq(1).attr("name", "tiers["+(idx-1)+"].taxMaster.taxCode");
+						$(hiddens).eq(2).attr("name", "tiers["+(idx-1)+"].taxMaster.taxKey");
+						$(hiddens).eq(3).attr("name", "tiers["+(idx-1)+"].taxMaster.description");
+						$(hiddens).eq(4).attr("name", "tiers["+(idx-1)+"].tierValue");
+						$(hiddens).eq(5).attr("name", "tiers["+(idx-1)+"].id.rowNumber");
+						$(hiddens).eq(6).attr("name", "tiers["+(idx-1)+"].id.chargeKey");
+				});
+				var length = tableTier.fnGetNodes().length;
+				if ((length == 1) &&($("#masterTieringType").val()=="CHARGE_CALCULATION-S")) {
+					$('#save').button("option","disabled",false);
+					$("#errmsgTierValueNull").html("");
+				}
+				$("#dialog-message").dialog("close");
+			}
+			var closeDialog = function() {
+				$("#dialog-message").dialog("close");
+			}
+			
+			/* $("#dialog-message-1").dialog({
+				autoOpen:false,
+				height:120,
+				width:250,
+				modal:true,
+				resizable : false,
+				buttons: {
+					"Yes": function() {
+						tableTier.fnDeleteRow(rowNumber);
+						var idTable = $("#listTier #gridTier");
+						var trs = $("tr", idTable);
+						$.each(trs, function(idx, data){
+							var hiddens = $("[type=hidden]", $(this));
+								$(hiddens).eq(0).attr("name", "tiers["+(idx-1)+"].tierMaximumRange");
+								$(hiddens).eq(1).attr("name", "tiers["+(idx-1)+"].taxMaster.taxCode");
+								$(hiddens).eq(2).attr("name", "tiers["+(idx-1)+"].taxMaster.taxKey");
+								$(hiddens).eq(3).attr("name", "tiers["+(idx-1)+"].taxMaster.description");
+								$(hiddens).eq(4).attr("name", "tiers["+(idx-1)+"].tierValue");
+								$(hiddens).eq(5).attr("name", "tiers["+(idx-1)+"].id.rowNumber");
+								$(hiddens).eq(6).attr("name", "tiers["+(idx-1)+"].id.chargeKey");
+						});
+						var length = tableTier.fnGetNodes().length;
+						if ((length == 1) &&($("#masterTieringType").val()=="CHARGE_CALCULATION-S")) {
+							$('#save').button("option","disabled",false);
+							$("#errmsgTierValueNull").html("");
+						}
+						$("#dialog-message-1").dialog("close");
+						
+					},
+					"No ": function() {
+						$("#dialog-message-1").dialog("close");
+					}	
+				}
+			});
+			$('#dialog-message-1').css('overflow','hidden');
+			$("#dialog-message-1").dialog('open'); */
+			
+			messageAlertYesNo("Are you sure to delete data ?", "ui-icon ui-icon-notice", "Confirmation Message", deleteChargeTier, closeDialog);
+		});
+		
+		//==== DEFINE DETAIL TIER AS DIALOG ====//
+		$( "#detailTier" ).dialog({
+			autoOpen:false,
+			modal:true,
+			heigth:'600px',
+			width:'465px',
+			resizable:false
+		});
+
+		// ====== EVENT ADD TIER INTO GRID ======//
+		$('#addTier').die("click");
+		$('#addTier').live("click", function(){
+			var table = $('#listTier #gridTier').dataTable();
+			var oldMax =  parseFloat($('#detailTier #tierForm #oldMaxRange').val());
+			var newMax =  parseFloat($('#detailTier #tierForm #newMaxRange').val());
+			var maxTier = $("#detailTier #tierForm #tierMaximumRangeStripped").val();
+			var rowPosition = $("#detailTier #tierForm #rowPosition").val();
+			if((maxTier==null) || (maxTier=="") || (maxTier=="MAX" )) {
+				maxTier="MAX";
+			} 
+
+				if ($('#tierForm #tierValue').hasClass('fieldError')){
+					return false;
+				}
+				
+				if ($('#tierForm #tierMaximumRange').attr('disabled')) {
+					if($('#tierForm #taxCode').val() == '') {
+						$('#detailTier').dialog('close');
+						$('#taxCodeMaster').focus();
+						$('#errmsgTax').html('Fill tax code here !');
+						return false;
+					}
+					if ($('#tierForm #tierValue').val() == '') {
+						$('#errmsgTier').html('Required');
+						return false;
+					}
+				} else {
+					if($('#tierForm #taxCode').val() == ''){
+						$('#detailTier').dialog('close');
+						$('#taxCodeMaster').focus();
+						$('#errmsgTax').html('Fill tax code here !');
+						return false;
+					}
+					
+					if (($('#tierForm #tierMaximumRange').val()=='')&&($('#tierForm #tierValue').val() == '')){
+						$('#errmsgTierMax').html('Required');
+						$('#errmsgTier').html('Required');
+						return false;
+					}
+					
+					if (($('#tierForm #tierMaximumRange').val()=='')){
+						$('#errmsgTierMax').html('Required');
+						return false;
+					} else {
+						$('#errmsgTierMax').html('');
+					}
+					if (($('#tierForm #tierValue').val() == '')){
+						$('#errmsgTier').html('Required');
+						return false;
+					} else {
+						$('#errmsgTier').html('');
+					}
+					
+				}
+				
+				// ADD TIER WHEN DATA ALREADY (EDIT DATA)
+				var dataTier = table.fnGetData(parseFloat(rowPosition));
+				if (rowPosition != "") {
+					var found = false;
+					var rows = table.fnGetNodes().length;
+					for (i=0; i<rows; i++) {
+						var cells = table.fnGetData(i);
+							if (maxTier != "MAX") {
+								$('#maxValidation').autoNumericSet(cells.tierMaximumRange, {aPad:true,mDec:2}).val();
+								if (((maxTier == cells.tierMaximumRange) || (maxTier == $('#maxValidation').autoNumericGet()) )&& (oldMax != newMax)) {
+									$("#detailTier #tierForm #tierMaximumRange").addClass('fieldError');
+									$('#errmsgTierMax').html("Tier Maximum already exist!");
+									found = true;
+									return false;
+									break;
+								} else {
+									$("#detailTier #tierForm #tierMaximumRange").removeClass('fieldError');
+									$('#errmsgTierMax').html("");
+								}
+							}
+					}
+					if (!found){
+						if(($("#detailTier #tierForm #tierMaximumRange").val()==null) || ($("#detailTier #tierForm #tierMaximumRange").val()=='') || 
+								($("#detailTier #tierForm #tierMaximumRange").val()=="MAX")) {
+							table.fnUpdate(dataTier.tierMaximumRange = "MAX" , parseFloat(rowPosition),2);
+						} else {
+							table.fnUpdate(dataTier.tierMaximumRange = $("#detailTier #tierForm #tierMaximumRangeStripped").val(), parseFloat(rowPosition),0);
+							table.fnUpdate(dataTier.tierMaximumRange = $("#detailTier #tierForm #tierMaximumRangeStripped").val(), parseFloat(rowPosition),2);
+						}
+						
+						if (dataTier.taxMaster == null){
+							dataTier.taxMaster = new Object();
+						}
+					
+						table.fnUpdate(((dataTier.taxMaster.taxCode = $('#detailTier #tierForm #taxCode').val())&&(dataTier.taxMaster.taxKey = $('#detailTier #tierForm #taxKey').val())
+								&&(dataTier.taxMaster.description=$('#detailTier #tierForm #taxName').val())),parseFloat(rowPosition),3);
+						table.fnUpdate(dataTier.tierValue = $('#detailTier #tierForm #tierValueStripped').val(),parseFloat(rowPosition),4);
+						#{if flash.error || errors}
+							var dataTier = new Object();
+							dataTier.id = new Object();
+						#{/if}
+						dataTier.id.rowNumber = $('#detailTier #tierForm #rowNumber').val();
+						dataTier.id.chargeKey = $('#detailTier #tierForm #chargeKey').val();
+						$('#errmsgTierValueNull').html('');
+						$('#errTierValueNull').html('');
+						$('#detailTier').dialog('close');
+					}
+				} else {
+					
+					// ADD TIER WHEN DATA EMPTY (NEW DATA)
+					var found = false;
+					var rows = table.fnGetNodes().length;
+					for (i = 0; i < rows; i++) {
+						var cells = table.fnGetData(i);
+							if ((maxTier == cells.tierMaximumRange)) {
+								$("#detailTier #tierForm #tierMaximumRange").addClass('fieldError');
+								$('#errmsgTierMax').html("Tier Maximum already exist!");
+								found = true;
+								break;
+							} else {
+								$("#detailTier #tierForm #tierMaximumRange").removeClass('fieldError');
+								$('#errmsgTierMax').html("");
+							}	
+					}
+					if (!found) {
+						var dataTier = new Object();
+						dataTier.id = new Object();
+						dataTier.taxMaster = new Object();
+						dataTier.id.rowNumber = $('#detailTier #tierForm #rowNumber').val();
+						dataTier.tierMaximumRange = $("#detailTier #tierForm #tierMaximumRangeStripped").val();
+						dataTier.tierValue = $('#detailTier #tierForm #tierValueStripped').val();
+						dataTier.taxMaster.taxCode = $('#detailTier #tierForm #taxCode').val();
+						dataTier.taxMaster.taxKey = $('#detailTier #tierForm #taxKey').val();
+						dataTier.taxMaster.description = $('#detailTier #tierForm #taxName').val();
+						dataTier.id.chargeKey = $('#detailTier #tierForm #chargeKey').val();
+						table.fnAddData(dataTier);
+						$('#detailTier').dialog('close');
+					}
+				}
+				
+				return false;
+		});
+		
+		// ========ACTION BUTTON NEW DATA FOR TIER======================// 
+		$('.buttons #newTierData').click(function() {
+		/*	if ($("#masterTieringType").val() == "CHARGE_CALCULATION-S"){
+				var rowNum = tableTier.fnGetNodes().length;
+				if (rowNum < 1){
+					selectedRow = null;
+					$("#detailTier").dialog('open');
+					$("#detailTier :text").val(""); 
+					$("#detailTier :hidden").val("");
+					$('#tierForm #taxCode').val($('#taxCodeMaster').val());
+					$('#tierForm #taxKey').val($('#taxKeyMaster').val());
+					$('#tierForm #taxName').val($('#taxNameMaster').val());
+					return false;
+				}else {
+					alert("Can't add new data, cause Tiering Type = Single Value");
+					return false;
+				}
+			} else {*/
+			var checktierValueNull = false;
+			var data = tableTier.fnGetData(0);
+			
+			if(data.tierValue == null) {
+				checktierValueNull = true;
+			}
+			
+				$('#errmsgTierValueNull').html('');
+				if ('${mode}'=='entry') {
+					//if ($("#detailTier #tierForm #tierValue").val() == ''){
+					if (checktierValueNull) {
+						$('#errTierValueNull').html('Click grid "MAX" and fill "Tier Value" into grid before add New Data !')
+						return false;	
+					}
+				} else {
+					if ($("#masterValueType").val() == 'CHARGE_VALUE-P'){
+						//if ($("#detailTier #tierForm #tierValue").val() == ''){
+						if (checktierValueNull) {
+							$('#errTierValueNull').html('Click grid "MAX" and fill "Tier Value" into grid before add New Data !')
+							return false;	
+						}	
+					}
+				}
+				$('#errTierValueNull').html('');	
+				$('#tierMaximumRange').removeClass('fieldError');
+				$('#tierForm #tierMaximumRange').attr('disabled', false);
+				selectedRow = null;
+				$("#detailTier").dialog('open');
+				$("#detailTier :text").val(""); 
+				$("#detailTier :hidden").val(""); 
+				$('#tierForm #taxCode').val($('#taxCodeMaster').val());
+				$('#tierForm #taxKey').val($('#taxKeyMaster').val());
+				$('#tierForm #taxName').val($('#taxNameMaster').val());
+				$('#detailTier #tierForm #errmsgTierMax').html('');
+				$('#detailTier #tierForm #errmsgTier').html('');
+				$("#detailTier #tierForm #tierValue").removeClass('fieldError');
+				$('.ui-widget-overlay').css('height',$('body').height());
+				return false;
+//			}
+		});
+
+	});
+	
+	function isNumberKey(evt)
+    {
+       var charCode = (evt.which) ? evt.which : event.keyCode
+       if (charCode > 31 && (charCode < 48 || charCode > 57)){
+          return false;
+       }
+       return true;
+    }
+	
+	function setMandatory(){
+		if ($("#masterChargeType").val() == "CHARGE_TYPE-M") {
+			$('li[id=mandatoryManual1] label span').html(' ');
+			$('li[id=mandatoryManual2] label span').html(' ');
+			$('li[id=mandatoryManual3] label span').html(' ');
+		} else { 
+			$('li[id=mandatoryManual1] label span').html(' *');
+			$('li[id=mandatoryManual2] label span').html(' *');
+			$('li[id=mandatoryManual3] label span').html(' *');
+		}
+	}
+	
+	function changeTaxGrid(){
+		var table = $('#listTier #gridTier').dataTable();
+		var rows = table.fnGetNodes().length;
+		for (i=0; i<rows; i++) {
+			var dataTier = table.fnGetData(parseFloat(i));
+			var cells = table.fnGetData(i);
+			if(dataTier.taxMaster.taxCode != '' && dataTier.taxMaster.taxCode != null){
+				table.fnUpdate(dataTier.taxMaster.taxCode = $('#taxCodeMaster').val(), parseFloat(i), 3);
+				dataTier.taxMaster.taxKey = $('#taxKeyMaster').val();
+				dataTier.taxMaster.taxCode = $('#taxCodeMaster').val();
+				dataTier.taxMaster.description = $('#taxNameMaster').val();
+				table.fnUpdate(dataTier, parseFloat(i), 3);
+			}
+		}
+	}
+	
+	//===========================================================//
+	
+	// =============== FUNCTION TIER ==========================//
+	function tabTier(data) {
+		var detailTiers;
+		#{if '${detailTiers}' != null }
+			detailTiers = ${detailTiers.raw()};
+		#{/if}
+		#{if '${detailTiers}' == null }
+			detailTiers = new Array();
+		#{/if}
+		
+		//======== TABLE CHARGE TIER ==============//
+		tableTier = $('#chargeMasterForm #listTier #gridTier').dataTable({
+			aaData: detailTiers,
+			aoColumns:[ 
+						{
+							bVisible:false,
+							sDefaultContent: "9999999999999999999999999999999999",
+							sType : "numeric",
+							fnRender: function(obj) {
+								var controls;
+									controls =  obj.aData.tierMaximumRange;
+								return controls;
+							}
+						},
+			            {
+							bVisible:false,
+							fnRender: function(obj){
+								var controls;
+								if (obj.aData.id !=null) {
+									controls = obj.aData.id.rowNumber;
+//									controls += '<input type="hidden" name="tiers[' + obj.iDataRow + '].id.rowNumber" value="' + obj.aData.id.rowNumber + '" />';
+//									controls += '<input type="hidden" name="tiers[' + obj.iDataRow + '].id.chargeKey" value="' + obj.aData.id.chargeKey + '" />';
+								} else {
+									controls = '';
+								}
+								return controls;
+							}
+						},
+						{
+							sDefaultContent: "MAX",
+							//sClass: 'numeric',
+							fnRender: function(obj) {
+								var controls;
+								if ((obj.aData.tierMaximumRange == null) || (obj.aData.tierMaximumRange == "")|| (obj.aData.tierMaximumRange == "MAX")){
+								//	controls = obj.aData.tierMaximumRange;
+									controls =  "MAX";
+									controls += '<input type="hidden" name="tiers[' + obj.iDataRow + '].tierMaximumRange" value="" />';
+			            		} else {
+			            			controls = $('#dummy').autoNumericSet(obj.aData.tierMaximumRange, {aPad:true,mDec:2}).val();
+			            			controls += '<input type="hidden" name="tiers[' + obj.iDataRow + '].tierMaximumRange" value="' + obj.aData.tierMaximumRange + '" />';
+			            		}
+								return controls; 
+							}
+						},
+						{
+							fnRender: function(obj) {
+								var controls;
+								controls = obj.aData.taxMaster.taxCode;
+								controls += '<input type="hidden" name="tiers[' + obj.iDataRow + '].taxMaster.taxCode" value="' + obj.aData.taxMaster.taxCode + '" />';
+								controls += '<input type="hidden" name="tiers[' + obj.iDataRow + '].taxMaster.taxKey" value="' + obj.aData.taxMaster.taxKey + '" />';
+								controls += '<input type="hidden" name="tiers[' + obj.iDataRow + '].taxMaster.description" value="' + obj.aData.taxMaster.description + '" />';
+								return controls;
+							}
+						},
+						{
+							sClass: 'numeric',
+							fnRender: function(obj) {
+								var controls;
+								if ((obj.aData.tierValue == null) || (obj.aData.tierValue == "")){
+			            			controls =  obj.aData.tierValue;
+			            			
+			            			// ada kondisi 0 masuk ke sini
+			            			controls += '<input type="hidden" name="tiers[' + obj.iDataRow + '].tierValue" value="' + obj.aData.tierValue + '" />';
+			            		} else {
+			            			//controls = $('#dummy').autoNumericSet(obj.aData.tierValue, {aPad:true,mDec:2}).val();
+			            			controls = obj.aData.tierValue;
+			            			controls += '<input type="hidden" name="tiers[' + obj.iDataRow + '].tierValue" value="' + obj.aData.tierValue + '" />';
+			            		}
+								return controls;
+							}
+						},
+						{
+							 fnRender: function(obj) {
+						 		if ((obj.aData.tierMaximumRange == null) || (obj.aData.tierMaximumRange == "") || (obj.aData.tierMaximumRange == "MAX")) {
+						 			var controls = '';
+						 			controls += '<input type="hidden" name="tiers[' + obj.iDataRow + '].id.rowNumber" value="' + obj.aData.id.rowNumber + '" />';
+									controls += '<input type="hidden" name="tiers[' + obj.iDataRow + '].id.chargeKey" value="' + obj.aData.id.chargeKey + '" />';
+									return controls;
+						 		} else {
+						 			var controls = '<center><input id="deleteButton" type="button" value="Delete" #{if readOnly}disabled="disabled"#{/if} /></center>';
+						 			controls += '<input type="hidden" name="tiers[' + obj.iDataRow + '].id.rowNumber" value="' + obj.aData.id.rowNumber + '" />';
+									controls += '<input type="hidden" name="tiers[' + obj.iDataRow + '].id.chargeKey" value="' + obj.aData.id.chargeKey + '" />';
+									return controls;
+					 			}
+						  }
+					  }
+					],
+					aaSorting:[[0,'asc']],
+		        	bAutoWidth: false,		
+		        	bDestroy: true,
+		        	bFilter: false,
+		        	bInfo: false,
+		        	//bRetrieve:true,
+		        	//bServerSide: true,
+		        	bJQueryUI: true,
+		        	bPaginate: false,
+		        	bSearch: false,
+		        	bLengthChange: false   			
+		});
+		
+		// ==================== END TABLE TIER =================================//
+		
+		// ===== EVENT EDIT TIER ==========//
+		$('#listTier #gridTier ').removeAttr('style');
+		$('#listTier #gridTier tbody tr td').die('click');
+		$('#listTier #gridTier tbody tr td').live('click', function(){
+			$('#tierMaximumRange').removeClass('fieldError');
+			$('#errTierValueNull').html('');
+			var rowPos = $(this).parents('tr');
+			var rowPosNumber = tableTier.fnGetPosition(rowPos[0]);
+			var pos = tableTier.fnGetPosition(this);
+			cell = tableTier.fnGetData(this.parentNode);
+			if (pos[1] != 3) {
+				
+				dataTier = tableTier.fnGetData(this.parentNode);
+//				if ((dataTier.tierMaximumRange == null) || (dataTier.tierMaximumRange == "") || (dataTier.tierMaximumRange == "MAX")){
+//					$('#detailTier #tierForm #tierMaximumRange').attr("disabled","disabled");
+//					$('#detailTier #tierForm #tierMaximumRange').val("MAX");
+					
+//				} else {
+//				}
+				$('#detailTier #tierForm #rowPosition').val(rowPosNumber);
+					#{if flash.error || errors}
+						$('#detailTier #tierForm #rowNumber').val('0');
+						$('#detailTier #tierForm #chargeKey').val('');
+					#{/if}
+					#{else}
+						$('#detailTier #tierForm #rowNumber').val(dataTier.id.rowNumber);
+						$('#detailTier #tierForm #chargeKey').val(dataTier.id.chargeKey);
+					#{/else}	
+				if ((dataTier.tierMaximumRange == null) || (dataTier.tierMaximumRange == "") || (dataTier.tierMaximumRange == "MAX")){
+					$('#detailTier #tierForm #tierMaximumRange').val("MAX");
+					$('#detailTier #tierForm #tierMaximumRange').attr("disabled","disabled");
+				} else {
+					$('#detailTier #tierForm #tierMaximumRange').autoNumericSet(dataTier.tierMaximumRange, {aPad:true,mDec:2}).val();
+					$('#detailTier #tierForm #tierMaximumRange').attr("disabled", false);
+					#{if (confirming) || mode=='view' }
+						$('#detailTier #tierForm #tierMaximumRange').attr("disabled","disabled");
+					#{/if}
+				}
+				$('#detailTier #tierForm #taxKey').val($("#taxKeyMaster").val());
+				$('#detailTier #tierForm #taxCode').val($("#taxCodeMaster").val());
+				$('#detailTier #tierForm #taxName').val($("#taxNameMaster").val());
+				
+				if ((dataTier.tierValue == null) || (dataTier.tierValue == "")){
+					$('#detailTier #tierForm #tierValue').val(dataTier.tierValue);
+				} else {
+				//	$("#detailTier #tierForm #tierValue").autoNumericSet( dataTier.tierValue, {aPad:true,mDec:2}).val();
+					$('#detailTier #tierForm #tierValue').val(dataTier.tierValue);
+				}
+				$("#detailTier #tierForm #tierValueStripped").val(dataTier.tierValue);
+				$("#detailTier #tierForm #tierMaximumRangeStripped").val(dataTier.tierMaximumRange);
+				$('#detailTier #tierForm #oldMaxRange').val($('#detailTier #tierForm #tierMaximumRangeStripped').val());
+				$('#detailTier #tierForm #newMaxRange').val($('#detailTier #tierForm #oldMaxRange').val());
+				$('#detailTier #tierForm #errmsgTierMax').html('');
+				$('#detailTier #tierForm #errmsgTier').html('');
+				$("#detailTier #tierForm #tierValue").removeClass('fieldError');
+				$("#detailTier").dialog('open');
+				$('.ui-widget-overlay').css('height',$('body').height());
+			}
+		});		
+	}		
+	
+		function doSave() {	
+			$("#masterChargeFrequencyHidden").val($("#masterChargeFrequency").val());
+	    	$("#masterBaseCalculationFieldHidden").val($("#masterBaseCalculationField").val());
+	    	
+	    	#{ifnot flash.error || errors}
+			if ('${mode}'=='entry'){
+				var length = $('#listTier #gridTier').dataTable().fnGetNodes().length;
+				if (length == 1) {
+					if ($('#detailTier #tierForm #tierValue').val()==''){
+						$("#errmsgTierValueNull").html("*Error saving! Make sure Tier Value in Tier Maximum Range 'MAX' is not empty");
+						return false;
+					}
+				}
+			} else {
+				if ($("#masterValueType").val()=='CHARGE_VALUE-P'){
+					if (($("input[name='tiers[0].tierValue']").val() == '')){
+						$("#errmsgTierValueNull").html("*Error saving! Make sure Tier Value in Tier Maximum Range 'MAX' is not empty");
+						return false;
+					}
+				}
+			}
+			#{/ifnot}
+
+			var lengthPeriod = $("#gridPeriods").dataTable().fnGetNodes().length;
+
+			// validate if grid period have error 
+	    	if($('#gridPeriods tbody tr #periodRow').val() == ""){
+	    		$("#periodRow").addClass('fieldError');
+	    		$('#tabsTier').tabs("select","#periods");
+	    		$("#periodRow").focus();
+	    		return false;
+	    	}
+			
+			//validate if error found into tab period
+	    	else if ($("#gridPeriods tbody tr").find("input[id*='periodRow']").hasClass('fieldError')){
+	    		$(this).focus();
+	    		return false;
+	    	}
+	    	
+	    	else if ($("#safekeepingFee").css("display") != 'none'){
+				if (($('#nPeriod').val()=='')&&($("#methodSkfee").val()=='METHOD_SKFEE-H')){
+					$('#nPeriod').addClass('fieldError');
+					$('#errmsgNull').html("Required");
+					$('#nPeriod').focus();
+					return false;
+				}
+				
+				// validate if grid period null
+				if ($("#enablePeriod").css("display") != 'none') {
+					if (($("#nPeriod").val() != '')&&(lengthPeriod == 0)){
+			    		$("#errmsgTierValueNull").html("Error saving! Periods in tab 'Days' is empty");
+			    		$('#tabsTier').tabs("select","#periods");
+			    		return false;
+			    	}
+				}
+				
+			}
+	        
+			else if ($('#masterMaximumValue').hasClass('fieldError')){
+				$('#masterMaximumValue').focus();
+				return false;
+				
+			}
+			else if ( $('#masterMaximumValueStripped').val() == '') {
+					return true;
+			}
+	    	
+	    	return true; 
+		} 
+
+</script>
+<style type="text/css">
+  #errmsg { color:red; }
+  #errmsgPeriod { color:red; }
+  #errmsgNull { color:red; }
+    #errmsgTax {color:red; }
+   #errmsgTierValueNull {color:red; }
+</style>
+
+#{include 'ChargeMasters/detailForm.html' /}

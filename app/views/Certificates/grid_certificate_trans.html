@@ -1,0 +1,57 @@
+#{hidden id:'rowNumber' /}
+<table id="gridCertificateTrans" class="display">
+	<thead>
+		<tr>
+			<th>Transaction No</th>
+			<th>Holding Ref</th>
+			<th>Description</th>
+			<th>Quantity</th>
+			<th>Status</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list certificate?.listTransactions, as:'transaction'}
+		<tr>
+			<td>
+				${transaction?.transactionNumber}
+				#{hidden id:'transactionNo', name:'listTransactions[' + (transaction_index-1) + '].transactionNumber', value:transaction?.transactionNumber /}
+			</td>
+			<td>
+				${transaction?.holdingRefs}
+				#{textBox id:'holdingRefs', name:'listTransactions[' + (transaction_index-1) + '].holdingRefs', value:transaction?.holdingRefs /}
+			</td>
+			<td>
+				${transaction?.description}
+				#{hidden id:'description', name:'listTransactions[' + (transaction_index-1) + '].description', value:transaction?.description /}
+			</td>
+			<td>
+				${transaction?.quantity}
+				#{hidden id:'quantity', name:'listTransactions[' + (transaction_index-1) + '].quantity', value:transaction?.quantity /}
+			</td>
+			<td>
+				${transaction?.transactionStatus}
+				#{hidden id:'transactionStatus', name:'listTransactions[' + (transaction_index-1) + '].transactionStatus', value:transaction?.transactionStatus /}
+			</td>
+			<td>
+				<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} /></center>
+				#{hidden id:'accountNo', name:'listTransactions[' + (transaction_index-1) + '].account.accountNo', value:transaction?.account?.accountNo /}
+				#{hidden id:'accountKey', name:'listTransactions[' + (transaction_index-1) + '].account.custodyAccountKey', value:transaction?.account?.custodyAccountKey /}
+				#{hidden id:'accountDesc', name:'listTransactions[' + (transaction_index-1) + '].account.name', value:transaction?.account?.name /}
+				#{hidden id:'securityKey', name:'listTransactions[' + (transaction_index-1) + '].security.securityKey', value:transaction?.security?.securityKey /}
+				#{hidden id:'securityCode', name:'listTransactions[' + (transaction_index-1) + '].security.securityId', value:transaction?.security?.securityId /}
+				#{hidden id:'securityDesc', name:'listTransactions[' + (transaction_index-1) + '].security.description', value:transaction?.security?.description /}
+				#{hidden id:'securityType', name:'listTransactions[' + (transaction_index-1) + '].security.securityType.securityType', value:transaction?.security?.securityType?.securityType /}
+				#{hidden id:'price', name:'listTransactions[' + (transaction_index-1) + '].price', value:transaction?.price /}
+				#{hidden id:'transactionKey', name:'listTransactions[' + (transaction_index-1) + '].transactionKey', value:transaction?.transactionKey /}
+				#{hidden id:'transactionCode', name:'listTransactions[' + (transaction_index-1) + '].transactionTemplate.transactionCode', value:transaction?.transactionTemplate?.transactionCode /}
+				#{hidden id:'transactionDescription', name:'listTransactions[' + (transaction_index-1) + '].transactionTemplate.description', value:transaction?.transactionTemplate?.description /}			 	
+				#{hidden id:'transactionTemplateKey', name:'listTransactions[' + (transaction_index-1) + '].transactionTemplate.transactionTemplateKey', value:transaction?.transactionTemplate?.transactionTemplateKey /}			 	
+				#{hidden id:'amount', name:'listTransactions[' + (transaction_index-1) + '].amount', value:transaction?.amount /}		
+				#{hidden id:'settlementAmount', name:'listTransactions[' + (transaction_index-1) + '].settlementAmount', value:transaction?.settlementAmount /}	 	
+							 	
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>

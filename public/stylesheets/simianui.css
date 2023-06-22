@@ -1,0 +1,117 @@
+.parent {
+	width: 100%;
+}
+
+.label {
+	text-align: left;
+	width: 175px;
+	height: 25px;
+	display: inline-block;
+	font-weight: bold;
+	font-size:small;
+}
+
+.validation {
+	text-align: left;
+	display: inline-block;
+	font-weight: bold;
+	font-size:small;
+}
+
+.disabled{
+	color:rgb(107,107,107);
+}
+
+.enabled{
+	color:rgb(0,0,0);
+}
+
+.form{
+	font-size:small;
+}
+
+.view{
+	font-size:small;
+}
+
+.fillere{
+	width: 175px;
+	height: 30px;
+}
+.fillerp{
+	width: 175px;
+	height: 30px;
+}
+
+.name {
+	width: 100px;
+	height: 30px;
+}
+.age {
+	width: 100px;
+	height: 30px;
+}
+.comment {
+	width: 100px;
+	height: 85px;
+}
+.agama {
+	width: 100px;
+	height: 30px;
+}
+.transDate {
+	width: 100px;
+	height: 30px;
+}
+.active {
+	width: 100px;
+	height: 30px;
+}
+.music {
+	width: 100px;
+	height: 30px;
+}
+.sex {
+	width: 100px;
+	height: 30px;
+}
+.profesi {
+	width: 100px;
+	height: 30px;
+}
+.bankName {
+	width: 100px;
+	height: 30px;
+}
+.accountNumber {
+	width: 100px;
+	height: 30px;
+}
+
+.save {
+	width: 100px;
+	height: 30px;
+	display: inline-block;
+}
+
+.cancel {
+	width: 100px;
+	height: 25px;
+	display: inline-block;
+}
+
+.new {
+	width: 100px;
+	height: 30px;
+	display: inline-block;
+}
+
+.back {
+	width: 100px;
+	height: 30px;
+	display: inline-block;
+}
+
+
+
+	

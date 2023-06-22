@@ -1,0 +1,115 @@
+function UnitRegistry(html) {
+	if (this instanceof UnitRegistry) {
+
+/* =========================================================================== 
+ * GUI Variable
+ * ========================================================================= */
+		var TRADETYPE_SUBSCRIBE = "Subscribe";
+		var TRADETYPE_REDEEM = "Redeem";
+		var TYPE_SWITCHING = "Switching";		
+		//var TRADETYPE_FUND_ACTION = "FundAction";
+		var TYPE_DIVIDEND = "Dividend";
+		
+		var rg = html.inject(this);
+		
+		var closeDialogMessage = function() {
+			$("#dialog-message").dialog("close");
+		};
+		
+/* =========================================================================== 
+ * Method
+ * ========================================================================= */		
+		function isDividend() {
+			return (rg.type.val() == TYPE_DIVIDEND);
+		}
+		
+		function isSwiching() {
+			return (rg.type.val() == TYPE_SWITCHING);
+		}
+		
+		function changeTransactionLabel() {
+			if (isDividend()) {
+				$("label", rg.transactionNoP).html("Dividend No");
+			} else if (isSwiching()){
+				$("label", rg.transactionNoP).html("Switching No");
+			}else{
+				$("label", rg.transactionNoP).html("Transaction No");
+			}			
+		};
+		
+		function isSelected(tradeKey) {
+			var tradeKeys = rg.remark.val().split(",");
+			var idx = jQuery.inArray(tradeKey, tradeKeys);
+			return idx != -1;
+		}
+		
+		function checkbox(row, checked) {
+			var td = $("tbody", rg.tblTransaction).children().eq(row).children().eq(0);
+			if (checked) {
+				$("input", td).attr("checked", "checked");	
+			}else{
+				$("input", td).removeAttr("checked");	
+			}
+		}
+		
+/* =========================================================================== 
+ * Event
+ * ========================================================================= */
+
+		html.clazz('calendar').datepicker();
+		
+		rg.fundCode.popupProduct("tradeDate");
+		
+		$("option", rg.type).eq(0).remove();
+
+		rg.type.change(function(){
+			changeTransactionLabel();
+			$('#tblTransaction').dataTable().fnClearTable();
+			$('#tblTransaction').css('width', '');
+		});
+
+		rg.btnNext.click(function(){
+			if ((rg.fundCode.isEmpty()) || (rg.tradeDate.isEmpty())){
+				if (rg.fundCode.isEmpty()){
+					$('#fundCodeError').html('Required');
+				}
+				
+				if (rg.tradeDate.isEmpty()){
+					$('#tradeDateError').html('Required');
+				}
+				
+				return false;
+			}
+			
+			rg.remark.val("");
+			rg.selected.val("");
+			rg.inquiryUnitRegistryForm.attr('action', 'showTransaction');
+			rg.inquiryUnitRegistryForm.submit();			
+		});
+		
+		rg.btnClear.click(function(){
+			location.href='@{InquiryUnitRegistry.list()}';
+			return false;
+		});
+
+		
+		$("tbody tr", rg.tblTransaction).live('click',function(){
+//			$(this).live('click', function(){
+				var url = $(this).attr("url");
+				rg.inquiryUnitRegistryForm.attr("action", url);
+				rg.inquiryUnitRegistryForm.submit();
+//			});
+		});
+
+	//	$("tbody tr", rg.tblTransaction).live('click',function() {alert('test')});
+		$("tbody tr", rg.tblTransaction).each(function(idx, obj){
+			var tradeKey = $(this).attr("tradeKey");
+			if (tradeKey) checkbox(idx, isSelected(tradeKey));
+		});
+		
+		changeTransactionLabel();
+	}else{
+		return new UnitRegistry(html);
+	}
+}
+	

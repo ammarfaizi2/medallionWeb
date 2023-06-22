@@ -1,0 +1,138 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: ' ' /}
+#{set fixData: true /}
+#{set mode: mode /}
+#{script 'lookuppaging.js' /}
+#{script 'lookups.js' /}
+
+<script type="text/javascript">
+	function doEdit(data) {
+		return false;
+	}
+</script>
+<!-- <style type="text/css">
+div#tblBillingDetail_wrapper .ui-widget-header {width:2490px;}
+</style> -->
+
+
+<div id="root">
+	<h3><a href="#">Payment Invoice</a></h3>
+	<form id="searchForm" class="form">
+		<input id="param" name="params.param" type="hidden" value="${param}"/>
+		<div id="tabs">
+		#{hidden id:'query', name:'param.query', value:param?.query /}
+		#{hidden id:'billingMessage', name:'param.message', value:param?.message/}
+		#{hidden id:'filter', name:'param.filter', value:param?.filter/}
+		#{hidden id:'billingKeys', name:'param.billingKeys', value:param?.billingKeys/}
+		
+		<p>
+			#{textBox id:'hidAppDate', value:param?.invDate?.format(appProp.dateFormat) /}
+			#{textBox id:'paymentDate', label:'Payment Date', name:'param.invDate', value:param?.invDate?.format(appProp.dateFormat), class:'calendar', required:'true', readOnly:readOnly /}
+			<span id="paymentDateErr" class="error">#{error 'Payment Date' /}</span>
+		</p>
+		
+		<p id="pcustomerType">
+			#{textBox id:'customer', label:'Customer Code',name:'param.customer', value:param?.customer, class:'capitalize' /}
+			#{hidden id:'customerKey', name:'param.customerKey', value:param?.customerKey/}
+			#{button id:'customerHelp', value:'?', class:'small' /}
+			#{textBox id:'customerDesc', name:'param.customerDesc', value:param?.customerDesc, readOnly:true, width:'222px' /}
+			<span id="customerErr" class="error">#{error 'Customer' /}</span>	
+		</p>
+		
+		<p>
+			#{textBox id:'invMonth', label:'Invoice Month / Year',name:'param.invMonth', value:param?.invMonth, width:'85px', maxLength:2, size:2, class:'numberOnly' /}
+			<span id="invMonthErr" class="error">#{error 'Invoice Month' /}</span>
+			<label style="width:5px">/</label>
+			#{textBox id:'invYear', name:'param.invYear', value:param?.invYear, width:'85px', maxLength:4, size:4, class:'numberOnly', required:'true' /}
+			<span id="invYearErr" class="error">#{error 'Invoice Month' /}</span>
+			
+		</p>
+		<p>
+			<div class="buttons">
+				<input type="button" id="search" value="Search" />
+			</div>
+		</p>
+		</div>
+	</form>
+</div>
+
+<div id="result" style="display:block">
+	<table id="tblBilling" class="display">
+		<thead>
+			<tr>
+				<th width="1px" align="left" field="component|checkbox|none|center|nosort"><input name="chkRow" type="checkbox" ></th>
+				<th width="150px" field="invoiceNo|string|none|left|sort">Invoice&nbsp;No</th>
+				<th width="150px" field="customerNo|string|none|left|sort">Customer&nbsp;Code</th>
+				<th width="200px" field="customerName|string|none|left|sort">Name</th>
+				<th width="100px" field="period|string|none|left|sort">Period</th>
+				<th width="100px" field="totBillAmount|number|decimal2|left|sort">Total&nbsp;Amount</th>
+				<th width="100px" field="invoiceDate|date|date|center|sort">Invoice&nbsp;Date</th>
+				<th width="100px" field="dueDate|date|date|center|sort">Due&nbsp;Date</th>
+			</tr>
+		</thead>
+	</table>
+	<div class="buttons">
+		<input type="button" id="btnGenerate" value="Process" />
+		<input type="button" id="reset" value="Reset" />
+	</div>
+</div>
+
+
+
+
+<div id="popupDetail" class="form">
+	#{hidden id:'billingKey'/}
+	<p>
+		#{textBox id:'popInvoiceNo', label:'Invoice No',readOnly:true/}
+	</p>
+	<p>
+		<label>Customer Code</label>
+		#{textBox id:'popCustomer', readOnly:true/}
+		#{textBox id:'popCustomerDesc', readOnly:true, width:'222px' /}
+	</p>
+	<p>
+		<label>Invoice Month/Year</label>
+		#{textBox id:'popMonth', readOnly:true, width:'50px' /} /
+		#{textBox id:'popYear', readOnly:true, width:'50px' /}
+	</p>
+	<p>
+		#{textBox id:'popInvDate', label:'Invoice Date', class:'calendar',required:'true'/}
+		<span id="popInvDateError" class="error"></span>
+	</p>
+	<p>
+		#{textBox id:'popInvDueDate', label:'Invoice Due Date', class:'calendar',required:'true'/}
+		<span id="popInvDueDateError" class="error"></span>
+	</p>
+	<div>
+		<table id="tblBillingDetail" class="display">
+			<thead>
+				<tr>
+					<th align="left" width="150">Charges Group</th>
+					<th align="right" width="100">Amount</th>
+					<th align="right" width="100">Tax Amount</th>
+					<th align="right" width="100">Amount After Tax</th>
+				</tr>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+	</div>
+	
+	<p>
+		#{textBox id:'popTotAmtAfterTax',align:'right', readOnly:true, label:'Total Amount',width:'150px' /} 
+	</p>
+	<p>
+		<div class="buttons">
+			<input id='btnSave' type="button"  value="Save" ></input>
+			<input id='btnCancel' type="button" value="Cancel" ></input>			
+		</div>
+	</p>
+</div>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'PaymentInvoice/PaymentInvoicePaging.js' /}
+	$(document).ready(function() {
+		PaymentInvoicePaging($("#main"));
+	});
+</script>

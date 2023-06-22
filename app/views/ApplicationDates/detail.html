@@ -1,0 +1,177 @@
+#{extends 'templates/main.html' /}
+#{set id: next?.organization?.organizationId /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+
+<style>
+.holiday a {
+
+	color: red !important;
+}
+
+</style>
+<script type="text/javascript">
+	// LIST HOLIDAYS DECLARATION
+	var holidays = [	// holidays Array declaration 
+               		#{list items:holidays, as:'holiday'}
+                  		#{if holiday_isLast}
+                  			${holiday.id.calendarDate.time}
+                  		#{/if}
+                  		#{else}
+                  			${holiday.id.calendarDate.time},
+                  		#{/else}
+                  	#{/list}
+               ];
+	//=================================
+		
+ 	$(function() {
+ 		
+ 		//$('#lastBussinessDateHide').val($('#lastBussinessDate').val());
+ 		//$('#lastBussinessDateNewHide').val($('#lastBussinessDateNew').val());
+ 		//$('#nextBussinessDateHide').val($('#nextBussinessDate').val());
+ 		//$('#nextBussinessDateNewHide').val($('#nextBussinessDateNew').val());
+ 		
+		$('#tabs').tabs();
+ 		onChangeLastCurrentNext();
+		
+ 		// SAVE BUTTON ACTION
+ 		$('#save').click(function() {
+ 			if (($('#lastBusinessDateNew').val() != "") && ($('#nextBusinessDateNew').val() != "")) {
+ 				submit('@{save()}?mode=${mode}#{if group}&group=${group}#{/}');
+				return false; 			
+ 			} else {
+ 				alert("New Last Date not null & New Next Date not null");
+ 				return false;
+ 			}
+ 	 	});
+ 		//=================================
+		
+ 		// RESET BUTTON ACTION
+ 		$('#reset').click(function() {
+ 			location.href="@{ApplicationDates.edit()}";
+ 	 	});
+ 		//=================================
+ 		
+ 		// CONFIRM BUTTON ACTION
+ 		$('#confirm').click(function() {
+ 			submit('@{confirm()}?mode=${mode}#{if group}&group=${group}#{/}');
+ 	 	});
+ 		//=================================
+ 		
+ 		// BACK BUTTON ACTION
+ 		$('#back').click(function() {
+ 			location.href='@{back(id)}?mode=${mode}#{if group}&group=${group}#{/}';
+			return false;
+ 	 	}); 		
+ 		//=================================
+ 	});
+
+ 	// ON CHANGE CURRENT NEXT FUNCTION
+ 	function onChangeLastCurrentNext(){
+		$("#currentBusinessDateNew").change(function(){	
+			var y = $(this).datepicker( "getDate" );
+			if( y == null ){
+				return;
+			}
+	 		var x = y.getFullYear();
+	 		var right= false;
+			var selectDate = $(this).val();
+			// HOLIDAYS VALIDATION
+			for (i=0;i<holidays.length;i++){
+				if (holidays[i] == y.getTime()) {
+					right= true;
+					break;
+				}
+			}
+			if (!(right)) {
+				$.post('@{onChangeLastDate()}?date='+selectDate+'&year='+x, $('#form').serialize(), function(data) {
+		    		checkRedirect(data);
+					$("#lastBusinessDateNew").val(data.last);
+					$("#h_lastBusinessDateNew").val(data.last);
+					$("#nextBusinessDateNew").val(data.next);
+					$("#h_nextBusinessDateNew").val(data.next);
+				});
+			} else {
+				$("#lastBusinessDateNew").val("");
+				$("#h_lastBusinessDateNew").val("");
+				$("#nextBusinessDateNew").val("");
+				$("#h_nextBusinessDateNew").val("");
+				alert("New Current Date is Holiday");
+				return false;
+			}
+			//=================================
+			//$('#lastBussinessDateHide').val($('#lastBussinessDate').val());
+	 		//$('#lastBussinessDateNewHide').val($('#lastBussinessDateNew').val());
+	 		//$('#nextBussinessDateHide').val($('#nextBussinessDate').val());
+	 		//$('#nextBussinessDateNewHide').val($('#nextBussinessDateNew').val());			
+		})
+ 	}
+ 	//=================================
+	
+ 	// SUBMIT FUNCTION
+ 	function submit(action, id) {
+		var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Sending data to server ...</div>').appendTo('body');
+		loading.dialog({
+			closeOnEscape: false,
+			draggable: false,
+			modal: true,
+			resizable: false,
+			open:function() {
+				$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+			} 
+		});
+		$('#form').attr('action', action);
+		$('#form').submit();
+	}
+ 	//=================================
+
+</script>
+
+#{hidden id:'organizationId', name:'next.organization.organizationId', value:next?.organization?.organizationId /}
+
+<form id="form" class="form" method="POST">
+	<div id="tabs">
+		<p>	
+			<label style="width:158px"></label>
+			<label style="width:130px">Current Value</label>
+			<label>New</label>
+		</p>
+		<p>
+			#{textBox id:'lastBusinessDate', name:'current.lastBusinessDate', label:'Last Date', value:current?.lastBusinessDate?.format(appProp.dateFormat), class:'calendar', readOnly:true /}&nbsp;&nbsp;&nbsp;
+			#{textBox id:'lastBusinessDateNew', name:'next.lastBusinessDate', value:next?.lastBusinessDate?.format(appProp.dateFormat), class:'calendar', readOnly:true /}
+			&nbsp;&nbsp;(${appProp.displayDateFormat})
+		</p>
+		<p>
+			#{textBox id:'currentBusinessDate', name:'current.currentBusinessDate', label:'Current Date', value:current?.currentBusinessDate?.format(appProp.dateFormat), class:'calendar', required:true, readOnly:true /}&nbsp;&nbsp;&nbsp;
+			#{textBox id:'currentBusinessDateNew', name:'next.currentBusinessDate', value:next?.currentBusinessDate?.format(appProp.dateFormat), class:'calendar', readOnly:readOnly /}
+			&nbsp;&nbsp;(${appProp.displayDateFormat})
+			<span id="currentBusinessDateNewError" class="error">#{error 'next.currentBusinessDate' /}</span>
+		</p>
+		<p>
+			#{textBox id:'nextBusinessDate', name:'current.nextBusinessDate', label:'Next Date', value:current?.nextBusinessDate?.format(appProp.dateFormat), class:'calendar', readOnly:true /}&nbsp;&nbsp;&nbsp;
+			#{textBox id:'nextBusinessDateNew', name:'next.nextBusinessDate', value:next?.nextBusinessDate?.format(appProp.dateFormat), class:'calendar', readOnly:true /}
+			&nbsp;&nbsp;(${appProp.displayDateFormat})
+		</p>
+		<br />
+	</div>
+</form>
+
+<div class="buttons">
+	#{if !confirming}
+		<button id="save">Save</button>
+		<button id="reset">Reset</button>
+	#{/if}
+	#{if confirming}
+		<button id="confirm">Confirm</button>
+		<button id="back">Back</button>
+	#{/if}	
+</div>
+
+
+
+
+
+
+
+
+
+

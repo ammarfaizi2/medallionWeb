@@ -1,0 +1,194 @@
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{script 'lookups.js' /}
+#{script 'date.js', characterset:'utf-8' /}
+#{script 'transaction.js' /}
+#{if taskId==null}
+	<h2>Deposito Update</h2>
+#{/if}
+#{else}
+	<h2>Deposito Update Approval</h2>
+#{/else}
+#{if flash.error || errors}
+    <div class="error">
+    	<b>Error when saving data!</b><br/><br/>
+    	#{if flash.error}
+<li>${flash.error}</li>
+		#{/if}
+		#{ifErrors}
+			#{errors}
+<li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'Utility/Util.js' /}
+	#{include 'DepositoUpdates/DepositoUpdate.js' /}
+</script>
+
+<style type="text/css">
+  textarea {resize:none; height: 50px;}
+</style>
+
+<form id="depositoUpdateForm" class="form" method="POST">
+#{hidden id:'depositoKey', name:'deposito.depositoKey', value:deposito?.depositoKey /}
+#{hidden id:'paymentFreqMaturity', name:'deposito.interestFrequency.lookupId', value:deposito?.interestFrequency?.lookupId /}
+#{hidden id:'valueTaxAmount', name:'deposito.taxAmount', value:deposito?.taxAmount /}
+#{hidden id:'frequency', name:'deposito.security.frequency.lookupCode', value:deposito?.security?.frequency?.lookupCode /}
+#{hidden id:'frequencyId', name:'deposito.security.frequency.lookupId', value:deposito?.security?.frequency?.lookupId /}
+#{hidden id:'accrualBase', name:'deposito.security.accrualBase.lookupCode', value:deposito?.security?.accrualBase?.lookupCode /}
+#{hidden id:'yearBase', name:'deposito.security.yearBase.lookupCode', value:deposito?.security?.yearBase?.lookupCode /}
+#{hidden id:'totalPaid', name:'deposito.totalPaidSchedule', value:deposito?.totalPaidSchedule /}
+#{hidden id:'classification', name:'deposito.classification.lookupId', value:deposito?.classification?.lookupId /}
+#{hidden id:'pbaTransferMethod', name:'deposito.pbaTransferMethod.lookupId', value:deposito?.pbaTransferMethod?.lookupId /}
+#{hidden id:'pbaAccountNo', name:'deposito.pbaAccountNo', value:deposito?.pbaAccountNo /}
+#{hidden id:'pbaBankCode', name:'deposito.pbaBankCode.thirdPartyKey', value:deposito?.pbaBankCode?.thirdPartyKey /}
+#{hidden id:'pbaBeneficiaryName', name:'deposito.pbaBeneficiaryName', value:deposito?.pbaBeneficiaryName /}
+#{hidden id:'pbaCurrency', name:'deposito.pbaCurrency.currencyCode', value:deposito?.pbaCurrency?.currencyCode /}
+#{hidden id:'pbaDescription', name:'deposito.pbaDescription', value:deposito?.pbaDescription /}
+#{hidden id:'interestAdjust', name:'deposito.interestAdjust', value:deposito?.interestAdjust /}
+#{hidden id:'isScript', name:'deposito.script', value:deposito?.script /}
+#{hidden id:'chargeableTam', name:'deposito.chargeableTam', value:deposito?.chargeableTam /}
+#{hidden id:'externalReference2', name:'deposito.externalReference2', value:deposito?.externalReference2 /}
+<p>
+	#{textBox id:'updateAsOfDate', name:'deposito.updateDate', label:'Update as of', value:deposito?.updateDate?.format(appProp.dateFormat), required:true, class:'calendar', readOnly:readOnly, width:'100px' /}(${appProp.displayDateFormat})
+	<span id="updateAsOfDateError" class="error">#{error 'Update as of is' /}</span>
+</p>
+<br />
+<fieldset>
+<legend><b>Summary</b></legend>
+	<p>
+		#{textBox id:'depositoNo', name:'depositoNo', label:'Deposito No.', value:deposito?.depositoNo, required:false, readOnly:true, width:'165px' /}
+		#{hidden id:'depositoNoHidden', name:'deposito.depositoNo', value:deposito?.depositoNo /}
+		
+		<label style="margin-left: 10px; margin-right: -20px">Placement Date</label>
+		#{textBox id:'placementDate', name:'placementDate', value:deposito?.placementDate?.format(appProp.dateFormat), required:false, class:'calendar', readOnly:true, width:'100px' /}(${appProp.displayDateFormat})
+		#{hidden id:'placementDateHidden', name:'deposito.placementDate', value:deposito?.placementDate?.format(appProp.dateFormat) /}
+	</p>
+	<p>
+		#{textBox id:'accountNo', name:'accountNo', label:'Account No', value:deposito?.account?.accountNo, required:false, class:'capitalize', readOnly:true, width:'165px' /}
+		#{hidden id:"accountNoHidden", name:'deposito.account.accountNo', value:deposito?.account?.accountNo /}
+		#{hidden id:"accountKey", name:'deposito.account.custodyAccountKey', value:deposito?.account?.custodyAccountKey /}
+		#{textBox id:'accountName', name:'deposito.account.name', value:deposito?.account?.name, readOnly:true, width:'350px' /}
+		<span id="accountNoError" class="error">#{error 'Account No is' /}</span> 
+	</p>
+	<p>
+		#{textBox id:'securityType', name:'securityType', label:'Security Type', value:deposito?.security?.securityType?.securityType, readOnly:true, required:false, class:'capitalize', width:'165px' /}
+		#{hidden id:'securityTypeDescHidden', name:'deposito.security.securityType.securityType', value:deposito?.security?.securityType?.securityType /}
+		#{textBox id:'securityTypeDesc', name:'securityTypeDesc', value:deposito?.security?.securityType?.description, readOnly:true, width:'350px' /}
+		#{hidden id:'securityTypeDescHidden', name:'deposito.security.securityType.description', value:deposito?.security?.securityType?.description /}
+		<span class="error">#{error 'Security Type is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'securityId', name:'securityId', label:'Security Code', value:deposito?.security?.securityId, required:false, class:'capitalize', readOnly:true, width:'165px' /}
+		#{hidden id:'securityIdHidden', name:'deposito.security.securityId', value:deposito?.security?.securityId /}
+		#{hidden id:'securityKey', name:'deposito.security.securityKey', value:deposito?.security?.securityKey /}
+		#{textBox id:'securityDesc', name:'securityDesc', value:deposito?.security?.description, readOnly:true, width:'350px' /}
+		#{hidden id:'securityDescHidden', name:'deposito.security.description', value:deposito?.security?.description /}
+		<span class="error">#{error 'Security Code is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'currencyCode', name:'currencyCode', label:'Currency', value:deposito?.security?.currency?.currencyCode, class:'capitalize', readOnly:true, width:'165px' /}
+		#{hidden id:'currencyCodeHidden', name:'deposito.security.currency.currencyCode', value:deposito?.security?.currency?.currencyCode /}
+	</p>
+	<p>
+		#{textBox id:'issuerCode', name:'issuerCode', label:'Issuer Bank', value:deposito?.security?.issuer?.thirdPartyCode,  class:'capitalize', readOnly:true, width:'165px' /}
+		#{hidden id:'issuerCodeHide', name:'deposito.security.issuer.thirdPartyCode', value:deposito?.security?.issuer?.thirdPartyCode /}
+		#{hidden id:'issuerCodeKey', name:'deposito.security.issuer.thirdPartyKey', value:deposito?.security?.issuer?.thirdPartyKey /}
+		#{textBox id:'issuerCodeDesc', name:'issuerCodeDesc', value:deposito?.security?.issuer?.thirdPartyName, class:'capitalize',readOnly:true, width:'350px' /}
+		#{hidden id:'issuerCodeDescHide', name:'deposito.security.issuer.thirdPartyName', value:deposito?.security?.issuer?.thirdPartyName /}
+	</p>
+	<p>
+		#{textBox id:'branchCode', name:'branchCode', label:'Branch', value:deposito?.branchCode,class:'capitalize', required:false, readOnly:true, width:'519px', maxLength:100/}
+		#{hidden id:'branchCodeHidden', name:'deposito.branchCode', value:deposito?.branchCode /}
+		<span class="error">#{error 'Branch is' /}</span>
+	</p>
+	<p id="pNetAmount">
+		#{textBox id:'nominal', label:'Nominal', value:deposito?.amount, format:'#,##0.####', class:'numeric', required:false, readOnly:true /}
+		#{hidden id:'nominalStripped', name:'deposito.amount', value:deposito?.amount /}
+	</p>
+		#{hidden id:'effectiveDateHidden', name:'deposito.effectiveDate', value:deposito?.effectiveDate?.format(appProp.dateFormat) /}
+	<p class="onMaturity">
+		#{textBox id:'effectiveDate', name:'effectiveDate', value:deposito?.effectiveDate?.format(appProp.dateFormat),label:'Effective Date', required:false, class:'calendar', readOnly:true, width:'100px' /}(${appProp.displayDateFormat})
+		
+		<label style="margin-left: 70px; margin-right: -20px">Last Rollover#</label>
+		#{textBox id:'lastRollover', value:deposito?.countLastRollover, class:'numberOnly', required:false, readOnly:true, width:'100px'/}
+		#{hidden id:'lastRolloverStripped', name:'deposito.countLastRollover', value:deposito?.countLastRollover /}
+	</p>
+	<p>
+		#{textBox id:'externalReference', name:'deposito.externalReference', label:'External Reference', value:deposito?.externalReference, maxLength:50, class:'capitalize', readOnly:readOnly, width:'519px' /}
+	</p>
+	
+	
+	
+</fieldset>
+<p><b><span id="errGlobal" class="error"></span></b></p>
+
+	<div id="tabs" style="height:auto;width:850px">
+		<ul>
+			<li><a href="#tab1">Detail</a></li>
+			<li><a href="#tab2">Int. Payment Schedule</a></li>
+			<li><a href="#tab3">Bank Info</a></li>
+		</ul>
+		<div id="tab1">
+			#{include 'DepositoUpdates/tab_detail.html' /}
+			<!-- <div class="buttons">
+				<input type="button" id="prev1" value="&lt; Previous" disabled="disabled" />
+				<input type="button" id="next1" value="Next &gt;" />
+			</div> -->
+		</div>
+		<div id="tab2">
+			<div style="height:auto">
+			<p>
+				#{textBox id:'totalCoupon', label:'No. of int. payment', name:'noOfPayment', value:deposito?.noOfPayment, required:true, class:'numeric', readOnly:readOnly, width:'80px'  /}
+				#{hidden id:'totalCouponHidden', name:'deposito.noOfPayment',value:deposito?.noOfPayment /}
+				<span class="error">#{error 'No. of int. payment is' /}</span>	
+			</p>
+			<p>																			
+				#{checkBox id:'considerHoliday', name:'deposito.considerHoliday', value:deposito?.considerHoliday, readOnly:readOnly /}
+				<b>Consider Holiday</b>
+			</p>
+			<br /> 
+			<p>
+		       #{button id:'generateButton',name:'generateButton', value:'Populate Interest Payment Schedule',class:'buttons', readOnly:readOnly   /}            
+		       &nbsp; <b><span id="generateButtonError" class="error"></span></b>
+		   </p>
+				<div id="paymentSchedule" style="overflow-y:scroll;max-height:170px;width:100%">
+					#{include 'DepositoUpdates/gridPaymentSchedules.html' /}
+				</div>
+			</div>
+			<!-- <div class="buttons">
+				<input type="button" id="prev2" value="&lt; Previous" />
+				<input type="button" id="next2" value="Next &gt;" />
+			</div> -->
+		</div>
+		<div id="tab3">
+			<div style="height:290px">
+				<p>
+					#{textBox id:'bankAccount', name:'deposito.bankAccount.accountNo', label:'Account No', value:deposito?.bankAccount?.accountNo, class:'capitalize', required:true, readOnly:readOnly, width:'100px' /}
+					#{hidden id:'bankAccountKey', name:'deposito.bankAccount.bankAccountKey', value:deposito?.bankAccount?.bankAccountKey /}
+					#{button id:'bankAccountHelp', value:'?', class:'small', readOnly:readOnly /}
+					#{hidden id:'bankAccountName', name:'deposito.bankAccount.name', value:deposito?.bankAccount?.name, readOnly:true, width:'170px' /}
+					<span id="bankAccountError" class="error">#{error 'Account No in tab Bank Info is' /}</span>
+				</p>
+				<p>
+					#{textBox id:'bankCode', name:'deposito.bankAccount.bankCode.thirdPartyCode', label:'Bank Code', value:deposito?.bankAccount?.bankCode?.thirdPartyCode, width:'100px', maxLength:'25', class:'capitalize', readOnly:true /}
+					#{hidden id:'bankCodeKey', name:'deposito.bankAccount.bankCode.thirdPartyKey', value:deposito?.bankAccount?.bankCode?.thirdPartyKey /}
+					#{textBox id:'bankCodeName', name:'deposito.bankAccount.bankCode.thirdPartyName', value:deposito?.bankAccount?.bankCode?.thirdPartyName, readOnly:true, class:'capitalize', width:'182px' /}
+				</p>
+				<p>
+					#{textBox id:'bankAccountBeneficiary', name:'deposito.bankAccount.name', label:'Beneficiary Name', value:deposito?.bankAccount?.name, class:'capitalize', readOnly:true, width:'290px' /}
+				</p>
+				<p>
+					#{textBox id:'bankAccountCurrency', name:'deposito.bankAccount.currency.currencyCode', label:'Currency', value:deposito?.bankAccount?.currency?.currencyCode, class:'capitalize', readOnly:true, width:'100px' /}
+				</p>
+				</div>
+			<!-- <div class="buttons">
+				<input type="button" id="prev3" value="&lt; Previous" />
+				<input type="button" id="next3" value="Next &gt;" />
+			</div> -->
+		</div>
+	</div>
+</form>
+<input type="hidden" id="dummy" />

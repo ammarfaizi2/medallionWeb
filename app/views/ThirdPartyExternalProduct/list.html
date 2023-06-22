@@ -1,0 +1,35 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Third Party Eksternal Product' /}
+#{set fixData: true /}
+#{script 'lookuppaging.js' /}
+#{script 'lookups.js' /}
+
+<script type="text/javascript">
+#{include 'RegistrySubscription/Util.js' /}
+#{include 'ThirdPartyExternalProduct/externalProduct.js' /}
+$(document).ready(function() {
+	Paging($("#main"));
+});
+</script>
+<div id="root">
+	<h3>Third Party Eksternal Product</h3>
+</div>
+<div id="result" style="display:block">
+    <table id="tableThirdPartyEksternalProduct" class="display">
+        <thead>
+            <tr>
+                <th width="80px" field="thirdPartyCode|string|none|left|sort">Code</th>
+                <th width="50px" field="thirdPartyName|string|none|left|sort">Name</th>
+                <th width="80px" field="recordStatus|string|decode|left|sort">Status</th>
+				<th width="50px" field="isActive|boolean|yesno|center|sort">Active</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<div id="btn" class="buttons">
+	<!-- <label><input type="checkbox" id="notInList"/> Not in the list</label>&nbsp; -->
+	<input type="button" id="newData" value="New Data" />	
+</div>

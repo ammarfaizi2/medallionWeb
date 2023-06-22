@@ -1,0 +1,121 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'BPJS Monthly Process' /}
+#{set fixData: true /}
+#{set mode: mode /}
+#{script 'lookuppaging.js' /}
+#{script 'lookups.js' /}
+
+<style type="text/css">
+.column {
+    float: left;
+}
+
+.left {
+    width: 25%;
+}
+
+.right {
+    width: 75%;
+}
+
+/* Clear floats after the columns */
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+</style>
+
+<form id="bpjsMonthlyProcessForm" class="form">
+	<p style='line-height: 10px;'>&nbsp;</p>
+	#{hidden id:'filterAll1', name:'param.filterAll1', value:param?.filterAll1/}
+	#{hidden id:'filterAll2', name:'param.filterAll2', value:param?.filterAll2/}
+	#{hidden id:'filterAll3', name:'param.filterAll3', value:param?.filterAll3/}
+	#{hidden id:'filterSpecific2', name:'param.filterSpecific2', value:param?.filterSpecific2/}
+	<p>
+		#{textBox id:'month', name:'param.month', value:param?.month, label:'Invoice Month / Year', width:'50px', maxLength:2, size:2, class:'numberOnly', required:'true' /}
+		<span id="monthErr" class="error">#{error 'Month' /}</span>
+		<label style="width:10px">/</label>
+		#{textBox id:'year', name:'param.year', value:param?.year, width:'80px', maxLength:4, size:4, class:'numberOnly', required:'true' /}
+		<span id="yearErr" class="error">#{error 'Year' /}</span>
+	</p>
+	<p style='line-height: 10px;'>&nbsp;</p>
+	<div class="row">
+	  	<div class="column">
+	  		<fieldset style="width:auto;">
+				<legend style="color: black;"><b>Customer</b></legend>
+				<div>
+					<p>
+						<input id="all1" type="radio" name="filterAll1"/>
+						<label>All</label>
+					</p>
+					<p>
+						<input id="specific1" type="radio" name="filterSpecific1"/>
+						<label>Specific</label>
+					</p>
+					<p>
+						#{dropDownList id:'classification1', name:'param.filterSpecific1', options:customers, value:param?.filterSpecific1, readOnly:readOnly, required:true/}
+					</p>
+					<span id="classification1Err" class="error">#{error 'Classification' /}</span>
+				</div>
+			</fieldset>
+	  	</div>
+	  	<div class="column">
+	  		<fieldset style="width:auto;">
+				<legend style="color: black;"><b>Jenis Efek</b></legend>
+				<div>
+					<p>
+						<input id="all2" type="radio" name="filterAll2"/>
+						<label>All</label>
+					</p>
+					<p>
+						<input id="obligasi" type="radio" name="filterObligasi"/>
+						<label>Obligasi</label>
+					</p>
+					<p>
+						<input id="saham" type="radio" name="filterSaham"/>
+						<label>Saham</label>
+					</p>
+				</div>
+			</fieldset>
+	  	</div>
+	  	<div class="column">
+	  		<fieldset style="width:auto;">
+				<legend style="color: black;"><b>Classification</b></legend>
+				<div>
+					<p>
+						<input id="all3" type="radio" name="filterAll3"/>
+						<label>All</label>
+					</p>
+					<p>
+						<input id="specific3" type="radio" name="filterSpecific3"/>
+						<label>Specific</label>
+					</p>
+					<p>
+						#{dropDownList id:'classification3', name:'param.filterSpecific3', options:classification, value:param?.filterSpecific3, readOnly:readOnly, required:true/}
+					</p>
+					<span id="classification3Err" class="error">#{error 'Classification' /}</span>
+				</div>
+			</fieldset>
+	  	</div>
+	</div>
+	<p style='line-height: 20px;'>&nbsp;</p>
+	<div class="buttons">
+		<input id='btnProcess' type="button" id="process" value="Process" ></input>
+		<input id='btnReset' type="button" id="reset" value="Reset" ></input>			
+	</div>
+</form>
+
+<div id="result" style="display:none">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<div class="response"></div>
+</div>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'BpjsMonthlyProcess/BpjsMonthlyProcess.js' /}
+	$(document).ready(function() {
+		$('.buttons input:button').button();
+		BpjsMonthlyProcess($("#main"));
+	});
+</script>

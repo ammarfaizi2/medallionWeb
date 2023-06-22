@@ -1,0 +1,73 @@
+#{extends 'templates/detail1.html' /}
+#{if mode == 'edit' || mode == 'entry' || cpSecurity?.recordStatus == 'O ' || cpSecurity?.recordStatus == 'N ' || cpSecurity?.recordStatus == 'U '}
+	#{set pageTitle: 'Restricted Security Type' /}
+#{/if}
+#{else}
+	#{set pageTitle: 'Restricted Security Type Approval' /}
+#{/else}
+#{set id:cpSecurity?.securityLimitKey /}
+
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+
+#{script 'lookups.js' /}
+#{script 'validation/numericOnly.js' /}
+#{script 'external/Util.js' /}
+
+<style type="text/css">
+  .errmsg { color:red; }
+  textarea{resize: none;}
+</style>
+
+<form id="mainSecurityLimitForm" class="form" method="POST">
+#{hidden id:'securityLimitKey', name:'cpSecurity.securityLimitKey', value:cpSecurity?.securityLimitKey /}
+#{hidden id:'recordStatus', name:'cpSecurity.recordStatus', value:cpSecurity?.recordStatus /}
+<p id="pRuleId">
+	#{textBox id:'ruleCode', name:'cpSecurity.complianceRule.ruleCode', label:'Rule Code', value:cpSecurity?.complianceRule?.ruleCode, class:'capitalize', required:true, readOnly:((mode=='entry') ? confirming : true ), width:'120px' /}
+	#{hidden id:'ruleId', name:'cpSecurity.complianceRule.ruleId', value:cpSecurity?.complianceRule?.ruleId /}
+	#{button id:'ruleHelp', value:'?', class:'small', readOnly:((mode=='entry') ? confirming : true ) /}
+	<span id="ruleCodeError" class="error">#{error 'Rule Code' /}</span>
+</p>
+<p>	
+	#{textArea id:'ruleDesc', name:'cpSecurity.complianceRule.description', label:'Description', value:cpSecurity?.complianceRule?.description, readOnly:true, width:'318px', maxLength:'255' /}
+</p>
+<p>
+	#{radioButton id:'active', name:'active', value:((cpSecurity?.active)?'true':'false'), label:'Active', options:operators, readOnly:readOnly /}
+	#{hidden id:'activeHidden', name:'cpSecurity.active', value:((cpSecurity?.active)?'true':'false') /}
+	<span id="activeError" class="error">#{error 'Active' /}</span>
+</p>		
+<br/>
+<b><span id="errSecurityLimitDetail" class="error"></span></b>
+<p></p>	
+<div id="tabsDetailSecurityLimit">
+	<ul>
+		<li><a href="#securityLimitDetail">Security Type</a>
+	</ul>
+	<div class="pane" id="securityLimitDetail">	
+		<div id="listSecurityLimitDetail" style="overflow-y:scroll;height:120px">
+			#{include 'SecurityLimits/grid_securitylimit.html' /}
+		</div>
+		<div class="buttons">
+			<button id="newSecurityLimitDetailData" #{if readOnly}disabled="disabled"#{/if}>Add</button>
+		</div>	
+	</div>	
+</div>
+</form>
+<form></form>
+<input type="hidden" id="dummy" />
+<div id="detailSecurityLimitDetail" title="Security Type">
+		#{include 'SecurityLimits/detail_securitylimit.html' /}	
+	<div class="buttons">
+		#{if (mode=='entry' || mode == 'edit')&& (!(confirming))}
+			<button id="saveSecurityLimitDetail">Save</button>
+			<button id="cancelSecurityLimitDetail">Cancel</button>
+		#{/if}
+		#{else}
+			#{if confirming || mode=='view' }
+				<button id="cancelSecurityLimitDetail">Close</button>
+			#{/if}
+		#{/else}	
+	</div>
+</div>
+<script type="text/javascript">
+	#{include 'SecurityLimits/securitylimit.js' /}
+</script>

@@ -1,0 +1,127 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Certificate Management' /}
+#{if param == 'register-cust-acct'}
+	#{set pageTitle: 'Register Custody Account' /}
+#{/if}
+#{if param == 'register-bank-acct'}
+	#{set pageTitle: 'Register Bank Account' /}
+#{/if}
+#{if param == 'register-invt-acct'}
+	#{set pageTitle: 'Register Investment Account' /}
+#{/if}
+#{if param == 'dedupe'}
+	#{set pageTitle: 'Certificate Management' /}
+#{/if}
+#{set fixData: true /}
+#{set mode: mode /}
+#{script 'lookups.js', characterset:'utf-8' /}
+#{script 'lookuppaging.js' /}
+#{script 'external/Util.js' /}
+
+
+<script type="text/javascript">	
+#{include 'RegistrySubscription/Util.js' /}
+#{include 'Certificates/paging.js' /}
+#{include 'Certificates/certificates.js' /}
+$(document).ready(function() {
+	Paging($("#main"));
+});
+</script>
+
+<div id="root">
+	<h3><a href="#">Search Certificate</a></h3>
+	<form id="searchForm" class="form">
+		<input id="param" name="params.param" type="hidden" value="${param}"/> 
+			
+<!-- 		 <p> -->
+<!--             #{textBox id:'csCertificateFrom', name:'params.csCertificateFrom', label:'Certificate Date', width:'85px', value:params?.csCertificateFrom ,class:'calendar', required:'true'  /} (${appProp.displayDateFormat}) -->
+<!--             <span id="csCertificateFromError" class="error"></span> <b>To</b> -->
+<!--             #{textBox id:'csCertificateTo', name:'params.csCertificateTo', value:params?.csCertificateTo, class:'calendar'  /} (${appProp.displayDateFormat}) -->
+<!--             <span id="csCertificateToError" class="error"></span> -->
+<!--         </p> -->
+		<p>
+            #{textBox id:'customerCode',width:'120px', name:'', label:'Account No', value:'', class:'capitalize' /}
+            #{hidden id:'customerCodeId', name:'params.customerCodeId', value:params.csCertificateCustodyAccountKey /}
+            #{button id:'customerCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+            #{textBox id:'customerDesc', name:'', value:'', readOnly:true, width:'300px' /}
+            <span id="errGroupCode" class="error"></span>
+        </p>
+        
+		<p id="pSecurityType">
+			#{textBox id:'securityType', name:'params.securityType', label:'Security Type', value:params?.csCertificateSecurityType, dataold:params?.csCertificateSecurityType, class:'lookup capitalize', readOnly:readOnly, width:'120px' /}
+			#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'securityTypeDesc', name:'certificate.security.securityType.description', value:certificate?.security?.securityType?.description, readOnly:true, width:'300px' /}
+			<span id="securityTypeError" class="error"></span>
+		</p>
+		<p id="pSecurityCode">
+			#{textBox id:'securityCode', name:'securityCode', label:'Security Code', class:'capitalize', value:'', readOnly:readOnly, width:'120px' /}
+			#{button id:'securityCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'securityCodeDesc', name:'securityCodeDesc', value:'', readOnly:true, width:'300px' /}
+			#{hidden id:'securityKey', name:'params.securityKey', value:params?.securityKey /}
+			<span id="securityCodeError" class="error"></span>
+		</p>
+		<p>
+            #{dropDownList id:'certificateNoOperator', name:'params.certificateNoOperator', label:'Certificate No', options:stringOperators, value:params?.certificateNoOperator,width:'120px' /}
+            #{textBox id:'csCertificateCertificateId', name:'params.csCertificateCertificateId', value:params.csCertificateCertificateId, class:'capitalize', width:'120px' /}
+		
+        </p>
+		<!-- <p id="pAccountNo">
+			#{textBox id:'accountNo', name:'certificate.account.accountNo', label:'Account No', value:certificate?.account?.accountNo, required:true, class:'capitalize', readOnly:readOnly, width:'120px' /}
+			#{hidden id:"accountKey", name:'params.csCertificateCustodyAccountKey', value:params?.csCertificateCustodyAccountKey /}
+			#{button id:'accountHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'accountName', name:'certificate.account.name', value:certificate?.account?.name, readOnly:true, width:'241.5px' /}
+			<span id="accountNoError" class="error"></span>
+		</p>
+		<p id="pSecurityType">
+			#{textBox id:'securityType', name:'params.csCertificateSecurityType', label:'Security Type', value:params?.csCertificateSecurityType, dataold:params?.csCertificateSecurityType, class:'lookup capitalize', required:true, readOnly:readOnly, width:'120px' /}
+			#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'securityTypeDesc', name:'certificate.security.securityType.description', value:certificate?.security?.securityType?.description, readOnly:true, width:'241.5px' /}
+			<span id="securityTypeError" class="error"></span>
+		</p>
+		<p id="pSecurityCode">
+			#{textBox id:'securityCode', name:'certificate.security.securityId', label:'Security Code', class:'capitalize', value:certificate?.security?.securityId, required:true,readOnly:readOnly, width:'120px' /}
+			#{button id:'securityCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'securityCodeDesc', name:'certificate.security.description', value:certificate?.security?.description, readOnly:true, width:'241.5px' /}
+			#{hidden id:'securityKey', name:'params.csCertificateSecurityKey', value:params?.csCertificateSecurityKey /}
+			<span id="securityCodeError" class="error"></span>
+		</p>	
+		<p id="pCertificateId">
+			#{textBox id:'certificateId', name:'params.csCertificateCertificateId', label:'Certificate Id', value:params.csCertificateCertificateId, class:'capitalize', width:'120px' /}
+		</p> -->
+		<p>
+			<div class="buttons">
+				<input type="button" id="search" value="Search" />				
+				<input type="button" id="reset" value="Reset" />					
+			</div>
+		</p>
+	</form>
+</div>	
+
+<!-- <div id="result" style="overflow-xy:scroll;display:none"> -->
+<div id="result" style="display:none">
+	<table id="tblCertificates" class="display">
+		<thead>
+			<tr>
+				<th width="250px" field="certificateDate|date|date|center|sort">Date</th>
+				<th width="200px" field="certificateId|string|none|left|sort">Certificate&nbsp;#</th>
+				<th width="250px" field="account.accountNo|string|none|left|sort">Account&nbsp;No</th>
+				<th width="250px" field="account.name|string|none|left|sort">Account&nbsp;Name</th>
+				<th width="250px" field="security.securityId|string|none|left|sort">Security&nbsp;Code</th>
+				<th width="200px" field="quantity|number|decimal2|left|sort">Quantity</th>
+				<th width="200px" field="denomination|number|decimal2|left|sort">Denomination</th>
+				<th width="200px" field="portMode.lookupId|string|none|left|sort">Port&nbsp;Move</th>
+				<th width="80px" field="recordStatus|string|decode|left|sort">Status</th>
+				<th width="50px" field="isActive|boolean|yesno|center|sort">Active</th>
+			</tr>
+		</thead>
+	</table>
+	
+</div>
+<div id="btn" class="buttons">
+	<input type="button" id="new" value="New Data" />	
+</div>
+<!-- <div id="buttonNotInList" class="buttons"> -->
+<!-- 		<label><input type="checkbox" id="notInList"/> Not in the list</label>&nbsp; -->
+		
+<!-- </div> -->
+

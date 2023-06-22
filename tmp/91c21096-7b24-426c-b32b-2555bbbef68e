@@ -1,0 +1,813 @@
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="param"
+
+edit
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="status"
+
+A 
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="account.custodyAccountKey"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="account.name"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="account.settlementAccount.accountNo"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="account.settlementAccount.name"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.organization.organizationId"
+
+2FE3AD52-C618-484F-857E-A9D530EF716A
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.customerKey"
+
+69747
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="currentDate"
+
+11/11/2022
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.customerKey"
+
+69747
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.customerType.lookupId"
+
+CUSTOMER_TYPE-I
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.customerNo"
+
+62447188
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.firstName"
+
+SRI MURNIATI
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.middleName"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.lastName"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customerName"
+
+SRI MURNIATI
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.customerName"
+
+SRI MURNIATI
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.customerCategory.lookupId"
+
+CUSTOMER_CATEGORY-DIRECT
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.custRetailFlag"
+
+true
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.customerGroup.thirdPartyCode"
+
+RITELBSM
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.customerGroup.thirdPartyKey"
+
+89556
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.customerGroup.thirdPartyName"
+
+PT. BANK SYARIAH INDONESIA, TBK
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.externalNo"
+
+62447188
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="currencyCode"
+
+IDR
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.currency.currencyCode"
+
+IDR
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.currency.description"
+
+INDONESIAN RUPIAH
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.taxProfile.taxProfileCode"
+
+IND
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.taxProfile.description"
+
+INDIVIDU DALAM NEGERI
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.lkpbu.lookupCode"
+
+S14
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.lkpbu.lookupId"
+
+LKPBU_CODE-XXX
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.lkpbu.lookupDescription"
+
+Perorangan
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.cisNo"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.isActive"
+
+true
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.jointDate"
+
+12/09/2022
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.lastModifDate"
+
+26/10/2022
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.lastModifDateWithTime"
+
+26/10/2022 05:08:54
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.flagNoChangeData"
+
+true
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.amlCustomer.amlId"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="amlKey"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.taxId.lookupCode"
+
+1010
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.taxId.lookupId"
+
+TAX_ID-1010
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.taxId.lookupDescription"
+
+INDIVIDUAL – DOMESTIC
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.nationality.lookupCode"
+
+ID
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.nationality.lookupId"
+
+COUNTRY-ID
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.nationality.lookupDescription"
+
+INDONESIA
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.birthPlace.lookupCode"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.birthPlace.lookupId"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.birthPlace.lookupDescription"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.birthArea.lookupCode"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.birthArea.lookupId"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.birthArea.lookupDescription"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.birthPlaceOther"
+
+PACITAN
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.birthDate"
+
+29/03/1996
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.religion.lookupId"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.gender.lookupId"
+
+GENDER-F
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.maritalStatus.lookupId"
+
+MARITAL_STATUS-1
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.motherName"
+
+SUMIATI
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.heirName"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.heirRelation"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.educationBackground.lookupId"
+
+EDUCATION-SMA
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.occupation.lookupId"
+
+OCCUPATION-4
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.occupationDescription"
+
+BISNIS SENDIRI
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.annualIncomeRange.lookupId"
+
+INCOME_IND-6
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.npwp"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.npwpDate"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="identificationType1"
+
+IDENTIFICATION_TYPE-1
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.identificationType1.lookupId"
+
+IDENTIFICATION_TYPE-1
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.identification1No"
+
+3501066903970002
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.identification1Expiry"
+
+31/12/9998
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.identificationType2.lookupId"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.identification2No"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.identification2Expiry"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.identificationType3.lookupId"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.identification3No"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.identification3Expiry"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.identificationType4.lookupId"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.identification4No"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.identification4Expiry"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[1].addressType.lookupId"
+
+ADDRESS_TYPE-2
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[1].addressType.lookupDescription"
+
+2'ND ADDRESS
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[1].address1"
+
+DUTA PERMAI IV9
+ 003/014 PONDOK PINANG
+ KEBAYORAN LAMA
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[1].address1Area.lookupCode"
+
+141
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[1].address1Area.lookupId"
+
+AREA-141
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[1].address1Area.lookupDescription"
+
+JAKARTA SELATAN
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[1].address1Phone1"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[1].address1Country.lookupCode"
+
+ID
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[1].address1Country.lookupId"
+
+COUNTRY-ID
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[1].address1Country.lookupDescription"
+
+INDONESIA
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[1].address1State.lookupCode"
+
+5
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[1].address1State.lookupId"
+
+STATE-5
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[1].address1State.lookupDescription"
+
+DKI. JAKARTA
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[1].address1ZipCode"
+
+12310
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[1].address1Phone2"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[1].address1Phone3"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[1].addressExt1"
+
+DUTA PERMAI IV9
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[1].addressExt2"
+
+003/014 PONDOK PINANG
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[1].addressExt3"
+
+KEBAYORAN LAMA
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[1].isCustomer"
+
+true
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[1].contactKey"
+
+136263
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[0].addressType.lookupId"
+
+ADDRESS_TYPE-1
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[0].addressType.lookupDescription"
+
+MAIN ADDRESS
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[0].address1"
+
+DUTA PERMAI IV9
+ 003/014 PONDOK PINANG
+ KEBAYORAN LAMA
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[0].address1Area.lookupCode"
+
+141
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[0].address1Area.lookupId"
+
+AREA-141
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[0].address1Area.lookupDescription"
+
+JAKARTA SELATAN
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[0].address1Phone1"
+
++62-82246620804
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[0].address1Country.lookupCode"
+
+ID
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[0].address1Country.lookupId"
+
+COUNTRY-ID
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[0].address1Country.lookupDescription"
+
+INDONESIA
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[0].address1State.lookupCode"
+
+5
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[0].address1State.lookupId"
+
+STATE-5
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[0].address1State.lookupDescription"
+
+DKI. JAKARTA
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[0].address1ZipCode"
+
+12310
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[0].address1Phone2"
+
++62-82246620804
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[0].address1Phone3"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[0].addressExt1"
+
+DUTA PERMAI IV9
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[0].addressExt2"
+
+003/014 PONDOK PINANG
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[0].addressExt3"
+
+KEBAYORAN LAMA
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[0].isCustomer"
+
+true
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="contacts[0].contactKey"
+
+136264
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.email"
+
+NIAMURNI29@GMAIL.COM
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.password"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.correspondenceAddress.lookupId"
+
+ADDRESS_TYPE-2
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="sourceOfFunds"
+
+SRC_OF_FUND_IND-OTH
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+SRC_OF_FUND_IND-OTH
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.sourceOfFundOthers"
+
+OTH
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="hidInvestObjs"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="investObjs"
+
+PURPOSE_OF_INV_IND-3
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="hidInvestObjs"
+
+PURPOSE_OF_INV_IND-3
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="hidInvestObjs"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="hidInvestObjs"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="hidInvestObjs"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.swiftCode"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.assetOwner.lookupId"
+
+ASSET_OWNER-1
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.remarks"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="isAttachment"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.attachment"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="accounts[0].custodyAccountKey"
+
+20713
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="accounts[0].accountNo"
+
+62447188
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="accounts[0].name"
+
+SRI MURNIATI
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="accounts[0].balance"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="bankAccounts[0].bankAccountKey"
+
+25410
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="bankAccounts[0].accountNo"
+
+3615664290
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="bankAccounts[0].name"
+
+SRI MURNIATI
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="bankAccounts[0].balance"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.oriBankAccountInvoice.accountNo"
+
+3615664290
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.oriBankAccountInvoice.bankAccountKey"
+
+25410
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.oriBankAccountInvoice.name"
+
+SRI MURNIATI
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.bankAccountInvoice.accountNo"
+
+3615664290
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.bankAccountInvoice.bankAccountKey"
+
+25410
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.bankAccountInvoice.name"
+
+SRI MURNIATI
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.oriBankAccountInvoice.currency.currencyCode"
+
+IDR
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.oriBankAccountInvoice.currency.description"
+
+INDONESIAN RUPIAH
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="currencyCode"
+
+IDR
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.bankAccountInvoice.currency.currencyCode"
+
+IDR
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.bankAccountInvoice.currency.description"
+
+INDONESIAN RUPIAH
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.exchangeRateRef.lookupCode"
+
+BI
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.exchangeRateRef.lookupId"
+
+EXCHANGE_RATE_REF-BI
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.customer.lookupDescription"
+
+BI MIDDLE RATE
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.paymentMethod.lookupCode"
+
+1
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.paymentMethod.lookupId"
+
+PAYMENT_METHOD-1
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="customer.customer.lookupDescription"
+
+POOL ACCOUNT
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="udfs[0].value"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="udfs[0].fieldName"
+
+FATCA
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="udfs[0].displayType.lookupId"
+
+DISPLAY_TYPE-2
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="udfs[0].dataType.lookupId"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="udfs[0].label"
+
+FATCA
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="udfs[0].lookupGroup.lookupGroup"
+
+LOOKUP_YN
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="udfs[0].sequence"
+
+1
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="udfs[1].value"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="udfs[1].fieldName"
+
+TIN
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="udfs[1].displayType.lookupId"
+
+DISPLAY_TYPE-1
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="udfs[1].dataType.lookupId"
+
+DATA_TYPE-STR
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="udfs[1].label"
+
+TAXPAYER ID NO
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="udfs[1].lookupGroup.lookupGroup"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="udfs[1].sequence"
+
+2
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="udfs[2].value"
+
+LOW
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="udfs[2].fieldName"
+
+BRANCH_CODE
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="udfs[2].displayType.lookupId"
+
+DISPLAY_TYPE-1
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="udfs[2].dataType.lookupId"
+
+DATA_TYPE-STR
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="udfs[2].label"
+
+BRANCH CODE
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="udfs[2].lookupGroup.lookupGroup"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="udfs[2].sequence"
+
+3
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="udfs[3].value"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="udfs[3].fieldName"
+
+DORMANT
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="udfs[3].displayType.lookupId"
+
+DISPLAY_TYPE-2
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="udfs[3].dataType.lookupId"
+
+
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="udfs[3].label"
+
+DORMANT
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="udfs[3].lookupGroup.lookupGroup"
+
+LOOKUP_YN
+-----------------------------13366250949119483831357680988
+Content-Disposition: form-data; name="udfs[3].sequence"
+
+4
+-----------------------------13366250949119483831357680988--

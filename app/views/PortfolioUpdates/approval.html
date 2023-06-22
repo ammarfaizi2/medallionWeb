@@ -1,0 +1,106 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Portfolio Update Approval' /}
+
+<script type="text/javascript">
+	$(function() {
+		// DECLARE CLASS BTN
+		$(".btn").button();
+		$(".btn").css("width", "100px");
+		$("#load").button();
+		$("#reset").button();
+		//===============
+			
+		// DECLARE SOME ID VARIABLE	
+		$('#approve').button();
+		$('#reject').button();
+		//===============
+		
+		//$('#approve').insertBefore('#close');
+		//$('#reject').insertBefore('#close');
+		
+		var backToWorkList = function() {
+			loading.dialog('open');
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			};
+		}
+		
+		// ACTION BUTTON APPROVE 
+		$('#approve').click(function() {
+			var action = "@{approve()}?keyId=${portfolioUpdate?.portfolioUpdateKey}&taskId=${taskId}";
+			loading.dialog('open');
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					messageAlertOk("Portfolio No : '${portfolioUpdate?.portfolio?.portfolioKey}' is Approved", "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+					//alert("Portfolio No : '${portfolioUpdate?.portfolio?.portfolioKey}' is approved");
+				} else {
+					if (data.code == 'error.data.duplicate') {
+						messageAlertOk("Portfolio No : '${portfolioUpdate?.portfolio?.portfolioKey}' already exsist, Please run CS4015 Reprocess Portfolio", "ui-icon1 ui-icon-alert", "Warning Message", backToWorkList);
+						//alert("Portfolio No : '${portfolioUpdate?.portfolio?.portfolioKey}' already exsist, Please run CS4015 Reprocess Portfolio");
+					} else {
+						messageAlertOk("Data Error", "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+						//alert("Data Error");
+					}
+				}
+			});			
+		});
+		//===============
+		
+		// ACTION BUTTON REJECT
+		$('#reject').click(function() {
+			var action = "@{reject()}?keyId=${portfolioUpdate?.portfolioUpdateKey}&taskId=${taskId}";
+			loading.dialog('open');
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					messageAlertOk("Portfolio Update No : '${portfolioUpdate?.portfolio?.portfolioKey}' is Rejected", "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+					//alert("Portfolio Update No : '${portfolioUpdate?.portfolio?.portfolioKey}' is rejected");
+				}else{
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+				}
+			});
+		});
+		//===============
+		
+		// ACTION BUTTON CLOSE
+		$('#closeWorkflow').click(function() {
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			}
+		});
+		//===============
+		
+		// HIDE ALL CLASS BUTTON
+		//$(".buttons").css("display","none");
+		//===============
+		
+		// HIDE DISPLAY INSIDE APPROVAL ACTIONS ID
+		$("#approval-actions").css("display","block");
+		//===============
+	});
+
+</script>
+
+<h2>Portfolio Update Approval</h2>
+<div id="detail">
+	<form id="form" class="form">
+		#{include 'PortfolioUpdates/detail.html' /}
+	</form>
+</div>	
+
+<div id="approval-actions">
+	#{hidden id:'taskId', name:'taskId', value:taskId /}
+	#{hidden id:'keyId', name:'keyId', value:keyId /}	
+	#{hidden id:'from', name:'from', value:from /}	
+	
+	<input type="button" id="approve" value="Approve" class="btn" />
+	<input type="button" id="reject" value="Reject" style="margin:5px;" class="btn"/>
+	<input type="button" id="closeWorkflow" value="Cancel" class="btn" />
+</div>

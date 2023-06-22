@@ -1,0 +1,183 @@
+#{extends 'templates/detail1.html' /}
+#{set pageTitle: ' ' /}
+#{set fixData: true /}
+#{set mode: mode /}
+#{script 'lookups.js' /}
+
+<div id="accordion">
+#{hidden id:'source', name:'profile.source', value:profile?.source /}
+
+#{hidden id:'separatorCsv', name:'profile.separatorCsv', value:profile?.separatorCsv /}
+
+	<h3>Download Profile Entry</h3>
+	<form id="downloadForm" class="form">
+			#{hidden id:'key', name:'profile.profileKey', value:profile?.profileKey/}
+		<p>
+			#{textBox id:'name', name:'profile.name', value:profile?.name, label:'Profil ID', class:'capitalize', width:'150px', maxLength:50, size:50, required:'true' /}
+			<span class="error">#{error 'Name' /}</span>
+		</p>
+		<p>
+			#{textBox id:'description', name:'profile.description', value:profile?.description, label:'Profil Name', class:'capitalize', width:'200px', maxLength:100, size:100, required:'true' /}
+			<span class="error">#{error 'Description' /}</span>
+		</p>	
+		<p>
+			#{textBox id:'templete',value:profileTemplate?.name, displayValue:profileTemplate?.name, required:true, label:'Profile Ref', width:'150px', class:'capitalize'/}
+			#{hidden id:'h_templete', name:'profile.templete', value:profileTemplate?.profileKey/}
+			#{button id:'groupTemplateHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'names', name:'', value:profileTemplate?.description, width:'250px', readOnly:true/}
+			<span class="error">#{error 'Profile Ref' /}</span>
+		</p>		
+		<p>
+			#{textBox id:'process', name:'profile.process', value:profile?.process, label:'Template', readOnly:'true' /}
+			#{hidden name:'profile.actionType', value:'Download'/}
+			<span class="error">#{error 'Action Type' /}</span>
+		</p>
+			
+		<p>
+			#{dropDownList id:'separatorTxt', name:'profile.separatorTxt', label:'Separator', value:profile?.separatorTxt, options:inHead, required:true, readOnly:false /}
+		</p>
+		<p>
+			
+			#{radioButton id:'include', name:'includeHeader', value:((profile?.includeHeader)?'true':'false'), label:'Include Header Row', options:operators/}
+			#{hidden id:'includeHidden', name:'profile.includeHeader', value:((profile?.includeHeader)?'true':'false') /}
+		</p>
+		<p>
+			#{radioButton id:'status', name:'status', value:((profile?.status)?'true':'false'), label:'Active', options:operators/}
+			#{hidden id:'statusHidden', name:'profile.status', value:((profile?.status)?'true':'false') /}
+		</p>
+		<p>
+			#{radioButton id:'archiving', name:'archiving', value:((profile?.archiveStatus)?'true':'false'), label:'Archiving', options:operators/}
+			#{hidden id:'archiveHidden', name:'profile.archiveStatus', value:((profile?.archiveStatus)?'true':'false') /}
+		</p>
+		<p>
+			<label>Archive Field</label>
+			#{textBox id:'archiveField', required:true, width:'150px', class:'capitalize', readOnly:true/}
+			#{button id:'archiveHelp', value:'?', class:'small', readOnly:(!profile?.archiveStatus) /}
+			<span class="error">#{error 'Archive List' /}</span>
+		</p>
+		<div id="divofarchive" style="#{if !profile?.archiveStatus}display:none#{/if}">
+			<div style="width:15em;float:left">&nbsp;</div>
+			<div style="float:left" id="divoftext">
+				#{list listArchive, as:'archiveField'}
+					<div id="textline">
+						<input type="text" name="archiveField[]" value="${archiveField }"/>
+						<a href="#" class="closedivline"><span style="padding-left:4px">X</span></a>
+					</div>
+				#{/list}
+			</div>
+			<div style="clear:both"></div>
+		</div>
+		<br/>
+		<input id='btnPopulate' class='buttons' type="button" value="Populate" ></input>&nbsp;
+		<input id='btnReset' class='buttons' type="button" value="Reset" ></input>
+		<br>
+		<br>
+		<p>
+			<table id="tblMapping">
+				<thead>
+					<tr>
+						<th width="50px" class="ui-state-default"><b>Action</b></th>
+						<th width="10px" class="ui-state-default"><b>No</b></th>
+						<th width="100px" class="ui-state-default"><b>Source&nbsp;Field</b></th>
+						<th width="100px" class="ui-state-default"><b>Target&nbsp;Field</b></th>
+						<th width="75px" class="ui-state-default"><b>Type&nbsp;Data</b></th>
+						<th width="100px" class="ui-state-default"><b>Format&nbsp;Data</b></th>
+						<th width="100px" class="ui-state-default"><b>Overwrite&nbsp;Value</b></th>
+						<th width="100px" class="ui-state-default"><b>Length</b></th>
+						<th width="50px" class="ui-state-default"><b>Order</b></th>
+					</tr>	
+				</thead>
+				<tbody>
+					#{list profile.details, as:'detail'}
+						<tr>
+						
+							<td>
+								#{hidden id:"profileDetailKey_"+(detail_index-1), name:"pdetails["+(detail_index-1)+"].profileDetailKey", value:detail?.profileDetailKey /}
+								<input style='width:50px' type='button' name='profile.delete' value='Del'></input>
+								<input style='width:50px;height:25px;display:none' class="systemField" type='checkbox' name='pdetails[${detail_index-1}].systemField' value=${detail?.systemField} ${detail?.systemField ? 'checked' : ''}></input>
+								<input style='width:50px;height:25px;display:none' class="cdata" type='checkbox' name='pdetails[${detail_index-1}].cdata' ${detail?.cdata ? 'checked' : ''}></input>
+							</td>
+							<td><input style='width:20px;height:25px;' class="noSeq" type="text" name="pdetails[${detail_index-1}].noSeq" value="${detail?.noSeq}" readOnly></input></td>
+							<td><input style='width:150px;height:25px' id="sourceIds[${detail_index-1}]" class="sourceField" type="text" name="pdetails[${detail_index-1}].sourceField" value='${detail?.sourceField}'></input></td>
+							<td><input style='width:150px;height:25px' class="targetField" type="text" name="pdetails[${detail_index-1}].targetField" value='${detail?.targetField}'></input></td>
+							<td><input style='width:75px;height:25px' id="typeIds[${detail_index-1}]" class="dataType" type="text" name="pdetails[${detail_index-1}].dataType" value='${detail?.dataType}' readOnly></input></td>
+							<td><input style='width:100px;height:25px' class="formatType" type="text" name="pdetails[${detail_index-1}].formatType" value='${detail?.formatType}'></input></td>
+							<td><input style='width:100px;height:25px' class="defaultValue" type="text" name="pdetails[${detail_index-1}].defaultValue" value='${detail?.defaultValue}'></input></td>
+							<td><input style='width:100px;height:25px' class="length" type="text" name="pdetails[${detail_index-1}].length" value="${detail?.length}"></input></td>
+							<td><input style='width:50px' type='button' name='profile.orderup' value='^'></input></td>
+						</tr>
+					#{/list}
+				</tbody>
+			</table>
+		</p>
+		<br>
+		<p>
+			<input id='btnMapping' class='buttons' type="button" value="Add Field" ></input>
+			
+		</p>
+		<br>
+		<table id="tblFilter">
+				<thead>
+					<tr>
+						<th width="50px" class="ui-state-default"><b>Action</b></th>
+						<th width="10px" class="ui-state-default"><b>No</b></th>
+						<th width="100px" class="ui-state-default"><b>Filter&nbsp;Field</b></th>
+						<th width="100px" class="ui-state-default"><b>Type</b></th>
+						<th width="75px" class="ui-state-default"><b>Default&nbsp;Operator</b></th>
+						<th width="200px" class="ui-state-default"><b>Default&nbsp;Value</b></th>
+						<th width="50px" class="ui-state-default"><b>Order</b></th>
+					</tr>	
+				</thead>
+				<tbody>
+					#{list profile.filters, as:'filter'}
+						<tr>
+							<td>
+								<input style='width:50px' type='button' name='profile.deleteF' value='Del'></input>
+							</td>
+							<td><input style='width:20px;height:25px;' class="noSeqFilter" type="text" name="pfilters[${filter_index-1}].noSeq" value="${filter?.noSeq}" readOnly></input></td>
+							<td><input style='width:150px;height:25px' id="filterIds[${filter_index-1}]" class="filterField" type="text" name="pfilters[${filter_index-1}].fieldName" value='${filter?.fieldName}'></input></td>
+							<td><input style='width:150px;height:25px' id="typeIds2[${filter_index-1}]" class="type dataType" type="text" name="pfilters[${filter_index-1}].dataType" value='${filter?.dataType}' readOnly></input></td>
+							<td>
+								<input style='width:150px;height:25px' id="operatorIds[${filter_index-1}]" class="defaultOperator" type="text" name="pfilters[${filter_index-1}].defOperator.lookupDescription" value='${filter?.defOperator?.lookupDescription}'></input>
+								<input type="hidden" class="defaultOperatorCode" id="lookIds[${filter_index-1}]" name="pfilters[${filter_index-1}].defOperator.lookupId" value='${filter?.defOperator?.lookupId}'></input>
+							</td>
+							<td><input style='width:250px;height:25px' class="defaultValue" type="text" name="pfilters[${filter_index-1}].defValue" value='${filter?.defValue}'></input></td>
+							
+							<td><input style='width:50px' type='button' name='profile.orderupF' value='^'></input></td>
+							
+						</tr>
+					#{/list}
+				</tbody>
+			</table>
+			<p>
+				<input id='btnField' class='buttons' type="button" value="Add Filter" ></input>
+			</p>
+	</form>
+</div>	
+
+<div id="result" style="display:none">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<div class="response"></div>
+</div>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'UploadDownload/Download.js' /}
+	$(document).ready(function() {
+		$('.buttons input:button').button();
+		$('#btnMapping').button();
+		$('#btnPopulate').button();
+		$('#btnField').button();
+		$('#btnReset').button();
+		Download($("#html"));
+	});
+			
+	function doCancel(){
+		location.href = '@{UploadDownload.list()}?action=Download';
+	}
+</script>
+
+
+
+	
+

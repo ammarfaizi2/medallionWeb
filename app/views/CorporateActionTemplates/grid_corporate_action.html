@@ -1,0 +1,67 @@
+<table id="gridCorporateAction" class="display">
+	<thead>
+		<tr>
+			<th>Action Template Key</th>
+			<th>Action Detail Key</th>
+			<th>Transaction Template Key</th>
+			<th width="100px">Transaction Code</th>
+			<th width="200px"">Description</th>
+			<th width="100px"">Source/Target</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list actionTemplateMaster?.actionTemplateDetails, as:'actionDetail'}
+		<tr>
+			<td>
+				${actionDetail?.actionTemplateMaster?.actionTemplateKey}
+			</td>
+			<td>
+				${actionDetail?.actionDetailKey}
+			</td>
+			<td>
+				${actionDetail?.transactionTemplate?.transactionTemplateKey}
+			</td>
+			
+			<td>
+				${actionDetail?.transactionTemplate?.transactionCode}
+			</td>
+			<td>
+				${actionDetail?.description}
+			</td>
+			<td> 
+				<span>${((actionDetail?.isSource)?'Source':'Target')}</span>
+				#{hidden id:'actionTemplateKeyX', name:'actionDetails[' + (actionDetail_index-1) + '].actionTemplateMaster.actionTemplateKey', value:actionDetail?.actionTemplateMaster?.actionTemplateKey /}
+				#{hidden id:'actionDetailKeyX',name:'actionDetails[' + (actionDetail_index-1) + '].actionDetailKey', value:actionDetail?.actionDetailKey /}
+				#{hidden id:'transactionTemplateKeyX',name:'actionDetails[' + (actionDetail_index-1) + '].transactionTemplate.transactionTemplateKey', value:actionDetail?.transactionTemplate?.transactionTemplateKey /}
+				#{hidden id:'transactionCodeX', name:'actionDetails[' + (actionDetail_index-1) + '].transactionTemplate.transactionCode', value:actionDetail?.transactionTemplate?.transactionCode /}
+				#{hidden id:'isSourceX', name:'actionDetails[' + (actionDetail_index-1) + '].isSource', value:actionDetail?.isSource /}
+				#{hidden id:'transactionTemplateDescriptionX', name:'actionDetails[' + (actionDetail_index-1) + '].description', value:actionDetail?.description /}
+			</td>	
+				
+		</tr>
+	#{/list}
+	</tbody>
+	<tfoot style="display:none">
+		<tr>
+			<td>
+			</td>
+			<td>
+			</td>
+			<td>
+			</td>
+			<td>
+			</td>
+			<td>
+			</td>
+			<td>
+			<input type="hidden" id="actionTemplateKeyX" />
+			<input type="hidden" id="actionDetailKeyX" />
+			<input type="hidden" id="transactionTemplateKeyX" />
+			<input type="hidden" id="transactionCodeX" />	
+			<input type="hidden" id="isSourceX" />	
+			<input type="hidden" id="transactionTemplateDescriptionX" />	
+			</td>
+			
+		</tr>	
+	</tfoot>
+</table>

@@ -1,0 +1,105 @@
+<table id="gridCorporateAction" class="display">
+	<thead>
+		<tr>
+			<th>Security Source</th>
+			<th>Security Target</th>
+			<th>Source Quantity</th>
+			<th>Target Quantity</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list corporateAnnouncement?.announcementDetails, as:'announcement'}
+		<tr>
+			
+			<td>
+				${announcement?.securitySource?.securityId}
+				#{hidden id:'securityCodeSource', name:'corporateAnnouncement.announcementDetails[' + (announcement_index-1) + '].securitySource.securityId', value:announcement?.securitySource?.securityId /}
+				#{hidden id:'securityCodeSourceDesc', name:'corporateAnnouncement.announcementDetails[' + (announcement_index-1) + '].securitySource.description', value:announcement?.securitySource?.description /}								
+				#{hidden id:'SecurityCodeSourceKey', name:'corporateAnnouncement.announcementDetails[' + (announcement_index-1) + '].securitySource.securityKey', value:announcement?.securitySource?.securityKey/}
+			</td>
+			<td>
+				${announcement?.securityTarget?.securityId}
+				#{hidden id:'securityCodeTarget', name:'corporateAnnouncement.announcementDetails[' + (announcement_index-1) + '].securityTarget.securityId', value:announcement?.securityTarget?.securityId /}
+				#{hidden id:'securityCodeTargetDesc', name:'corporateAnnouncement.announcementDetails[' + (announcement_index-1) + '].securityTarget.description', value:announcement?.securityTarget?.description /}								
+				#{hidden id:'securityCodeTargetKey', name:'corporateAnnouncement.announcementDetails[' + (announcement_index-1) + '].securityTarget.securityKey', value:announcement?.securityTarget?.securityKey /}
+			</td>
+			<td>
+				${announcement?.sourceQuantity?.format('#,##0.##########')}
+				#{hidden id:'sourceQuantity', name:'corporateAnnouncement.announcementDetails[' + (announcement_index-1) + '].sourceQuantity', value:announcement?.sourceQuantity /}	
+				
+			</td>
+			<td> 
+				${announcement?.targetQuantity?.format('#,##0.##########')}
+				#{hidden id:'targetQuantity', name:'corporateAnnouncement.announcementDetails[' + (announcement_index-1) + '].targetQuantity', value:announcement?.targetQuantity /}
+			</td>
+			<td>
+				#{button sim='btnDel', id:'btnDel', value:'Delete',  readOnly:readOnly/}
+				
+				#{hidden id:'announcementDetailKey',name:'corporateAnnouncement.announcementDetails[' + (announcement_index-1) + '].announcementDetailKey', value:announcement?.announcementDetailKey /}
+				#{hidden id:'corporateAnnouncementKey',name:'corporateAnnouncement.announcementDetails[' + (announcement_index-1) + '].corporateAnnouncement.corporateAnnouncementKey', value:announcement?.corporateAnnouncement?.corporateAnnouncementKey /}
+				
+				#{hidden id:'securityTypeSource', name:'corporateAnnouncement.announcementDetails[' + (announcement_index-1) + '].securityTypeSource.securityType', value:announcement?.securityTypeSource?.securityType /}
+				#{hidden id:'securityTypeSourceDesc', name:'corporateAnnouncement.announcementDetails[' + (announcement_index-1) + '].securityTypeSource.description', value:announcement?.securityTypeSource?.description /}
+				
+				#{hidden id:'securityTypeTarget', name:'corporateAnnouncement.announcementDetails[' + (announcement_index-1) + '].securityTypeTarget.securityType', value:announcement?.securityTypeTarget?.securityType /}
+				#{hidden id:'securityTypeTargetDesc', name:'corporateAnnouncement.announcementDetails[' + (announcement_index-1) + '].securityTypeTarget.description', value:announcement?.securityTypeTarget?.description /}
+				
+				
+				#{hidden id:'actionTemplateKey', name:'corporateAnnouncement.announcementDetails[' + (announcement_index-1) + '].actionTemplate.actionTemplateKey', value:announcement?.actionTemplate?.actionTemplateKey /}
+				#{hidden id:'actionCode', name:'corporateAnnouncement.announcementDetails[' + (announcement_index-1) + '].actionTemplate.actionCode', value:announcement?.actionTemplate?.actionCode /}
+				#{hidden id:'actionTemplateDescription', name:'corporateAnnouncement.announcementDetails[' + (announcement_index-1) + '].actionTemplate.description', value:announcement?.actionTemplate?.description /}
+				
+				#{hidden id:'couponSchedule', name:'corporateAnnouncement.announcementDetails[' + (announcement_index-1) + '].couponSchedule.id.couponNo', value:announcement?.couponSchedule?.id?.couponNo /}
+				#{hidden id:'couponScheduleKey', name:'corporateAnnouncement.announcementDetails[' + (announcement_index-1) + '].couponNo', value:announcement?.couponNo /}
+				#{hidden id:'couponScheduleDesc', name:'corporateAnnouncement.announcementDetails[' + (announcement_index-1) + '].couponSchedule.paymentDate', value:announcement?.couponSchedule?.paymentDate?.format('MM/dd/yyyy') /}
+				
+				#{hidden id:'isCoupon', name:'corporateAnnouncement.announcementDetails[' + (announcement_index-1) + '].actionTemplate.isCoupon', value:announcement?.actionTemplate?.isCoupon /}
+				#{hidden id:'targetType', name:'corporateAnnouncement.announcementDetails[' + (announcement_index-1) + '].actionTemplate.targetType.lookupId', value:announcement?.actionTemplate?.targetType?.lookupId /}
+				<!-- #{hidden id:'basedCalculation', name:'corporateAnnouncement.announcementDetails[' + (announcement_index-1) + '].securitySource.interestRate', value:announcement?.securitySource?.interestRate /}  -->
+				#{hidden id:'basedCalculation', name:'corporateAnnouncement.announcementDetails[' + (announcement_index-1) + '].securitySource.isFraction', value:announcement?.securitySource?.isFraction /}
+				#{hidden id:'interestRateCoupon', name:'corporateAnnouncement.announcementDetails[' + (announcement_index-1) + '].couponSchedule.interestRate', value:announcement?.couponSchedule?.interestRate /}
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+	<tfoot style="display:none">
+		<tr>
+			<td>
+			</td>
+			<td>
+			</td>
+			<td>
+			</td>
+			<td>
+			</td>
+			<td>
+			</td>
+			<td>
+			<input type="hidden" id="announcementDetailKey" />
+			<input type="hidden" id="corporateAnnouncementKey" />
+			<input type="hidden" id="securityTypeSource" />	
+			<input type="hidden" id="securityCodeSource" />
+			<input type="hidden" id="securityCodeSourceKey" />		
+			<input type="hidden" id="securityTypeTarget" />	
+			<input type="hidden" id="securityCodeTarget" />
+			<input type="hidden" id="securityCodeTargetKey" />	
+			<input type="hidden" id="sourceQuantity" />
+			<input type="hidden" id="targetQuantity" />				
+			<input type="hidden" id="securityTypeSourceDesc" />	
+			<input type="hidden" id="securityCodeSourceDesc" />
+			<input type="hidden" id="securityTypeTargetDesc" />	
+			<input type="hidden" id="securityCodeTargetDesc" />	
+			<input type="hidden" id="actionTemplateKey" />
+			<input type="hidden" id="actionCode" />
+			<input type="hidden" id="actionTemplateDescription" />
+			<input type="hidden" id="couponSchedule" />
+			<input type="hidden" id="couponScheduleKey" />
+			<input type="hidden" id="couponScheduleDesc" />
+			<input type="hidden" id="isCoupon" />
+			<input type="hidden" id="basedCalculation" />
+			<input type="hidden" id="interestRateCoupon" />
+			</td>
+		</tr>	
+	</tfoot>
+</table>

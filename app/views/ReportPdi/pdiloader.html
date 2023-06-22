@@ -1,0 +1,100 @@
+#{extends 'templates/main.html' /}
+
+#{script 'jquery.rc4.js' /}
+<script type="text/javascript">
+	$(function() {
+		$('#signin').button();
+		$('#loginForm').submit(function() {
+			encrypt();
+			return true;
+		});
+		
+		$("#addnew").click( function() {
+			var tbodys = $( "#inputtable tbody" );
+			var newrow = document.createElement( "tr" );
+			var newcola = document.createElement( "td" );
+			var newcolb = document.createElement( "td" );
+	
+			$(newcola).html( "<input type='text' name='paramname[]'/>" );
+			$(newcolb).html( "<input type='text' name='paramvalue[]'/>" );
+			$(newrow).append( newcola );
+			$(newrow).append( newcolb );
+	
+			tbodys.last().append($(newrow));
+			
+		} );
+	});
+	
+	function encrypt() {
+		var id = '${session.id}';
+		for (i = 0; i < id.length; i++) {
+			if (!isNaN(id.substring(i, i+1))) {
+				var start = Number(id.substring(i, i+1));
+				if ($('#password').val() != '') {
+					$('#password').rc4({
+						key: id.substring(start, start + 8)
+					});
+				}
+				break;
+			}
+		}		
+	}
+</script>
+<div id="news">
+	<form action="@{ReportPdi.upload()}" method="POST" enctype="multipart/form-data">
+		<fieldset>
+			<legend>Input:</legend>
+			<h3>Parameter</h3>
+			<span>*in case no parameter, leave it empty.</span>
+			<table class="" id="inputtable">
+				<thead>
+					<tr>
+						<th>Parameter Name</th>
+						<th>Parameter Value</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><input type="text" name="paramname[]"/></td>
+						<td><input type="text" name="paramvalue[]"/></td>
+					</tr>
+				</tbody>
+				<tfoot>
+					<tr>
+						<td></td>
+						<td><input type="button" value="Add Parameter" name="addnew" id="addnew"/></td>
+					</tr>
+				</tfoot>
+			</table>
+			
+			<h3>Upload Transformation file(usually .ktr)</h3>
+			<input type="file" name="attachment" id="attachment" /><br/>
+			<input type="submit" name="submit" value="Submit" /> 
+		</fieldset>
+	</form>
+	<form>
+		<fieldset>
+		<legend>Output:</legend>	
+		<div id="output">
+			#{if ktrStatus}
+				File Name : ${ktrStatus.fileName}<br/>
+				
+				#{if ktrStatus.isSuccess()}
+					Output file :
+					<ul>
+					#{list ktrStatus.outputFileName, as:'filename'}
+					     <li>
+					     <a href="/reportpdi/pdidownload/${filename}">${filename}</a>
+					     </li>
+					#{/list} 
+					</ul>
+				#{/if}
+				#{else}
+					Error[s] detected:  ${ktrStatus.errors}
+				#{/else}
+	
+			#{/if}
+		</div>
+		</fieldset>
+	</form>
+</div>

@@ -1,0 +1,82 @@
+<h3>Search results</h3>
+
+#{if corporateAnnouncements}
+<table id="grid" class="display">
+	<thead>
+		<tr>
+			<th width="100px">Key</th>
+			<th width="100px">Announcement #</th>
+			<th width="100px">Subject</th>
+			<th width="50px">Announcement Date</th>
+			<th width="50px">Recording Date</th>
+			<th width="50px">Distribution Date</th>
+			
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:corporateAnnouncements, as:'corporateAnnouncement'}
+		<tr onclick="edit('${corporateAnnouncement?.corporateAnnouncementKey}','corporateAnnouncement')">
+			<td>
+				${corporateAnnouncement?.corporateAnnouncementKey}
+			</td>
+			<td>
+				${corporateAnnouncement?.corporateAnnouncementCode}
+			</td>
+			<td>
+				${corporateAnnouncement?.description}
+			</td>
+			<td>
+				${corporateAnnouncement?.announcementDate?.format(appProp.dateFormat)}
+			</td>
+			<td>
+				${corporateAnnouncement?.recordingDate?.format(appProp.dateFormat)}
+			</td>
+			<td>
+				${corporateAnnouncement?.distributionDate?.format(appProp.dateFormat)}
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>
+
+#{/if}
+#{else}
+<div>No record found</div>
+#{/else}
+
+<!-- <table id="grid" class="display">
+	<thead>
+		<tr>
+			<th width="100px">Key</th>
+			 <th width="100px">Announcement No</th> 
+			<th width="100px">Action Type</th>
+			<th width="100px">Security Id</th>
+			<th width="260px">Description</th>
+			<th width="40px">Announcement Date</th>
+			<th width="50px">Status</th>
+			
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:entitlements, as:'entitlement'}
+		<tr onclick="show('${entitlement?.corporateAnnouncementKey}')">
+			<td>
+				${entitlement?.corporateAnnouncementKey}
+			</td>
+			<td class="capitalize">
+				${entitlement?.security?.securityId}
+			</td>
+			<td class="capitalize">
+				${entitlement?.security?.description}
+			</td>
+			<td>
+				${entitlement?.announcementDate?.format("dd/MMM/yyyy")}
+			</td>
+			<td align="center" class="capitalize">
+				${entitlement?.status}
+			</td>
+			
+		</tr>
+	#{/list}
+	</tbody>
+</table> -->

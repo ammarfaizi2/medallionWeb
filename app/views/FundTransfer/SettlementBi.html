@@ -1,0 +1,126 @@
+#{script 'lookuppaging.js' /}
+#{script 'lookups.js' /}
+
+<form id="rootSettlementBI" class="form">
+	<input id='applicationDateBI' value="${param.applicationDate}" type="hidden"/>
+	<p>
+		#{textBox id:'fundBatchNoBI', label:'Fund Batch No', width:'120px', readOnly:true, class:'capitalize', required:false /}
+	</p>
+	<p> 
+		<label>Settlement Date</label>
+		<input id='checkAsOfBIDate' type='radio' name='checkSettlementDate' checked="checked"/>
+		<b>As Of&nbsp;</b>
+		#{textBox id:'asOfDateBI', label:'', width:'80px', readOnly:false, class:'calendar', required:false /}
+		<span id="asOfDateBIErr" class="error"></span>
+	</p>
+	<p>
+		<label>&nbsp;</label>
+		<input id='checkBIFromTo' type='radio' name='checkSettlementDate'/>
+		<b>From&nbsp;</b>
+		#{textBox id:'BIDateFrom', label:'', width:'80px', readOnly:true, class:'calendar', required:false /}
+		<b>&nbsp;To&nbsp;</b>
+		#{textBox id:'BIDateTo', label:'', width:'80px', readOnly:true, class:'calendar', required:false /}
+		<span id="BIDateFromError" class="error"></span>
+		<span id="BIDateToError" class="error"></span>
+	</p>	
+	<p>
+		#{textBox id:'accountNoBI', label:'Account No', width:'120px', readOnly:readOnly, class:'capitalize', required:false /}
+		#{hidden  id:'accountNoBIKey' /}
+		#{button  id:'accountNoBIHelp', value:'?', class:'small', readOnly:readOnly/}
+		#{textBox id:'accountNoBIDesc', readOnly:true, width:'245px' /}
+	</p>
+	<p>
+		#{dropDownList id:'transTypeBI', label:'Transaction Type', options:transactionType, readOnly:readOnly,width:'120px', required:true /}
+		<span id="transTypeBIError" class="error"></span>
+	</p>
+	<p>
+		#{textBox id:'securityTypeBI',width:'120px', name:'', label:'Security Type', value:'', class:'capitalize', required:false /}
+		#{hidden id:'securityTypeBIId', name:'params.securityTypeSearchId', value:params?.securityTypeSearchId /}
+		#{button id:'securityTypeBIHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'securityTypeBIName', name:'transaction.transactionTemplate.securityType.description', value:transaction?.transactionTemplate?.securityType?.description, readOnly:true, width:'245px' /}
+		<span id="securityTypeBIError" class="error"></span>
+	</p>
+	<p>
+		#{dropDownList id:'transferTypeBI', label:'Transfer Type', options:transferType, readOnly:readOnly,width:'120px', required:true /}
+		<span id="transferTypeBIError" class="error"></span>
+	</p>
+	<p>
+		#{textBox id:'currencyBI', name:'', label:'Currency', class:'capitalize', required:true, readOnly:readOnly, width:'120px', maxLength:'10' /}
+		#{button id:'currencyBIHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'currencyBIDesc', name:'', readOnly:true, width:'245px' /}	
+		<span id="currencyBIError" class="error"></span>	
+	</p>
+	<p>
+		<label>Process Mode</label>
+		<input id='checkDefaultBI' type='radio' name='checkProcessMode' checked="checked"/><b>&nbsp;Group</b>
+		<input id='checkTransactionBI' type='radio' name='checkProcessMode'/><b>&nbsp;Transaction</b>
+	</p>	
+	<p>
+		&nbsp;
+	</p>
+	<p>
+		<input id='btnPopulateBI' type="button" value="Populate" ></input>
+		<input id='btnResetBI' type="button" value="Reset"></input>
+	</p>
+	<p>
+		<table id='tblFundTransferBI'>
+			<thead>
+				<tr>
+					<td><input id='checkAllBI' type="checkbox"/></td>
+					<td>No</td>
+					<td>Date</td>
+					<td>Account&nbsp;No</td>
+					<td>Security</td>
+					<td>Currency</td>
+					<td>Transaction&nbsp;No</td>
+					<td>Payment&nbsp;Amount</td>
+					<td>DR/CR</td>
+					<td>Status</td>
+					<td>Sender&nbsp;Branch&nbsp;Code</td>
+					<td>Sender&nbsp;Bank&nbsp;Code</td>					
+					<td>Sender&nbsp;A/C&nbsp;No</td>
+					<td>Sender&nbsp;A/C&nbsp;Name</td>
+					<td>Sender&nbsp;Currency</td>
+					<td>Benef&nbsp;Bank&nbsp;Code</td>
+					<td>Benef&nbsp;Bank&nbsp;Name</td>					
+					<td>Benef&nbsp;A/C&nbsp;No</td>
+					<td>Benef&nbsp;A/C&nbsp;Name</td>
+					<td>Benef&nbsp;Currency</td>
+					<td>Charge&nbsp;Amount</td>
+					<td>Net&nbsp;Payment&nbsp;Amount</td>
+					<td>Payment&nbsp;Type&nbsp;Code</td>
+				</tr>
+			</thead>
+		</table>
+	</p>
+	<p>&nbsp;</p>
+	<p>
+		<div>
+			<input id='btnSaveBI' type="button" value="Save"></input>
+			<input id='btnConfirmBI' type="button" value="Confirm"></input>
+		</div>
+		<div id='totalBI' style="float: right;position: relative;display: none;">
+			<p id = 'totalDR'>
+				<b>Total&nbsp;Amount&nbsp;<input id='totAmtDrBI' type="text" disabled="disabled"/></b>
+			</p>
+			<p id = 'totalCR' style="display:none">
+				<b>Total&nbsp;Amount&nbsp;CR&nbsp;<input id='totAmtCrBI' type="text" disabled="disabled"/></b>
+			</p>
+			<p>
+				<b>Bank&nbsp;Charges&nbsp;<input id='totCharges' type="text" disabled="disabled"/></b>
+			</p>		
+		</div>
+	</p>	
+	<p>
+		&nbsp;
+	</p>
+	<p>&nbsp;</p>
+	<p>&nbsp;</p>
+</form>
+
+<script type="text/javascript">
+	#{include 'FundTransfer/SettlementBi.js' /}
+	$(document).ready(function() {
+		SettlementBI($("#rootSettlementBI"));
+	});
+</script>

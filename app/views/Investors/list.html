@@ -1,0 +1,123 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Investor Information' /}
+#{if param == 'register-cust-acct'}
+	#{set pageTitle: 'Register Custody Account' /}
+#{/if}
+#{if param == 'register-bank-acct'}
+	#{set pageTitle: 'Register Bank Account' /}
+#{/if}
+#{if param == 'register-invt-acct'}
+	#{set pageTitle: 'Register Investment Account' /}
+#{/if}
+
+#{if param == 'dedupe'}
+	#{set pageTitle: 'Investor Information' /}
+#{/if}
+#{set fixData: true /}
+#{set mode: mode /}
+
+<script type="text/javascript">	
+	$(function() {
+		// Search section
+		$('#root').accordion({
+			collapsible: true
+		});
+		
+		$('#customerNoOperator').children().eq(0).remove();
+		$('#customerNameOperator').children().eq(0).remove();
+		$('#externalNo').children().eq(0).remove();
+
+		$('#buttonNotInList').hide();
+		$('#birthDate').datepicker();
+		$('.calendar').datepicker();
+		$('.buttons button:first').button({
+			icons: {
+				primary: 'ui-icon-search'
+			}
+		}).next().button();	
+		
+		$('#reset').click(function() {
+			#{if dedupe}
+				location.href="@{Investors.dedupe()}?";
+			#{/if}
+			#{else}
+				location.href="@{Investors.list()}?mode=${mode}#{if param}&param=${param}#{/if}";
+			#{/else}			
+		});
+		
+		$('#notInList').change(function() {
+		if ($('#notInList').is(':checked')) 
+        	$('.buttons #new').show();
+		else 
+			$('.buttons #new').hide();
+		});
+		
+		$('.buttons input:button').button();
+		$('.buttons #new').hide();		
+					 
+		$('.buttons #new').click(function() {
+			location.href="@{Investors.entry()}";
+		});
+	});
+
+</script>
+
+<div id="root">
+<h3><a href="#">Search Investor</a></h3>
+	<form id="searchForm" class="form">
+		<input id="param" name="params.param" type="hidden" value="${param}"/>
+		#{hidden id:'query', name:'params.query', value:params?.query /} 
+		<p>
+			#{dropDownList id:'customerNoOperator', name:'params.customerNoOperator', label:'Investor No', options:stringOperators, value:params.customerNoOperator /}
+			#{textBox id:'customerSearchNo', name:'params.customerSearchNo', value:params.customerSearchNo, class:'capitalize' /}
+		</p>
+		<p>
+			#{dropDownList id:'customerNameOperator', name:'params.customerNameOperator', label:'Investor Name', options:stringOperators, value:params.customerNameOperator /}
+			#{textBox id:'customerSearchName', name:'params.customerSearchName', value:params.customerName, width:'350px', class:'capitalize' /}
+		</p>
+		<p>
+			#{dropDownList id:'externalNo', name:'params.externalNo', label:'SID No', options:stringOperators, value:params.externalNo /}
+			#{textBox id:'customerSearchExternalNo', name:'params.customerSearchExternalNo', value:params.customerSearchExternalNo, width:'350px', class:'capitalize' /}
+		</p>
+		<p>
+			<div class="buttons">
+				<input type="button" id="search" value="Search" />				
+				<input type="button" id="reset" value="Reset" />					
+			</div>
+		</p>
+	</form>
+</div>	
+
+<div id="result" style="display:block;">
+	<table id="tableinvestor" class="display">
+		<thead>
+			<tr>
+				<th width="50px" field="customerNo|string|none|left|sort">Investor No</th>
+				<th width="250px" field="customerName|string|none|left|sort">Investor Name</th>
+				<th width="100px" field="externalNo|string|none|left|sort">SID No</th>
+				<th width="80px" field="birthDate|date|date|center|sort">Birth Date</th>
+				<th width="80px" field="identification1No|string|none|left|sort">Identification No</th>
+				<th width="80px" field="recordStatus|string|decode|left|sort">Status</th>
+				<th width="100px" field="isActive|boolean|yesno|center|sort">Active</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+</div>
+
+#{if param == 'dedupe'}
+		<div id="buttonNotInList" class="buttons">
+					<label><input type="checkbox" id="notInList"/> Not in the list</label>&nbsp;
+					<input type="button" id="new" value="New Data" />	
+		</div>
+#{/if}
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'Investors/pagingList.js' /}
+	$(document).ready(function() {
+		pagingList($("#main"));
+	});
+</script>	
+

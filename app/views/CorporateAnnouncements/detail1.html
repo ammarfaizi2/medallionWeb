@@ -1,0 +1,1596 @@
+#{set pageTitle: 'Corporate Action Announcement' /}
+#{set id:corporateAnnouncement?.corporateAnnouncementKey /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+
+#{script 'lookups.js' /}
+#{if  ((mode!='entry') && (corporateAnnouncement?.status != 'O '))}
+	#{set readOnly: true /}
+#{/if}
+
+#{if  announcements?.actionTemplate?.isCoupon == false }
+	#{set readOnlyCoupon: true /}
+#{/if}
+#{else}
+	#{set readOnlyCoupon: readOnly /}
+#{/else}
+
+#{script 'date.format.js' /}
+#{script 'external/Util.js' /}
+<script type="text/javascript">
+//alert('${(corporateAnnouncement?.status != 'O ')}')
+	$(function() {
+
+		$('#holdingBasedOn').val('HOLDING_BASED_ON-2') ;
+		
+		var checkCoupon = $(selectedRow).find('#isCoupon').val();
+		if (checkCoupon=="true") {
+			$("b[id=couponScheduleReq]").html(" *");
+			if (checkFraction=="true") {
+				$("b[id=ratioReq]").html("");
+			}
+		} else {
+			$("b[id=couponScheduleReq]").html("");
+		}
+		
+		$('.calendar').datepicker();
+		var tabs = 
+			$('#tabsCorporateAction').tabs({
+				select: function(event, ui) {
+					activeTab = $(ui.panel).attr('id');
+					activeTabCapital = activeTab.toString().slice(0,1).toUpperCase() + activeTab.slice(1);
+					}
+			});
+		
+		$("#announcementDate").change(function(){
+			var id = this.id;
+			var thisId = "#" + id;
+			var errorId = "#" + id + "Error";
+			var compare1 =  thisId ;
+			var compare2 = "#cumDate";
+			var compare3 = "#exDate";
+			var compare1Format =  new Date($(compare1).datepicker('getDate')).getTime();
+			var compare2Format = new Date($(compare2).datepicker('getDate')).getTime();
+			var compare3Format =  new Date($(compare3).datepicker('getDate')).getTime();
+			var conditionMessageError = "Invalid date format";
+			var errorMsg = "Invalid date value";
+			
+			validateCompare(thisId, errorId, compare1, compare2, compare3, errorMsg, compare1Format, compare2Format, compare3Format, conditionMessageError);
+		});
+		
+		$("#cumDate").change(function() {
+			var id = this.id;
+			var thisId = "#" + id;
+			var errorId = "#" + id + "Error";
+			var compare1 = "#announcementDate";
+			var compare2 = thisId;
+			var compare3 = "#exDate";
+			var compare1Format = new Date($(compare1).datepicker('getDate')).getTime();
+			var compare2Format = new Date($(compare2).datepicker('getDate')).getTime();
+			var compare3Format = new Date($(compare3).datepicker('getDate')).getTime();
+			var conditionMessageError = "Invalid date format";
+			var errorMsg = "Invalid date value";
+			
+			validateCompare(thisId, errorId, compare1, compare2, compare3, errorMsg, compare1Format, compare2Format, compare3Format, conditionMessageError);
+		});
+		
+		$("#exDate").change(function() {
+			var id = this.id;
+			var thisId = "#" + id;
+			var errorId = "#" + id + "Error";
+			var compare1 = "#announcementDate" ;
+			var compare2 =  "#cumDate";
+			var compare3 = thisId;
+			var compare1Format = new Date($(compare1).datepicker('getDate')).getTime();
+			var compare2Format = new Date($(compare2).datepicker('getDate')).getTime();
+			var compare3Format = new Date($(compare3).datepicker('getDate')).getTime();
+			var conditionMessageError = "Invalid date format";
+			var errorMsg = "Invalid date value";
+			validateCompare(thisId, errorId, compare1, compare2, compare3, errorMsg, compare1Format, compare2Format, compare3Format, conditionMessageError);
+			
+			var recordingDateFormat = new Date($("#recordingDate").datepicker('getDate')).getTime();
+						
+			if ($(thisId+"Error").html()!= "Invalid date format") { 
+				if (($("#recordingDate").val() != "") && ($("#recordingDateError").html() != conditionMessageError)) {
+					$("#recordingDate").removeClass("fieldError");
+					$("#recordingDateError").html("");
+					if (recordingDateFormat < compare3Format) {
+						$("#recordingDate").addClass("fieldError");
+						$("#recordingDateError").html("Invalid date value").show();
+					} 
+				}
+			}
+		
+		});
+		
+		$("#recordingDate").change(function() {
+			var id = this.id;
+			var thisId = "#" + id;
+			var errorId = "#" + id + "Error";
+			var compare1 = "#announcementDate" ;
+			var compare2 =  "#cumDate";
+			var compare3 = "#exDate";
+			var compare4 = thisId;
+			var compare5 = "#distributionDate";
+			var compare1Format = new Date($(compare1).datepicker('getDate')).getTime();
+			var compare2Format = new Date($(compare2).datepicker('getDate')).getTime();
+			var compare3Format = new Date($(compare3).datepicker('getDate')).getTime();
+			var compare4Format = new Date($(compare4).datepicker('getDate')).getTime();
+			var compare5Format = new Date($(compare5).datepicker('getDate')).getTime();
+			var conditionMessageError = "Invalid date format";
+			var errorMsg = "Invalid date value";
+						
+			
+			if ($(thisId+"Error").html()!= "Invalid date format") { 
+				if (compare4Format < compare3Format) {
+					$(compare4).addClass("fieldError");
+					$(thisId+"Error").html(errorMsg).show();
+				} 
+
+				if (($(compare5).val() != "") && ($(compare5+"Error").html() != conditionMessageError)) {
+					$(compare5).removeClass("fieldError");
+					$($(compare5+"Error")).html("");
+					if (compare5Format < compare4Format) {
+						$(compare5).addClass("fieldError");
+						$($(compare5+"Error")).html(errorMsg).show();
+					} 
+				}
+			}
+			
+		
+		});
+		
+		$("#distributionDate").change(function() {
+			var id = this.id;
+			var thisId = "#" + id;
+			var errorId = "#" + id + "Error";
+			var compare1 = "#announcementDate" ;
+			var compare2 =  "#cumDate";
+			var compare3 = "#exDate";
+			var compare4 = "#recordingDate";
+			var compare5 = thisId;
+			var compare1Format = new Date($(compare1).datepicker('getDate')).getTime();
+			var compare2Format = new Date($(compare2).datepicker('getDate')).getTime();
+			var compare3Format = new Date($(compare3).datepicker('getDate')).getTime();
+			var compare4Format = new Date($(compare4).datepicker('getDate')).getTime();
+			var compare5Format = new Date($(compare5).datepicker('getDate')).getTime();
+			var conditionMessageError = "Invalid date format";
+			var errorMsg = "Invalid date value";
+						
+			if ($(thisId+"Error").html()!= "Invalid date format") { 
+				if (compare5Format < compare4Format) {
+					$(thisId).addClass("fieldError");
+					$(thisId+"Error").html(errorMsg).show();
+				}
+			}
+		});
+		
+		var securityCodeFilter = "";
+		if ($('#securityType').val() != "") {
+			securityCodeFilter = $('#securityType');
+		}
+		securityCode(securityCodeFilter);
+		
+		$('#securityType').lookup({
+			list:'@{Pick.securityTypes()}',
+			get:{
+				url:'@{Pick.securityType()}',
+				success: function(data) {
+					if (data) {
+						$('#securityType').removeClass('fieldError');
+						$('#securityType').val(data.code);
+						$('#securityTypeDesc').val(data.description);
+						$('#h_securityTypeDesc').val(data.description);
+						securityCode($('#securityType'));
+					}	
+				},
+				error: function(data) {
+					$('#securityType').addClass('fieldError');
+					$('#securityTypeDesc').val('NOT FOUND');
+					//$('#securityType').val(data.code);
+					$('#securityType').val('');
+					$('#h_securityTypeDesc').val('');
+				}
+			},
+			description:$('#securityTypeDesc'),
+			help:$('#securityTypeHelp')
+		});
+		
+		// DataTables section
+		var table = 
+			$('#listCorporateAction #gridCorporateAction').dataTable({
+				aaSorting:[[0,'asc']],
+				aoColumnDefs: [{asSorting:["asc"], aTargets:[0]}, {asSorting:[""], aTargets:[1,2]}],
+				bJQueryUI:true,
+				//bAutoWidth: true,
+				//bLengthChange:true,
+				//iDisplayLength:15,	
+				bFilter:false,												
+				bSort: false,											// disabled sorting data tables
+				bPaginate:false,
+				bInfo:false
+				
+			});
+
+		$('#listCorporateAction #gridCorporateAction').removeAttr('style'); // tembak nilai widht untuk tampilan
+		$('#listCorporateAction #gridCorporateAction tbody tr td').die('click');
+		$('#listCorporateAction #gridCorporateAction tbody tr td').live('click', function() {
+			//editCorporateAction(this);	
+			$("#detailCorporateAction span").html("");
+			var table = $('#listCorporateAction #gridCorporateAction').dataTable();
+			var rowPos= $(this).parents('tr');
+			var rowPosNumber = table.fnGetPosition(rowPos[0]);
+			
+			var pos = table.fnGetPosition(this);
+			if (pos[1] != 4) {
+				var hiddens = $("[type=hidden]", rowPos);
+				
+				$('#detailCorporateAction #securityCodeSourceRow').val($(hiddens).eq(0).attr("name", "corporateAnnouncement.announcementDetails["+(rowPosNumber)+"].securitySource.securityId").val());
+				$('#detailCorporateAction #securityCodeSourceDescRow').val($(hiddens).eq(1).attr("name", "corporateAnnouncement.announcementDetails["+(rowPosNumber)+"].securitySource.description").val());
+				$('#detailCorporateAction #securityCodeSourceKeyRow').val($(hiddens).eq(2).attr("name", "corporateAnnouncement.announcementDetails["+(rowPosNumber)+"].securitySource.securityKey").val());
+				
+				$('#detailCorporateAction #securityCodeTargetRow').val($(hiddens).eq(3).attr("name", "corporateAnnouncement.announcementDetails["+(rowPosNumber)+"].securityTarget.securityId").val());
+				$('#detailCorporateAction #securityCodeTargetDescRow').val($(hiddens).eq(4).attr("name", "corporateAnnouncement.announcementDetails["+(rowPosNumber)+"].securityTarget.description").val());
+				$('#detailCorporateAction #securityCodeTargetKeyRow').val($(hiddens).eq(5).attr("name", "corporateAnnouncement.announcementDetails["+(rowPosNumber)+"].securityTarget.securityKey").val())
+			
+				//$('#detailCorporateAction #sourceQuantityRow').autoNumericSet($(hiddens).eq(6).attr("name", "corporateAnnouncement.announcementDetails["+(rowPosNumber)+"].sourceQuantity").val(), {vMAx:'999999999999.999999'}).val();
+				//$('#detailCorporateAction #targetQuantityRow').autoNumericSet($(hiddens).eq(7).attr("name", "corporateAnnouncement.announcementDetails["+(rowPosNumber)+"].targetQuantity").val(), {vMAx:'999999999999.999999'}).val();
+				
+				$('#detailCorporateAction #sourceQuantityRowStripped').val($(hiddens).eq(6).attr("name", "corporateAnnouncement.announcementDetails["+(rowPosNumber)+"].sourceQuantity").val());
+				$('#detailCorporateAction #targetQuantityRowStripped').val($(hiddens).eq(7).attr("name", "corporateAnnouncement.announcementDetails["+(rowPosNumber)+"].targetQuantity").val());
+				
+				if ($('#detailCorporateAction #sourceQuantityRowStripped').val() == ""){
+					$('#detailCorporateAction #sourceQuantityRow').val("");
+				} else {
+					//($(hiddens).eq(6).attr("name", "corporateAnnouncement.announcementDetails["+(rowPosNumber)+"].sourceQuantity").val() == "" ? 
+					//"" : autoNumericGet("detailCorporateAction #sourceQuantityRow", $(hiddens).eq(6).attr("name", "corporateAnnouncement.announcementDetails["+(rowPosNumber)+"].sourceQuantity").val()));
+					autoNumericGet("detailCorporateAction #sourceQuantityRow", $(hiddens).eq(6).attr("name", "corporateAnnouncement.announcementDetails["+(rowPosNumber)+"].sourceQuantity").val());
+				}
+				
+				if ($('#detailCorporateAction #targetQuantityRowStripped').val() == "") {
+					$('#detailCorporateAction #targetQuantityRow').val("");
+				} else {
+					//($(hiddens).eq(7).attr("name", "corporateAnnouncement.announcementDetails["+(rowPosNumber)+"].targetQuantity").val() == "" ?
+					//"" : autoNumericGet("detailCorporateAction #targetQuantityRow", $(hiddens).eq(7).attr("name", "corporateAnnouncement.announcementDetails["+(rowPosNumber)+"].targetQuantity").val()));
+					autoNumericGet("detailCorporateAction #targetQuantityRow", $(hiddens).eq(7).attr("name", "corporateAnnouncement.announcementDetails["+(rowPosNumber)+"].targetQuantity").val());
+				}
+				
+				$('#detailCorporateAction #announcementDetailKeyRow').val($(hiddens).eq(8).attr("name", "corporateAnnouncement.announcementDetails["+(rowPosNumber)+"].announcementDetailKey").val())
+				$('#detailCorporateAction #corporateAnnouncementKeyRow').val($(hiddens).eq(9).attr("name", "corporateAnnouncement.announcementDetails["+(rowPosNumber)+"].corporateAnnouncement.corporateAnnouncementKey").val())
+
+				$('#detailCorporateAction #securityTypeSourceRow').val($(hiddens).eq(10).attr("name", "corporateAnnouncement.announcementDetails["+(rowPosNumber)+"].securityTypeSource.securityType").val())
+				$('#detailCorporateAction #securityTypeSourceDescRow').val($(hiddens).eq(11).attr("name", "corporateAnnouncement.announcementDetails["+(rowPosNumber)+"].securityTypeSource.description").val())
+
+				$('#detailCorporateAction #securityTypeTargetRow').val($(hiddens).eq(12).attr("name", "corporateAnnouncement.announcementDetails["+(rowPosNumber)+"].securityTypeTarget.securityType").val())
+				$('#detailCorporateAction #securityTypeTargetDescRow').val($(hiddens).eq(13).attr("name", "corporateAnnouncement.announcementDetails["+(rowPosNumber)+"].securityTypeTarget.description").val())
+
+				$('#detailCorporateAction #actionTemplateKeyRow').val($(hiddens).eq(14).attr("name", "corporateAnnouncement.announcementDetails["+(rowPosNumber)+"].actionTemplate.actionTemplateKey").val())
+				$('#detailCorporateAction #actionCodeRow').val($(hiddens).eq(15).attr("name", "corporateAnnouncement.announcementDetails["+(rowPosNumber)+"].actionTemplate.actionCode").val())
+				$('#detailCorporateAction #actionTemplateDescriptionRow').val($(hiddens).eq(16).attr("name", "corporateAnnouncement.announcementDetails["+(rowPosNumber)+"].actionTemplate.description").val())
+
+				$('#detailCorporateAction #couponScheduleRow').val($(hiddens).eq(17).attr("name", "corporateAnnouncement.announcementDetails["+(rowPosNumber)+"].couponSchedule.id.couponNo").val())
+				$('#detailCorporateAction #couponScheduleKeyRow').val($(hiddens).eq(18).attr("name", "corporateAnnouncement.announcementDetails["+(rowPosNumber)+"].couponNo").val())
+				$('#detailCorporateAction #couponScheduleDescRow').val($(hiddens).eq(19).attr("name", "corporateAnnouncement.announcementDetails["+(rowPosNumber)+"].couponSchedule.paymentDate").val())
+
+				$('#detailCorporateAction #isCouponRow').val($(hiddens).eq(20).attr("name", "corporateAnnouncement.announcementDetails["+(rowPosNumber)+"].actionTemplate.isCoupon").val())
+				$('#detailCorporateAction #targetTypeRow').val($(hiddens).eq(21).attr("name", "corporateAnnouncement.announcementDetails["+(rowPosNumber)+"].actionTemplate.targetType.lookupId").val())
+				//$('#detailCorporateAction #basedCalculationRow').val($(hiddens).eq(22).attr("name", "corporateAnnouncement.announcementDetails["+(rowPosNumber)+"].securitySource.interestRate").val())
+				$('#detailCorporateAction #basedCalculationRow').val(($(hiddens).eq(22).attr("name", "corporateAnnouncement.announcementDetails["+(rowPosNumber)+"].securitySource.isFraction").val()=='true')?'Y':'N')
+				$('#detailCorporateAction #h_basedCalculationRow').val($(hiddens).eq(22).attr("name", "corporateAnnouncement.announcementDetails["+(rowPosNumber)+"].securitySource.isFraction").val())
+				$('#detailCorporateAction #interestRateRow').val($(hiddens).eq(23).attr("name", "corporateAnnouncement.announcementDetails["+(rowPosNumber)+"].couponSchedule.interestRate").val())
+
+				
+				$('#detailCorporateAction #rowPosNumber').val(rowPosNumber);
+				#{if mode == 'edit'}					
+					var checkCoupon = $(selectedRow).find('#isCoupon').val();
+					if (checkCoupon=="true"){
+						$("input[id='couponScheduleRow']").attr('disabled', false);
+						$('#detailCorporateAction #couponScheduleHelpRow').attr('disabled',false);
+						//$("b[id=couponScheduleReq]").html(" *");
+						#{if confirming}
+							$("#couponScheduleRow").attr('disabled','disabled');
+							$("#couponScheduleHelpRow").attr('disabled','disabled');
+						#{/if}
+					} else {
+						$("input[id='couponScheduleRow']").attr('disabled', 'disabled');
+						$('#detailCorporateAction #couponScheduleHelpRow').attr('disabled','disabled');
+						//$("b[id=couponScheduleReq]").html("");
+					}			
+				#{/if}
+				
+				if (($("b[id=ratioReq]").html() == " *") && (($("#sourceQuantityRow").val() == "") || ($("#targetQuantityRow").val() == ""))) {
+					$("b[id=ratioReq]").html("");
+					$('#sourceQuantityRow').attr("disabled", true);
+					$('#targetQuantityRow').attr("disabled", true);
+				}
+				
+				$("#detailCorporateAction").dialog('open');
+				$('.ui-widget-overlay').css('height',$('body').height());
+			}
+			
+			
+		}); 
+		
+		// Delete Row
+		$('#listCorporateAction #gridCorporateAction tbody tr input[id*=btnDel]').live('click', function() {
+			var row = $(this).parents('tr');
+			var rowDelete = table.fnGetPosition(row[0]);
+			table.fnDeleteRow(rowDelete);	
+			reordering();
+			return false;
+		});
+
+		// end of DataTables
+		
+		$('.buttons button').button();
+		$('#new').click(function() {
+			entry('${group}');
+		})
+
+		$('#profileMaster').accordion({
+			autoHeight:false
+		});
+
+		$('#profileGroup').accordion("resize");
+		
+		$('.buttons input:button').button();
+		
+		$('#securityType').blur(function() {
+			if (($('#securityType').val() == "") || ($('#securityType').isChange())) {
+				$('#securityKey').val("");
+				$('#securityCode').val("");
+				$('#securityCodeDesc').val("");
+				securityCode("");
+			}
+		});
+		
+		$( "#detailCorporateAction" ).dialog({
+			autoOpen:false,
+			heigth:'600px',
+			width:'960px',
+			resizable:false,
+			modal:true			
+		});
+
+		//#{if mode == 'view'}
+		//	$(".buttons #newCorporateActionData").css("display","none");
+			//$('#newCorporateActionData').attr("disabled", "disabled");
+		//#{/if}
+			
+		$('.buttons #newCorporateActionData').click(function() {
+			selectedRow = null;
+			$(".target").val("");
+			$("#securityTypeTargetRow").attr('disabled', false);
+			$("#securityCodeTargetRow").attr('disabled', false);
+			$("#securityTypeTargetHelpRow").attr('disabled', false);
+			$("#securityCodeTargetHelpRow").attr('disabled', false);
+			$("#detailCorporateAction span").html("");
+			$("#detailCorporateAction").dialog('open');
+			$('.ui-widget-overlay').css('height',$('body').height());
+			$("#detailCorporateAction :text").val(""); 
+			$("#detailCorporateAction :hidden").val(""); 
+							
+	//			$("#corporateActionForm #isDefaulEquation2").attr('checked', true);
+	//			$("input[name='announcement.isDefaulEquation']:checked").val()=='false';
+	//		
+	//				if ($("input[name='announcement.isDefaulEquation']:checked").val() == "true"){
+	//						$("#corporateActionForm #isDefaulEquation1").attr('checked', true);
+	//						$("input[name='announcement.isDefaulEquation']:checked").val()=='true';
+	//					}else{
+	//						$("#corporateActionForm #isDefaulEquation2").attr('checked', true);
+	//						$("input[name='announcement.isDefaulEquation']:checked").val()=='false';
+	//				}
+			
+			$("#couponScheduleRow").attr('disabled','disabled');
+			$("#couponScheduleHelpRow").attr('disabled','disabled');		
+			$("#securityTypeCodeSource").val($("#securityType").val());
+
+			$('#actionCodeRow').removeClass('fieldError');
+			$('#securityTypeSourceRow').removeClass('fieldError');
+			$('#securityTypeTargetRow').removeClass('fieldError');
+			$("#securityCodeSourceRow").removeClass('fieldError');
+			$("#securityCodeTargetRow").removeClass('fieldError');
+			$("#couponScheduleRow").removeClass('fieldError');
+			
+			return false;	
+		});
+
+		// validasi untuk rounding type tidak boleh lebih dari 6
+		$("#roundingValue").blur(function(){
+			var el = $(this);
+			var roundingValue = $('#roundingValueStripped').val();
+					
+			el.removeClass('fieldError');
+			
+			$("#errmsg").html("");
+			if ((roundingValue > 6)){
+				el.addClass('fieldError');
+				$("#errmsg").html("value 0 - 6").show();
+			}
+			
+		});	
+		// akhir validasi
+		
+		// ANNOUNCEMENT DETAIL JAVA SCRIPT
+		
+		$("#couponScheduleRow").attr('disabled','disabled');
+		$("#couponScheduleHelpRow").attr('disabled','disabled');
+
+		// HIDE BUTTON SAVE & CANCEL ON ANNOUNCEMENT DETAIL WHEN VIEW MODE
+		#{if mode == 'view' || confirming}
+			$('#addCorporateAction').css("display","none");
+			$('#cancelCorporateAction').css("display","none");
+		#{/if}
+		#{else}
+			$('#closeCorporateAction').css("display","none");
+		#{/else}
+			
+		$('#cancelCorporateAction').click(function() {
+			$("#detailCorporateAction").dialog('close');
+		});
+
+		$('#closeCorporateAction').click(function() {
+			$("#detailCorporateAction").dialog('close');
+		});
+		
+		$('#addCorporateAction').click(function(){		
+			$("#detailCorporateAction span").html("");
+			if (($("#actionCodeRow").val() == "") || ($("#securityTypeSourceRow").val() == "") || ($("#securityCodeSourceRow").val() == "") || ($("#securityTypeTargetRow").val() == "") || ($("#securityCodeTargetRow").val() == "") || (($("#couponScheduleRow").val() == "") && ($('#couponScheduleRow').is(':disabled')==false)) || (($("b[id=ratioReq]").html() == " *") && (($("#sourceQuantityRow").val() == "") || ($("#targetQuantityRow").val() == "")))) {
+				
+				if ($("#actionCodeRow").val() == "") {
+					$("#actionCodeRowError").html("Required").show();
+					//alert("Security Type Field not null");
+					//return false;
+				}
+				
+				if ($("#securityTypeSourceRow").val() == "") {
+					$("#securityTypeSourceRowError").html(" Required").show();
+					//alert("Security Type Field not null");
+					//return false;
+				}
+				if ($("#securityCodeSourceRow").val() == "") {
+					$("#securityCodeSourceRowError").html(" Required").show();
+					//alert("Security Code Field not null");
+					//return false;
+				}
+				
+				if ($("#securityTypeTargetRow").val() == "") {
+					$("#securityTypeTargetRowError").html(" Required").show();
+					//alert("Security Type Field not null");
+					//return false;
+				}
+				if ($("#securityCodeTargetRow").val() == "") {
+					$("#securityCodeTargetRowError").html(" Required").show();
+					//alert("Security Code Field not null");
+					//return false;
+				}
+				if (($("#couponScheduleRow").val() == "") && ($('#couponScheduleRow').is(':disabled')==false)) {
+					$("#couponScheduleRowError").html("Required").show();
+					//alert("Coupon Schedule Field not null");
+					//return false;
+				}
+				
+				if (($("b[id=ratioReq]").html() == " *") && (($("#sourceQuantityRow").val() == "") || ($("#targetQuantityRow").val() == ""))) {
+					$("#ratioRowError").html("Required").show();
+				}
+				return false;
+			}
+			
+			// TODO check source must be same target
+			if (($('#targetTypeRow').val() == "CA_TARGET_TYPE-S") && ($('#sourceTransactionRow').val() != "") && ($('#targetTransactionRow').val() != "")) {
+				if (($("#securityTypeSourceRow").val() != $("#securityTypeTargetRow").val()) || ($("#securityCodeSourceKeyRow").val() != $("#securityCodeTargetKeyRow").val())) {
+					//alert("Source must same with Target");
+					messageAlertOk("Source must same with Target", "ui-icon1 ui-icon-alert", "Warning Message", closeDialogMessage);
+					return false;
+				}
+			}
+			
+			if ($('#targetTypeRow').val() == "CA_TARGET_TYPE-O") {
+				if ($('#securityTypeTargetRow').val() == $('#securityTypeSourceRow').val()) {
+					//alert("Security Type Target can not same with Security Type Source");
+					messageAlertOk("Security Type Target can not same with Security Type Source", "ui-icon1 ui-icon-alert", "Warning Message", closeDialogMessage);
+					return false;
+				}
+			}
+			
+			var rowPosNumber= $('#detailCorporateAction #rowPosNumber').val();
+			saveCorporateAction(rowPosNumber);
+			// RESET VALUE FOR TARGETTYPE
+			//$('#targetTypeRow').val("");
+			$('#detailCorporateAction').dialog('close');
+			return false;
+			//$(':hidden').attr('name').replace('index', rowCount);
+		});		
+		
+		$('#actionCodeRow').change(function() {
+			$('.source').val("");
+			$('.target').val("");
+			$('#couponScheduleRow').val("");
+			$('#couponScheduleKeyRow').val("");
+			$('#couponScheduleDescRow').val("");
+			$('#h_couponScheduleDescRow').val("");
+			
+			$('#sourceQuantityRow').val("");
+			$('#sourceQuantityRowStripped').val($('#sourceQuantityRow').val());
+			$('#targetQuantityRow').val("");
+			$('#targetQuantityRowStripped').val($('#tagretQuantityRow').val());
+			$('#basedCalculationRow').val("");
+			$('#interestRateRow').val("");
+			
+			$("#securityCodeSourceRow").removeClass('fieldError');
+			$("#securityCodeTargetRow").removeClass('fieldError');
+			$("#couponScheduleRow").removeClass('fieldError');
+		})
+		
+		$('#securityTypeSourceRow').blur(function() {
+			//alert("tes securityTypeSourceRow");
+			targetOthers();
+			targetCash();					
+			targetSameAsSource();		
+			if (($('#securityTypeSourceRow').val() == "") || ($('#securityTypeSourceRow').isChange())) {
+				$('#securityCodeSourceRow').val("");
+				$('#securityCodeSourceKeyRow').val("");
+				$('#securityCodeSourceDescRow').val("");
+				$('#h_securityCodeSourceDescRow').val("");
+				
+				$('#securityCodeTargetRow').val("");
+				$('#securityCodeTargetKeyRow').val("");
+				$('#securityCodeTargetDescRow').val("");
+				$('#h_securityCodeTargetDescRow').val("");
+				$('#securityCodeTargetRow').removeClass('fieldError');
+				
+				$('#couponScheduleRow').val("");
+				$('#couponScheduleKeyRow').val("");
+				$('#couponScheduleDescRow').val("");
+				$('#h_couponScheduleDescRow').val("");
+				$("#couponScheduleRow").removeClass('fieldError');
+				
+				$('#sourceQuantityRow').val("");
+				$('#sourceQuantityRowStripped').val($('#sourceQuantityRow').val());
+				$('#targetQuantityRow').val("");
+				$('#targetQuantityRowStripped').val($('#tagretQuantityRow').val());
+				$('#basedCalculationRow').val("");
+				$('#interestRateRow').val("");
+			}
+			$('#securityTypeTargetRow').trigger('blur');
+			$('#securityCodeTargetRow').trigger('blur');
+		});
+		
+		$('#securityCodeSourceRow').blur(function() {
+			//alert("tes securityCodeSourceRow");
+			targetOthers();
+			targetCash();					
+			targetSameAsSource();
+			
+			$('#securityTypeTargetRow').trigger('blur');
+			$('#securityCodeTargetRow').trigger('blur');
+			
+			if (($('#securityCodeSourceRow').val() == "") || ($('#securityCodeSourceRow').isChange())) {
+				$('#couponScheduleRow').val("");
+				$('#couponScheduleKeyRow').val("");
+				$('#couponScheduleDescRow').val("");
+				$('#h_couponScheduleDescRow').val("");
+				$("#couponScheduleRow").removeClass('fieldError');
+				
+				$('#sourceQuantityRow').val("");
+				$('#targetQuantityRow').val("");
+				$('#basedCalculationRow').val("");
+				$('#interestRateRow').val("");
+			}
+		});
+		
+		$('#securityTypeTargetRow').blur(function() {
+			if (($('#securityTypeTargetRow').val() == "") || ($('#securityTypeTargetRow').isChange())) {
+				$('#securityCodeTargetRow').val("");
+				$('#securityCodeTargetKeyRow').val("");
+				$('#securityCodeTargetDescRow').val("");
+				$('#h_securityCodeTargetDescRow').val("");
+				$('#securityCodeTargetRow').removeClass('fieldError');
+			}
+			
+		});
+
+		$('#actionCodeRow').lookup({
+			list:'@{Pick.actionTemplates()}',
+			get: {
+				url:'@{Pick.actionTemplate()}',
+				success: function(data) {
+					if (data) {
+						$('#actionCodeRow').removeClass('fieldError');
+						$('#actionTemplateKeyRow').val(data.code);
+						$('#actionTemplateDescriptionRow').val(data.description);
+						$('#h_actionTemplateDescriptionRow').val(data.description);
+						$('#isCoupon').val(data.isCoupon);			
+						$('#targetTypeRow').val(data.targetType);		
+						$('#sourceTransactionRow').val(data.sourceTransaction);
+						$('#targetTransactionRow').val(data.targetTransaction);
+						
+						//swapTargetType = $('#targetType').val();
+	
+						//$('#newTargetType').val(swapTargetType);
+						if ($("#isCoupon").val()=="true") {						
+							$("#couponScheduleRow").attr('disabled',false);
+							$("#couponScheduleHelpRow").attr('disabled',false);
+							$("#isCouponRow").val('true');		
+							$("b[id=couponScheduleReq]").html(" *");
+						} else {
+							$("#couponScheduleRow").attr('disabled','disabled');
+							$("#couponScheduleHelpRow").attr('disabled','disabled');
+							$("#isCouponRow").val('false');
+							$("#couponScheduleRow").val('');
+							$("#couponScheduleKeyRow").val('');
+							$("#couponScheduleDescRow").val('');
+							$("b[id=couponScheduleReq]").html("");
+						}	
+	
+						console.debug("sourceTransaction = "+$('#sourceTransactionRow').val());
+						console.debug("targetTransaction = "+$('#targetTransactionRow').val());
+						
+						adjustSourceTarget();
+						
+						$('#sourceQuantityRow').attr("disabled", false);
+						$('#targetQuantityRow').attr("disabled", false);
+						$("b[id=ratioReq]").html(" *");
+						
+						//targetOthers();
+						//targetCash();					
+						//targetSameAsSource();
+	
+				}
+			},
+				error: function(data) {
+					$('#actionCodeRow').addClass('fieldError');
+					$('#actionTemplateDescriptionRow').val('NOT FOUND');
+					$('#actionCodeRow').val('');
+					$('#actionTemplateKeyRow').val('');
+					$('#h_actionTemplateDescriptionRow').val('');	
+				}
+			},	
+			
+			description:$('#actionTemplateDescriptionRow'),
+			help:$('#actionTemplateHelpRow')
+		});
+	
+		$('#securityTypeSourceRow').lookup({
+			list:'@{Pick.securityTypes()}',
+			get:{
+				url:'@{Pick.securityType()}',
+				success: function(data) {
+					if (data) {
+						$('#securityTypeSourceRow').removeClass('fieldError');
+						$('#securityTypeSourceRow').val(data.code);
+						$('#securityTypeSourceDescRow').val(data.description);
+						$('#h_securityTypeSourceDescRow').val(data.description);
+					}	
+				},
+				error: function(data) {
+					$('#securityTypeSourceRow').addClass('fieldError');
+					$('#securityTypeSourceDescRow').val('NOT FOUND');
+					$('#securityTypeSourceRow').val('');
+					$('#h_securityTypeSourceDescRow').val('');
+				}
+			},
+			description:$('#securityTypeSourceDescRow'),
+			help:$('#securityTypeSourceHelpRow')
+		});
+
+		
+		$('#securityCodeSourceRow').lookup({
+			list:'@{Pick.securities()}',
+			get: {
+				url: '@{Pick.security()}',
+				success: function(data) {
+					if(data){					
+						$('#securityCodeSourceRow').removeClass('fieldError');
+						$('#securityCodeSourceKeyRow').val(data.code);
+						$('#securityCodeSourceDescRow').val(data.description);
+						$('#h_securityCodeSourceDescRow').val(data.description);
+						$('#interestRateSecurity').val(data.interestRate);
+	
+						//var interestRateSec = $('#interestRateSecurity').val();
+						//$('#basedCalculationRow').val(interestRateSec);
+						
+						$('#basedCalculationRow').val((data.isFraction)?'Y':'N');
+						$('#h_basedCalculationRow').val(data.isFraction);
+					}
+
+				},
+				error: function(data){
+					$('#securityCodeSourceRow').addClass('fieldError');
+					//$('#securityCodeSourceKeyRow').val(data.code);
+					$('#securityCodeSourceDescRow').val('NOT FOUND');
+					$('#securityCodeSourceRow').val('');
+					$('#securityCodeSourceKeyRow').val('');
+					$('#h_securityCodeSourceDescRow').val('');
+				}
+			},
+			key:$('#securityCodeSourceKeyRow'),
+			description:$('#securityCodeSourceDescRow'),
+			filter:$('#securityTypeSourceRow'),
+			help:$('#securityCodeSourceHelpRow')
+		});
+		
+		$('#securityTypeTargetRow').lookup({
+			list:'@{Pick.securityTypes()}',
+			get:{
+				url:'@{Pick.securityType()}',
+				success: function(data) {
+					if (data) {
+						$('#securityTypeTargetRow').removeClass('fieldError');
+						$('#securityTypeTargetRow').val(data.code);
+						$('#securityTypeTargetDescRow').val(data.description);
+						$('#h_securityTypeTargetDescRow').val(data.description);
+					}	
+				},
+				error: function(data) {
+					$('#securityTypeTargetRow').addClass('fieldError');
+					$('#securityTypeTargetDescRow').val('NOT FOUND');
+					$('#securityTypeTargetRow').val('');
+					$('#h_securityTypeTargetDescRow').val('');
+				}
+			},
+			description:$('#securityTypeTargetDescRow'),
+			help:$('#securityTypeTargetHelpRow')
+		});
+		
+		$('#securityCodeTargetRow').lookup({
+			list:'@{Pick.securities()}',
+			get: {
+				url: '@{Pick.security()}',
+				success: function(data) {
+					if(data){					
+						$('#securityCodeTargetRow').removeClass('fieldError');
+						$('#securityCodeTargetKeyRow').val(data.code);
+						$('#securityCodeTargetDescRow').val(data.description);
+						$('#h_securityCodetargetDescRow').val(data.description);
+						//$('#interestRateSecurity').val(data.interestRate);
+	
+						//var interestRateSec = $('#interestRateSecurity').val();
+						//$('#basedCalculationRow').val(interestRateSec);	
+					}
+
+				},
+				error: function(data){
+					$('#securityCodeTargetRow').addClass('fieldError');
+					//$('#securityCodeSourceKeyRow').val(data.code);
+					$('#securityCodeTargetDescRow').val('NOT FOUND');
+					$('#securityCodeTargetRow').val('');
+					$('#securityCodeTargetKeyRow').val('');
+					$('#h_securityCodeTargetDescRow').val('');
+				}
+			},
+			key:$('#securityCodeTargetKeyRow'),
+			description:$('#securityCodeTargetDescRow'),
+			filter:$('#securityTypeTargetRow'),
+			help:$('#securityCodeTargetHelpRow')
+		});
+		
+		$('#couponScheduleRow').lookup({
+			list:'@{Pick.couponSchedulesWithPaid()}',
+			get: {
+				url: '@{Pick.couponScheduleWithPaid()}',
+				success: function(data) {
+					if (data) {
+						$('#couponScheduleRow').removeClass('fieldError');
+						$('#couponScheduleKeyRow').val(data.couponNo);
+						//$('#couponScheduleInfoHide').val(data.securityKey);
+						//$('#couponScheduleInfoHide').val(data.code);
+						//alert($('#couponScheduleRow'));
+						$('#couponScheduleDescRow').val(data.description);
+						$('#h_couponScheduleDescRow').val(data.description);
+						$('#fraction').val(data.fraction);
+						$('#fractionBase').val(data.fractionBase);
+						$('#interestRate').val(data.interestRate);
+	
+						var sourceQuantity = $('#fractionBase').val();
+						var targetQuantity = $('#fraction').val();
+						var interestRate = $('#interestRate').val();
+						
+						$('#sourceQuantityRow').attr("disabled", false);
+						$('#targetQuantityRow').attr("disabled", false);
+						$("b[id=ratioReq]").html(" *");
+						
+						//alert(data.isFraction);
+						if (data.isFraction == true) {
+							//alert("not null");
+							$('#sourceQuantityRowStripped').val(sourceQuantity);
+							$('#targetQuantityRowStripped').val(targetQuantity);	
+							$('#sourceQuantityRow').autoNumericSet( sourceQuantity, {vMAx:'999999999999.9999999999'}).val();
+							$('#targetQuantityRow').autoNumericSet( targetQuantity, {vMAx:'999999999999.9999999999'}).val();	
+							console.debug("sourceQuantity = " + sourceQuantity + " targetQuantity = " + targetQuantity);
+							if (($('#sourceQuantityRowStripped').val() == "") && ($('#targetQuantityRowStripped').val() == "")) {
+								$('#sourceQuantityRow').attr("disabled", true);
+								$('#targetQuantityRow').attr("disabled", true);
+								$("b[id=ratioReq]").html("");
+							}
+						} else {
+							//alert("null");
+							$('#sourceQuantityRow').val(null);
+							$('#targetQuantityRow').val(null);
+							$('#sourceQuantityRowStripped').val($('#sourceQuantityRow').val());
+							$('#targetQuantityRowStripped').val($('#targetQuantityRow').val());
+							$('#sourceQuantityRow').attr("disabled", true);
+							$('#targetQuantityRow').attr("disabled", true);
+							$("b[id=ratioReq]").html("");
+						}
+						
+						$('#interestRateRow').val(interestRate);
+						
+					}
+				},
+				error: function(data) {
+					$('#couponScheduleRow').addClass('fieldError');
+					$('#couponScheduleRow').val('');
+					$('#couponScheduleKeyRow').val('');
+					$('#couponScheduleDescRow').val('NOT FOUND');
+					$('#h_couponScheduleDescRow').val('');
+					
+				}
+			},
+			description : $('#couponScheduleDescRow'),
+			filter:$('#securityCodeSourceKeyRow'),
+			help:$('#couponScheduleHelpRow')
+		});
+		
+		//====================================================================================
+	});
+	
+	
+	var selectedRow;
+	/*
+	function editCorporateAction(actionDetail) {
+		//alert($('#targetTypeNew').val());
+		selectedRow = actionDetail;		
+		
+		$('#detailCorporateAction #securityCodeSourceKeyRow').val($(selectedRow).find('#SecurityCodeSourceKey').val());
+		$('#detailCorporateAction #securityCodeTargetKeyRow').val($(selectedRow).find('#SecurityCodeTargetKey').val());
+		$('#detailCorporateAction #announcementDetailKeyRow').val($(selectedRow).find('#announcementDetailKey').val());
+		$('#detailCorporateAction #corporateAnnouncementKeyRow').val($(selectedRow).find('#corporateAnnouncementKey').val());
+		$('#detailCorporateAction #securityTypeSourceRow').val($(selectedRow).find('#securityTypeSource').val());
+		$('#detailCorporateAction #securityCodeSourceRow').val($(selectedRow).find('#securityCodeSource').val());
+		$('#detailCorporateAction #securityTypeTargetRow').val($(selectedRow).find('#securityTypeTarget').val());
+		$('#detailCorporateAction #securityCodeTargetRow').val($(selectedRow).find('#securityCodeTarget').val());
+		$('#detailCorporateAction #actionTemplateKeyRow').val($(selectedRow).find('#actionTemplateKey').val());
+		$('#detailCorporateAction #sourceQuantityRow').val($(selectedRow).find('#sourceQuantity').val())
+		//$('#detailCorporateAction #sourceQuantityRowStripped').val($(selectedRow).find('#GridSourceQuantityRowStripped').val());
+		$('#detailCorporateAction #targetQuantityRow').val($(selectedRow).find('#targetQuantity').val())
+		//$('#detailCorporateAction #targetQuantityRowStripped').val($(selectedRow).find('#GridTargetQuantityRowStripped').val());
+		$('#detailCorporateAction #securityTypeSourceDescRow').val($(selectedRow).find('#securityTypeSourceDesc').val());
+		$('#detailCorporateAction #securityCodeSourceDescRow').val($(selectedRow).find('#securityCodeSourceDesc').val());
+		$('#detailCorporateAction #securityTypeTargetDescRow').val($(selectedRow).find('#securityTypeTargetDesc').val());
+		$('#detailCorporateAction #securityCodeTargetDescRow').val($(selectedRow).find('#securityCodeTargetDesc').val());
+		$('#detailCorporateAction #actionCodeRow').val($(selectedRow).find('#actionCode').val());
+		$('#detailCorporateAction #actionTemplateDescriptionRow').val($(selectedRow).find('#actionTemplateDescription').val());
+		$('#detailCorporateAction #couponScheduleRow').val($(selectedRow).find('#couponScheduleKey').val());
+		$('#detailCorporateAction #couponScheduleKeyRow').val($(selectedRow).find('#couponScheduleKey').val());
+		$('#detailCorporateAction #couponScheduleDescRow').val($(selectedRow).find('#couponScheduleDesc').val());
+		//$('#detailCorporateAction #couponScheduleInfoHide').val($(selectedRow).find('#couponScheduleInfo').val());
+		$('#detailCorporateAction #isCouponRow').val($(selectedRow).find('#isCoupon').val());
+		$('#detailCorporateAction #targetTypeRow').val($(selectedRow).find('#targetType').val());
+		//targetOthers();
+		//targetCash();					
+		//targetSameAsSource();
+		$('#detailCorporateAction #basedCalculationRow').val($(selectedRow).find('#basedCalculation').val());
+		$('#detailCorporateAction #interestRateRow').val($(selectedRow).find('#interestRateCoupon').val());
+	
+		#{if mode == 'edit'}					
+			var checkCoupon = $(selectedRow).find('#isCoupon').val();
+			if (checkCoupon=="true"){
+				$("input[id='couponScheduleRow']").attr('disabled', false);
+				$('#detailCorporateAction #couponScheduleHelpRow').attr('disabled',false);
+				#{if confirming}
+					$("#couponScheduleRow").attr('disabled','disabled');
+					$("#couponScheduleHelpRow").attr('disabled','disabled');
+				#{/if}
+			} else {
+				$("input[id='couponScheduleRow']").attr('disabled', 'disabled');
+				$('#detailCorporateAction #couponScheduleHelpRow').attr('disabled','disabled');
+			}			
+		#{/if}
+		return false;
+		
+		$("#detailCorporateAction #securityTypeCodeSource").val($("#securityType").val() );
+	}
+	*/
+	
+	
+	function saveCorporateAction(rowPosNumber) {
+		var table = $('#listCorporateAction #gridCorporateAction').dataTable();
+		if (rowPosNumber){
+/*			
+			$(selectedRow).find(':nth-child(1)').html($('#detailCorporateAction #securityCodeSourceRow').val());
+			$(selectedRow).find(':nth-child(2)').html($('#detailCorporateAction #securityCodeTargetRow').val());
+			$(selectedRow).find(':nth-child(3)').html($('#detailCorporateAction #sourceQuantityRow').val());
+			$(selectedRow).find(':nth-child(4) span').html($('#detailCorporateAction #targetQuantityRow').val());
+			alert($(selectedRow).find(':nth-child(4)').html());
+			$(selectedRow).find('#SecurityCodeSourceKey').val($('#detailCorporateAction #securityCodeSourceKeyRow').val());
+			$(selectedRow).find('#SecurityCodeTargetKey').val($('#detailCorporateAction #securityCodeTargetKeyRow').val());
+			$(selectedRow).find('#announcementDetailKey').val($('#detailCorporateAction #announcementDetailKeyRow').val());
+			$(selectedRow).find('#corporateAnnouncementKey').val($('#detailCorporateAction #corporateAnnouncementKeyRow').val());
+			$(selectedRow).find('#securityTypeSource').val($('#detailCorporateAction #securityTypeSourceRow').val());
+			$(selectedRow).find('#securityCodeSource').val($('#detailCorporateAction #securityCodeSourceRow').val());
+			$(selectedRow).find('#securityTypeTarget').val($('#detailCorporateAction #securityTypeTargetRow').val());
+			$(selectedRow).find('#securityCodeTarget').val($('#detailCorporateAction #securityCodeTargetRow').val());
+			$(selectedRow).find('#actionTemplateKey').val($('#detailCorporateAction #actionTemplateKeyRow').val());
+			$(selectedRow).find('#sourceQuantity').val($('#detailCorporateAction #sourceQuantityRow').val());
+			//$(selectedRow).find('#GridSourceQuantityRowStripped').val($('#detailCorporateAction #sourceQuantityRowStripped').val());
+			$(selectedRow).find('#targetQuantity').val($('#detailCorporateAction #targetQuantityRow').val());
+			//$(selectedRow).find('#GridTargetQuantityRowStripped').val($('#detailCorporateAction #targetQuantityRowStripped').val());
+			$(selectedRow).find('#securityTypeSourceDesc').val($('#detailCorporateAction #securityTypeSourceDescRow').val());
+			$(selectedRow).find('#securityCodeSourceDesc').val($('#detailCorporateAction #securityCodeSourceDescRow').val());
+			$(selectedRow).find('#securityTypeTargetDesc').val($('#detailCorporateAction #securityTypeTargetDescRow').val());
+			$(selectedRow).find('#securityCodeTargetDesc').val($('#detailCorporateAction #securityCodeTargetDescRow').val());
+			$(selectedRow).find('#actionCode').val($('#detailCorporateAction #actionCodeRow').val());
+			$(selectedRow).find('#actionTemplateDescription').val($('#detailCorporateAction #actionTemplateDescriptionRow').val());
+			$(selectedRow).find('#couponSchedule').val($('#detailCorporateAction #couponScheduleRow').val());
+			$(selectedRow).find('#couponScheduleKey').val($('#detailCorporateAction #couponScheduleKeyRow').val());
+			$(selectedRow).find('#couponScheduleDesc').val($('#detailCorporateAction #couponScheduleDescRow').val());
+			$(selectedRow).find('#isCoupon').val($('#detailCorporateAction #isCouponRow').val());
+			//$(selectedRow).find('#couponScheduleInfo').val($('#detailCorporateAction #couponScheduleInfoHide').val());
+			$(selectedRow).find('#targetTypeNew').val($('#detailCorporateAction #targetTypeRow').val());
+			$(selectedRow).find('#basedCalculation').val($('#detailCorporateAction #basedCalculationRow').val());
+			$(selectedRow).find('#interestRateCoupon').val($('#detailCorporateAction #interestRateRow').val());
+*/		
+			var dataCol1 = new Object();
+			var dataCol2 = new Object();
+			var dataCol3 = new Object();
+			var dataCol4 = new Object();
+			var dataCol5 = new Object();
+			
+			dataCol1.securityCodeSourceRow = $('#detailCorporateAction #securityCodeSourceRow').val();
+			dataCol1.securityCodeSourceDescRow = $('#detailCorporateAction #securityCodeSourceDescRow').val();
+			dataCol1.securityCodeSourceKeyRow = $('#detailCorporateAction #securityCodeSourceKeyRow').val();
+
+			table.fnUpdate(
+					dataCol1.securityCodeSourceRow +
+					"<input type='hidden' value='"+dataCol1.securityCodeSourceRow+"' name='corporateAnnouncement.announcementDetails["+rowPosNumber+"].securitySource.securityId'>"+
+					"<input type='hidden' value='"+dataCol1.securityCodeSourceDescRow+"' name='corporateAnnouncement.announcementDetails["+rowPosNumber+"].securitySource.description'>"+
+					"<input type='hidden' value='"+dataCol1.securityCodeSourceKeyRow+"' name='corporateAnnouncement.announcementDetails["+rowPosNumber+"].securitySource.securityKey'>"
+						, parseFloat(rowPosNumber),0);
+			
+			dataCol2.securityCodeTargetRow = $('#detailCorporateAction #securityCodeTargetRow').val();
+			dataCol2.securityCodeTargetDescRow = $('#detailCorporateAction #securityCodeTargetDescRow').val();
+			dataCol2.securityCodeTargetKeyRow = $('#detailCorporateAction #securityCodeTargetKeyRow').val();
+			
+			table.fnUpdate(
+					dataCol2.securityCodeTargetRow +
+					"<input type='hidden' value='"+dataCol2.securityCodeTargetRow+"' name='corporateAnnouncement.announcementDetails["+rowPosNumber+"].securityTarget.securityId'>"+
+					"<input type='hidden' value='"+dataCol2.securityCodeTargetDescRow+"' name='corporateAnnouncement.announcementDetails["+rowPosNumber+"].securityTarget.description'>"+
+					"<input type='hidden' value='"+dataCol2.securityCodeTargetKeyRow+"' name='corporateAnnouncement.announcementDetails["+rowPosNumber+"].securityTarget.securityKey'>"
+						, parseFloat(rowPosNumber),1);
+			
+			
+			dataCol3.sourceQuantityRow = $('#detailCorporateAction #sourceQuantityRowStripped').val();
+			table.fnUpdate(
+					//$('#dummy').autoNumericSet( dataCol3.sourceQuantityRow, {vMAx:'999999999999.9999999999'}).val() +
+					(dataCol3.sourceQuantityRow == ""  ? "": autoNumericGet("dummy", dataCol3.sourceQuantityRow)) +
+					"<input type='hidden' value='"+dataCol3.sourceQuantityRow+"' name='corporateAnnouncement.announcementDetails["+rowPosNumber+"].sourceQuantity'>"
+						, parseFloat(rowPosNumber),2);
+			
+			dataCol4.targetQuantityRow = $('#detailCorporateAction #targetQuantityRowStripped').val();
+			table.fnUpdate(
+					//$('#dummy').autoNumericSet( dataCol4.targetQuantityRow, {vMAx:'999999999999.9999999999'}).val() +
+					( dataCol4.targetQuantityRow == ""  ? "":autoNumericGet("dummy", dataCol4.targetQuantityRow))  +
+					"<input type='hidden' value='"+dataCol4.targetQuantityRow+"' name='corporateAnnouncement.announcementDetails["+rowPosNumber+"].targetQuantity'>"
+						, parseFloat(rowPosNumber),3);
+			
+			
+			dataCol5.announcementDetailKeyRow = $('#detailCorporateAction #announcementDetailKeyRow').val();
+			dataCol5.corporateAnnouncementKeyRow = $('#detailCorporateAction #corporateAnnouncementKeyRow').val();
+			
+			dataCol5.securityTypeSourceRow = $('#detailCorporateAction #securityTypeSourceRow').val();
+			dataCol5.securityTypeSourceDescRow = $('#detailCorporateAction #securityTypeSourceDescRow').val();
+			
+			dataCol5.securityTypeTargetRow = $('#detailCorporateAction #securityTypeTargetRow').val();
+			dataCol5.securityTypeTargetDescRow = $('#detailCorporateAction #securityTypeTargetDescRow').val();
+			
+						
+			dataCol5.actionTemplateKeyRow = $('#detailCorporateAction #actionTemplateKeyRow').val();
+			dataCol5.actionCodeRow = $('#detailCorporateAction #actionCodeRow').val();
+			dataCol5.actionTemplateDescriptionRow = $('#detailCorporateAction #actionTemplateDescriptionRow').val();
+			
+			dataCol5.couponScheduleRow = $('#detailCorporateAction #couponScheduleRow').val();
+			dataCol5.couponScheduleKeyRow = $('#detailCorporateAction #couponScheduleKeyRow').val();
+			dataCol5.couponScheduleDescRow = $('#detailCorporateAction #couponScheduleDescRow').val();
+			
+			dataCol5.isCouponRow = $('#detailCorporateAction #isCouponRow').val();
+			dataCol5.targetTypeRow = $('#detailCorporateAction #targetTypeRow').val();
+			dataCol5.basedCalculationRow = $('#detailCorporateAction #h_basedCalculationRow').val();
+			dataCol5.interestRateRow = $('#detailCorporateAction #interestRateRow').val();
+			table.fnUpdate(
+					"<input sim='btnDel' id='btnDel'+ type='button' value='Delete'>"+
+					"<input type='hidden' value='"+dataCol5.announcementDetailKeyRow+"' name='corporateAnnouncement.announcementDetails["+rowPosNumber+"].announcementDetailKey'>"+
+					"<input type='hidden' value='"+dataCol5.corporateAnnouncementKeyRow+"' name='corporateAnnouncement.announcementDetails["+rowPosNumber+"].corporateAnnouncement.corporateAnnouncementKey'>"+
+					"<input type='hidden' value='"+dataCol5.securityTypeSourceRow+"' name='corporateAnnouncement.announcementDetails["+rowPosNumber+"].securityTypeSource.securityType'>"+
+					"<input type='hidden' value='"+dataCol5.securityTypeSourceDescRow+"' name='corporateAnnouncement.announcementDetails["+rowPosNumber+"].securityTypeSource.description'>"+
+					"<input type='hidden' value='"+dataCol5.securityTypeTargetRow+"' name='corporateAnnouncement.announcementDetails["+rowPosNumber+"].securityTypeTarget.securityType'>"+
+					"<input type='hidden' value='"+dataCol5.securityTypeTargetDescRow+"' name='corporateAnnouncement.announcementDetails["+rowPosNumber+"].securityTypeTarget.description'>"+
+					"<input type='hidden' value='"+dataCol5.actionTemplateKeyRow+"' name='corporateAnnouncement.announcementDetails["+rowPosNumber+"].actionTemplate.actionTemplateKey'>"+
+					"<input type='hidden' value='"+dataCol5.actionCodeRow+"' name='corporateAnnouncement.announcementDetails["+rowPosNumber+"].actionTemplate.actionCode'>"+
+					"<input type='hidden' value='"+dataCol5.actionTemplateDescriptionRow+"' name='corporateAnnouncement.announcementDetails["+rowPosNumber+"].actionTemplate.description'>"+
+					"<input type='hidden' value='"+dataCol5.couponScheduleRow+"' name='corporateAnnouncement.announcementDetails["+rowPosNumber+"].couponSchedule.id.couponNo'>"+
+					"<input type='hidden' value='"+dataCol5.couponScheduleKeyRow+"' name='corporateAnnouncement.announcementDetails["+rowPosNumber+"].couponNo'>"+
+					"<input type='hidden' value='"+dataCol5.couponScheduleDescRow+"' name='corporateAnnouncement.announcementDetails["+rowPosNumber+"].couponSchedule.paymentDate'>"+
+					"<input type='hidden' value='"+dataCol5.isCouponRow+"' name='corporateAnnouncement.announcementDetails["+rowPosNumber+"].actionTemplate.isCoupon'>"+
+					"<input type='hidden' value='"+dataCol5.targetTypeRow+"' name='corporateAnnouncement.announcementDetails["+rowPosNumber+"].actionTemplate.targetType.lookupId'>"+
+					//"<input type='hidden' value='"+dataCol5.basedCalculationRow+"' name='corporateAnnouncement.announcementDetails["+rowPosNumber+"].securitySource.interestRate'>"+
+					"<input type='hidden' value='"+dataCol5.basedCalculationRow+"' name='corporateAnnouncement.announcementDetails["+rowPosNumber+"].securitySource.isFraction'>"+
+					"<input type='hidden' value='"+dataCol5.interestRateRow+"' name='corporateAnnouncement.announcementDetails["+rowPosNumber+"].couponSchedule.interestRate'>"
+						, parseFloat(rowPosNumber),4);
+			
+		} else {
+			
+			
+			 //$('#listCorporateAction #gridCorporateAction .dataTables_empty').each(function() {
+			//		$(this).parent().remove();
+			//	 });
+			//var index = $('#listCorporateAction #gridCorporateAction tbody tr').length;
+			//var row = $('#listCorporateAction #gridCorporateAction tfoot tr:first').clone();
+
+			//row.find(':nth-child(1)').html($('#detailCorporateAction #securityCodeSourceRow').val());
+			//row.find(':nth-child(2)').html($('#detailCorporateAction #securityCodeTargetRow').val());
+			//row.find(':nth-child(3)').html($('#detailCorporateAction #sourceQuantityRow').val());
+			//row.find(':nth-child(4)').prepend($('#detailCorporateAction #targetQuantityRow').val());
+			
+			var data = new Object();
+			
+			data.securityCodeSourceRow = $('#detailCorporateAction #securityCodeSourceRow').val();
+			data.securityCodeSourceDescRow = $('#detailCorporateAction #securityCodeSourceDescRow').val();
+			data.securityCodeSourceKeyRow = $('#detailCorporateAction #securityCodeSourceKeyRow').val();
+
+			data.securityCodeTargetRow = $('#detailCorporateAction #securityCodeTargetRow').val();
+			data.securityCodeTargetDescRow = $('#detailCorporateAction #securityCodeTargetDescRow').val();
+			data.securityCodeTargetKeyRow = $('#detailCorporateAction #securityCodeTargetKeyRow').val();
+			
+			data.announcementDetailKeyRow = $('#detailCorporateAction #announcementDetailKeyRow').val();
+			data.corporateAnnouncementKeyRow = $('#detailCorporateAction #corporateAnnouncementKeyRow').val();
+			
+			data.securityTypeSourceRow = $('#detailCorporateAction #securityTypeSourceRow').val();
+			data.securityTypeSourceDescRow = $('#detailCorporateAction #securityTypeSourceDescRow').val();
+			
+			data.securityTypeTargetRow = $('#detailCorporateAction #securityTypeTargetRow').val();
+			data.securityTypeTargetDescRow = $('#detailCorporateAction #securityTypeTargetDescRow').val();
+			
+			data.sourceQuantityRow = $('#detailCorporateAction #sourceQuantityRowStripped').val();
+			data.targetQuantityRow = $('#detailCorporateAction #targetQuantityRowStripped').val();
+						
+			data.actionTemplateKeyRow = $('#detailCorporateAction #actionTemplateKeyRow').val();
+			data.actionCodeRow = $('#detailCorporateAction #actionCodeRow').val();
+			data.actionTemplateDescriptionRow = $('#detailCorporateAction #actionTemplateDescriptionRow').val();
+			
+			data.couponScheduleRow = $('#detailCorporateAction #couponScheduleRow').val();
+			data.couponScheduleKeyRow = $('#detailCorporateAction #couponScheduleKeyRow').val();
+			data.couponScheduleDescRow = $('#detailCorporateAction #couponScheduleDescRow').val();
+			
+			data.isCouponRow = $('#detailCorporateAction #isCouponRow').val();
+			data.targetTypeRow = $('#detailCorporateAction #targetTypeRow').val();
+			data.basedCalculationRow = $('#detailCorporateAction #h_basedCalculationRow').val();
+			data.interestRateRow = $('#detailCorporateAction #interestRateRow').val();
+			
+			var idx =  table.fnGetNodes().length;
+			table.fnAddData([
+									data.securityCodeSourceRow +
+									"<input type='hidden' value='"+data.securityCodeSourceRow+"' name='corporateAnnouncement.announcementDetails["+idx+"].securitySource.securityId'>"+
+									"<input type='hidden' value='"+data.securityCodeSourceDescRow+"' name='corporateAnnouncement.announcementDetails["+idx+"].securitySource.description'>"+
+									"<input type='hidden' value='"+data.securityCodeSourceKeyRow+"' name='corporateAnnouncement.announcementDetails["+idx+"].securitySource.securityKey'>",
+									data.securityCodeTargetRow +
+									"<input type='hidden' value='"+data.securityCodeTargetRow+"' name='corporateAnnouncement.announcementDetails["+idx+"].securityTarget.securityId'>"+
+									"<input type='hidden' value='"+data.securityCodeTargetDescRow+"' name='corporateAnnouncement.announcementDetails["+idx+"].securityTarget.description'>"+
+									"<input type='hidden' value='"+data.securityCodeTargetKeyRow+"' name='corporateAnnouncement.announcementDetails["+idx+"].securityTarget.securityKey'>",
+									//$('#dummy').autoNumericSet( data.sourceQuantityRow, {vMAx:'999999999999.9999999999'}).val() +
+									(data.sourceQuantityRow == ""  ? "": autoNumericGet("dummy", data.sourceQuantityRow)) +
+									"<input type='hidden' value='"+data.sourceQuantityRow+"' name='corporateAnnouncement.announcementDetails["+idx+"].sourceQuantity'>",
+									//$('#dummy').autoNumericSet( data.targetQuantityRow, {vMAx:'999999999999.9999999999'}).val() +
+									(data.targetQuantityRow == ""  ? "": autoNumericGet("dummy", data.targetQuantityRow)) +
+									"<input type='hidden' value='"+data.targetQuantityRow+"' name='corporateAnnouncement.announcementDetails["+idx+"].targetQuantity'>",
+									"<input sim='btnDel' id='btnDel'+ type='button' value='Delete'>"+
+									"<input type='hidden' value='"+data.announcementDetailKeyRow+"' name='corporateAnnouncement.announcementDetails["+idx+"].announcementDetailKey'>"+
+									"<input type='hidden' value='"+data.corporateAnnouncementKeyRow+"' name='corporateAnnouncement.announcementDetails["+idx+"].corporateAnnouncement.corporateAnnouncementKey'>"+
+									"<input type='hidden' value='"+data.securityTypeSourceRow+"' name='corporateAnnouncement.announcementDetails["+idx+"].securityTypeSource.securityType'>"+
+									"<input type='hidden' value='"+data.securityTypeSourceDescRow+"' name='corporateAnnouncement.announcementDetails["+idx+"].securityTypeSource.description'>"+
+									"<input type='hidden' value='"+data.securityTypeTargetRow+"' name='corporateAnnouncement.announcementDetails["+idx+"].securityTypeTarget.securityType'>"+
+									"<input type='hidden' value='"+data.securityTypeTargetDescRow+"' name='corporateAnnouncement.announcementDetails["+idx+"].securityTypeTarget.description'>"+
+									"<input type='hidden' value='"+data.actionTemplateKeyRow+"' name='corporateAnnouncement.announcementDetails["+idx+"].actionTemplate.actionTemplateKey'>"+
+									"<input type='hidden' value='"+data.actionCodeRow+"' name='corporateAnnouncement.announcementDetails["+idx+"].actionTemplate.actionCode'>"+
+									"<input type='hidden' value='"+data.actionTemplateDescriptionRow+"' name='corporateAnnouncement.announcementDetails["+idx+"].actionTemplate.description'>"+
+									"<input type='hidden' value='"+data.couponScheduleRow+"' name='corporateAnnouncement.announcementDetails["+idx+"].couponSchedule.id.couponNo'>"+
+									"<input type='hidden' value='"+data.couponScheduleKeyRow+"' name='corporateAnnouncement.announcementDetails["+idx+"].couponNo'>"+
+									"<input type='hidden' value='"+data.couponScheduleDescRow+"' name='corporateAnnouncement.announcementDetails["+idx+"].couponSchedule.paymentDate'>"+
+									"<input type='hidden' value='"+data.isCouponRow+"' name='corporateAnnouncement.announcementDetails["+idx+"].actionTemplate.isCoupon'>"+
+									"<input type='hidden' value='"+data.targetTypeRow+"' name='corporateAnnouncement.announcementDetails["+idx+"].actionTemplate.targetType.lookupId'>"+
+									//"<input type='hidden' value='"+data.basedCalculationRow+"' name='corporateAnnouncement.announcementDetails["+idx+"].securitySource.interestRate'>"+
+									"<input type='hidden' value='"+data.basedCalculationRow+"' name='corporateAnnouncement.announcementDetails["+idx+"].securitySource.isFraction'>"+
+									"<input type='hidden' value='"+data.interestRateRow+"' name='corporateAnnouncement.announcementDetails["+idx+"].couponSchedule.interestRate'>"
+
+											]);
+			idx++;
+			
+			//row.find('#SecurityCodeSourceKey').val($('#detailCorporateAction #securityCodeSourceKeyRow').val());
+			//row.find('#SecurityCodeTargetKey').val($('#detailCorporateAction #securityCodeTargetKeyRow').val());
+			//row.find('#announcementDetailKey').val($('#detailCorporateAction #announcementDetailKeyRow').val());
+			//row.find('#corporateAnnouncementKey').val($('#detailCorporateAction #corporateAnnouncementKeyRow').val());
+			//row.find('#securityTypeSource').val($('#detailCorporateAction #securityTypeSourceRow').val());
+			//row.find('#securityCodeSource').val($('#detailCorporateAction #securityCodeSourceRow').val());
+			//row.find('#securityTypeTarget').val($('#detailCorporateAction #securityTypeTargetRow').val());
+			//row.find('#securityCodeTarget').val($('#detailCorporateAction #securityCodeTargetRow').val());
+			//row.find('#sourceQuantity').val($('#detailCorporateAction #sourceQuantityRow').val());
+			//row.find('#GridSourceQuantityRowStripped').val($('#detailCorporateAction #sourceQuantityRowStripped').val());
+			//row.find('#targetQuantity').val($('#detailCorporateAction #targetQuantityRow').val());
+			//row.find('#GridTargetQuantityRowStripped').val($('#detailCorporateAction #targetQuantityRowStripped').val());
+			//row.find('#securityTypeSourceDesc').val($('#detailCorporateAction #securityTypeSourceDescRow').val());
+			//row.find('#securityCodeSourceDesc').val($('#detailCorporateAction #securityCodeSourceDescRow').val());
+			//row.find('#securityTypeTargetDesc').val($('#detailCorporateAction #securityTypeTargetDescRow').val());
+			//row.find('#securityCodeTargetDesc').val($('#detailCorporateAction #securityCodeTargetDescRow').val());
+			//row.find('#actionTemplateKey').val($('#detailCorporateAction #actionTemplateKeyRow').val());
+			//row.find('#actionCode').val($('#detailCorporateAction #actionCodeRow').val());
+			//row.find('#actionTemplateDescription').val($('#detailCorporateAction #actionTemplateDescriptionRow').val());
+			//row.find('#couponSchedule').val($('#detailCorporateAction #couponScheduleRow').val());
+			//row.find('#couponScheduleKey').val($('#detailCorporateAction #couponScheduleKeyRow').val());
+			//row.find('#couponScheduleDesc').val($('#detailCorporateAction #couponScheduleDescRow').val());
+			//row.find('#isCoupon').val($('#detailCorporateAction #isCouponRow').val());
+			//row.find('#couponScheduleInfo').val($('#detailCorporateAction #couponScheduleInfoHide').val());
+			//row.find('#targetTypeNew').val($('#detailCorporateAction #targetTypeRow').val());
+			//row.find('#basedCalculation').val($('#detailCorporateAction #basedCalculationRow').val());
+			//row.find('#interestRateCoupon').val($('#detailCorporateAction #interestRateRow').val());
+
+			//row.appendTo($('#listCorporateAction #gridCorporateAction tbody'));
+/*			
+			row.find('#SecurityCodeSourceKey').attr('name', 'announcements[' + index + '].securitySource.securityKey');
+			row.find('#SecurityCodeTargetKey').attr('name', 'announcements[' + index + '].securityTarget.securityKey');
+			row.find('#announcementDetailKey').attr('name', 'announcements[' + index + '].announcementDetailKey');
+			row.find('#corporateAnnouncementKey').attr('name', 'announcements[' + index + '].corporateAnnouncement.corporateAnnouncementKey');
+			row.find('#securityTypeSource').attr('name', 'announcements[' + index + '].securityTypeSource.securityType');
+			row.find('#securityCodeSource').attr('name', 'announcements[' + index + '].securitySource.securityId');
+			row.find('#securityTypeTarget').attr('name', 'announcements[' + index + '].securityTypeTarget.securityType');
+			row.find('#securityCodeTarget').attr('name', 'announcements[' + index + '].securityTarget.securityId');
+			row.find('#sourceQuantity').attr('name', 'announcements[' + index + '].sourceQuantity');
+			//row.find('#GridSourceQuantityRowStripped').attr('name', 'announcements[' + index + '].sourceQuantity');
+			row.find('#targetQuantity').attr('name', 'announcements[' + index + '].targetQuantity');
+			//row.find('#GridTargetQuantityRowStripped').attr('name', 'announcements[' + index + '].targetQuantity');
+			row.find('#securityTypeSourceDesc').attr('name', 'announcements[' + index + '].securityTypeSource.description');
+			row.find('#securityCodeSourceDesc').attr('name', 'announcements[' + index + '].securitySource.description');
+			row.find('#securityTypeTargetDesc').attr('name', 'announcements[' + index + '].securityTypeTarget.description');
+			row.find('#securityCodeTargetDesc').attr('name', 'announcements[' + index + '].securityTarget.description');
+			row.find('#actionTemplateKey').attr('name', 'announcements[' + index + '].actionTemplate.actionTemplateKey');
+			row.find('#actionCode').attr('name', 'announcements[' + index + '].actionTemplate.actionCode');
+			row.find('#actionTemplateDescription').attr('name', 'announcements[' + index + '].actionTemplate.description');
+			row.find('#couponSchedule').attr('name', 'announcements[' + index + '].couponSchedule.id.couponNo');
+			row.find('#couponScheduleKey').attr('name', 'announcements[' + index + '].couponNo');
+			row.find('#couponScheduleDesc').attr('name', 'announcements[' + index + '].couponSchedule.paymentDate');
+			row.find('#isCoupon').attr('name', 'announcements[' + index + '].actionTemplate.isCoupon');
+			row.find('#basedCalculation').attr('name', 'announcements[' + index + '].securitySource.interestRate');
+			row.find('#interestRateCoupon').attr('name', 'announcements[' + index + '].couponSchedule.interestRate');
+*/
+		}
+		selectedRow = null;
+	}
+	
+	function adjustSourceTarget() {
+		//$('#targetTypeNew').val($('#targetTypeRow').val());
+		if (($('#sourceTransactionRow').val() != "") && ($('#targetTransactionRow').val() == "")) {
+			if ($('#targetTypeRow').val() == "CA_TARGET_TYPE-O") {
+				targetOthers();
+			} else if ($('#targetTypeRow').val() == "CA_TARGET_TYPE-C") {
+				targetCash();
+			} else if ($('#targetTypeRow').val() == "CA_TARGET_TYPE-S") {
+				targetSameAsSource();
+			} else {
+				$("#securityTypeTargetRow").attr('disabled', true);
+				$("#securityCodeTargetRow").attr('disabled', true);
+				$("#securityTypeTargetHelpRow").attr('disabled', true);
+				$("#securityCodeTargetHelpRow").attr('disabled', true);
+				$(".target").val("");
+			}
+		} else if (($('#targetTransactionRow').val() != "") && ($('#sourceTransactionRow').val() == "")) {
+			if ($('#targetTypeRow').val() == "CA_TARGET_TYPE-O") {
+				targetOthers();
+			} else if ($('#targetTypeRow').val() == "CA_TARGET_TYPE-C") {
+				targetCash();
+			} else if ($('#targetTypeRow').val() == "CA_TARGET_TYPE-S") {
+				targetSameAsSource();
+			} else {
+				$("#securityTypeSourceRow").attr('disabled', true);
+				$("#securityCodeSourceRow").attr('disabled', true);
+				$("#securityTypeSourceHelpRow").attr('disabled', true);
+				$("#securityCodeSourceHelpRow").attr('disabled', true);
+				$(".source").val("");
+			}
+		} else {
+			$("#securityTypeTargetRow").attr('disabled', false);
+			$("#securityCodeTargetRow").attr('disabled', false);
+			$("#securityTypeTargetHelpRow").attr('disabled', false);
+			$("#securityCodeTargetHelpRow").attr('disabled', false);
+			$(".target").val("");
+			$("#securityTypeSourceRow").attr('disabled', false);
+			$("#securityCodeSourceRow").attr('disabled', false);
+			$("#securityTypeSourceHelpRow").attr('disabled', false);
+			$("#securityCodeSourceHelpRow").attr('disabled', false);
+			$(".source").val("");
+		}
+	}	
+
+	function targetOthers() {
+		$('#targetTypeNew').val($('#targetTypeRow').val());
+		if ($('#targetTypeNew').val() == "CA_TARGET_TYPE-O") {
+			//alert("Ada!");
+			$("#securityTypeTargetRow").attr('disabled', false);
+			$("#securityCodeTargetRow").attr('disabled', false);
+			$("#securityTypeTargetHelpRow").attr('disabled', false);
+			$("#securityCodeTargetHelpRow").attr('disabled', false);
+			$(".target").val("");
+		}
+	}
+
+	function targetCash() {
+		$('#targetTypeNew').val($('#targetTypeRow').val());
+		if ($('#targetTypeNew').val() == "CA_TARGET_TYPE-C") {
+			//alert("SECTION CA_TARGET_TYPE-C");
+			$(".target").attr('disabled', true);
+			$("#securityTypeTargetHelpRow").attr('disabled', true);
+			$("#securityCodeTargetHelpRow").attr('disabled', true);
+			$(".target").val("");	
+			
+			// FOR COPY VALUE FROM ... TO ...
+			
+			$("#securityTypeTargetRow").val($("#securityTypeSourceRow").val());
+			$("#securityTypeCodeTarget").val($("#securityTypeCodeSource").val());
+			$("#securityTypeTargetDescRow").val($("#securityTypeSourceDescRow").val());
+				
+			$("#securityCodeTargetRow").val($("#securityCodeSourceRow").val());
+			$("#securityCodeTargetKeyRow").val($("#securityCodeSourceKeyRow").val());
+			$("#securityCodeTargetDescRow").val($("#securityCodeSourceDescRow").val());	
+		}
+	}
+
+	function targetSameAsSource() {
+		$('#targetTypeNew').val($('#targetTypeRow').val());
+		//alert($('#targetTypeNew').val());
+		if ($('#targetTypeNew').val() == "CA_TARGET_TYPE-S") {
+			$(".target").attr('disabled', true);
+			$("#securityTypeTargetHelpRow").attr('disabled', true);
+			$("#securityCodeTargetHelpRow").attr('disabled', true);
+									
+			// FOR COPY VALUE FROM ... TO ...
+			$("#securityTypeTargetRow").val($("#securityTypeSourceRow").val());
+			$("#securityTypeCodeTarget").val($("#securityTypeCodeSource").val());
+			$("#securityTypeTargetDescRow").val($("#securityTypeSourceDescRow").val());
+				
+			$("#securityCodeTargetRow").val($("#securityCodeSourceRow").val());
+			$("#securityCodeTargetKeyRow").val($("#securityCodeSourceKeyRow").val());
+			$("#securityCodeTargetDescRow").val($("#securityCodeSourceDescRow").val());								
+		}
+	}
+	
+	function reordering() {
+		
+		var grid = $('#listCorporateAction #gridCorporateAction tbody');
+		var trs = $("tr", grid);
+		
+		$.each(trs, function(idx, data){
+			var hiddens = $("[type=hidden]", $(this));
+			$(hiddens).eq(0).attr("name", "corporateAnnouncement.announcementDetails["+idx+"].securitySource.securityId");
+			$(hiddens).eq(1).attr("name", "corporateAnnouncement.announcementDetails["+idx+"].securitySource.description");
+			$(hiddens).eq(2).attr("name", "corporateAnnouncement.announcementDetails["+idx+"].securitySource.securityKey");
+			
+			$(hiddens).eq(3).attr("name", "corporateAnnouncement.announcementDetails["+idx+"].securityTarget.securityId");
+			$(hiddens).eq(4).attr("name", "corporateAnnouncement.announcementDetails["+idx+"].securityTarget.description");
+			$(hiddens).eq(5).attr("name", "corporateAnnouncement.announcementDetails["+idx+"].securityTarget.securityKey");
+		
+			$(hiddens).eq(6).attr("name", "corporateAnnouncement.announcementDetails["+idx+"].sourceQuantity");
+			$(hiddens).eq(7).attr("name", "corporateAnnouncement.announcementDetails["+idx+"].targetQuantity");
+			
+			$(hiddens).eq(8).attr("name", "corporateAnnouncement.announcementDetails["+idx+"].announcementDetailKey");
+			$(hiddens).eq(9).attr("name", "corporateAnnouncement.announcementDetails["+idx+"].corporateAnnouncement.corporateAnnouncementKey");
+
+			$(hiddens).eq(10).attr("name", "corporateAnnouncement.announcementDetails["+idx+"].securityTypeSource.securityType");
+			$(hiddens).eq(11).attr("name", "corporateAnnouncement.announcementDetails["+idx+"].securityTypeSource.description");
+
+			$(hiddens).eq(12).attr("name", "corporateAnnouncement.announcementDetails["+idx+"].securityTypeTarget.securityType");
+			$(hiddens).eq(13).attr("name", "corporateAnnouncement.announcementDetails["+idx+"].securityTypeTarget.description");
+
+			$(hiddens).eq(14).attr("name", "corporateAnnouncement.announcementDetails["+idx+"].actionTemplate.actionTemplateKey");
+			$(hiddens).eq(15).attr("name", "corporateAnnouncement.announcementDetails["+idx+"].actionTemplate.actionCode");
+			$(hiddens).eq(16).attr("name", "corporateAnnouncement.announcementDetails["+idx+"].actionTemplate.description");
+
+			$(hiddens).eq(17).attr("name", "corporateAnnouncement.announcementDetails["+idx+"].couponSchedule.id.couponNo");
+			$(hiddens).eq(18).attr("name", "corporateAnnouncement.announcementDetails["+idx+"].couponNo");
+			$(hiddens).eq(19).attr("name", "corporateAnnouncement.announcementDetails["+idx+"].couponSchedule.paymentDate");
+
+			$(hiddens).eq(20).attr("name", "corporateAnnouncement.announcementDetails["+idx+"].actionTemplate.isCoupon");
+			$(hiddens).eq(21).attr("name", "corporateAnnouncement.announcementDetails["+idx+"].actionTemplate.targetType.lookupId");
+			$(hiddens).eq(22).attr("name", "corporateAnnouncement.announcementDetails["+idx+"].securitySource.interestRate");
+			$(hiddens).eq(23).attr("name", "corporateAnnouncement.announcementDetails["+idx+"].couponSchedule.interestRate");
+		
+			
+		});
+	}
+	
+	function autoNumericGet(id, value) {
+		    $("#"+id).val(value);
+			var splitNumeric =  $("#"+id).val().split(".");
+			if(splitNumeric.length > 1) {
+				var backNumeric = splitNumeric[1];
+				return $("#"+id).autoNumericSet( $("#"+id).val(), {vMin: '-999999999999.9999999999', vMAx:'999999999999.9999999999', mDec: backNumeric.length, aPad: true}).val();
+			} else {
+				return $("#"+id).autoNumericSet( $("#"+id).val(), {vMin: '-999999999999.9999999999', vMAx:'999999999999.9999999999'}).val();
+			}
+	}
+	
+	function securityCode(data) {
+		$('#securityCode').lookup({
+			list:'@{Pick.securities()}',
+			get: {
+				url:'@{Pick.security()}',
+				success: function(data) {
+					if (data) {
+						$('#securityCode').removeClass('fieldError');
+						$('#securityKey').val(data.code);
+						$('#securityCodeDesc').val(data.description);
+						$('#h_securityCodeDesc').val(data.description);
+					//	$('#parValue').val(data.parValue);
+					//	var executionPrice = $('#parValue').val();
+					//	$('#executionPrice').val(executionPrice);
+					//	$('#executionPriceStripped').val(executionPrice);
+					}
+				},
+				error: function(data) {
+					$('#securityCode').addClass('fieldError');
+					$('#securityCodeDesc').val('NOT FOUND');
+					//$('#securityKey').val(data.code);
+					$('#securityKey').val('');
+					$('#securityCode').val('');
+					$('#h_securityCodeDesc').val('');
+				}
+			},
+			description:$('#securityCodeDesc'),
+			//filter:$('#securityType'),
+			filter:$('#securityType'),
+			help:$('#securityCodeHelp')
+		});
+	}
+	
+</script>
+
+<style type="text/css">
+  #errmsg {color:red;}
+  #isUnsettledHolding {margin-left:1.7em;}
+  #targetQuantityRow {margin-left:2px;}
+  .master {margin-left:2em;}
+</style>
+
+<form id="corporateAnnouncementForm" class="form" method="POST">
+	#{hidden id:'parValue', name:'corporateAnnouncement.security.parUnitValue', value:corporateAnnouncement?.security?.parUnitValue /}
+	<div>
+		<ul>
+			#{hidden id:'corporateAnnouncementKey', name:'corporateAnnouncement.corporateAnnouncementKey', value:corporateAnnouncement?.corporateAnnouncementKey /}
+		 	#{hidden id:'checkDate2', name:'checkDate', value:checkDate/}
+			#{hidden id:'result2', name:'result', value:result/}
+			<li>      
+				#{textBox id:'corporateAnnouncementCode', name:'corporateAnnouncement.corporateAnnouncementCode', label:'Announcement Code', value:corporateAnnouncement?.corporateAnnouncementCode, class:'capitalize master', width:'120px', required:true, maxLength:'100', readOnly:((mode=='entry') ? confirming :true ) /} 
+				<span><b>&nbsp;&nbsp; Status&nbsp;</b></span>
+				#{textBox id:'status', name:'corporateAnnouncement.status', width:'85px',value:corporateAnnouncement?.status, readOnly:true /}
+			 	<span class="error">#{error 'corporateAnnouncement.corporateAnnouncementCode' /}</span>
+			</li>
+			<li>			
+				#{textBox id:'description', name:'corporateAnnouncement.description', label:'Description', width:'443px',value:corporateAnnouncement?.description, class:'capitalize master', readOnly:readOnly, maxLength:100 /}
+			</li>
+			<li>
+				#{textBox id:'securityType', name:'corporateAnnouncement.securityType.securityType', label:'Security Type', dataold:corporateAnnouncement?.securityType?.securityType, class:'capitalize master', value:corporateAnnouncement?.securityType?.securityType, required:true, readOnly:readOnly, width:'85px' /}
+				#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:readOnly  /}
+				#{textBox id:'securityTypeDesc', name:'corporateAnnouncement.securityType.description', value:corporateAnnouncement?.securityType?.description, readOnly:true, width:'324px' /}
+				<span class="error">#{error 'corporateAnnouncement.securityType.securityType' /}</span>		
+			</li>
+			<li>
+				#{textBox id:'securityCode', name:'corporateAnnouncement.security.securityId', label:'Security Code', class:'capitalize master', value:corporateAnnouncement?.security?.securityId, required:true, readOnly:readOnly, width:'85px' /}
+				#{button id:'securityCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'securityCodeDesc', name:'corporateAnnouncement.security.description', value:corporateAnnouncement?.security?.description, readOnly:true, width:'324px' /}
+				#{hidden id:'securityKey', name:'corporateAnnouncement.security.securityKey', value:corporateAnnouncement?.security?.securityKey /}
+				<span class="error">#{error 'corporateAnnouncement.security.securityId' /}</span>
+			</li>			
+			<li>			
+				#{textBox id:'announcementDate', name:'corporateAnnouncement.announcementDate', label:'Announcement Date', value:corporateAnnouncement?.announcementDate?.format(appProp.dateFormat),required:true , readOnly:readOnly, class:'calendar master' /} (${appProp.displayDateFormat})
+				<span id="announcementDateError" class="error">#{error 'corporateAnnouncement.announcementDate' /}</span>
+			</li> 
+			<li>			
+				#{textBox id:'cumDate', name:'corporateAnnouncement.cumDate', label:'Cum Date', value:corporateAnnouncement?.cumDate?.format(appProp.dateFormat), readOnly:readOnly, required:true, class:'calendar master' /} (${appProp.displayDateFormat})
+				<span id="cumDateError" class="error">#{error 'corporateAnnouncement.cumDate' /}</span>
+			</li> 
+			<li>			
+				#{textBox id:'exDate', name:'corporateAnnouncement.exDate', label:'Ex Date', value:corporateAnnouncement?.exDate?.format(appProp.dateFormat), readOnly:readOnly, required:true, class:'calendar master' /} (${appProp.displayDateFormat})
+				<span id="exDateError" class="error">#{error 'corporateAnnouncement.exDate' /}</span>	
+			</li> 
+			<li>			
+				#{textBox id:'recordingDate', name:'corporateAnnouncement.recordingDate', label:'Recording Date', value:corporateAnnouncement?.recordingDate?.format(appProp.dateFormat), readOnly:readOnly, required:true, class:'calendar master' /} (${appProp.displayDateFormat})
+				<span  id="recordingDateError" class="error">#{error 'corporateAnnouncement.recordingDate' /}</span>		
+			</li>
+			<li>			
+				#{textBox id:'distributionDate', name:'corporateAnnouncement.distributionDate', label:'Distribution Date', value:corporateAnnouncement?.distributionDate?.format(appProp.dateFormat), readOnly:readOnly, required:true, class:'calendar master' /} (${appProp.displayDateFormat})
+				<span id="distributionDateError" class="error">#{error 'corporateAnnouncement.distributionDate' /}</span>
+			</li> 
+			<li>	
+				#{dropDownList id:'holdingBasedOn', name:'corporateAnnouncement.holdingBasedOn.lookupId', label:'Holding Based On', options:holdingBasedOn, value:corporateAnnouncement?.holdingBasedOn?.lookupId, required:true, readOnly:readOnly, class:'master' /}		
+				<span class="error">#{error 'corporateAnnouncement.holdingBasedOn.lookupId' /}</span>
+			</li>
+			<li>			
+				#{textBox id:'executionPrice', label:'Execution Price', value:corporateAnnouncement?.executionPrice, class:'numeric master', format:'#,##0.####', readOnly:readOnly, width:'120px', maxLength:24 /}
+				#{hidden id:'executionPriceStripped', name:'corporateAnnouncement.executionPrice', value:corporateAnnouncement?.executionPrice /}
+			</li> 
+			<li>	
+				#{dropDownList id:'roundingType', name:'corporateAnnouncement.roundingType.lookupId', label:'Rounding Type', options:roundingType, value:corporateAnnouncement?.roundingType?.lookupId, required:true, readOnly:readOnly, width:'124px', class:'master' /}
+				<span class="error">#{error 'corporateAnnouncement.roundingType.lookupId' /}</span>		
+			</li>
+			<li>			
+				#{textBox id:'roundingValue', label:'Rounding Value', value:corporateAnnouncement?.roundingValue, format:'#,##0.####', readOnly:readOnly, width:'120px', class:'numericminus master', maxLength:24 /}
+				#{hidden id:'roundingValueStripped', name:'corporateAnnouncement.roundingValue',  value:corporateAnnouncement?.roundingValue /}
+				<span id="errmsg"></span>
+			</li> 
+			<li>
+				#{checkBox id:'isUnsettledHolding', label:'Include Unsettle Holding', name:'corporateAnnouncement.isUnsettledHolding', value:corporateAnnouncement?.isUnsettledHolding, readOnly:readOnly, class:'master' /}
+			</li>
+		</ul>		
+	</div>
+
+	<p> </p>
+	<div id="tabsCorporateAction">
+	
+		<ul>
+			<li><a href="#tier">Corporate Announcement Detail</a></li>
+		</ul>
+		<div class="pane" id="tier">	
+			<div id="listCorporateAction" style="overflow-y:scroll;height:120px">
+				#{include 'CorporateAnnouncements/grid_corporate_announcement.html' /}
+			</div>
+			<div class="buttons">
+				<button id="newCorporateActionData" #{if readOnly}disabled="disabled"#{/if}>New Data</button>
+			</div>	
+		</div>
+		
+	</div>
+	<p> </p>	
+	
+	<div id="detailCorporateAction" title="Detail Corporate Announcement">
+		#{hidden id:'announcementDetailKeyRow', name:'announcements.announcementDetailKey' /}
+		#{hidden id:'corporateAnnouncementKeyRow', name:'announcements.corporateAnnouncement.corporateAnnouncementKey', value:announcements?.corporateAnnouncement?.corporateAnnouncementKey /}
+		#{hidden id:'isCouponRow', name:'announcements.actionTemplate.isCoupon', value:announcements?.actionTemplate?.isCoupon /}	
+		#{hidden id:'targetTypeRow', name:'announcements.actionTemplate.targetType.lookupId', value:announcements?.actionTemplate?.targetType?.lookupId /}
+		#{hidden id:'targetTypeNew', name:'targetType' /}
+		#{hidden id:'fraction', name:'announcements.corporateAnnouncement.couponSchedule.fraction', value:announcements?.couponSchedule?.fraction /}
+		#{hidden id:'fractionBase', name:'announcements.couponSchedule.fractionBase', value:announcements?.couponSchedule?.fractionBase /}
+		#{hidden id:'interestRate', name:'announcements.couponSchedule.interestRate', value:announcements?.couponSchedule?.interestRate /}
+		#{hidden id:'interestRateSecurity', name:'announcements.securitySource.interestRate', value:announcements?.securitySource?.interestRate /}
+		#{hidden id:'sourceTransactionRow', name:'announcements.actionTemplate.sourceTransaction.transactionTemplateKey', value:announcements?.actionTemplate?.sourceTransaction?.transactionTemplateKey /}
+		#{hidden id:'sourceTransactionNew', name:'sourceTransaction' /}
+		#{hidden id:'targetTransactionRow', name:'announcements.actionTemplate.targetTransaction.transactionTemplateKey', value:announcements?.actionTemplate?.targetTransaction?.transactionTemplateKey /}
+		#{hidden id:'targetTransactionNew', name:'targetTransaction' /}
+		#{hidden id:'isFraction', name:'announcements.couponSchedule.security.isFraction', value:announcements?.couponSchedule?.security?.isFraction /}
+			
+		#{hidden id:'rowPosNumber' /}		
+		#{hidden id:'dummy' /}
+		<div>
+			<table width="100%">
+				<tr bgcolor="#ffffff">
+					<td width="171px">
+						<label><b>Action Code</b><b class="req"> *</b></label>
+					</td>
+					<td>
+						#{textBox id:'actionCodeRow', name:'announcements.actionTemplate.actionCode', value:announcements?.actionTemplate?.actionCode, class:'capitalize', readOnly:readOnly, required:true, width:'85px', tabIndex:'1' /}
+						#{hidden id:'actionTemplateKeyRow', name:'announcements.actionTemplate.actionTemplateKey', value:announcements?.actionTemplate?.actionTemplateKey/}
+						#{button id:'actionTemplateHelpRow', value:'?', class:'small', readOnly:readOnly, tabIndex:'2' /}
+						#{textBox id:'actionTemplateDescriptionRow', name:'announcements.actionTemplate.description', value:announcements?.actionTemplate?.description, readOnly:true, width:'250px' /}
+						<span id = "actionCodeRowError" class="error"></span>						
+					</td>
+				</tr>
+			</table>
+			<br />
+		
+			<table width="100%">
+					<tr bgcolor="#6ea7d1">
+						<td align="center"><label><b>FIELD</b></label></td>
+						<td align="center"> <label><b>SOURCE</b></label></td>
+						<td align="center"><label><b>TARGET</b></label></td>
+					</tr>
+				
+					<tr bgcolor="#e3f1fc">
+						<td width="171px" >
+							<label><b>Security Type</b><b class="req"> *</b></label>
+						</td>
+						<td>
+							#{textBox id:'securityTypeSourceRow', name:'announcements.securityTypeSource.securityType', value:announcements?.securityTypeSource?.securityType, dataOld:announcements?.securityTypeSource?.securityType, class:'capitalize source', required:true, readOnly:readOnly, width:'85px', tabIndex:'3' /}
+							#{button id:'securityTypeSourceHelpRow', value:'?', class:'small', readOnly:readOnly, tabIndex:'4'  /}
+							#{textBox id:'securityTypeSourceDescRow', name:'announcements.securityTypeSource.description', value:announcements?.securityTypeSource?.description, class:'source', readOnly:true, width:'250px' /}
+							#{hidden id:'securityTypeCodeSource', name:'securityTypeCodeSource', class:'source' /}
+						</td>
+						<td>
+							#{textBox id:'securityTypeTargetRow', name:'announcements.securityTypeTarget.securityType', value:announcements?.securityTypeTarget?.securityType, dataOld:announcements?.securityTypeTarget?.securityType, class:'capitalize target', required:true, readOnly:readOnly, width:'85px', tabIndex:'9' /}
+							#{button id:'securityTypeTargetHelpRow', value:'?', class:'small', readOnly:readOnly, tabIndex:'10'  /}
+							#{textBox id:'securityTypeTargetDescRow', name:'announcemenst.securityTypeTarget.description', value:announcements?.securityTypeTarget?.description, class:'target', readOnly:true, width:'250px' /}
+							#{hidden id:'securityTypeCodeTarget' ,name:'securityTypeCodeTarget', class:'target' /}
+						</td>
+					</tr>
+					
+					<tr bgcolor="#e3f1fc">
+						<td></td>
+						<td><span style="margin-left:1.5em" id="securityTypeSourceRowError" class="error"></span></td>
+						<td><span style="margin-left:1.5em" id="securityTypeTargetRowError" class="error"></span></td>
+					</tr>
+					
+					<tr bgcolor="#c6e0f4">
+						<td width="171px">
+							<label><b>Security Code</b><b class="req"> *</b></label>
+						</td>
+						<td>
+							#{textBox id:'securityCodeSourceRow', name:'announcements.securitySource.securityId', value:announcements?.securitySource?.securityId, dataOld:announcements?.securitySource?.securityId, class:'capitalize source', required:true,readOnly:readOnly, width:'85px', tabIndex:'5' /}
+							#{button id:'securityCodeSourceHelpRow', value:'?', class:'small', readOnly:readOnly, tabIndex:'6' /}
+							#{textBox id:'securityCodeSourceDescRow', name:'announcements.securitySource.description', value:announcements?.securitySource?.description, class:'source', readOnly:true, width:'250px' /}
+							#{hidden id:'securityCodeSourceKeyRow', name:'announcements.securitySource.securityKey', value:announcements?.securitySource?.securityKey, tabIndex:'8', class:'source' /}
+						</td>
+						<td>
+							#{textBox id:'securityCodeTargetRow', name:'announcements.securityTarget.securityId',  value:announcements?.securityTarget?.securityId, class:'capitalize target', required:true,readOnly:readOnly, width:'85px', tabIndex:'11' /}
+							#{button id:'securityCodeTargetHelpRow', value:'?', class:'small', readOnly:readOnly, tabIndex:'12' /}
+							#{textBox id:'securityCodeTargetDescRow', name:'announcements.securityTarget.description', value:announcements?.securityTarget?.description, class:'target', readOnly:true, width:'250px' /}
+							#{hidden id:'securityCodeTargetKeyRow', name:'announcements.securityTarget.securityKey', value:announcements?.securityTarget?.securityKey, tabIndex:'14', class:'target' /}
+						</td>
+					</tr>	
+					
+					<tr bgcolor="#c6e0f4">
+						<td></td>
+						<td><span style="margin-left:1.5em" id="securityCodeSourceRowError" class="error"></span></td>
+						<td><span style="margin-left:1.5em" id="securityCodeTargetRowError" class="error"></span></td>
+					</tr>	
+			</table>
+			<br />
+		
+			<table width="100%">
+				<tr bgcolor="#ffffff">
+					<td width="171px">
+						<label><b>Coupon Schedule</b><b id="couponScheduleReq" class="req"> *</b></label>
+					</td>
+					<td>
+						#{textBox id:'couponScheduleRow', name:'announcements.couponNo', value:announcements?.couponNo, class:'numberOnly capitalize', readOnly:readOnlyCoupon, width:'85px', tabIndex:'1' /}
+						#{hidden id:'couponScheduleKeyRow', name:'announcements.couponNo', value:announcements?.couponNo /}
+						#{button id:'couponScheduleHelpRow', value:'?', class:'small', readOnly:readOnlyCoupon, tabIndex:'2' /}
+						#{textBox id:'couponScheduleDescRow', name:'announcements.couponSchedule.paymentDate', value:announcements?.couponSchedule?.paymentDate, readOnly:true, width:'250px' /}
+						<span id = "couponScheduleRowError" class="error"></span>
+					</td>
+				</tr>
+				<tr bgcolor="#ffffff">
+					<td width="171px">
+						<label><b>Ratio (Source / Target)</b><b id="ratioReq" class="req"> *</b></label>
+					</td>
+					<td>
+						#{textBox id:'sourceQuantityRow', name:'sourceQuantityRow', value:announcements?.sourceQuantity, class:'numeric', readOnly:readOnly, width:'85px', maxLength:24, tabIndex:'15'/}
+						#{hidden id:'sourceQuantityRowStripped', name:'announcements.sourceQuantity', value:announcements?.sourceQuantity, maxLength:24, tabIndex:'15'/}
+						&nbsp;<b> /</b>&nbsp;
+						#{textBox id:'targetQuantityRow',  name:'targetQuantityRow', value:announcements?.targetQuantity, class:'numeric', required:true, readOnly:readOnly, width:'85px', maxLength:24, tabIndex:'16'/}
+						#{hidden id:'targetQuantityRowStripped',  name:'announcements.targetQuantity', value:announcements?.targetQuantity, maxLength:24, tabIndex:'16'/}
+						<span id = "ratioRowError" class="error"></span>
+					</td>
+				</tr>
+				<tr bgcolor="#ffffff">
+					<td>
+						<label><b>Fraction</b></label>
+					</td>
+					<td>
+						<!-- #{textBox id:'basedCalculationRow', name:'announcements.securitySource.interestRate', value:announcements?.securitySource?.interestRate, readOnly:true, width:'85px' /} -->
+						#{textBox id:'basedCalculationRow', name:'announcements.securitySource.isFraction', value:announcements?.securitySource?.isFraction, readOnly:true, width:'85px' /}
+					</td>
+				</tr>
+				<tr bgcolor="#ffffff">
+					<td>
+						<label><b>Interest Rate</b></label>
+					</td>
+					<td>
+						#{textBox id:'interestRateRow', name:'announcements.couponSchedule.interestRate', value:announcements?.couponSchedule?.interestRate, readOnly:true, width:'85px' /}
+					</td>
+				</tr>
+			</table>
+		</div>	
+		<div class="buttons">
+			#{button id:'addCorporateAction', value:'Save' /}
+			#{button id:'cancelCorporateAction', value:'Cancel' /}
+			#{button id:'closeCorporateAction', value:'Close' /}		
+		</div>
+	</div>
+</form>
+
+
+

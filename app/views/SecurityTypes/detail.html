@@ -1,0 +1,559 @@
+#{extends 'templates/detail1.html' /}
+#{set pageTitle: 'Security Type Maintenance' /}
+#{set id:securityType?.securityType /}
+
+#{hidden id:'fairValueTrade', name:'fairValueTrade', value:fairValueTrade /}
+#{hidden id:'amortizedTrade', name:'amortizedTrade', value:amortizedTrade /}
+#{hidden id:'fairValueAFS', name:'fairValueAFS', value:fairValueAFS /}
+#{hidden id:'amortizedAFS', name:'amortizedAFS', value:amortizedAFS /}
+#{hidden id:'fairValueHTM', name:'fairValueHTM', value:fairValueHTM /}
+#{hidden id:'amortizedHTM', name:'amortizedHTM', value:amortizedHTM /}
+
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{script 'lookups.js' /}
+#{if mode == 'edit'} 
+	#{set readOnlySecType : true /}
+#{/if} 
+#{else}
+		#{set readOnlySecType : readOnly /}
+#{/else}
+
+<script type="text/javascript">
+
+$(function(){
+	
+	if (('${mode}'=='entry') || (('${mode}'=='edit') && (('${securityType?.recordStatus?.decodeStatus()}' == 'Reject')|| ($("#status").val() == 'R' )))) {
+		$('input[name=isActive]').attr("disabled", "disabled");
+	}
+	
+	$('input[name=isActive]').change(function(){
+		$("input[name='securityType.isActive']").val($("input[name='isActive']:checked").val());
+	});
+	
+	$('#securityGroup').change(function(){
+		if ($(this).val()==''){
+			$('#securityGroupDesc').val('');
+			$('#securityGroup').val('');
+			$('#securityGroupId').val('');
+			$('#h_securityGroupDesc').val('');
+			
+			$('#securityClass').val('');
+			$('#securityClassHidden').val('');
+			$('#securityClassId').val('');
+			$('#securityClassDesc').val('');
+			$('#h_securityClassDesc').val('');
+			$('#securityClass').attr('disabled', false);
+			$('#securityClassHelp').attr('disabled', false);
+		}
+	});
+	
+	$('#securityGroup').lookup({
+		list:'@{Pick.lookups()}?group=SECURITY_GROUP',
+		get:{
+			url:'@{Pick.lookup()}?group=SECURITY_GROUP',
+			success: function(data) {
+				if (data) {
+					$('#securityGroup').removeClass('fieldError');
+					$('#securityGroupId').val(data.code);
+					$('#securityGroupDesc').val(data.description);
+					$('#h_securityGroupDesc').val(data.description);
+					var securityGroup = $('#securityGroupId').val();
+					if(securityGroup == 'SECURITY_GROUP-EQ'){
+						$('#securityClass').removeClass('fieldError');
+						$('#securityClass').attr('disabled', 'disabled');
+						$('#securityClassHelp').attr('disabled', 'disabled');
+						$('#securityClass').val($('#securityGroup').val());
+						$('#securityClassHidden').val($('#securityClass').val());
+						$('#securityClassId').val('SECURITY_CLASS-EQ');
+						$('#securityClassDesc').val(data.description);
+						$('#h_securityClassDesc').val(data.description);
+					} else if (securityGroup == 'SECURITY_GROUP-FI'){
+						$('#securityClass').removeClass('fieldError');
+						$('#securityClass').attr('disabled', 'disabled');
+						$('#securityClassHelp').attr('disabled', 'disabled');
+						$('#securityClass').val($('#securityGroup').val());
+						$('#securityClassHidden').val($('#securityClass').val());
+						$('#securityClassId').val('SECURITY_CLASS-FI');
+						$('#securityClassDesc').val(data.description);
+						$('#h_securityClassDesc').val(data.description);
+					} else if (securityGroup == 'SECURITY_GROUP-MM'){
+						$('#securityClass').removeClass('fieldError');
+						$('#securityClass').attr('disabled', 'disabled');
+						$('#securityClassHelp').attr('disabled', 'disabled');
+						$('#securityClass').val($('#securityGroup').val());
+						$('#securityClassHidden').val($('#securityClass').val());
+						$('#securityClassId').val('SECURITY_CLASS-MM');
+						$('#securityClassDesc').val(data.description);
+						$('#h_securityClassDesc').val(data.description);
+					} else {
+						$('#securityClass').attr('disabled', false);
+						$('#securityClassHelp').attr('disabled', false);
+						$('#securityClass').val('');
+						$('#securityClassHidden').val('');
+						$('#securityClassId').val('');
+						$('#securityClassDesc').val('');
+						$('#h_securityClassDesc').val('');
+					}
+				}	
+			},
+			error: function(data) {
+				$('#securityGroup').addClass('fieldError');
+				$('#securityGroupDesc').val('NOT FOUND');
+				$('#securityGroup').val('');
+				$('#securityGroupId').val('');
+				$('#h_securityGroupDesc').val('');
+			}
+		},
+		key:$('#securityGroupId'),
+		description:$('#securityGroupDesc'),
+		help:$('#securityGroupHelp')
+	});
+	
+	
+	if($('#securityGroupId').val() == 'SECURITY_GROUP-EQ'){
+		$('#securityClass').attr('disabled', 'disabled');
+		$('#securityClassHelp').attr('disabled', 'disabled');
+//		$('#securityClass').val($('#securityGroup').val());
+//		$('#securityClassHidden').val($('#securityClass').val());
+//		$('#securityClassId').val($('#securityGroupId').val());
+//		$('#securityClassDesc').val($('#securityGroupDesc').val());
+//		$('#h_securityClassDesc').val($('#securityGroupDesc').val());
+	} 
+	
+	if ($('#securityGroupId').val() == 'SECURITY_GROUP-FI'){
+		$('#securityClass').attr('disabled', 'disabled');
+		$('#securityClassHelp').attr('disabled', 'disabled');
+//		$('#securityClass').val($('#securityGroup').val());
+//		$('#securityClassHidden').val($('#securityClass').val());
+//		$('#securityClassId').val($('#securityGroupId').val());
+//		$('#securityClassDesc').val($('#securityGroupDesc').val());
+//		$('#h_securityClassDesc').val($('#securityGroupDesc').val());
+	}
+	
+	if ($('#securityGroupId').val() == 'SECURITY_GROUP-MM'){
+		$('#securityClass').attr('disabled', 'disabled');
+		$('#securityClassHelp').attr('disabled', 'disabled');
+//		$('#securityClass').val($('#securityGroup').val());
+//		$('#securityClassHidden').val($('#securityClass').val());
+//		$('#securityClassId').val($('#securityGroupId').val());
+//		$('#securityClassDesc').val($('#securityGroupDesc').val());
+//		$('#h_securityClassDesc').val($('#securityGroupDesc').val());
+	}
+	
+	$('#securityClass').lookup({
+		list:'@{Pick.lookups()}?group=SECURITY_CLASS',
+		get:{
+			url:'@{Pick.lookup()}?group=SECURITY_CLASS',
+			success: function(data) {
+				if (data) {
+					$('#securityClass').removeClass('fieldError');
+					$('#securityClassId').val(data.code);
+					$('#securityClassDesc').val(data.description);
+					$('#h_securityClassDesc').val(data.description);
+					$('#securityClassHidden').val(data.lookupCode);
+	/*				if ($('#securityClassId').val() == 'SECURITY_CLASS-OT') {
+						$('#refSecurityClass').attr('disabled', false);
+						$('#refSecurityClassHelp').attr('disabled', false);
+						$('input[name=securityType.hasInterest]').attr('disabled',false);
+					} else if ($('#securityClassId').val() == 'SECURITY_CLASS-EQ'){
+						$('#refSecurityClass').attr('disabled', 'disabled');
+						$('#refSecurityClassHelp').attr('disabled', 'disabled');
+						$('input[name=securityType.hasInterest]').attr('disabled','disabled');
+					} else {
+						$('#refSecurityClass').attr('disabled', 'disabled');
+						$('#refSecurityClassHelp').attr('disabled', 'disabled');
+						$('input[name=securityType.hasInterest]').attr('disabled',false);
+						$('#refSecurityClass').val('');
+						$('#refSecurityClassDesc').val('');
+					}*/
+				}	
+			},
+			error: function(data) {
+				$('#securityClass').addClass('fieldError');
+				$('#securityClassDesc').val('NOT FOUND');
+				$('#securityClass').val('');
+				$('#securityClassHidden').val($('#securityClass').val());
+				$('#securityClassId').val('');
+				$('#h_securityClassDesc').val('');
+			}
+		},
+	//	key:$('#securityClassId'),
+		description:$('#securityClassDesc'),
+		help:$('#securityClassHelp')
+	});
+	
+	// FOR REMOVECLASS FIELDERROR 
+	$('#priceUnit').removeClass("fieldError");
+	
+	#{ifnot confirming}
+		// SET DEFAULT VALUE
+		if($("input[name='securityType.isPrice']:checked").val() == 'false'){
+			$('#priceUnit').attr('disabled', 'disabled');
+			$('#priceUnit').val('1');
+			$('#priceUnitHidden').val($('#priceUnit').val());
+			$('p[id=pPriceUnit] label span').html('');
+			//$("input[name='securityType.isDiscounted']").attr('disabled', 'disabled');	
+			//$("input[name='securityType.isRollover']").attr('disabled', 'disabled');		
+		}
+	
+		$("input[name='securityType.isRollover']").attr('disabled', 'disabled');
+		if ($("#securityClass").val()=='MM') {				
+			$("input[name='securityType.isRollover']").attr('disabled', false);														
+		}
+		
+	#{/ifnot}
+	
+	$("input[name='securityType.isPrice']").click(function(){
+		if($("input[name='securityType.isPrice']:checked").val() == 'true'){
+			$('#priceUnit').attr('disabled', false);
+			$('#priceUnit').val('');
+			$('#priceUnitHidden').val($('#priceUnit').val());
+			$('p[id=pPriceUnit] label span').html(' *');
+			//$("input[name='securityType.isDiscounted']").attr('disabled', 'disabled');	
+			//$("input[name='securityType.isRollover']").attr('disabled', 'disabled');		
+		} else {
+			$('#priceUnit').val("1");
+			$('#priceUnit').attr('disabled', 'disabled');
+			$('#priceUnitHidden').val($('#priceUnit').val());
+			$('p[id=pPriceUnit] label span').html('');
+			//$("input[name='securityType.isDiscounted']").attr('disabled', false);	
+			//$("input[name='securityType.isRollover']").attr('disabled', false);	
+		} 	
+	});	
+	
+	$('#priceUnit').change(function(){
+		if($('#priceUnit').val()=='1'){
+			$('#priceUnitHidden').val($('#priceUnit').val());
+		} else {
+			$('#priceUnitHidden').val($('#priceUnit').val());
+		} 
+	});
+	
+	$("#securityClass").blur(function() {
+		if ($("#securityClass").val()=='MM') {				
+			$("input[name='securityType.isRollover']").attr('disabled', false);														
+		} else {		
+			$("input[name='securityType.isRollover']").attr('disabled', 'disabled');		
+		}
+		if ($('#securityClass').val() == "") {
+			$('#securityClassHidden').val("");
+			$('#securityClass').val("");
+			$('#securityClassId').val("");
+			$('#securityClassDesc').val("");
+			$('#h_securityClassDesc').val("");
+		}
+	})
+});
+
+function doSave() {	
+	
+	$('#isTradeHidden').val(($('input[name=isTrade]').is(":checked")) ? true :false);
+	$('#isAfsHidden').val(($('input[name=isAfs]').is(":checked")) ? true :false);
+	$('#isHtmHidden').val(($('input[name=isHtm]').is(":checked")) ? true :false);
+	
+	submit('@{save()}?mode=${mode}&isNewRec=${isNewRec}#{if group}&group=${group}#{/}')
+	return false;
+}
+
+function doConfirm() {
+	submit('@{confirm()}/?mode=${mode}&isNewRec=${isNewRec}#{if group}&group=${group}#{/}');
+	return false;
+}
+
+function doBack() {
+	submit('@{back()}?id=${id}&mode=${mode}#{if group}&group=${group}#{/if}#{if isNewRec}&isNewRec=${isNewRec}#{/if}#{if status}&status=${status}#{/if}');
+	return false;
+};	
+
+</script>
+
+<form>
+	#{hidden id:'status', name:'status', value:status /}
+	#{hidden id:'organizationId', name:'securityType.organization.organizationId', value:securityType?.organization?.organizationId /}
+	<p>      
+		#{textBox id:'securityType', name:'securityType.securityType', label:'Security Type', value:securityType?.securityType, class:'capitalize', required:true, readOnly:readOnlySecType, width:'100px', maxLength:50 /}
+		<span class="error">#{error 'Security Type is' /}</span>
+		#{textBox id:'securityTypeDescription', name:'securityType.description', value:securityType?.description, class:'capitalize', readOnly:readOnly, width:'326px', maxLength:100 /}
+		<span class="error">#{error 'Description is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'securityGroup', name:'securityType.securityGroup.lookupCode', label:'Security Group', value:securityType?.securityGroup?.lookupCode, class:'capitalize', required:true, readOnly:readOnly, width:'100px' /}
+		#{hidden id:'securityGroupId', name:'securityType.securityGroup.lookupId', value:securityType?.securityGroup?.lookupId /}
+		#{button id:'securityGroupHelp', value:'?', class:'small', readOnly:readOnly  /}
+		#{textBox id:'securityGroupDesc', name:'securityType.securityGroup.lookupDescription', value:securityType?.securityGroup?.lookupDescription, readOnly:true, width:'300px' /}
+		<span class="error">#{error 'Security Group is' /}</span>
+	</p>
+	<p>      
+		#{textBox id:'securityClass', name:'securityClass', label:'Security Class', value:securityType?.securityClass?.lookupCode, class:'capitalize', required:true, readOnly:readOnly, width:'100px' /}
+		#{hidden id:'securityClassHidden', name:'securityType.securityClass.lookupCode', value:securityType?.securityClass?.lookupCode /}
+		#{hidden id:'securityClassId', name:'securityType.securityClass.lookupId', value:securityType?.securityClass?.lookupId /}
+		#{button id:'securityClassHelp', value:'?', class:'small', readOnly:readOnly  /}
+		#{textBox id:'securityClassDesc', name:'securityType.securityClass.lookupDescription', value:securityType?.securityClass?.lookupDescription, readOnly:true, width:'300px' /}
+		<span class="error">#{error 'Security Class is' /}</span>
+	</p>
+	<p>
+		#{radioButton id:'isPrice', name:'securityType.isPrice', value:((securityType?.isPrice)?'true':'false'), label:'Price [Y/N]', options:operators, readOnly:readOnly /}
+	</p>
+	<p id="pPriceUnit">
+		#{dropDownList id:'priceUnit', name:'priceUnit', label:'Price As', value:securityType?.priceUnit, options:prices, readOnly:readOnly, required:true, width:'104px' /}
+		#{hidden id:'priceUnitHidden',  name:'securityType.priceUnit', value:securityType?.priceUnit /}
+		<span class="error">#{error 'Price As is' /}</span>
+	</p>
+	<p>
+		#{radioButton id:'isDiscounted', name:'securityType.isDiscounted', value:((securityType?.isDiscounted)?'true':'false'), label:'Discounted', options:operators, readOnly:readOnly /}
+	</p>
+	<p>
+		#{radioButton id:'isRollover', name:'securityType.isRollover', value:((securityType?.isRollover)?'true':'false'), label:'Rollover', options:operators, readOnly:readOnly /}
+	</p>
+	<p>
+		#{dropDownList id:'holdingType', name:'securityType.holdingType.lookupId', label:'Holding Type', value:securityType?.holdingType?.lookupId, options:holdingTypes, readOnly:readOnly, width:'125px' /}
+	</p>
+	<p>
+		#{radioButton id:'hasInterest', name:'securityType.hasInterest', value:((securityType?.hasInterest)?'true':'false'), label:'Has Interest', options:operators, readOnly:readOnly /}
+	</p>
+	<!-- <p>
+		#{dropDownList id:'cbestMessageType', name:'securityType.cbestMessageType.lookupId', label:'C-BEST Message Type', value:securityType?.cbestMessageType?.lookupId, options:cbestMessageTypes, readOnly:readOnly, width:'125px' /}
+	</p> -->
+	<p>
+		#{radioButton id:'ctpRequired', name:'securityType.ctpRequired', value:((securityType?.ctpRequired)?'true':'false'), label:'CTP Reference', options:operators, readOnly:readOnly /}
+	</p>
+	<p>
+		#{dropDownList id:'cBestMessaging', name:'securityType.cbestMessageType.lookupId', label:'C-BEST Messaging', value:securityType?.cbestMessageType?.lookupId, options:cbestMessageTypes, readOnly:readOnly, width:'150px' /}
+	</p>
+	<p>
+		#{radioButton id:'isActive', name:'isActive', value:((securityType?.isActive)?'true':'false'), label:'Active', options:operators, readOnly:readOnly /}
+		#{hidden id:'isActiveHidden', name:'securityType.isActive', value:((securityType?.isActive)?'true':'false') /}
+	</p>
+	
+	<p></p>
+
+	<div>
+    <fieldset style="border-color:#A6C9E2">
+        <legend style="color: black;"><b>Valuation</b></legend>
+        <div>
+            <table id="tblValuation">
+                <tr>
+                    <td>
+                        <label style="width:221px"></label>
+                    </td>
+                    <td align="center">
+                        <input type="checkbox" id="isTrade" name="isTrade" #{if readOnly}disabled="disabled"#{/if} />
+                        #{hidden id:'isTradeHidden', name:'securityType.checkTrade', value:securityType?.checkTrade /}
+                    </td>
+                    <td align="center">
+                       <input type="checkbox" id="isAfs" name="isAfs" #{if readOnly}disabled="disabled"#{/if} />
+                        #{hidden id:'isAfsHidden', name:'securityType.checkAfs', value:securityType?.checkAfs /}
+                    </td>
+                    <td align="center">
+                        <input type="checkbox" id="isHtm" name="isHtm" #{if readOnly}disabled="disabled"#{/if} />
+                        #{hidden id:'isHtmHidden', name:'securityType.checkHtm', value:securityType?.checkHtm /}
+                    </td>
+                </tr>
+                <tr>
+	                <td>
+	                    <label style="width:210px"></label>
+	                </td>
+	                <td id="tdTrade" >
+	                    <label style="width:190px; text-align: center;">TRADE</label>
+	                   <span class="error" style="margin-left: -70px">#{error 'TRADE is' /}</span>
+	                </td>
+	                <td align="center">
+	                    <label style="width:180px">AFS</label>
+	                    <span></span>
+	                </td>
+	                <td align="center">
+	                    <label style="width:150px">HTM</label>
+	                </td>
+                </tr>
+                
+                
+                <tr>
+                    <td id="tdValuationMethod">
+                        <label style="width:190px">Valuation Method<span class="req"> *</span></label>
+                    </td>
+                    <td>
+                        #{dropDownList id:'valuationMethodTrade', name:'securityType.valuationMethodTrade.lookupId', options:valuationMethod, value:securityType?.valuationMethodTrade?.lookupId, required:true, readOnly:readOnly, width:'175px', class:'trade checkBox' /}
+                    </td>
+                    <td>
+                        #{dropDownList id:'valuationMethodAFS', name:'securityType.valuationMethodAFS.lookupId', options:valuationMethod, value:securityType?.valuationMethodAFS?.lookupId, readOnly:readOnly, width:'175px', class:'afs checkBox' /}
+                    </td>
+                    <td>
+                        #{dropDownList id:'valuationMethodHTM', name:'securityType.valuationMethodHTM.lookupId', options:valuationMethod, value:securityType?.valuationMethodHTM?.lookupId, readOnly:readOnly, width:'175px', class:'htm checkBox' /}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label style="width:190px"></label>
+                    </td>
+                    <td align="center">
+                        <span id="valuationMethodTradeErrorMessage" class="error">#{error 'Valuation Method For TRADE is' /}</span>
+                    </td>
+                    <td align="center">
+                        <span id="valuationMethodAFSErrorMessage" class="error">#{error 'Valuation Method For AFS is' /}</span>
+                    </td>
+                    <td align="center">
+                        <span id="valuationMethodHTMErrorMessage" class="error">#{error 'Valuation Method For HTM is' /}</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td id="tdMarketPrice">
+                        <label style="width:190px">Market Price<span class="req"> *</span></label>
+                    </td>
+                    <td>
+                        #{dropDownList id:'marketPriceTrade', name:'marketPriceTrade', options:marketPrice, value:securityType?.marketPriceTrade?.lookupId, readOnly:readOnly, width:'175px', class:'trade'/}
+                        #{hidden id:'marketPriceTradeHidden', name:'securityType.marketPriceTrade.lookupId', value:securityType?.marketPriceTrade?.lookupId, class:'trade' /}
+                    </td>
+                    <td>
+                        #{dropDownList id:'marketPriceAFS', name:'marketPriceAFS', options:marketPrice, value:securityType?.marketPriceAFS?.lookupId, readOnly:readOnly, width:'175px', class:'afs'/}
+                        #{hidden id:'marketPriceAFSHidden', name:'securityType.marketPriceAFS.lookupId', value:securityType?.marketPriceAFS?.lookupId, class:'afs' /}
+                    </td>
+                    <td>
+                        #{dropDownList id:'marketPriceHTM', name:'marketPriceHTM', options:marketPrice, value:securityType?.marketPriceHTM?.lookupId, readOnly:readOnly, width:'175px', class:'htm'/}       
+                        #{hidden id:'marketPriceHTMHidden', name:'securityType.marketPriceHTM.lookupId', value:securityType?.marketPriceHTM?.lookupId, class:'htm' /}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                    	 <label style="width:190px"></label>
+                    </td>
+                    <td align="center">
+                    	<span class="error">#{error 'Market Price For TRADE is' /}</span>
+                    </td>
+                    <td align="center">
+                    	<span class="error">#{error 'Market Price For AFS is' /}</span>
+                    </td>
+                    <td align="center">
+                    	<span class="error">#{error 'Market Price For HTM is' /}</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td id="tdAmortization">
+                        <label style="width:190px">Amortization Method<span class="req"> *</span></label>
+                    </td>
+                    <td>
+                        #{dropDownList id:'amortizationMethodTrade', name:'amortizationMethodTrade', options:amortizationMethod, value:securityType?.amortizationMethodTrade?.lookupId, readOnly:readOnly, width:'175px', class:'trade'/}
+                        #{hidden id:'amortizationMethodTradeHidden', name:'securityType.amortizationMethodTrade.lookupId', value:securityType?.amortizationMethodTrade?.lookupId, class:'trade' /}
+                    </td>
+                    <td>
+                        #{dropDownList id:'amortizationMethodAFS', name:'securityType.amortizationMethodAFS.lookupId', options:amortizationMethod, value:securityType?.amortizationMethodAFS?.lookupId, readOnly:readOnly, width:'175px', class:'afs'/}
+                        #{hidden id:'amortizationMethodAFSHidden', name:'amortizationMethodAFS', value:securityType?.amortizationMethodAFS?.lookupId, class:'afs' /}
+                    </td>
+                    <td>
+                        #{dropDownList id:'amortizationMethodHTM', name:'amortizationMethodHTM', options:amortizationMethod, value:securityType?.amortizationMethodHTM?.lookupId, readOnly:readOnly, width:'175px', class:'htm'/}
+                        #{hidden id:'amortizationMethodHTMHidden', name:'securityType.amortizationMethodHTM.lookupId', value:securityType?.amortizationMethodHTM?.lookupId, class:'htm' /}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                    	 <label style="width:190px"></label>
+                    </td>
+                    <td align="center">
+                    	<span class="error">#{error 'Amortization Method For TRADE is' /}</span>
+                    </td>
+                    <td align="center">
+                    	<span class="error">#{error 'Amortization Method For AFS is' /}</span>
+                    </td>
+                    <td align="center">
+                    	<span class="error">#{error 'Amortization Method For HTM is' /}</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </fieldset>
+	</div>
+
+	<p></p>
+	
+</form>
+<script type="text/javascript">
+
+	#{include 'SecurityTypes/valuation.js' /}
+
+	$(document).ready(function() {
+		/*
+		if ('${isNewRec}'=='true') {
+			$('#tblValuation select').each(function(){
+				$(this).attr("disabled", "disabled");
+			});
+		}
+		
+		// EVENT RADIO BUTTON TRADE, AFS & HTM FEATURES #1375
+        $("input[name=isTrade]").click(function(){
+           
+            if ($(this).is(":checked")){
+            	
+            	$('.trade').attr("disabled", false);
+            	
+            } else {
+            	
+            	$('.trade').attr("disabled", "disabled");
+            	 
+            }
+            
+        });
+        $("input[name=isAfs]").click(function(){
+           
+            if ($(this).is(":checked")){
+            	$('.afs').attr("disabled", false);
+            
+            } else {
+            
+            	 $('.afs').attr("disabled", "disabled");
+            
+            }
+            
+        });
+        $("input[name=isHtm]").click(function(){
+            
+            if ($(this).is(":checked")){
+            	$('.htm').attr("disabled", false);
+            	
+            } else {
+            	
+            	 $('.htm').attr("disabled", "disabled");
+            	
+            }
+            
+        });
+        // ======================================================================================================================
+        
+        if ((('${mode}' == 'view') || ('${mode}' == 'entry') || ('${mode}' == 'edit')) && ('${confirming}' != 'false')) {
+            //setChecked();
+            //doChecked();
+            $('input[name=isTrade]').attr('checked', false);
+            if($('#valuationMethodTrade').val() != '' || $('#marketPriceTrade').val() != '' || $('#amortizationMethodTrade').val() != ''){
+            	$('input[name=isTrade]').attr('checked', true);
+            }
+            $('input[name=isAfs]').attr('checked', false);
+            if($('#valuationMethodAFS').val() != '' || $('#marketPriceAFS').val() != '' || $('#amortizationMethodAFS').val() != ''){
+            	$('input[name=isAfs]').attr('checked', true);
+            }
+            $('input[name=isHtm]').attr('checked', false);
+            if($('#valuationMethodHTM').val() != '' || $('#marketPriceHTM').val() != '' || $('#amortizationMethodHTM').val() != ''){
+            	$('input[name=isHtm]').attr('checked', true);
+            }
+        }
+        */
+        $('input[type=radio][name=securityType.isPrice]').change(function() {
+        	
+			defaultValueDropdownOnValuationTrade();
+    		defaultValueDropdownOnValuationAfs();
+    		defaultValueDropdownOnValuationHtm();
+			
+        });
+        $('input[type=radio][name=securityType.isDiscounted]').change(function() {
+        	
+			defaultValueDropdownOnValuationTrade();
+    		defaultValueDropdownOnValuationAfs();
+    		defaultValueDropdownOnValuationHtm();
+			
+        });
+        $('input[type=radio][name=securityType.hasInterest]').change(function() {
+        	
+			defaultValueDropdownOnValuationTrade();
+    		defaultValueDropdownOnValuationAfs();
+    		defaultValueDropdownOnValuationHtm();
+			
+        });
+	});
+</script>

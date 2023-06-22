@@ -1,0 +1,61 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle:'Posting Rule Maintenance' /}
+
+<script type="text/javascript">
+	$(function() {
+		/* $('#backPosRul').button();
+		$('.buttons button').button();	 */
+		
+		$('#backPosRul').insertAfter("#new");
+		
+		$('#backPosRul').click(function() {
+			location.href='@{PostingProfiles.edit(profileId)}';
+		})
+		
+	});
+	
+	/* function doEntry() {
+		location.href='@{PostingRules.entry()}?profileId=${profileId}';
+	}
+	
+	function doEdit(data) {
+		if ((data[3] == "New") || (data[3] == "Updated")) {
+			view(data[0]);
+			return false;
+		} else {
+			return true;
+		}
+	} */
+		
+</script>
+
+<div id="result" style="display:block">
+    <table id="tablePostingRule" class="display">
+        <thead>
+            <tr>
+                <th width="80px" field="postingRuleCode|string|none|left|sort">Rule Id</th>
+                <th field="description|string|none|left|sort">Rule Name</th>
+                <th width="80px" field="recordStatus|string|decode|left|sort">Status</th>
+				<th width="50px" field="isActive|boolean|yesno|center|sort">Active</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+
+<!-- <button class="buttons", id="backPosRul", style="margin:5px;">Back</button>
+ -->
+<div id="btn" class="buttons">
+	<input type="button" id="newData" value="New Data" />	
+	<input type="button" id="backPosRul" value="Back" />	
+</div>
+
+<script type="text/javascript">
+#{include 'RegistrySubscription/Util.js' /}
+#{include 'PostingRules/postingRule.js' /}
+$(document).ready(function() {
+	Paging($("#main"));
+});
+</script>

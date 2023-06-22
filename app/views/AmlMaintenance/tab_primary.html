@@ -1,0 +1,440 @@
+<style type="text/css">
+  .primary { margin-top:-0.8em;}
+</style>
+
+<!--[if IE]>
+	<style type="text/css">
+	  .primary { margin-top:-2.2em;}
+	</style>
+<![endif]-->
+
+<script type="text/javascript">
+$(function(){
+	if (('${mode}'=='entry')||(('${mode}'=='edit'))){
+		$('input[name=amlCustomer.isActive]').attr("disabled", "disabled");
+	}
+	
+	function setCustName(firstName, middleName, lastName){
+		var fullName = firstName;
+		if(middleName != "")
+			fullName = fullName + " "+middleName;
+		if(lastName != "")
+			fullName = fullName + " "+lastName;
+		return fullName;
+	}
+	
+	if ($('#middleName').val()==''){
+		$('p[id=pLastName] label span').html('');
+	}
+	$('#firstName').blur(function(){
+		fullName = setCustName($(this).val(), $('#middleName').val(), $('#lastName').val());
+		$('#customerNameHide').val($.trim($('#customerName').val()));
+		$('#customerName').val(fullName);
+		$('#customerNameHide').val(fullName);
+		
+	});
+	
+	$('#middleName').blur(function(){
+		fullName = setCustName($('#firstName').val(), $(this).val(), $('#lastName').val());
+		$('#customerNameHide').val($.trim($('#customerName').val()));
+		$('#customerName').val(fullName);
+		$('#customerNameHide').val(fullName);
+		if ($(this).val()!=''){
+			$('p[id=pLastName] label span').html(' *');
+		} else {
+			$('p[id=pLastName] label span').html('');
+		}
+	});
+	
+	$('#lastName').blur(function(){
+		fullName = setCustName($('#firstName').val(), $('#middleName').val(), $(this).val());
+		$('#customerNameHide').val($.trim($('#customerName').val()));
+		$('#customerName').val(fullName);
+		$('#customerNameHide').val(fullName);
+	});
+	
+	mandatoryDirectIndirect();
+	
+	$('#custRetailFlag1').add($('#custRetailFlag2')).click(function(){
+		custRetailOfStatus();
+	});
+	custRetailOfStatus();
+	
+	$('#custRetailOf').lookup({
+		list:'@{Pick.thirdParties()}?type=THIRD_PARTY-RETAIL',
+		get:{
+			url:'@{Pick.thirdParty()}?type=THIRD_PARTY-RETAIL',
+			success: function(data){
+				$('#custRetailOf').removeClass('fieldError');
+				$('#custRetailOfKey').val(data.code);
+				$('#custRetailOfDesc').val(data.description);
+				$('#h_custRetailOfDesc').val(data.description);
+			},
+			error: function(data){
+				$('#custRetailOf').addClass('fieldError');
+				$('#custRetailOfKey').val('');
+				$('#custRetailOf').val('');
+				$('#custRetailOfDesc').val('NOT FOUND');
+				$('#h_custRetailOfDesc').val('');
+			}
+		},
+		description:$('#custRetailOfDesc'),
+		help:$('#custRetailOfHelp')
+	});
+	
+	$('#custRetailOf').change(function(){
+		if ($(this).val()==''){
+			$('#custRetailOfKey').val('');
+			$('#custRetailOf').val('');
+			$('#custRetailOfDesc').val('');
+			$('#h_custRetailOfDesc').val('');
+		}
+	});
+	
+	$('#isActive1').add($('#isActive2')).click(function(){
+		if($("#isActive1").attr('checked')){
+			$("p[atr=isActiveMandatory] label span").html("");
+		}
+		if($("#isActive2").attr('checked')){
+			$("p[atr=isActiveMandatory] label span").html(" *");
+		}
+	});
+		
+});
+
+function custRetailOfStatus() {
+	var disabled = $('#custRetailFlag1').attr("disabled");
+	if (disabled != 'disabled') {
+		var yescon = $('#custRetailFlag1').checked();
+		var nocon = $('#custRetailFlag2').checked();
+		
+		if (yescon == 'true' && nocon == 'false') {
+			if(
+					(('${mode}'=='entry')&&(!'${confirming}')) || 
+					(('${mode}'=='edit') && (!'${confirming}') && 
+							((('${amlCustomer.recordStatus}').trim() != 'A') &&
+							((('${amlCustomer.recordStatus}').trim() != 'N') &&
+							(('${amlCustomer.recordStatus}').trim() != 'U'))  ) || 
+					(('${param}'=='edit')&&(!'${confirming}') && 
+							((('${amlCustomer.recordStatus}').trim() != 'I') &&
+									(('${amlCustomer.recordStatus}').trim() != 'N') &&
+									(('${amlCustomer.recordStatus}').trim() != 'U') ) ))
+				){
+				$('#custRetailFlagHidden').val(yescon);
+				$('#custRetailOf').enabled();
+				$('#custRetailOfHelp').enabled();
+				$('#externalCifNo').enabled();
+			}
+			$("p[atr=custRetailMandatory] label span").html(" *");
+			$("p[atr=custRetailNotMandatory] label span").html(" ");
+		}
+		if (nocon == 'false' && yescon == 'false') {
+			$('#custRetailFlagHidden').val(nocon);
+			$('#custRetailOf').disabled();
+			$('#custRetailOfHelp').disabled();
+			$('#custRetailOf').val('');
+			$('#custRetailOfKey').val('');
+			$('#custRetailOfDesc').val('');
+			$('#externalCifNo').disabled();
+			$('#externalCifNo').val('');
+			$("p[atr=custRetailMandatory] label span").html("");
+			$("p[atr=custRetailNotMandatory] label span").html(" *");
+		}
+		
+	}
+}
+
+function mandatoryDirectIndirect(){	
+	var amlKey = $('#amlKey').val();
+	var amlId = $('#amlId').val();
+	if(!amlId){
+		$('#amlId').val('**AUTO**');
+	}
+	$("p[atr=custRetailMandatory] label span").html("");
+	$("p[atr=custRetailNotMandatory] label span").html("");
+	$("p[atr=isActiveMandatory] label span").html("");
+	$("p[atr=pLastName] label span").html("");
+	
+	if ('${isCloseReasonMandatory}' == 'true' && !($("#isActive1").attr('checked'))) {
+		$("p[atr=isActiveMandatory] label span").html(" *");
+	}
+	if ('${isInActive}' == 'false') {
+		$("p[atr=isActiveMandatory] label span").html(" *");
+	}
+
+	if($("#isActive2").attr('checked') && $('#closeReason').val()){
+		$("p[atr=isActiveMandatory] label span").html(" *");
+	}
+	
+	
+}
+
+</script>
+<div>
+<table>
+	<tr>
+		<td valign="top">
+		    <p>
+				#{dropDownList id:'customerType', name:'amlCustomer.customerType.lookupId', label:'Customer Type', value:amlCustomer?.customerType?.lookupId, options:customerTypes, readOnly:((mode=='entry') ? confirming :true), required:true /}
+				<span class="error">#{error 'Customer Type is' /}</span>
+			</p>	
+		    <p class="individual_only primary">
+				#{textBox id:'firstName', name:'amlCustomer.firstName', label:'First Name', value:amlCustomer?.firstName, readOnly:readOnly, required:true, width:'307px', maxLength:30, class:'capitalize noSpace specialField' /}
+				<span class="error">#{error 'First Name is' /}</span>
+			</p>
+		    <p class="individual_only primary">
+				#{textBox id:'middleName', name:'amlCustomer.middleName', label:'Middle Name', value:amlCustomer?.middleName, readOnly:readOnly, width:'307px', maxLength:30, class:'capitalize specialField' /}
+			</p>
+		    <p id="pLastName" class="individual_only primary">
+				#{textBox id:'lastName', name:'amlCustomer.lastName', label:'Last Name', value:amlCustomer?.lastName, readOnly:readOnly, required:true, width:'307px', maxLength:30, class:'capitalize noSpace specialField' /}
+				<span class="error">#{error 'Last Name is' /}</span>
+			</p>
+			
+		    <p class="individual_only primary">
+				#{textBox id:'customerName', name:'customerName', label:'Customer Name', value:amlCustomer?.customerName, required:false, readOnly:true, width:'307px', maxLength:100, class:'capitalize specialField' /}
+				#{hidden id:'customerNameHide', name:'amlCustomer.customerName', value:amlCustomer?.customerName, class:'capitalize specialField' /}
+			</p>
+			<p class="corporate_only primary">			
+				#{textBox id:'corporateName', name:'amlCustomer.customerName', label:'Company Name', value:amlCustomer?.customerName, readOnly:readOnly, class:'capitalize specialField', width:'328px', maxLength:100, required:true /}
+				<span class="error">#{error 'Company Name is' /}</span>
+			</p>
+			
+		    <p align="right" style="margin-right: 80px;" class="corporate_only primary">
+				<b>Document No</b>
+				<span class="error">#{error 'Document Type is' /}</span>
+			</p>
+			<p class="corporate_only primary">
+				#{dropDownList id:'documentType', name:'amlCustomer.documentType.lookupId', label:'Document', value:amlCustomer?.documentType?.lookupId, options:supplementDoc, readOnly:readOnly, class:'capitalize', width:'100px' /}
+				#{textBox id:'documentNo', name:'amlCustomer.documentNo', value:amlCustomer?.documentNo, required:true, readOnly:readOnly, class:'capitalize', width:'218px', maxLength:50 /}
+			</p>
+		    <p align="right" style="margin-right: 50px;" class="individual_only primary">
+				<b>Identification Number</b><span class="error">#{error 'Identification is' /}</span>
+			</p>
+			<p class="individual_only primary">
+				#{dropDownList id:'identificationType', name:'amlCustomer.identificationType.lookupId', label:'Identification 1', value:amlCustomer?.identificationType?.lookupId, options:identificationTypes, readOnly:readOnly, class:'capitalize' /}
+				#{textBox id:'identificationNo', name:'amlCustomer.identificationNo', value:amlCustomer?.identificationNo, required:true, readOnly:readOnly, class:'capitalize', width:'218px', maxLength:50 /}	
+			</p>
+		    <p>
+				#{textBox id:'npwp', name:'amlCustomer.npwp', label:'NPWP Number', value:amlCustomer?.npwp, readOnly:readOnly, width:'307px', maxLength:30, class:'capitalize specialField' /}
+			</p>
+		    <p class="individual_only primary">
+				#{textBox id:'birthPlace', name:'amlCustomer.birthPlace', label:'Place Of Birth', value:amlCustomer?.birthPlace, required:true, readOnly:readOnly, width:'307px', maxLength:30, class:'capitalize' /}
+				<span class="error">#{error 'Place Of Birth is' /}</span>
+			</p>
+			<p class="individual_only primary">
+				#{textBox id:'birthDate', name:'amlCustomer.birthDate', label:'Date Of Birth', value:amlCustomer?.birthDate?.format(appProp.dateFormat), class:'calendar', required:true, readOnly:readOnly, maxLength:10 /}(${appProp.displayDateFormat})
+				<span id="birthDateError" class="error">#{error 'Date Of Birth is' /}</span>
+			</p>		
+			<p class="corporate_only primary">
+				#{textBox id:'dateCompEstb', name:'amlCustomer.birthDate', label:'Date of Company Estb.', value:amlCustomer?.birthDate?.format(appProp.dateFormat), readOnly:readOnly, required:true, class:'calendar corporate', maxLength:10 /} (${appProp.displayDateFormat})
+				<span id="dateCompEstbError" class="error">#{error 'Date of Company Estb is' /}</span>
+			</p>
+		    <p class="individual_only primary">
+				#{textBox id:'motherName', name:'amlCustomer.motherName', label:'Mother\'s Maiden Name', value:amlCustomer?.motherName, readOnly:readOnly, width:'164px', maxLength:100, class:'capitalize specialField' /}
+				<span class="error">#{error 'Mother Maiden Name is' /}</span>
+			</p>
+		    <p class="individual_only primary">
+				#{dropDownList id:'occupation', name:'amlCustomer.occupation.lookupId', label:'Occupation', value:amlCustomer?.occupation?.lookupId, options:occupation, readOnly:readOnly, width:'168px', class:'', required:true /}
+				<span class="error">#{error 'Occupation is' /}</span>
+			</p>
+		    <p>
+				#{dropDownList id:'natureBusiness', name:'amlCustomer.natureBusiness.lookupId', label:'Nature Business', value:amlCustomer?.natureBusiness?.lookupId, options:natureBusiness, readOnly:readOnly, required:true, width:'168px', class:'' /}
+				<span class="error">#{error 'Nature Business is' /}</span>
+			</p>
+		    <p class="corporate_only primary">
+				#{dropDownList id:'natureBusinessType', name:'amlCustomer.natureBusinessType.lookupId', label:'Nature Business Type', value:amlCustomer?.natureBusinessType?.lookupId, options:natureBusinessTypes, readOnly:readOnly, required:true, width:'168px', class:'' /}
+				<span class="error">#{error 'Nature Business Type is' /}</span>
+			</p>
+		    <p class="individual_only primary">
+				#{textBox id:'position', name:'amlCustomer.position', label:'Position', value:amlCustomer?.position, readOnly:readOnly, width:'307px', maxLength:30, class:'capitalize specialField' /}
+				<span class="error">#{error 'Position is' /}</span>
+			</p>
+			<p>
+				#{dropDownList id:'addressType', name:'amlCustomer.addressType.lookupId', label:'Address Type', value:amlCustomer?.addressType?.lookupId, options:addressType, readOnly:readOnly, width:'145px', required:true /}
+				#{hidden id:'addressTypeDesc', name:'amlCustomer.addressType.lookupDescription', value:amlCustomer?.addressType?.lookupDescription /}			
+				<span class="error">#{error 'Address Type is' /}</span>
+			</p>
+			<p>			
+				#{textBox id:'address1', name:'amlCustomer.address1', label:'Address', value:amlCustomer?.address1, readOnly:readOnly, class:'capitalize specialField', width:'328px', maxLength:100, required:true /}
+				<span class="error">#{error 'Address is' /}</span>
+			</p>
+			<p>	
+				<label></label>		
+				#{textBox id:'address2', name:'amlCustomer.address2', value:amlCustomer?.address2, readOnly:readOnly, class:'capitalize specialField', width:'328px', maxLength:100 /}
+			</p>
+			<p>	
+				<label></label>		
+				#{textBox id:'address3', name:'amlCustomer.address3', value:amlCustomer?.address3, readOnly:readOnly, class:'capitalize specialField', width:'328px', maxLength:100 /}
+			</p>
+			<p>
+				#{textBox id:'address1CountryCode', name:'amlCustomer.address1Country.lookupCode', label:'Country', value:amlCustomer?.address1Country?.lookupCode, dataold:amlCustomer?.address1Country?.lookupCode, class:'capitalize sameAs', readOnly:readOnly, width:'80px', required:true /}
+				#{hidden id:'address1Country', name:'amlCustomer.address1Country.lookupId', value:amlCustomer?.address1Country?.lookupId, class:'sameAs' /}
+				#{button id:'address1CountryHelp', value:'?', class:'small', readOnly:readOnly /}	
+				#{textBox id:'address1CountryDesc', name:'amlCustomer.address1Country.lookupDescription', value:amlCustomer?.address1Country?.lookupDescription, readOnly:true, width:'220px' /}
+				<span class="error">#{error 'Country is' /}</span>
+			</p>
+			<p>
+				#{textBox id:'address1StateCode', name:'amlCustomer.address1State.lookupCode', label:'State', value:amlCustomer?.address1State?.lookupCode, dataold:amlCustomer?.address1State?.lookupCode, class:'capitalize sameAs', readOnly:readOnly, width:'80px' , required:true/}
+				#{hidden id:'address1State', name:'amlCustomer.address1State.lookupId', value:amlCustomer?.address1State?.lookupId, class:'sameAs', /}
+				#{button id:'address1StateHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'address1StateDesc', name:'amlCustomer.address1State.lookupDescription', value:amlCustomer?.address1State?.lookupDescription, readOnly:true, width:'220px' /}&nbsp;<span class="errmsg"></span>
+				<span class="error">#{error 'State is' /}</span>
+			</p>
+			<p>
+				#{textBox id:'address1AreaCode', name:'amlCustomer.address1Area.lookupCode', label:'Area', value:amlCustomer?.address1Area?.lookupCode, class:'capitalize sameAs', readOnly:readOnly, width:'80px', required:true /}
+				#{hidden id:'address1Area', name:'amlCustomer.address1Area.lookupId', value:amlCustomer?.address1Area?.lookupId, class:'sameAs', /}
+				#{button id:'address1AreaHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'address1AreaDesc', name:'amlCustomer.address1Area.lookupDescription', value:amlCustomer?.address1Area?.lookupDescription, readOnly:true, width:'220px' /}&nbsp;<span class="errmsg"></span>
+				<span class="error">#{error 'Area is' /}</span>			
+			</p>
+		</td>
+		<td valign="top">
+		    <p style="margin-left: 30px">
+				#{textBox id:'amlId', name:'amlCustomer.amlId', value:amlCustomer?.amlId, label:'AML Key', readOnly:true, width:'200px', maxLength:30, class:'capitalize specialField' /}
+				#{hidden id:'amlKey', name:'amlCustomer.amlKey', value:amlCustomer?.amlKey /}
+			</p>	
+		    <p style="margin-left: 30px">
+				#{textBox id:'eddId', label:'EDD ID', readOnly:true, width:'200px', maxLength:30, class:'capitalize' /}
+				#{hidden id:'eddIdHide', name:'amlCustomer.eddId', value:amlCustomer?.eddId, class:'capitalize specialField' /}
+			</p>
+		    <p style="margin-left: 30px">
+				#{dropDownList id:'blackList', name:'amlCustomer.blackList.lookupId', label:'Black List', value:amlCustomer?.blackList?.lookupId, options:blackList, readOnly:readOnly /}
+				<span class="error">#{error 'BlackList is' /}</span>
+			</p>	
+		    <p style="margin-left: 30px">
+				#{dropDownList id:'riskProfile', name:'amlCustomer.riskProfile.lookupId', label:'Risk Profile', value:amlCustomer?.riskProfile?.lookupId, options:riskProfile, readOnly:readOnly /}
+				<span class="error">#{error 'Risk Profile is' /}</span>
+			</p>	
+			<p atr="isHightReasonMandatory" style="margin-left: 30px">
+				#{textArea id:'highReason', name:'amlCustomer.highReason', label:'High Reason', value:amlCustomer?.highReason, readOnly:readOnly, required:true, class:'capitalize all specialField',width:'200px', maxLength:225 /}
+				<span class="error">#{error 'High Reason is' /}</span>
+			</p>
+		</td>
+	</tr>
+</table>
+</div>
+
+<div style="overflow-x:scroll;width:901px">
+	<table id="grid-contact-corp"  class="display" >
+		<thead>
+			<tr>
+				<th style="width: 100px">Contact Type</th>
+				<th style="width: 100px">Contact Name</th>
+				<th style="width: 200px">Position</th>
+				<th style="width: 50px">Action</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>
+				</td>
+				<td>
+				</td>
+				<td>
+				</td>
+				<td>					
+					<input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} />
+				</td>
+			</tr>		
+		</tbody>
+	</table>
+	<b><span id="errGlobalContactCorp" class="error"></span></b>
+	<div class="buttons">
+		<input type="button" id="newContact" value="Add" />
+		<span id="deleteErrorMessage1" class="errorMessage"></span>
+	</div>
+</div>
+
+<div>
+    <p>
+		#{dropDownList id:'product', name:'amlCustomer.product.lookupId', label:'Product', value:amlCustomer?.product?.lookupId, options:products, readOnly:readOnly, required:true, width:'168px', class:'' /}
+		<span class="error">#{error 'Product is' /}</span>
+	</p>
+    <p>
+		#{dropDownList id:'transactionFrequency', name:'amlCustomer.transactionFrequency.lookupId', label:'Transaction Frequency', value:amlCustomer?.transactionFrequency?.lookupId, options:transactionFrequencies, readOnly:readOnly, required:true, width:'168px', class:'' /}
+		<span class="error">#{error 'Transaction Frequency is' /}</span>
+	</p>
+    <p class="corporate_only primary">
+		#{dropDownList id:'ownershipStructure', name:'amlCustomer.ownershipStructure.lookupId', label:'Ownership Structure', value:amlCustomer?.ownershipStructure?.lookupId, options:ownershipStructures, readOnly:readOnly, required:true, width:'168px', class:'' /}
+		<span class="error">#{error 'Ownership Structure is' /}</span>
+	</p>
+	<p class="primary">
+		#{radioButton id:'custRetailFlag', name:'amlCustomer.custRetailFlag', value:((amlCustomer?.custRetailFlag)?'true':'false'), label:'Customer Retail[Y/N]', options:yesNo, readOnly:readOnly /}
+	</p>
+	<p atr="custRetailMandatory" class="primary">	
+		#{textBox id:'custRetailOf', name:'amlCustomer.customerGroup.thirdPartyCode', label:'Customer Retail Of', value:amlCustomer?.customerGroup?.thirdPartyCode, readOnly:readOnly, required:true, width:'55px', class:'capitalize' /}
+		#{hidden id:'custRetailOfKey', name:'amlCustomer.customerGroup.thirdPartyKey', value:amlCustomer?.customerGroup?.thirdPartyKey /}
+		#{button id:'custRetailOfHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'custRetailOfDesc', name:'amlCustomer.customerGroup.thirdPartyName', value:amlCustomer?.customerGroup?.thirdPartyName, readOnly:true, width:'218px' /}
+		<span class="error">#{error 'Customer Retail Of is' /}</span>
+	</p>
+	<p atr="custRetailMandatory" class="primary">
+		#{textBox id:'externalCifNo', name:'amlCustomer.externalNo', label:'External CIF No.', value:amlCustomer?.externalNo, readOnly:readOnly, width:'307px', maxLength:50, required:true, class:'capitalize' /}
+		<span class="error">#{error 'External CIF No. is' /}</span>
+	</p>
+    <p atr="isActiveMandatory" class="primary">
+		#{dropDownList id:'closeReason', name:'amlCustomer.closeReason.lookupId', label:'Close Reason', value:amlCustomer?.closeReason?.lookupId, options:closeReasons, readOnly:readOnly, width:'168px', required:true, class:'' /}
+		<span class="error">#{error 'Close Reason is' /}</span>
+	</p>
+</div>
+#{if ( (!param) || (param == 'edit') || ((param == 'entry') && (mode == 'edit')) || (mode == 'view') )}
+<div id="watchListSegment">
+	<table>
+		<tr >
+			<td style="width: 100px" rowspan="2">
+				<label>
+					Watch List
+				</label>
+			</td>
+			<td>
+			</td>
+		</tr>
+		<tr>
+			<td>
+			</td>
+			<td>	
+				<!-- <p class="corporate_only primary">		
+					#{button id:'amlInterface', value:'Interface To AML', readOnly:readOnly /}	
+				</p> -->
+				<div>
+					<table>
+						<tr>
+							<td>
+								#{button id:'amlInterface', value:'Interface To AML', readOnly:readOnly /}	
+							</td>
+							<td>
+								<p class="individual_only primary">		
+									<input type="radio" id="amlInterfaceRadio1" name="amlInterfaceRadio" value="aml.tipeIndividu" >Customer</input>
+									<input type="radio" id="amlInterfaceRadio2" name="amlInterfaceRadio" value="aml.tipeIndividu.bo" >Beneficiary Owner</input>
+									<span id="amlInterfaceError" class="errorMessage"></span>
+								</p>				
+							</td>
+						</tr>
+					</table>
+				</div>
+				<div style="overflow-x:scroll;width:750px">
+					<table id='tblAmlWatchList'>
+						<thead>
+							<tr>
+								<th><input id='checkAll' type="checkbox"/></th>
+								<th width="100px">Match&nbsp;Source</th>
+								<th width="100px">Name</td>
+								<th width="100px">Data&nbsp;ID</th>
+								<th width="200px">Detail&nbsp;Data</th>
+								<th width="100px">Source</th>
+								<th width="100px">Data&nbsp;Type</th>	
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</td>
+		</tr>
+	</table>
+</div>
+#{/if}
+<div>
+	<p >
+		#{radioButton id:'isActive', name:'amlCustomer.isActive', value:((amlCustomer?.isActive)?'true':'false'), label:'Active', options:yesNo, readOnly:readOnly /}
+		<span id="errActive" class="error"></span>
+	</p>
+</div>	

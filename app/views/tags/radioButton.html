@@ -1,0 +1,38 @@
+#{if _label}<label #{if _labelwidth}style="width:${_labelwidth}"#{/if}>${_label} #{if _required}<span class="req">*</span>#{/if}</label>#{/if}
+#{if _readOnly}
+	#{list items:_options, as:'option'}
+	
+		#{if _stacking}
+			#{if option_index > 1}
+				<label></label>
+			#{/if}
+		#{/if}
+	
+		<input #{if _id}id="${_id}${option_index}"#{/if} type="radio" value="${option.value}" #{if _value}#{if option.value == _value}checked="checked"#{/if}#{/if} #{if _class}class="${_class}"#{/if} disabled="disabled" />
+		${option.text}
+		
+		#{if _stacking}
+			<br/>
+		#{/if}
+		
+	#{/list}
+<input #{if _name}name="${_name}"#{/if} type="hidden" value="${_value}" />
+#{/if}
+#{else}
+	#{list items:_options, as:'option'}
+	
+		#{if _stacking}
+			#{if option_index > 1}
+				<label></label>
+			#{/if}
+		#{/if}
+		
+		<input #{if _id}id="${_id}${option_index}"#{/if} type="radio" #{if _name}name="${_name}"#{/if} value="${option.value}" #{if _value}#{if option.value == _value}checked="checked"#{/if}#{/if} #{if _class}class="${_class}"#{/if}  />
+		${option.text}
+
+		#{if _stacking}
+			<br/>
+		#{/if}
+		
+	#{/list}
+#{/else}

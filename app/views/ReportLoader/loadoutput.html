@@ -1,0 +1,32 @@
+
+<div id="loadouput">
+	<form>
+		<div id="output">
+			#{if ktrStatus}
+				Executing file "${ktrStatus.fileName}" 
+				
+				#{if ktrStatus.isSuccess()}
+					success.
+					<br/>
+					#{if ktrStatus.outputFileName?.length > 0}
+					File result:
+					<ol>
+					#{list ktrStatus.outputFileName, as:'filename'}
+					     <li>
+					     <a href="/reportpdi/pdidownload/${filename}">${filename}</a>
+					     </li>
+					#{/list} 
+					</ol>
+					#{/if}
+					#{else}
+						No file exported.
+					#{/else}
+				#{/if}
+				#{else}
+					<br/>
+					Error[s] detected:  ${ktrStatus.errors}
+				#{/else}
+	
+			#{/if}
+		</div>
+</div>

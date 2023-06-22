@@ -1,0 +1,117 @@
+ul.menu, ul.menu ul {
+  list-style-type:none;
+  margin: 0;
+  padding: 0;
+  width: 15em;
+}
+
+ul.menu a {
+  display: block;
+  text-decoration: none;	
+}
+
+ul.menu li {
+  margin-top: 1px;
+}
+
+ul.menu li a {
+  background: #333;
+  color: #fff;	
+  padding: 0.5em;
+}
+
+ul.menu li a:hover {
+  background: #000;
+}
+
+ul.menu li ul li a {
+  background: #ccc;
+  color: #000;
+  padding-left: 20px;
+}
+
+ul.menu li ul li a:hover {
+  background: #aaa;
+  border-left: 5px #000 solid;
+  padding-left: 15px;
+}
+
+
+.arrowlistmenu{
+	width: 180px; /*width of accordion menu*/
+}
+
+.arrowlistmenu .menuheader{ /*CSS class for menu headers in general (expanding or not!)*/
+	font: bold 14px;
+	color: white;
+	/*background: black url(../images/titlebar.png) repeat-x center left;*/
+	background: #4467AA;
+	margin-bottom: 5px; /*bottom spacing between header and rest of content*/
+	text-transform: uppercase;
+	padding: 7px 0 7px 10px; /*header text is indented 10px*/
+	cursor: hand;
+	cursor: pointer;
+}
+
+.arrowlistmenu .openheader{ /*CSS class to apply to expandable header when it's expanded*/
+	/*background-image: url(../images/titlebar-active.png) repeat-x center left;*/
+	background: #ff9900;
+	color: black;
+}
+
+.arrowlistmenu ul{ /*CSS for UL of each sub menu*/
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	margin-bottom: 8px; /*bottom spacing between each UL and rest of content*/
+}
+
+.arrowlistmenu ul li{
+	padding-bottom: 2px; /*bottom spacing between menu items*/
+}
+
+.arrowlistmenu ul li .opensubheader{ /*Open state CSS for sub menu header*/
+	background: #6699cc !important;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.arrowlistmenu ul li .closedsubheader{ /*Closed state CSS for sub menu header*/
+	background: #ffcc00 !important;	
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.arrowlistmenu ul li a{
+	/*color: #A70303; */
+	color: black;
+	background: url(../images/arrowbullet.png) no-repeat center left; /*custom bullet list image*/
+	display: block;
+	padding: 2px 0;
+	padding-left: 19px; /*link text is indented 19px*/
+	text-decoration: none;
+	font-weight: bold;
+	border-bottom: 1px solid #dadada;
+	font-size: 90%;
+}
+
+.arrowlistmenu ul li a:visited{
+	/*color: #A70303;*/
+	color: black;
+}
+
+.arrowlistmenu ul li a:hover{ /*hover state CSS*/
+	background-color: #F3F3F3;
+}
+
+.arrowlistmenu ul li a.subexpandable:hover{ /*hover state CSS for sub menu header*/
+	background: #33ccff;
+}
+ul.subcategoryitems{
+	margin-left: 15px;
+}
+
+textarea[disabled], select[disabled], input[type='text'][disabled] {    
+   font-weight: bold;
+}
+

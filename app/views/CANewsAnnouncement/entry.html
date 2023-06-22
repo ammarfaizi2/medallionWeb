@@ -1,0 +1,159 @@
+#{extends 'templates/detail1.html' /}
+#{set pageTitle: 'CA News Announcement ' /}
+#{set id:canews?.caNewsKey /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{script 'lookups.js', characterset:'utf-8' /}
+#{script 'lookuppaging.js' /}
+
+#{script 'katex.min.js' /}
+#{script 'highlight.min.js' /}
+#{script 'quill.min.js' /}
+#{stylesheet 'quill.snow.css' /}
+
+
+<div id='root'>
+	<form id="caNewsForm" action="save" class="form" method="post">
+		#{hidden id:'caNewsKey', name:'canews.caNewsKey', value:canews?.caNewsKey /}
+		#{hidden id:'id', name:'canews.caNewsKey', value:canews?.caNewsKey /}
+		#{hidden id:'status', name:'status', value:status /}
+		#{hidden id:'readOnly', name:'readOnly', value:readOnly /}
+		
+		<!-- Property untuk attachment -->
+		#{hidden id:'fileDirectory', name:'attachment.fileDirectory', value:attachment?.fileDirectory /}
+		#{hidden id:'filename', name:'attachment.filename', value:attachment?.filename /}
+		#{hidden id:'filepath', name:'attachment.filepath', value:attachment?.filepath /}		
+		#{hidden id:'attachmentExt', name:'attachment.attachmentExt', value:attachment?.attachmentExt /}
+		#{hidden id:'attachmentMaxSize', name:'attachment.attachmentMaxSize', value:attachment?.attachmentMaxSize /}
+		#{hidden id:'attachmentMaxSizeStr', name:'attachment.attachmentMaxSizeStr', value:attachment?.attachmentMaxSizeStr /}
+		#{hidden id:'attachmentInfo', name:'attachment.attachmentInfo', value:attachment?.attachmentInfo /}
+		
+		<p>
+			#{textBox id:'newsDate', name:'canews.newsDate', label:'News Date', value:canews?.newsDate?.format(appProp.dateFormat), class:'calendar', required:false, readOnly:true /}(${appProp.displayDateFormat})
+			<span id="newsDateError" class="error">#{error 'News Date is' /}</span>
+		</p>
+		<p>
+			#{textBox id:'securityType', name:'canews.security.securityType.securityType', label:'Security Type', value:canews?.security?.securityType?.securityType, class:'capitalize', width:'120px', required:true, readOnly:readOnly /}
+			#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'securityTypeDesc', name:'canews.security.securityType.description', value:canews?.security?.securityType?.description, readOnly:true, width:'300px' /}
+			<span id='securityTypeError' class="error">#{error 'Security Type is' /}</span>
+		</p>	
+		<p>
+			#{textBox id:'securityCode', name:'canews.security.securityId', label:'Security Code', value:canews?.security?.securityId, class:'capitalize', width:'120px', required:true,readOnly:readOnly /}
+			#{hidden id:'securityCodeKey', name:'canews.security.securityKey', value:canews?.security?.securityKey /}
+			#{button id:'securityCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'securityCodeDesc', name:'canews.security.description', value:canews?.security?.description, readOnly:true, width:'300px' /}
+			<span id="securityCodeError" class="error">#{error 'Security Code is' /}</span>
+		</p>
+		<p>
+			#{textBox id:'recordingDate', name:'canews.recordingDate', label:'Recording Date', value:canews?.recordingDate?.format(appProp.dateFormat), class:'calendar', required:true, readOnly:readOnly /}(${appProp.displayDateFormat})
+			<span id="recordingDateError" class="error">#{error 'Recording Date is' /}</span>
+		</p>
+		<p>
+			#{textBox id:'subject', name:'canews.subject', label:'Subject', value:canews?.subject, readOnly:readOnly, width:'450px', maxLength:100, required:true /}			
+			<span id="subjectError" class="error">#{error 'Subject is' /}</span>
+		</p>
+		<p>
+			#{radioButton id:'isActive', name:'canews.active', value:((canews?.active)?'true':'false'), label:'Active', options:operators, readOnly:readOnly /}
+		</p>
+		<p>
+			#{dropDownList id:'variable', label:'Variable', options:variables, readOnly:readOnly, required:false /}
+			#{button id:'btnUse', value:'>', class:'small', readOnly:readOnly /}			
+		</p>
+		<p>
+			#{textArea id:'narrative', name:'canews.narrative', label:'Narrative', value:canews?.narrative, readOnly:readOnly, required:true /}			
+			<span id="narrativeError" class="error">#{error 'Narrative is' /}</span>
+		</p>
+		<p>
+			<div id="standalone-container">
+				<div id="toolbar-container">
+					<!-- 
+				    <span class="ql-formats">
+				      <select class="ql-font"></select>
+				      <select class="ql-size"></select>
+				    </span>
+				     -->
+				    <span class="ql-formats">
+				      <button class="ql-bold"></button>
+				      <button class="ql-italic"></button>
+				      <button class="ql-underline"></button>
+				      <button class="ql-strike"></button>
+				    </span>
+				    <span class="ql-formats">
+				      <select class="ql-color"></select>
+				      <select class="ql-background"></select>
+				    </span>
+				    <!-- 
+				    <span class="ql-formats">
+				      <button class="ql-script" value="sub"></button>
+				      <button class="ql-script" value="super"></button>
+				    </span>
+				     -->
+				    <span class="ql-formats">
+				      <button class="ql-header" value="1"></button>
+				      <button class="ql-header" value="2"></button>
+				      <!-- 
+				      <button class="ql-blockquote"></button>
+				      <button class="ql-code-block"></button>
+				       -->
+				    </span>
+				    <span class="ql-formats">
+				      <button class="ql-list" value="ordered"></button>
+				      <button class="ql-list" value="bullet"></button>
+				      <!-- 
+				      <button class="ql-indent" value="-1"></button>
+				      <button class="ql-indent" value="+1"></button>
+				       -->
+				    </span>
+				    <!--
+				    <span class="ql-formats">
+				       <button class="ql-direction" value="rtl"></button>  
+				      <select class="ql-align"></select>
+				    </span>
+				    <span class="ql-formats">
+				      <button class="ql-link"></button>
+				      <button class="ql-image"></button>
+				      <button class="ql-video"></button>
+				      <button class="ql-formula"></button>
+				    </span>
+				     -->
+				    <span class="ql-formats">
+				      <button class="ql-clean"></button>
+				    </span>
+				  </div>
+				<div id="editor-container" style="height: 200px"></div>
+			</div>
+		</p>
+		<p>#{button id:'btnPreview', value:'Preview', readOnly:false /}</p>
+		<p>
+			#{textBox id:'deliverDate', name:'canews.deliverDate', label:'Delivery Date', value:canews?.deliverDate?.format(appProp.dateFormat), class:'calendar', required:true, readOnly:readOnly /}(${appProp.displayDateFormat})
+			<span id="deliverDateError" class="error">#{error 'Delivery Date is' /}</span>
+		</p>
+		<p>
+			<label>Attach Document<span id='attachmentReq' class="req"> *</span></label>
+			 #{checkBox id:'addAttachment', name:'attachment.addAttachment', value:attachment?.addAttachment, readOnly:readOnly /} Yes
+		</p>
+		<p id='pFile'>
+			<label style="margin-right: 5px"></label>
+			#{fileUpload id:'file', name:'attachment.file', value:attachment?.file, disabled:readOnly, class:'all' /}
+			<span id="fileError" class="error"></span>
+		</p>
+		<p id='pDownload'>
+			<label style="margin-right: 5px"></label>
+			<span>${attachment?.filename} <a href="/canewsannouncement/downloadAttachment">Download</a> </span>
+		</p>
+		<p id='pAttachmentInfo'>
+			<label style="margin-right: 5px"></label>
+			<span>${attachment?.attachmentInfo}</span>
+		</p>
+		<div id="preview" title="Preview" class='ql-editor'>
+			<link rel="stylesheet" type="text/css" href="/public/stylesheets/quill.snow.css" charset="utf-8">
+		</div>
+	</form>
+</div>
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'CANewsAnnouncement/entry.js' /}
+	$(document).ready(function() {
+		new Entry($("#root"));
+	});
+</script>

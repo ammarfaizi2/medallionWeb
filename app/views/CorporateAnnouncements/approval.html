@@ -1,0 +1,137 @@
+#{extends 'templates/main.html' /}
+
+<script type="text/javascript">
+	$(function() {
+		
+		var backToWorkList = function() {
+			loading.dialog('open');
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			};
+		}
+		
+		var closeDialogMessage = function() {
+			$("#dialog-message").dialog('close');
+			return false;
+		}
+		
+		$('#approve').click(function() {
+			//var action = "@{approve()}?keyId=${corporateAnnouncement?.corporateAnnouncementKey}&taskId=${taskId}";
+			var action = "@{approve()}?taskId=${taskId}&maintenanceLogKey=${maintenanceLogKey}&operation=${operation}"+"";
+			var postData = {
+				"correction": $('#remarkCorrection').val()
+			};
+			loading.dialog('open');
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+					//alert("Announcement No ${corporateAnnouncement?.corporateAnnouncementKey} is Approved");
+				} else {
+					loading.dialog('close');
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+					//alert(data.error);
+				}
+			});			
+		});
+		
+		$('#reject').click(function() {
+			var resultValidateCorrection = validateRemarkCorrection();
+			if (!resultValidateCorrection) {
+				return;
+			}
+			
+			//var action = "@{reject()}?keyId=${corporateAnnouncement?.corporateAnnouncementKey}&taskId=${taskId}";
+			var action = "@{reject()}?taskId=${taskId}&maintenanceLogKey=${maintenanceLogKey}&operation=${operation}"+"";
+			var postData = {
+					"correction": $('#remarkCorrection').val()
+			};
+			loading.dialog('open');
+			$.post(action, postData, function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+					//alert("Announcement No ${corporateAnnouncement?.corporateAnnouncementKey} is Rejected");
+				} else {
+					loading.dialog('close');
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+					//alert(data.error);
+				}
+			});
+		});
+		$('#back').click(function() {
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			}
+		});
+		
+		//$(".buttons").css("display","none");
+		$("#approval-actions").css("display","block");
+		
+		if ($("input[name='corporateAnnouncement.needCorrection']:checked").val() == 'true') {
+			$('#approve').button({disabled: true});
+			$('p[id=pRemarkCorrection] label span').html(" *");
+		} else {
+			$('#approve').button({disabled: false});
+			$('p[id=pRemarkCorrection] label span').html("");
+		}
+		
+		$('#needCorrection').removeAttr('disabled');
+		
+		if ($('#remarkCorrection').val() != '') {
+			$('#remarkCorrection').removeAttr('disabled');
+		}else{
+			$('#remarkCorrection').attr('disabled', 'disabled');
+		}
+		
+		$('input[name=corporateAnnouncement.needCorrection]').change(function(){
+			if ($("input[name='corporateAnnouncement.needCorrection']:checked").val() == 'true') {
+				$('#approve').button({disabled: true});
+				$('p[id=pRemarkCorrection] label span').html(" *");
+				$('#remarkCorrection').removeAttr('disabled');
+			} else {
+				$('#approve').button({disabled: false});
+				$('p[id=pRemarkCorrection] label span').html("");
+				$('#remarkCorrection').val('');
+				$('#remarkCorrection').attr('disabled', 'disabled');
+			}
+			
+			$('#needCorrection').removeAttr('disabled');
+			
+		});
+	});
+	function validateRemarkCorrection() {
+		if ($("input[name='corporateAnnouncement.needCorrection']:checked").val() == 'true') {
+			if (($('#remarkCorrection').val() == '') || ($('#remarkCorrection').val() == null)) {
+				$('#remarkCorrectionError').html('Required');
+			} else {
+				$('#remarkCorrectionError').html('');
+				return true;
+			}
+			return false;
+		}
+		return true;
+	}
+</script>
+
+<h2>Corporate Announcement Maintenance Approval</h2>
+<div id="detail">
+	<form id="form" class="form">
+		#{include 'CorporateAnnouncements/detail.html' /}
+	</form>
+</div>	
+<div id="approval-actions" class="buttons">
+	#{hidden id:'taskId', name:'taskId', value:taskId /}
+	#{hidden id:'from', name:'from', value:from /}
+	
+	<input type="button" id="approve" value="Approve" />
+	<input type="button" id="reject" value="Reject" />
+	<input type="button" id="back" value="Cancel" />			
+	<br/>
+</div>

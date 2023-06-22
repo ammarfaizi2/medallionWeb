@@ -1,0 +1,44 @@
+<div id="address">
+	<ul>
+		<li>
+			#{textArea id:'address1', name:'account.address1', label:'Address', value:account?.address1, readOnly:readOnly, class:'capitalize',width:'318px', maxLength:'255'  /}
+		</li>
+		<li>
+			#{textBox id:'address1City', name:'account.address1City', label:'City', value:account?.address1City, readOnly:readOnly, class:'capitalize', width:'318px' ,maxLength:'100' /}
+		</li>
+		<li>
+			#{textBox id:'address1CountryCode', name:'account.address1Country.lookupCode', label:'Country', value:account?.address1Country?.lookupCode, class:'capitalize', readOnly:readOnly, width:'70px' /}
+			#{hidden id:'address1Country', name:'account.address1Country.lookupId', value:account?.address1Country?.lookupId /}
+			#{button id:'address1CountryHelp', value:'?', class:'small', readOnly:readOnly /}	
+			#{textBox id:'address1CountryDesc', name:'account.address1Country.lookupDescription', value:account?.address1Country?.lookupDescription, readOnly:true, width:'220px' /}
+		</li>
+		<li>
+			#{textBox id:'address1StateCode', name:'account.address1State.lookupCode', label:'State', value:account?.address1State?.lookupCode, class:'capitalize', readOnly:readOnly, width:'70px' /}
+			#{hidden id:'address1State', name:'account.address1State.lookupId', value:account?.address1State?.lookupId /}
+			#{button id:'address1StateHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'address1StateDesc', name:'account.address1State.lookupDescription', value:account?.address1State?.lookupDescription, readOnly:true, width:'220px' /}
+		</li>
+		<li>
+			#{textBox id:'address1AreaCode', name:'account.address1Area.lookupCode', label:'Area', value:account?.address1Area?.lookupCode, class:'capitalize', readOnly:readOnly, width:'70px' /}
+			#{hidden id:'address1Area', name:'account.address1Area.lookupId', value:account?.address1Area?.lookupId /}
+			#{button id:'address1AreaHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'address1AreaDesc', name:'account.address1Area.lookupDescription', value:account?.address1Area?.lookupDescription, readOnly:true, width:'220px' /}				
+		</li>
+		<li>
+			#{textBox id:'account_address1SubArea', name:'account.address1SubArea', label:'Sub Area', value:account?.address1SubArea, readOnly:readOnly, class:'capitalize', width:'318px' ,maxLength:'50' /}
+		</li>
+		<li>
+			#{textBox id:'account_address1ZipCode', name:'account.address1ZipCode', label:'Zip Code', value:account?.address1ZipCode, readOnly:readOnly, class:'capitalize',width:'318px',maxLength:'50'  /}
+		</li>
+		<li>
+			#{textBox id:'account_address1Phone1', name:'account.address1Phone1', label:'Phone 1', value:account?.address1Phone1, class:'numberOnly',readOnly:readOnly, width:'318px' ,maxLength:'50' /}
+		</li>
+		<li>
+			#{textBox id:'account_address1Phone2', name:'account.address1Phone2', label:'Phone 2', value:account?.address1Phone2, class:'numberOnly', readOnly:readOnly, width:'318px',maxLength:'50'  /}
+		</li>
+		<li>
+			#{textBox id:'account_address1Phone3', name:'account.address1Phone3', label:'Fax', value:account?.address1Phone3, readOnly:readOnly, class:'numberOnly',width:'318px' ,maxLength:'50' /}
+		</li>
+	</ul>
+</div>
+	

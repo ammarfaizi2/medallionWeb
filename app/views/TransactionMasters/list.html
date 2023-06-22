@@ -1,0 +1,52 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Transaction Master Maintenance' /}
+
+<script type="text/javascript">
+	function doEdit(data) {
+		if ((data[3] == "New") || (data[3] == "Updated")) {
+			view(data[0]);
+			return false;
+		} else {
+			return true;
+		}
+	}
+</script>
+
+
+<table class="display">
+	<thead>
+		<tr>
+			<th width="100px">Key</th>
+			<th width="100px">Transaction Code</th>
+			<th width="300px">Description</th>
+			<th width="50px">Status</th>
+			<th width="50px">Active</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:custodyTransactionMasters, as:'custodyTransactionMaster'}
+		<tr>
+			<td>
+				${custodyTransactionMaster.transactionMasterKey}
+			</td>
+			<td class="capitalize">
+				${custodyTransactionMaster.custodyTransactionCode}
+			</td>
+			<td class="capitalize">
+				${custodyTransactionMaster.transactionDescription}
+			</td>
+			<td>
+				${custodyTransactionMaster?.recordStatus?.decodeStatus() }
+			</td>
+			<td>
+				${(custodyTransactionMaster?.isActive) ? 'Yes' : 'No' }
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>
+
+
+	
+
+

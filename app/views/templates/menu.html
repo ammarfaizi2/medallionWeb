@@ -1,0 +1,148 @@
+#{set ctx=play.configuration.getProperty('war.context', '') /}
+#{if session.username && shortcut != null}
+	<script type="text/javascript">
+		function checkRedirect(data) {
+			if (data == "/login") { 
+				window.location.href = data;
+			}else if ((""+data).indexOf("<title>MEDALLION*</title>") >=0){
+				$('#logoutTag')[0].click();
+			}
+		}
+	
+		$(function() {
+			$('#menuAnchor').fgmenu({
+				backLink: false,
+				content: $('#menuList').html(),
+				crumbDefaultText: 'Select a menu',
+				topLinkText: 'Main'
+			});
+			
+			$(".fg-button:not(.ui-state-disabled)")
+			.hover(
+				function(){ $(this).addClass("ui-state-hover");},
+				function(){ $(this).removeClass("ui-state-hover"); }
+			)
+			.mousedown(function(){
+					$(this).parents('.fg-buttonset-single:first').find(".fg-button.ui-state-active").removeClass("ui-state-active");
+					if( $(this).is('.ui-state-active.fg-button-toggleable, .fg-buttonset-multi .ui-state-active') ){ $(this).removeClass("ui-state-active"); }
+					else { $(this).addClass("ui-state-active"); }	
+			})
+			.mouseup(function(){
+				if(! $(this).is('.fg-button-toggleable, .fg-buttonset-single .fg-button,  .fg-buttonset-multi .fg-button') ){
+					$(this).removeClass("ui-state-active");
+				}
+			});
+			
+			$('#shortcut').autocomplete({
+				source:[${shortcut.raw()}],
+				minLength:2,
+				focus: function(event, ui) {
+					$('#shortcut').val(ui.item.label);
+					return false;
+				},
+				select: function(event, ui) {
+					$('#shortcut').val(ui.item.label);
+					console.log("from "+ui.item.label);
+					$.get("@{Application.open()}", { menu: $('#shortcut').val() }, function(data, status, xhr) {
+						checkRedirect(data);
+						if (status == 'success') {
+							location.replace(data);
+						} else {
+							alert("Invalid shortcut!");
+						}
+					})
+					return false;
+				}
+			})
+			.data('autocomplete')
+			._renderItem = function(ul, item) {
+				return $("<li></li>")
+				.data("item.autocomplete", item)
+				.append("<a>" + item.label + " - " + item.desc + "</a>")
+				.appendTo(ul);				
+			};
+			
+			$('#shortcut').keydown(function(e) {
+				if (e.keyCode == 9 ) {return false}
+			});
+
+			$('#shortcut').keyup(function(e) {
+				if (e.keyCode == 13) {
+					$(':button:contains("Ok")').click();
+					var menuAccess = "";					
+					$.get("@{Application.getMenuAccessList()}", {menu: $('#shortcut').val().toUpperCase()}, function(data, status, xhr) {
+						checkRedirect(data);
+						if (data=="NotFound"){
+							var message = "Menu is not registered";
+							var icon = "ui-icon1 ui-icon-alert";
+							var dialogTitle = "Security Message";
+							var closeDialog = function() {
+								$("#dialog-message").dialog("close");
+								return false;
+							};
+							
+							messageAlertOk(message, icon, dialogTitle, closeDialog);
+						} else {
+							menuAccess = data;	
+						}
+					})
+					$.get("@{Secure.checkMenuAccess()}", {menuAccessList: menuAccess }, function(data, status, xhr) {
+						checkRedirect(data);
+						if(data == 0){
+							var message = "You are not authorized";
+							var icon = "ui-icon1 ui-icon-alert";
+							var dialogTitle = "Security Message";
+							var closeDialog = function() {
+								$("#dialog-message").dialog("close");
+								return false;
+							};
+							
+							messageAlertOk(message, icon, dialogTitle, closeDialog);
+						} else {
+							// ini menyebabkan double submit
+							//$.get("@{Application.open()}", { menu: $('#shortcut').val().toUpperCase() }, function(data, status, xhr) {
+							//	checkRedirect(data);
+							//	if (status == 'success') {
+							//		location.replace(data);
+							//	} else {
+							//		var message = "Invalid shortcut!";
+							//		var icon = "ui-icon1 ui-icon-alert";
+							//		var dialogTitle = "Security Message";
+							//		var closeDialog = function() {
+							//			$("#dialog-message").dialog("close");
+							//			return false;
+							//		};
+							//		
+							//		messageAlertOk(message, icon, dialogTitle, closeDialog);
+							//	}
+							//});
+						}
+					}) 
+				}
+			});
+			
+			if ('${from}'=='forceChange'){
+				$('#toolbar').hide();
+			} else {
+				$('#toolbar').show();
+			}
+ 		})	
+	</script>
+	
+	<span id="toolbar" class="fg-toolbar ui-widget-header ui-corner-all ui-helper-clearfix" style="min-width:700px;max-width:720px; height:23px">
+		<div class="fg-buttonset ui-helper-clearfix" style="width: 230px!important; width:300px;">
+			<a id="home" tabindex="0" href="@{Application.index}" class="fg-button fg-button-icon-left ui-widget ui-state-default ui-corner-all"><span class="ui-icon ui-icon-home"></span>Home</a>
+			<a id="menuAnchor" tabindex="0" href="#" class="fg-button fg-button-icon-right ui-widget ui-state-default ui-corner-all"><span class="ui-icon ui-icon-triangle-1-s"></span>Menu</a>
+			<!--  localize this input in a form, so ever submit is just in this form -->
+			<form onSubmit="return false;">
+				<input type="text" size="9" maxLength="7" id="shortcut" class="capitalize ui-corner-all" />
+			</form>
+		</div>
+		<div class="fg-buttonset fg-buttonset-single ui-helper-clearfix" style="float:right">
+			<a class="fg-button ui-state-default ui-corner-left" href="@{Users.view(session?.userKey)}">${session.username} (${session.branch})</a>
+			<a class="fg-button ui-state-default" href="@{ChangePasswords.entry}">Change Password</a> 
+			<a id=logoutTag class="fg-button fg-button-icon-right ui-state-default ui-corner-right" href="@{Secure.logout(session.auditTrailKey)}" ><span class="ui-icon ui-icon-power"></span>Logout</a>
+		</div>
+	</span>
+	<div id="menuList" class="hidden">${menu.raw()}</div>
+#{/if}

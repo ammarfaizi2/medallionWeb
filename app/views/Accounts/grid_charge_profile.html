@@ -1,0 +1,39 @@
+<table id="gridChargeProfile" class="display">
+	<thead>
+		<tr>
+			<th>chargeKey</th>
+			<th>tieType</th>
+			<th >Charge Code</th>
+			<th>Description</th>
+			<th>chargeType</th>
+			<th>valueType</th>
+			<th></th>
+			<th></th>
+			<th>chargeFrequency</th>
+			<th>Action</th>
+			
+		</tr>
+	</thead>
+	<tbody>
+	 	#{list chargeMasters, as:'item'}
+		<tr>
+			<td>${item?.chargeKey}</td>
+			<td>${item?.tieringType?.lookupId}</td>	
+			<td>${item?.chargeCode}</td>
+			<td>${item?.description}
+			</td>
+			<td>${item?.chargeType?.lookupId}</td>
+			<td>${item?.valueType?.lookupId}</td>
+			<td>${item?.chargeCategory?.lookupId}</td>
+			<td>${item?.invoiceCharge?.lookupId}</td>
+			<td>${item?.chargeFrequency?.lookupId}</td>
+			<td>
+				<center>
+					#{button id:'overrideButton', name :'overrideButton[' + (item_index-1) + ']', value:'Overwrite',class:'buttons', readOnly:readOnly /}
+				</center>			
+			</td>
+		
+		</tr>
+		#{/list}
+	</tbody>
+</table>

@@ -1,0 +1,111 @@
+#{extends 'templates/detail1.html' /}
+#{set pageTitle: 'PDI Loader' /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{set id:report?.reportKey /}
+ 
+#{script 'lookups.js' /}
+#{script 'jquery.rc4.js' /}
+<script type="text/javascript">
+	$(function() {
+		// 0 already used by default. start the next generated html with this counter as suffix
+		
+		
+		var tmpCounter = 1;
+		
+		jQuery.fn.resetAndDisabled = function(){
+			html = $(this);
+			html.val("");
+			html.css("display", "none");
+		};
+
+		jQuery.fn.reActivate = function(){
+			html = $(this);
+			html.css("display", "block");
+		};
+		
+		// enable file upload
+		$( "#form.form" ).attr("enctype", "multipart/form-data");
+		
+		$('input[name=isActive]').change(function(){
+			$("input[name='report.isActive']").val($("input[name='isActive']:checked").val());
+		});
+		
+		$('input[name=isPentahoLoader]').change(function(){
+			$("input[name='report.isPentahoLoader']").val($("input[name='isPentahoLoader']:checked").val());
+		});
+		
+		//REPORT GROUP LOOKUP
+		$('#reportGroupCode').lookup({
+			list:'@{Pick.lookups()}?group=REPORT_GROUP',
+			get:{
+				url:'@{Pick.lookup()}?group=REPORT_GROUP',
+				success: function(data){
+					$('#reportGroupCode').removeClass('fieldError');
+					$('#reportGroupId').val(data.code);
+					$('#reportGroupDesc').val(data.description);
+					$('#h_reportGroupDesc').val(data.description);
+				},
+				error: function(data){
+					$('#reportGroupCode').addClass('fieldError');
+					$('#reportGroupId').val('');
+					$('#reportGroupCode').val('');
+					$('#reportGroupDesc').val('NOT FOUND');
+					$('#h_reportGroupDesc').val('');
+				}
+			},
+			description:$('#reportGroupDesc'),
+			help:$('#reportGroupHelp')
+		});
+		
+		$("#reportName").blur(function(){
+			var val = $("#reportName").val();
+			// replace /[\/:*?<>|"
+			val = val.replace(/[\\/:*<>|?\[\]\"]/gi,'');
+			$("#reportName").val(val);
+		});
+		
+	});
+	
+</script>		
+#{if !confirming}
+<p>
+	#{fileUpload name:'attachment', id:'attachment',width:'290px', label:'Transformation File', required:true /}
+	<span class="error">#{error 'File' /}</span>
+	${report?.reportFile}
+</p>
+#{/if}
+#{else}
+<p>
+	#{textBox id:'attachmentFile', name:'attachment', label:'File', value:report?.reportFile, readOnly:readOnly, width:'200px', required:true /}
+	<span class="error">#{error 'File' /}</span>
+</p>
+#{/else}
+
+</p>
+#{hidden id:'reportKey', name:'report.reportKey', value:report?.reportKey /}
+#{hidden id:'reportFile', name:'report.reportFile', value:report?.reportFile /}
+#{hidden id:'isAttachment', name:'isAttachment', value:isAttachment /}
+<p>
+	#{textBox id:'seqNo', name:'report.sequenceNo', label:'Sequence No', value:report?.sequenceNo, readOnly:readOnly, width:'50px', required:false, class:'numberOnly' /}
+</p>
+<p>
+	#{textBox id:'reportGroupCode', name:'report.reportGroup.lookupCode', label:'Group', value:report?.reportGroup?.lookupCode, class:'capitalize individual', required:true, readOnly:readOnly, width:'50px' /}
+	#{hidden id:'reportGroupId', name:'report.reportGroup.lookupId', value:report?.reportGroup?.lookupId /}
+	#{button id:'reportGroupHelp', value:'?', class:'small', readOnly:readOnly /}	
+	#{textBox id:'reportGroupDesc', name:'report.reportGroup.lookupDescription', value:report?.reportGroup?.lookupDescription , width:'200px', required:true, readOnly:true /}
+	<span class="error">#{error 'Report group' /}</span>
+</p>
+<p>
+	#{textBox id:'reportName', name:'report.reportName', label:'Name', value:report?.reportName, required:true, class:'capitalize individual', readOnly:readOnly, width:'285px'  /}
+	<span class="error">#{error 'Report name' /}</span>
+</p>
+<p>
+	#{radioButton id:'isPentahoLoader', name:'isPentahoLoader', value:((report?.isPentahoLoader) ? 'true' : 'false'), label:'Load Pentaho Variable', options:operators, readOnly:readOnly, required:false /}
+	#{hidden id:'isPentahoLoaderHidden', name:'report.isPentahoLoader', value:((report?.isPentahoLoader)?'true':'false') /}
+	<span class="error">#{error 'Active' /}</span>
+</p>
+<p>
+	#{radioButton id:'isActive', name:'isActive', value:((report?.isActive) ? 'true' : 'false'), label:'Active', options:operators, readOnly:readOnly, required:true /}
+	#{hidden id:'isActiveHidden', name:'report.isActive', value:((report?.isActive)?'true':'false') /}
+	<span class="error">#{error 'Active' /}</span>
+</p>

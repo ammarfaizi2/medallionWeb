@@ -1,0 +1,117 @@
+#{extends 'templates/main.html' /}
+
+<script type="text/javascript">
+$(function() {
+	$('#save').button();
+	$('#cancel').button();
+	$('#confirm').button();
+	$('#back').button();
+	
+	$('#cancel').click(function(){
+		location.href='@{entry()}';
+		return false;
+	});
+	
+	$('#save').click(function(){
+		if (($('#effectiveDate').hasClass('fieldError'))||($('#lastPaymentDate').hasClass('fieldError'))||
+				($('#nextPaymentDate').hasClass('fieldError'))||($('#maturityDate').hasClass('fieldError'))) {
+			return false;
+		}
+		submit('@{save()}');
+	});
+	
+	
+	$('#confirm').click(function(){
+		confirm('@{confirm()}');
+		return false;
+	});
+	
+	$('#back').click(function(){
+		location.href='@{back}?id=${id}';
+		return false;
+	});
+
+});	
+
+	function submit(action, id) {
+		/* var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Sending data to server ...</div>').appendTo('body');
+		loading.dialog({
+			closeOnEscape: false,
+			draggable: false,
+			modal: true,
+			resizable: false,
+			open:function() {
+				$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+			} 
+		}); */
+		loading.dialog('open');
+		$('#searchForm').attr('action', action);
+		$('#searchForm').submit();
+	}
+	
+	function confirm(action, id) {
+		var backToEntry = function() {
+			loading.dialog('open');
+			location = "@{entry()}";
+		}
+		var closeDialogMessage = function() {
+			$("#dialog-message").dialog("close");
+		}
+		/* var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Sending data to server ...</div>').appendTo('body');
+		loading.dialog({
+			closeOnEscape: false,
+			draggable: false,
+			modal: true,
+			resizable: false,
+			open:function() {
+				$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+			} 
+		}); */
+		loading.dialog('open');
+		$.post(action, $('#searchForm').serialize(), function(data, status) {
+    		checkRedirect(data);
+			loading.dialog('close');
+			if (data.status == 'success') {
+				messageAlertOk("Portfolio No : " + data.portfolioNo + ", Update Successfully", "ui-icon ui-icon-circle-check", "Notification", backToEntry);
+				//alert("Portfolio No : " + data.portfolioNo + ", Update Successfully");
+				//location = "@{entry()}";
+			} else {
+				if (data.code == 'error.data.duplicate') {
+					messageAlertOk("Portfolio No : " + data.portfolioNo + " already exsist, Please run CS4015 Reprocess Portfolio", "ui-icon1 ui-icon-alert", "Warning Message", closeDialogMessage);
+					//alert("Portfolio No : " + data.portfolioNo + " already exsist, Please run CS4015 Reprocess Portfolio");
+				} else {
+					messageAlertOk("Data Error", "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+					//alert("Data Error");
+				}
+			}
+		});
+	}
+	
+</script>
+
+#{if flash.error || errors}
+    <div class="error">
+    	Error when saving data!<br/>
+		<li>${flash.error}</li>
+		#{ifErrors}
+			#{errors}
+				 <li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}
+
+<div>
+	#{include 'PortfolioUpdates/detail.html' /}
+</div>
+
+<div class="buttons">
+	#{if confirming}
+		<button id="confirm">Confirm</button>
+		<button id="back">Back</button>
+	#{/if}
+	#{else}
+		<button id="save">Save</button>				
+		<button id="cancel">Cancel</button>
+	#{/else}						
+</div>

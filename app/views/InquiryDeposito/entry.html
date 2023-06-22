@@ -1,0 +1,99 @@
+#{extends 'templates/main.html' /}
+#{set param: param /}
+
+<script type="text/javascript">
+	$(function() {
+		
+		var closeDialogMessage = function() {
+			$("#dialog-message").dialog("close");
+		}
+		
+		var backToEntry = function() {
+			loading.dialog('open');
+			location = "@{entry()}";
+		}
+		var backToList = function() {
+			loading.dialog('open');
+			location = "@{list()}";
+		}
+		// Action buttons 
+		$('#save').click(function() {
+			$(".cancel").remove();
+			var length = $('#chargeList').dataTable().fnGetNodes().length; 
+			var resume = true;
+			if(typeof doSave == 'function') {
+				resume = doSave();
+			} 
+			if (resume){
+			#{ifnot flash.error || errors}
+				if (reloadCharge) {
+					
+				//if (length < 1){
+					messageAlertOk("You must load Charge to be able to continue!", "ui-icon1 ui-icon-alert", "Warning Message", closeDialogMessage);
+					return false;
+				}
+			#{/ifnot}
+
+			var action = "@{save()}?mode=${mode}";
+			loading.dialog('open');
+			$('#inquiryDepositoForm').attr('action', action);
+			$('#inquiryDepositoForm').submit();
+			}
+		});
+		
+		$('#confirm').click(function() {
+			$(".cancel").remove();
+			var action = "@{confirm()}";
+			loading.dialog('open');
+			$.post(action, $('#inquiryDepositoForm').serialize(), function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					
+					if ('${mode}' == 'entry') {
+						messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Notification", backToEntry);
+					}
+					else if ('${mode}' == 'edit') {
+						messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Notification", backToList);
+					}
+					
+				} else {
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+				}
+			});
+		});
+		
+		$('#back').click(function() {
+			location.href = "@{back()}?id=${deposito?.depositoKey}&param=${param}&mode=${mode}";
+		});
+		$('#clear').click(function() {
+			location.href="@{entry()}";			
+		});
+		if ('${mode}'=='edit'){
+			$('#clear').css('display', 'none');
+		}
+		$('#cancel').click(function(){
+			location.href="@{list()}";
+		});
+		
+	});	
+</script>
+
+<div id="detail">
+	#{include 'InquiryDeposito/detail.html' /}	
+</div>
+
+<div id="actions" class="buttons">
+	#{if confirming}
+		<input type="button" id="confirm" value="Confirm" />
+		<input type="button" id="back" value="Back" />
+	#{/if}
+	#{elseif ((mode == 'entry') || (mode == 'edit')) && (!confirming)}
+		<input type="button" id="save" value="Save" />
+		<input type="button" id="clear" value="Clear" />
+		<input type="button" id="cancel" value="Cancel"/>
+	#{/elseif}
+	#{else}
+		<input type="button" id="cancel" value="Close" />
+	#{/else}
+</div>

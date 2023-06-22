@@ -1,0 +1,485 @@
+
+<script type="text/javascript">
+	$(function(){
+		$('.calendar').datepicker();
+		$('#addInterestDetail').button();
+		$('#cancelInterestDetail').button();
+		$('#closeInterestDetail').button();
+		
+		// onload
+		if($('#isAccruedInterest').is(':checked')){
+			$('p[id=pTaxCodeAccruedInterest] label span').html(' *');
+			$('#taxCodeAccruedInterest').attr("disabled", false);
+			$('#taxCodeHelpAccruedInterest').attr("disabled", false);
+		} else {
+			$('p[id=pTaxCodeAccruedInterest] label span').html('');
+			$('#taxCodeAccruedInterest').attr("disabled", true);
+			$('#taxCodeHelpAccruedInterest').attr("disabled", true);
+		}
+		
+		if($('#isCapitalGain').is(':checked')){
+			$('p[id=pTaxCodeCapitalGain] label span').html(' *');
+			$('#taxCodeCapitalGain').attr('disabled',false);
+			$('#taxCodeHelpCapitalGain').attr('disabled',false);
+		} else {
+			$('p[id=pTaxCodeCapitalGain] label span').html('');
+			$('#taxCodeCapitalGain').attr('disabled',true);
+			$('#taxCodeHelpCapitalGain').attr('disabled',true);
+		}
+		
+		if($('#isDiscount').is(':checked')){
+			$('p[id=pTaxCodeDiscount] label span').html(' *');
+			$('#taxCodeDiscount').attr('disabled',false);
+			$('#taxCodeHelpDiscount').attr('disabled',false);
+		} else {
+			$('p[id=pTaxCodeDiscount] label span').html('');
+			$('#taxCodeDiscount').attr('disabled',true);
+			$('#taxCodeHelpDiscount').attr('disabled',true);
+		}
+		
+		if($('#isDividend').is(':checked')){
+			$('p[id=pTaxCodeDividend] label span').html(' *');
+			$('#taxCodeDividend').attr('disabled',false);
+			$('#taxCodeHelpDividend').attr('disabled',false);
+		} else {
+			$('p[id=pTaxCodeDividend] label span').html('');
+			$('#taxCodeDividend').attr('disabled',true);
+			$('#taxCodeHelpDividend').attr('disabled',true);
+		}
+		
+		$('#isAccruedInterest').change(function(){
+			$("#isAccruedInterest").attr('checked', $('#isAccruedInterest').is(':checked'));
+			$("#isAccruedInterestHidden").val($('#isAccruedInterest').is(':checked'));
+			
+			if($('#isAccruedInterest').is(':checked')){
+				$('p[id=pTaxCodeAccruedInterest] label span').html(' *');
+				$('#taxCodeAccruedInterest').attr("disabled", false);
+				$('#taxCodeHelpAccruedInterest').attr("disabled", false);
+			} else {
+				$('p[id=pTaxCodeAccruedInterest] label span').html('');
+				$('#taxCodeAccruedInterest').attr("disabled", true);
+				$('#taxCodeHelpAccruedInterest').attr("disabled", true);
+				
+				setEmptyTaxCodeAccruedInterest();
+			}
+		});
+		
+		$('#isCapitalGain').change(function(){
+			$("#isCapitalGain").attr('checked', $('#isCapitalGain').is(':checked'));
+			$("#isCapitalGainHidden").val($('#isCapitalGain').is(':checked'));
+			
+			if($('#isCapitalGain').is(':checked')){
+				$('p[id=pTaxCodeCapitalGain] label span').html(' *');
+				$('#taxCodeCapitalGain').attr('disabled',false);
+				$('#taxCodeHelpCapitalGain').attr('disabled',false);
+			} else {
+				$('p[id=pTaxCodeCapitalGain] label span').html('');
+				$('#taxCodeCapitalGain').attr('disabled',true);
+				$('#taxCodeHelpCapitalGain').attr('disabled',true);
+				
+				setEmptyTaxCodeCapitalGain();
+			}
+		});
+		
+		$('#isDiscount').change(function(){
+			$("#isDiscount").attr('checked', $('#isDiscount').is(':checked'));
+			$("#isDiscountHidden").val($('#isDiscount').is(':checked'));
+			
+			if($('#isDiscount').is(':checked')){
+				$('p[id=pTaxCodeDiscount] label span').html(' *');
+				$('#taxCodeDiscount').attr('disabled',false);
+				$('#taxCodeHelpDiscount').attr('disabled',false);
+			} else {
+				$('p[id=pTaxCodeDiscount] label span').html('');
+				$('#taxCodeDiscount').attr('disabled',true);
+				$('#taxCodeHelpDiscount').attr('disabled',true);
+
+				setEmptyTaxCodeDiscount();
+			}
+		});
+		
+		$('#isDividend').change(function(){
+			$("#isDividend").attr('checked', $('#isDividend').is(':checked'));
+			$("#isDividendHidden").val($('#isDividend').is(':checked'));
+			
+			if($('#isDividend').is(':checked')){
+				$('p[id=pTaxCodeDividend] label span').html(' *');
+				$('#taxCodeDividend').attr('disabled',false);
+				$('#taxCodeHelpDividend').attr('disabled',false);
+			} else {
+				$('p[id=pTaxCodeDividend] label span').html('');
+				$('#taxCodeDividend').attr('disabled',true);
+				$('#taxCodeHelpDividend').attr('disabled',true);
+
+				setEmptyTaxCodeDividend();
+			}
+		});
+		
+		function setEmptyTaxCodeAccruedInterest() {
+			$('#taxCodeAccruedInterest').val('');
+			$('#taxKeyAccruedInterest').val('');
+			$('#taxNameAccruedInterest').val('');
+			$('#h_taxNameAccruedInterest').val('');
+			$('#rateIntDetailAccruedInterest').val('');
+			$('#rateIntDetailAccruedInterestStripped').val('');
+			
+			$('#isLossCompensation').removeAttr('checked');
+			$('#isLossCompensationHidden').val(false);
+			$('#rateLossCompensation').attr("disabled", true);
+			$('#rateLossCompensation').val('');
+			$('#rateLossCompensationStripped').val('');
+		}
+		
+		// lookup Accrued Interest
+		$('#taxCodeAccruedInterest').change(function(){
+			if ($('#taxCodeAccruedInterest').val()==''){
+				setEmptyTaxCodeAccruedInterest();
+			}
+		});
+		
+		$('#taxCodeAccruedInterest').lookup({
+			list:'@{Pick.taxMasters()}',
+			get:{
+				url:'@{Pick.taxMaster()}',
+				success: function(data) {
+							$('#taxCodeAccruedInterest').removeClass('fieldError');
+							$('#taxKeyAccruedInterest').val(data.code);
+							$('#taxCodeAccruedInterest').val(data.taxCode);
+							$('#taxNameAccruedInterest').val(data.description);
+							$('#rateIntDetailAccruedInterest').val(data.taxRate);
+							$('#rateIntDetailAccruedInterestStripped').val(data.taxRate);
+							$('#h_taxNameAccruedInterest').val(data.description);
+							
+							var rateAccruedInterestTax = parseFloat($('#rateIntDetailAccruedInterest').val());
+							var rateCapitalGainTax = parseFloat($('#rateIntDetailCapitalGain').val());
+							$('#isLossCompensation').removeAttr("checked");
+							$('#isLossCompensationHidden').val(false);
+							$('#rateLossCompensation').val('');
+							$('#rateLossCompensationStripped').val('');
+							if ((rateAccruedInterestTax > 0) && (rateCapitalGainTax > 0)) {
+								$('#isLossCompensation').removeAttr("disabled");
+							} else {
+								$('#isLossCompensation').attr("disabled", true);
+							}
+						},
+				error: function() {
+						$('#taxCodeAccruedInterest').addClass('fieldError');
+						$('#taxKeyAccruedInterest').val('');
+						$('#taxCodeAccruedInterest').val('');
+						$('#rateIntDetailAccruedInterest').val('');
+						$('#rateIntDetailAccruedInterestStripped').val('');
+						$('#taxNameAccruedInterest').val('NOT FOUND');
+						$('#h_taxNameAccruedInterest').val('');
+					}
+			},
+			key:$('#taxKeyAccruedInterest'),
+			description:$('#taxNameAccruedInterest'),
+			help:$('#taxCodeHelpAccruedInterest')
+		});
+		
+		function setEmptyTaxCodeCapitalGain() {
+			$('#taxCodeCapitalGain').val('');
+			$('#taxKeyCapitalGain').val('');
+			$('#taxNameCapitalGain').val('');
+			$('#h_taxNameCapitalGain').val('');
+			$('#rateIntDetailCapitalGain').val('');
+			$('#rateIntDetailCapitalGainStripped').val('');
+			
+			$('#isLossCompensation').removeAttr('checked');
+			$('#isLossCompensationHidden').val(false);
+			$('#rateLossCompensation').attr("disabled", true);
+			$('#rateLossCompensation').val('');
+			$('#rateLossCompensationStripped').val('');
+		}
+		
+		// lookup Capital Gain
+		$('#taxCodeCapitalGain').change(function(){
+			if ($('#taxCodeCapitalGain').val()==''){
+				setEmptyTaxCodeCapitalGain();
+			}
+		});
+		
+		$('#taxCodeCapitalGain').lookup({
+			list:'@{Pick.taxMasters()}',
+			get:{
+				url:'@{Pick.taxMaster()}',
+				success: function(data) {
+							$('#taxCodeCapitalGain').removeClass('fieldError');
+							$('#taxKeyCapitalGain').val(data.code);
+							$('#taxCodeCapitalGain').val(data.taxCode);
+							$('#taxNameCapitalGain').val(data.description);
+							$('#rateIntDetailCapitalGain').val(data.taxRate);
+							$('#rateIntDetailCapitalGainStripped').val(data.taxRate);
+							$('#h_taxNameCapitalGain').val(data.description);
+
+							var rateAccruedInterestTax = parseFloat($('#rateIntDetailAccruedInterest').val());
+							var rateCapitalGainTax = parseFloat($('#rateIntDetailCapitalGain').val());
+							$('#isLossCompensation').removeAttr("checked");
+							$('#isLossCompensationHidden').val(false);
+							$('#rateLossCompensation').val('');
+							$('#rateLossCompensationStripped').val('');
+							if ((rateAccruedInterestTax > 0) && (rateCapitalGainTax > 0)) {
+								$('#isLossCompensation').removeAttr("disabled");
+							} else {
+								$('#isLossCompensation').attr("disabled", true);
+							}
+						},
+				error: function() {
+						$('#taxCodeCapitalGain').addClass('fieldError');
+						$('#taxKeyCapitalGain').val('');
+						$('#taxCodeCapitalGain').val('');
+						$('#rateIntDetailCapitalGain').val('');
+						$('#rateIntDetailCapitalGainStripped').val('');
+						$('#taxNameCapitalGain').val('NOT FOUND');
+						$('#h_taxNameCapitalGain').val('');
+					}
+			},
+			key:$('#taxKeyCapitalGain'),
+			description:$('#taxNameCapitalGain'),
+			help:$('#taxCodeHelpCapitalGain')
+		});
+		
+		$('#isLossCompensation').change(function(){
+			$('#rateLossCompensation').val('');
+			$('#rateLossCompensationStripped').val('');
+			if ($('#isLossCompensation').is(":checked")) {
+				$('p[id=pLossCompensation] label span').html(' *');
+				$('#rateLossCompensation').removeAttr("disabled");
+			} else {
+				$('p[id=pLossCompensation] label span').html('');
+				$('#rateLossCompensation').attr("disabled", true);
+			}
+		});
+		
+		function setEmptyTaxCodeDiscount() {
+			$('#taxCodeDiscount').val('');
+			$('#taxKeyDiscount').val('');
+			$('#taxNameDiscount').val('');
+			$('#h_taxNameDiscount').val('');
+			$('#rateIntDetailDiscount').val('');
+			$('#rateIntDetailDiscountStripped').val('');
+		}
+		
+		// lookup Discount
+		$('#taxCodeDiscount').change(function(){
+			if ($('#taxCodeDiscount').val()==''){
+				setEmptyTaxCodeDiscount();
+			}
+		});
+		
+		$('#taxCodeDiscount').lookup({
+			list:'@{Pick.taxMasters()}',
+			get:{
+				url:'@{Pick.taxMaster()}',
+				success: function(data) {
+							$('#taxCodeDiscount').removeClass('fieldError');
+							$('#taxKeyDiscount').val(data.code);
+							$('#taxCodeDiscount').val(data.taxCode);
+							$('#taxNameDiscount').val(data.description);
+							$('#rateIntDetailDiscount').val(data.taxRate);
+							$('#rateIntDetailDiscountStripped').val(data.taxRate);
+							$('#h_taxNameDiscount').val(data.description);
+						},
+				error: function() {
+						$('#taxCodeDiscount').addClass('fieldError');
+						$('#taxKeyDiscount').val('');
+						$('#taxCodeDiscount').val('');
+						$('#rateIntDetailDiscount').val('');
+						$('#rateIntDetailDiscountStripped').val('');
+						$('#taxNameDiscount').val('NOT FOUND');
+						$('#h_taxNameDiscount').val('');
+					}
+			},
+			key:$('#taxKeyDiscount'),
+			description:$('#taxNameDiscount'),
+			help:$('#taxCodeHelpDiscount')
+		});
+		
+		function setEmptyTaxCodeDividend() {
+			$('#taxCodeDividend').val('');
+			$('#taxKeyDividend').val('');
+			$('#taxNameDividend').val('');
+			$('#h_taxNameDividend').val('');
+			$('#rateIntDetailDividend').val('');
+			$('#rateIntDetailDividendStripped').val('');
+		}
+		
+		// lookup Dividend
+		$('#taxCodeDividend').change(function(){
+			if ($('#taxCodeDividend').val()==''){
+				setEmptyTaxCodeDividend();
+			}
+		});
+		
+		$('#taxCodeDividend').lookup({
+			list:'@{Pick.taxMasters()}',
+			get:{
+				url:'@{Pick.taxMaster()}',
+				success: function(data) {
+							$('#taxCodeDividend').removeClass('fieldError');
+							$('#taxKeyDividend').val(data.code);
+							$('#taxCodeDividend').val(data.taxCode);
+							$('#taxNameDividend').val(data.description);
+							$('#rateIntDetailDividend').val(data.taxRate);
+							$('#rateIntDetailDividendStripped').val(data.taxRate);
+							$('#h_taxNameDividend').val(data.description);
+						},
+				error: function() {
+						$('#taxCodeDividend').addClass('fieldError');
+						$('#taxKeyDividend').val('');
+						$('#taxCodeDividend').val('');
+						$('#rateIntDetailDividend').val('');
+						$('#rateIntDetailDividendStripped').val('');
+						$('#taxNameDividend').val('NOT FOUND');
+						$('#h_taxNameDividend').val('');
+					}
+			},
+			key:$('#taxKeyDividend'),
+			description:$('#taxNameCapitalGain'),
+			help:$('#taxCodeHelpDividend')
+		});
+	});
+</script>
+<style type="text/css">
+   #errInterest {color:red; }
+   #errmsgTaxCodeAccruedInterest {color:red; }
+   #errmsgTaxCodeCapitalGain {color:red; }
+   #errmsgTaxCodeDiscount {color:red; }
+   #errmsgTaxCodeDividend {color:red; }
+</style>
+<form id="interestDetailForm" class="form">
+<p>
+	#{hidden id:'rowPositionRuleInt' /}
+	#{hidden id:'oldDateFrom' /}
+	#{hidden id:'newDateFrom' /}
+	#{hidden id:'oldDateTo' /}
+	#{hidden id:'newDateTo' /}
+	#{hidden id:'taxProfileCodeRuleInt', name:'taxProfileCodeRuleInt', value:taxProfileCodeRuleInt /}
+	#{hidden id:'securityTypeCodeRuleInt', name:'securityTypeCodeRuleInt', value:securityTypeCodeRuleInt /}
+</p>
+<b><span id="errInterest" class="error"></span></b>
+<p>
+	#{textBox id:'effectiveDateFrom', name:'effectiveDateFrom', label:'Effective Date', value:effectiveDateFrom?.format(appProp.dateFormat), required:true, class:'calendar', readOnly:readOnly /}
+	#{hidden id:'effectiveDateFromHidden', name:'effectiveDateFromHidden', value:effectiveDateFrom?.format(appProp.dateFormat) /}
+	<span id="effectiveDateFromError" class="error"></span>
+	<b>To</b>
+	#{textBox id:'effectiveDateTo', name:'effectiveDateTo', value:effectiveDateTo?.format(appProp.dateFormat), class:'calendar', readOnly:readOnly  /} (${appProp.displayDateFormat})
+	#{hidden id:'effectiveDateToHidden', name:'effectiveDateToHidden', value:effectiveDateTo?.format(appProp.dateFormat) /}
+	<span id="effectiveDateToError" class="error"></span>
+</p>
+<p>
+	<label style="width: 195px;">Tax Object : Accrued Interest</label>
+	#{checkBox id:'isAccruedInterest', name:'isAccruedInterest', value:isAccruedInterest, readOnly:readOnly/} Yes
+	#{hidden id:'isAccruedInterestHidden', name:'isAccruedInterestHidden', value:((isAccruedInterestHidden)?'true':'false') /}
+</p>
+<p id='pTaxCodeAccruedInterest'>
+	<label style="margin-left: 5em">Tax Code<span class="req"></span></label>
+	<span style="margin-left: -5em">
+	#{textBox id:'taxCodeAccruedInterest', name:'taxCodeAccruedInterest', value:taxCodeAccruedInterest, class:'capitalize', readOnly:readOnly, maxLength:50, width:'86px' /}
+	#{hidden id:'taxKeyAccruedInterest', name:'taxKeyAccruedInterest', value:taxKeyAccruedInterest  /}
+	#{button id:'taxCodeHelpAccruedInterest', value:'?', class:'small', readOnly:readOnly /}
+	#{textBox id:'taxNameAccruedInterest', name:'taxNameAccruedInterest', value:taxNameAccruedInterest, readOnly:true, width:'200px' /}
+	<span id="errmsgTaxCodeAccruedInterest" class="error">#{error 'Tax Code is' /}</span>
+	</span>
+</p>
+<p>
+	<label style="margin-left: 5em">Tax Rate</label>
+	<span style="margin-left: -5em">
+	#{textBox id:'rateIntDetailAccruedInterest', name:'rateIntDetailAccruedInterest', value:rateIntDetailAccruedInterest, format:'#,##0.####', class:'numeric', readOnly:true, width:'100px'/}
+	#{hidden id:'rateIntDetailAccruedInterestStripped', name:'rateIntDetailAccruedInterestStripped', value:rateIntDetailAccruedInterestStripped /} <span id="percent">%</span>
+	</span>
+</p>
+<br />
+<p>
+	<label style="width: 195px;">Tax Object : Capital Gain</label>
+	#{checkBox id:'isCapitalGain', name:'isCapitalGain', value:isCapitalGain, readOnly:readOnly/} Yes
+	#{hidden id:'isCapitalGainHidden', name:'isCapitalGainHidden', value:((isCapitalGainHidden)?'true':'false') /}
+</p>
+<p id='pTaxCodeCapitalGain'>
+	<label style="margin-left: 5em">Tax Code<span class="req"></span></label>
+	<span style="margin-left: -5em">
+	#{textBox id:'taxCodeCapitalGain', name:'taxCodeCapitalGain', value:taxCodeCapitalGain, class:'capitalize', readOnly:readOnly, maxLength:50, width:'86px' /}
+	#{hidden id:'taxKeyCapitalGain', name:'taxKeyCapitalGain', value:taxKeyCapitalGain  /}
+	#{button id:'taxCodeHelpCapitalGain', value:'?', class:'small', readOnly:readOnly /}
+	#{textBox id:'taxNameCapitalGain', name:'taxNameCapitalGain', value:taxNameCapitalGain, readOnly:true, width:'200px' /}
+	<span id="errmsgTaxCodeCapitalGain" class="error">#{error 'Tax Code is' /}</span>
+	</span>
+</p>
+<p>
+	<label style="margin-left: 5em">Tax Rate</label>
+	<span style="margin-left: -5em">
+	#{textBox id:'rateIntDetailCapitalGain', name:'rateIntDetailCapitalGain', value:rateIntDetailCapitalGain, format:'#,##0.####', class:'numeric', readOnly:true, width:'100px'/}
+	#{hidden id:'rateIntDetailCapitalGainStripped', name:'rateIntDetailCapitalGainStripped', value:rateIntDetailCapitalGainStripped /} <span id="percent">%</span>
+	</span>
+</p>
+<p id='pLossCompensation'>
+	<label style="margin-left: 5em;width: 195px;">Tax Compensation if Loss</label>
+	#{checkBox id:'isLossCompensation', name:'isLossCompensation', value:isLossCompensation, readOnly:readOnly/} Yes
+	#{hidden id:'isLossCompensationHidden', name:'isLossCompensationHidden', value:((isLossCompensationHidden)?'true':'false') /}
+	&nbsp;
+	#{textBox id:'rateLossCompensation', name:'rateLossCompensation', value:rateLossCompensation, format:'#,##0.####', class:'percent', readOnly:readOnly, width:'100px'/}
+	#{hidden id:'rateLossCompensationStripped', name:'rateLossCompensationStripped', value:rateLossCompensationStripped /} <span id="percent">%</span>
+	<span id="errmsgRateLossCompensation" class="error">#{error 'Rate Loss Compensation is' /}</span>
+</p>
+<br />
+<p>
+	<label style="width: 195px;">Tax Object : Discount</label>
+	#{checkBox id:'isDiscount', name:'isDiscount', value:isDiscount, readOnly:readOnly/} Yes
+	#{hidden id:'isDiscountHidden', name:'isDiscountHidden', value:((isDiscountHidden)?'true':'false') /}
+</p>
+<p id='pTaxCodeDiscount'>
+	<label style="margin-left: 5em">Tax Code<span class="req"></span></label>
+	<span style="margin-left: -5em">
+	#{textBox id:'taxCodeDiscount', name:'taxCodeDiscount', value:taxCodeDiscount, class:'capitalize', readOnly:readOnly, maxLength:50, width:'86px' /}
+	#{hidden id:'taxKeyDiscount', name:'taxKeyDiscount', value:taxKeyDiscount  /}
+	#{button id:'taxCodeHelpDiscount', value:'?', class:'small', readOnly:readOnly /}
+	#{textBox id:'taxNameDiscount', name:'taxNameDiscount', value:taxNameDiscount, readOnly:true, width:'200px' /}
+	<span id="errmsgTaxCodeDiscount" class="error">#{error 'Tax Code is' /}</span>
+	</span>
+</p>
+<p>
+	<label style="margin-left: 5em">Tax Rate</label>
+	<span style="margin-left: -5em">
+	#{textBox id:'rateIntDetailDiscount', name:'rateIntDetailDiscount', value:rateIntDetailDiscount, format:'#,##0.####', class:'numeric', readOnly:true, width:'100px'/}
+	#{hidden id:'rateIntDetailDiscountStripped', name:'rateIntDetailDiscountStripped', value:rateIntDetailDiscountStripped /} <span id="percent">%</span>
+	</span>
+</p>
+<br />
+<p>
+	<label style="width: 195px;">Tax Object : Dividend</label>
+	#{checkBox id:'isDividend', name:'isDividend', value:isDividend, readOnly:readOnly/} Yes
+	#{hidden id:'isDividendHidden', name:'isDividendHidden', value:((isDividendHidden)?'true':'false') /}
+</p>
+<p id='pTaxCodeDividend'>
+	<label style="margin-left: 5em">Tax Code<span class="req"></span></label>
+	<span style="margin-left: -5em">
+	#{textBox id:'taxCodeDividend', name:'taxCodeDividend', value:taxCodeDividend, class:'capitalize', readOnly:readOnly, maxLength:50, width:'86px' /}
+	#{hidden id:'taxKeyDividend', name:'taxKeyDividend', value:taxKeyDividend  /}
+	#{button id:'taxCodeHelpDividend', value:'?', class:'small', readOnly:readOnly /}
+	#{textBox id:'taxNameDividend', name:'taxNameDividend', value:taxNameDividend, readOnly:true, width:'200px' /}
+	<span id="errmsgTaxCodeDividend" class="error">#{error 'Tax Code is' /}</span>
+	</span>
+</p>
+<p>
+	<label style="margin-left: 5em">Tax Rate</label>
+	<span style="margin-left: -5em">
+	#{textBox id:'rateIntDetailDividend', name:'rateIntDetailDividend', value:rateIntDetailDividend, format:'#,##0.####', class:'numeric', readOnly:true, width:'100px'/}
+	#{hidden id:'rateIntDetailDividendStripped', name:'rateIntDetailDividendStripped', value:rateIntDetailDividendStripped /} <span id="percent">%</span>
+	</span>
+</p>
+<br />
+<br />
+<p>
+	<div class="buttons">
+		#{if (mode=='entry' || mode == 'edit')&& (!(confirming))}
+				<button id="addInterestDetail">Save</button>
+				<button id="cancelInterestDetail">Cancel</button>
+		#{/if}
+		#{else}
+			#{if confirming || (mode=='view') }
+				<button id="closeInterestDetail">Close</button>
+			#{/if}
+		#{/else}	
+	</div>
+</p>
+</form>

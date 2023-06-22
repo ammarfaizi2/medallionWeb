@@ -1,0 +1,45 @@
+
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Customer Maintenance Page
+GET     /                                   Application.index
+
+# Map static resources from the /app/public folder to the /public path
+GET     /public/                            staticDir:public
+
+# CRUD function
+GET		/{controller}/list					{controller}.list
+GET		/{controller}/list/{group}			{controller}.list
+GET		/{controller}/listpartial/{group}	{controller}.listpartial
+GET		/{controller}/entry					{controller}.entry
+GET		/{controller}/edit/{id}				{controller}.edit
+POST	/{controller}/save/{id}				{controller}.save
+GET		/{controller}/confirming/{id}		{controller}.confirming
+POST	/{controller}/confirm/{id}			{controller}.confirm
+POST	/{controller}/back/{id}				{controller}.back
+
+# Report PDI Loader
+GET		/{controller}/pdidownload/{downloadfile}		{controller}.pdidownload
+GET		/{controller}/lookup/{lookupId}		{controller}.lookup
+
+# Report loader
+GET		/{controller}/reportdownload/{downloadfile}		{controller}.reportdownload
+
+# Shareholder Download
+GET		/{controller}/attachmentdownload/{downloadfile}		{controller}.attachmentDownload
+
+# customer
+GET     /{controller}/customerdownload/{downloadfile}		{controller}.customerDownload
+
+# Announcement
+GET    /{controller}/announcementdownload/{downloadfile}		{controller}.announcementdownload
+
+# Catch all
+*     	/               					module:secure
+*		/{controller}/{action}/{id}			{controller}.{action}
+*		/{controller}/{action}/{key}		{controller}.{action}
+*       /{controller}/{action}              {controller}.{action}
+*       /{controller}/{action}/             {controller}.{action}
+

@@ -1,0 +1,107 @@
+#{set readOnly: ((mode != 'edit' && mode != 'entry') || confirming) /}
+#{set id:faTransaction?.transactionKey /}
+#{if flash.error}
+    <p style="color:#c00">
+        ${flash.error}
+    </p>
+#{/if}
+#{script 'date.js', characterset:'utf-8' /}
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+<script type="text/javascript">
+#{include 'RegistrySubscription/Util.js' /}
+$(function() {
+	Array.max = function( array ){
+		return Math.max.apply( Math, array );
+		};
+
+		// Function to get the Minimam value in Array
+		Array.min = function( array ){
+		return Math.min.apply( Math, array );
+		};
+		
+	var closeDialog = function() {
+		$("#dialog-message").dialog('close');	
+	}
+	
+	$('#fundCode').dynapopup2({key:'fundKey', help:'fundHelp', desc:'fundDesc'}, 'PICK_FA_MASTER', '', 'name', function(data){
+		$('#fundCode').removeClass('fieldError');
+		$('#fundKey').val(data.code);
+		$('#fundDesc').val(data.description);
+		$('#h_fundDesc').val(data.description);
+	},function(data){
+		$('#fundCode').addClass('fieldError');
+		$('#fundCode').val('');
+		$('#fundKey').val('');
+		$('#fundDesc').val('NOT FOUND');
+		$('#h_fundDesc').val('');
+	});
+
+	$('.calendar').datepicker();
+	
+	if ($.browser.msie){
+		$("#remarks[maxlength]").bind('input propertychange', function() {
+	        var maxLength = $(this).attr('maxlength');  
+	        if ($(this).val().length > maxLength) {  
+	            $(this).val($(this).val().substring(0, maxLength));  
+	        }  
+	    });
+	}
+});
+
+function doSave() {
+	return true;
+}
+
+
+</script>
+<style type="text/css">
+  textarea {resize: none; width:390px; height: 60px;}
+   #errmsgCompare { color:red; }
+   .numericManualJournal { text-align: right; }
+}
+</style>
+<form id="closingEOYForm" class="form" method="POST">
+<table>
+<tr>
+	<td>
+		<div id="profileMaster">
+		
+			#{hidden id:'mode', name:'mode', value:mode /}
+	
+			<ul>
+				<li>
+					#{textBox id:'transactionNo', label:'Transaction No', value:faTransaction?.transactionKey, width:'120px', readOnly:true /}
+					#{hidden id:'transactionKey', name:'faTransaction.transactionKey', value:faTransaction?.transactionKey /}
+				</li>
+				<li>
+					#{textBox id:'fundCode', name:'faTransaction.faMaster.fundCode', label:'Fund Code', value:faTransaction?.faMaster?.fundCode, required:true, class:'capitalize', width:'120px', maxLength:50, readOnly:readOnly /}
+					#{hidden id:'fundKey', name:'faTransaction.faMaster.fundKey', value:faTransaction?.faMaster?.fundKey /}
+					#{button id:'fundHelp', value:'?', class:'small', readOnly:readOnly /}
+					#{textBox id:'fundDesc', name:'faTransaction.faMaster.fundDescription', value:faTransaction?.faMaster?.fundDescription, class:'capitalize', readOnly:true, maxLength:100, width:'241.5px' /}
+					<span class="error">#{error 'Fund Code is' /}</span>
+				</li>
+				<li>
+					#{textBox id:'closingYear', name:'faTransaction.name', label:'Closing Year', value:faTransaction?.name, class:'onlyNumber numericManualJournal', required:true, readOnly:readOnly , width:'120px', maxLength:4/} (YYYY)
+					<span class="error">#{error 'Closing Year is' /}</span>
+				</li>
+				<li>
+					#{textBox id:'closingDate', name:'faTransaction.transactionDate', label:'Closing Date', value:faTransaction?.transactionDate?.format(appProp.dateFormat), required:true,readOnly:readOnly,class:'calendar', maxLength:10 /} (${appProp.displayDateFormat})
+					<span id="closingDateError" class="error">#{error 'Closing Date is' /}</span>
+				</li>
+				<li>			
+					#{textArea id:'remarks', name:'faTransaction.remarks', label:'Remarks', value:faTransaction?.remarks, class:'capitalize', readOnly:readOnly, width:'390px', maxLength:255 /}
+				</li>
+			</ul>
+		</div>
+	</td>
+	
+</tr>
+</table>
+<br>
+<p> </p>
+
+<form></form>
+
+</form>
+<input type="hidden" id="dummy" />

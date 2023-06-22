@@ -1,0 +1,20 @@
+<table id="grid" class="display">
+	<thead>
+		<tr>
+			<th width="25%">
+				Account No
+			</th>
+			<th width="75%">
+				Name
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:items, as:'item'}
+		<tr>
+			<td>${item.accountNo}</td>
+			<td>${item.name}</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>

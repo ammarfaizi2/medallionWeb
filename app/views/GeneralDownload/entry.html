@@ -1,0 +1,246 @@
+#{extends 'templates/detail1.html' /}
+#{set mode: mode /}
+#{set pageTitle : "Download Profile Entry" /}
+#{script 'lookups.js' /}
+#{set readOnly: confirming/}
+#{set id: profile?.profileKey/}
+
+<div id="accordion">
+	<form id="downloadForm_entry" class="form">
+			#{hidden id:'source', name:'profile.source', value:profile?.source /}
+			#{hidden id:'key', name:'profile.profileKey', value:profile?.profileKey/}
+			#{hidden id:'systemTemplete', name:'profile.systemTemplete', value:0/}
+			
+			#{hidden id:'archiveField', name:'profile.archiveField', value:profile?.archiveField/}
+			#{hidden id:'archiveStatus', name:'profile.archiveStatus', value:profile?.archiveStatus/}
+		<p id="divFilters">
+			<!-- #{list profile?.filters, as: "filter"} -->
+				#{hidden id:'filterKey_'+(filter_index-1)+1, name:'profile.filters['+(filter_index-1)+'].filterKey', value:filter?.filterKey/}
+				#{hidden id:'filterKey_'+(filter_index-1)+2, name:'profile.filters['+(filter_index-1)+'].noSeq', value:filter?.noSeq/}
+				#{hidden id:'filterKey_'+(filter_index-1)+3, name:'profile.filters['+(filter_index-1)+'].fieldName', value:filter?.fieldName/}
+				#{hidden id:'filterKey_'+(filter_index-1)+4, name:'profile.filters['+(filter_index-1)+'].dataType', value:filter?.dataType/}
+				#{hidden id:'filterKey_'+(filter_index-1)+5, name:'profile.filters['+(filter_index-1)+'].defValue', value:filter?.defValue/}
+				#{hidden id:'filterKey_'+(filter_index-1)+6, name:'profile.filters['+(filter_index-1)+'].defOperator.lookupId', value:filter?.defOperator?.lookupId/}
+				#{hidden id:'filterKey_'+(filter_index-1)+7, name:'profile.filters['+(filter_index-1)+'].lookupView', value:filter?.lookupView/}
+				#{hidden id:'filterKey_'+(filter_index-1)+8, name:'profile.filters['+(filter_index-1)+'].lookupDisplay', value:filter?.lookupDisplay/}				
+				#{hidden id:'filterKey_'+(filter_index-1)+9, name:'profile.filters['+(filter_index-1)+'].required', value:filter?.required/}				
+			<!-- #{/list} -->
+		</p>
+		<p>
+			#{textBox id:'name', name:'profile.name', value:profile?.name, label:'Profile ID', class:'capitalize', width:'250px', maxLength:50, size:50, required:'true', readOnly:readOnly /}
+			<span class="error">#{error 'Profile ID' /}</span>
+		</p>
+		<p>
+			#{textBox id:'description', name:'profile.description', value:profile?.description, label:'Profile Name', class:'capitalize', width:'350px', maxLength:250, size:250, required:'true',readOnly:readOnly /}
+			<span class="error">#{error 'Profile Name' /}</span>
+		</p>	
+		<p>
+			#{textBox id:'template',value:profileTemplate?.name, displayValue:profileTemplate?.name, required:true, label:'Profile Ref', width:'250px', class:'capitalize',readOnly:readOnly/}
+			#{hidden id:'h_templete', name:'profile.templete', value:profileTemplate?.profileKey/}
+			#{button id:'groupTemplateHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'names', name:'', value:profileTemplate?.description, width:'350px', readOnly:true/}
+			<span class="error" id="profileRefError">#{error 'Profile Ref' /}</span>
+		</p>		
+		<p>
+			#{textBox id:'process', name:'profile.process', value:profile?.process, label:'Template', readOnly:'true' /}
+			#{hidden name:'profile.actionType', value:'Download'/}
+			<span class="error">#{error 'Action Type' /}</span>
+		</p>			
+		<p>
+			
+			#{checkBox id:'includeHeader', name:'profile.includeHeader', value:((profile?.includeHeader) ? true : false), label:'Include Header Row',readOnly:readOnly/}
+		</p>
+		<p>
+			#{dropDownList id:'separator', name:'profile.separator.lookupId', label:'Separator', value:profile?.separator?.lookupId, options:separatorOperators, required:true, readOnly:false,readOnly:readOnly /}
+			<span class="error">#{error 'Separator' /}</span>
+		</p>
+		<p>
+			#{dropDownList id:'fileType', name:'profile.fileType', label:'File Type', value:profile?.fileType, options:outputTypes, required:false, readOnly:readOnly /}
+		</p>
+		<p>
+			#{radioButton id:'status', name:'profile.status', value:((profile?.status)?'true':'false'), label:'Active', options:yesNoOperators, readOnly:readOnly/}
+		</p>
+		<div id="hiddenDetailInput" style="display:none">
+		
+		</div>
+		<br/>
+		#{if !confirming}
+		#{button id:"btnPopulate", value:"Populate", type:"button", class:"buttons", readOnly:readOnly/}
+		#{button id:"btnReset", value:"Reset", type:"button", class:"buttons", readOnly:readOnly/}
+		#{/if}
+		<br/>
+		<br/>
+		<div id="tempPofileTable">
+			<table class="display" id="profileDetailTable">
+				<thead>
+					<tr>
+						<th width="100px" field="component|button|none|center|nosort">
+							Order
+						</th>
+						<th width="100px" field="noSeq|string|none|left|sortdasc">No</th>
+						<th width="100px" field="targetField|string|none|left|nosort">Header Name</th>
+						<th width="100px" field="sourceField|string|none|left|nosort">Source Field</th>
+						<th width="100px" field="type|string|none|left|nosort">Type</th>
+						<th width="100px" field="mandatory|string|none|left|nosort">M/O/C</th>
+						<th width="100px" field="fixValue|string|none|left|nosort">Fix Length</th>
+						<th width="100px" field="length|string|none|left|nosort">Length</th>
+						<th width="100px" field="formatType|string|none|left|nosort">Format</th>
+						<th width="100px" field="component|button|none|left|nosort">
+							Action
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+		<!-- #{if !confirming}  -->
+		<p>
+			#{button id:"btnAddField", value:"Add Field", type:"button", class:"buttons", readOnly:readOnly/}
+		</p>
+		<!-- #{/if} -->
+	</form>
+	<div id="entryFormDialog" title="Setup Download Profile">
+		<div id="formTab">
+			<ul>
+				<li><a href="#tab-1">Main</a></li>
+				<li><a id="href-tab-2" href="#tab-2">Mapping Value</a></li>
+			</ul>
+			<div class="pane" id="tab-1">
+				<div class="form fakeform">
+				<p>
+					#{textBox id:'sequenceNo', name:'sequenceNo', value:"", label:'Sequence No', class:'numeric', width:'50px', maxLength:50, size:50, readOnly:true /}
+					#{hidden id:'systemField', name:'systemField', value:"" /}
+					#{hidden id:'profileDetailKey', name:'profileDetailKey', value:"" /}
+				</p>
+				<p>
+					#{textBox id:'headerName', name:'headerName', value:"", label:'Header Name', class:'capitalize', width:'200px', maxLength:50, size:50, required:'true' /}						
+					<span class="error mappingerror" id="headerNameError"></span>
+				</p>
+				<p>
+					#{dropDownList id:'sourceField', name:'sourceField', label:'Source Field', value:"", options:sourceField, required:true, readOnly:false, removeEmpty:true /}
+					<span class="error mappingerror" id="sourceFieldError"></span>
+				</p>
+				<p>
+					#{dropDownList id:'dataType', name:'dataType', value:"", label:'Data Type', width:'150px', options:dataTypeOperators, removeEmpty:true/}						
+				</p>
+				<p>
+					#{dropDownList id:'formatData', name:'formatData', value:"", label:'Format Data', width:'150px', removeEmpty:true/}						
+				</p>
+				<p>
+					#{radioButton id:'valueType', name:'valueType', class:"valueType", value:"0", options:valueTypeOperators, label:'Value Type', stacking:true/}
+				</p>
+				<p>
+					#{checkBox id:'fixValueRequired', name:'fixValueRequired', value:"", label:'Fix Length', readOnly:true/}
+					#{dropDownList id:'fixValue', name:'fixValue', options:fixValueOperators, width:'150px', readOnly:true, removeEmpty:true/}						
+					<select id="dummyFix" style="display:none;width:150px" disabled></select>
+				</p>
+				<p>
+					#{textBox id:'length', name:'length', value:"", label:'Length', class:'numberOnly', width:'50px', required:'true', maxLength:3/}
+					<span class="error mappingerror" id="lengthError"></span>
+				</p>
+				<p>					
+					#{checkBox id:'mappingRequired', name:'mappingRequired', value:"", label:'Mapping Required', readOnly:true/}
+				</p>
+				</div>
+			</div>
+			<div class="pane" id="tab-2">
+				<form class="form mappingform">
+					<p>
+						#{textBox id:'defaultValue', name:'defaultValue', value:"", class:'capitalize', label:'Default', width:'150px'/}
+						<span class="error mappingerror" id="defaultValueError"></span>
+					</p>
+					<div>
+						<table id="mappingTable" class="display" width="400px">
+							<thead>
+								<tr>
+									<th field="order|string|none|left|sort">From Medallion</th>
+									<th field="order|string|none|left|sort">To External</th>
+									<th field="order|string|none|left|sort">Action</th>
+								</tr>
+							</thead>
+							<tbody>
+							</tbody>
+						</table>
+					</div>
+				</form>
+				<!-- #{if !confirming} -->
+				<p>
+					<input id='btnAddMapping' type="button" value="Add Mapping" class="buttons ui-button ui-widget ui-state-default ui-corner-all"></input>			
+				</p>
+				<!-- #{/if} -->
+			</div>
+		</div>
+	</div>
+</div>	
+
+<div id="dialoggarden">
+<div id="result" style="display:none">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<div class="response"></div>
+</div>
+<div id="dialog-message-delete" title="Message Confirmation" style="display:none">
+	<p>
+	<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 50px 0;"></span>
+	Are you sure to delete data ? </p>
+</div>
+<div id="dialog-message-nodelete" title="Message Confirmation" style="display:none">
+	<p>
+	<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 50px 0;"></span>
+	Cannot delete all data!</p>
+</div>
+<div id="dialog-message-err-mapping" title="Message Confirmation" style="display:none">
+	<p>
+	<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 50px 0;"></span>
+	Fill all code before add new code, or remove the empty code!</p>
+</div>
+<div id="dialog-message-empty-mapping" title="Message Confirmation" style="display:none">
+	<p>
+	<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 50px 0;"></span>
+	Fill at least one mapping code!</p>
+</div>
+<div id="dialog-message-empty-mapping-2" title="Message Confirmation" style="display:none">
+	<p>
+	<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 50px 0;"></span>
+	Don't let the mapping code empty!</p>
+</div>
+<div id="dialog-message-unique-mapping" title="Message Confirmation" style="display:none">
+	<p>
+	<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 50px 0;"></span>
+	"From Code" already exists, it must be unique!</p>
+</div>
+<div id="dialog-message-self-parent" title="Message Confirmation" style="display:none">
+	<p>
+	<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 50px 0;"></span>
+	This profile cannot choose itself as parent!</p>
+</div>
+<div id="dialog-message-nosourcefield" title="Message Confirmation" style="display:none">
+	<p>
+	<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 50px 0;"></span>
+	Can not add field because all source fields are already used!</p>
+</div>
+
+<div id="mappingCodeForm" title="Setup Download Profile" style="display:none">
+	<div class="form fakeform">
+		<p>
+			#{textBox id:'dFromCode', name:'fromCode', value:"", class:'capitalize', label:'From Code', width:'150px'/}
+			<span class="error mappingerror" id="dfromCodeError"></span>
+		</p>
+		<p>
+			#{textBox id:'dToCode', name:'toCode', value:"", class:'capitalize', label:'To Code', width:'150px'/}
+			<span class="error mappingerror" id="dToCodeError"></span>
+		</p>
+	</div>
+</div>
+</div>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/jshashtable-2.1.js' /}
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include VIEW_DIR+'/ProfileDownload.js' /}
+	#{include VIEW_DIR+'/MappingPaging.js' /}
+	$(document).ready(function() {
+		//MappingPaging($("#tab-2"));
+		ProfileDownload($("#accordion").add("#result").add("#dialoggarden"));
+	});
+</script>

@@ -1,0 +1,87 @@
+#{extends 'templates/main.html' /}
+
+<script type="text/javascript">
+	$(function() {
+		
+		var backToList = function() {
+			loading.dialog('open');
+			location = "@{list()}";
+		}
+		
+		// Action buttons 
+		$('#confirm').click(function() {
+			$(".prematch").remove(); 
+			var action = "@{confirm()}";
+			loading.dialog('open');
+			/* var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+			loading.dialog({
+				closeOnEscape: false,
+				draggable: false,
+				modal: true,
+				resizable: false,
+				open:function() {
+					$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+				} 
+			}); */
+			$.post(action, $('#transactionForm').serialize(), function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status ==  'success') {
+					loading.dialog('close');
+					messageAlertOk(data.messages, "ui-icon ui-icon-circle-check", "Notification", backToList);
+				} else {
+					loading.dialog('close');
+					messageAlertOk(data.messages, "ui-icon1 ui-icon-circle-close", "Error Message", backToList);
+				}
+			});
+		});
+		
+		$('#back').click(function() {
+			location.href = "@{back()}?id=${transaction?.transactionKey}&fromView=viewCsCancelTrade&mode=${mode}";
+		});
+		
+		$('#clear').click(function() {
+			location.href="@{entry()}";			
+		});
+		
+		$('#close').click(function() {
+			location.href = "@{list()}";
+		})
+		
+		$('#saveCancel').click(function(){
+			$(".prematch").remove(); 
+			var action = "@{save()}?fromView=viewCsCancelTrade";
+			/* var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+			loading.dialog({
+				closeOnEscape: false,
+				draggable: false,
+				modal: true,
+				resizable: false,
+				open:function() {
+					$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+				} 
+			}); */
+			loading.dialog('open');
+			$('#transactionForm').attr('action', action);
+			$('#transactionForm').submit();
+		});
+
+
+	});	
+</script>
+
+<h2>Cancel Transaction Settlement Detail</h2>
+<div id="detail">
+	#{include 'Transactions/detail.html' /}	
+</div>
+
+<div id="actions" class="buttons">
+	#{if confirming}
+		<input type="button" id="confirm" value="Confirm" />
+		<input type="button" id="back" value="Back" />
+	#{/if}
+	#{else}
+		<input type="button" id="saveCancel" value="Save" />
+		<input type="button" id="close" value="Back" />
+	#{/else}
+</div>

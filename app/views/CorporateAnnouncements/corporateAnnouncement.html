@@ -1,0 +1,149 @@
+#{extends 'templates/main.html' /}
+
+<script type="text/javascript">
+	$(function() {
+		var backToEntry = function() {
+			loading.dialog('open');
+			location = "@{entry()}";
+		}
+		var closeDialogMessage = function() {
+			$("#dialog-message").dialog("close");
+		}
+		var backToList = function() {
+			loading.dialog('open');
+			location = "@{list()}";
+		}
+		
+		var backToListCancel = function() {
+			loading.dialog('open');
+			location = "@{CancelCorporateAnnouncements.list()}";
+		}
+		// Action buttons 
+		$('#save').click(function() {
+			//$('#h_effectiveDate').val($('#effectiveDate').val());
+			//$('#h_maturityDate').val($('#maturityDate').val());
+			if ($('input').hasClass('fieldError')){
+				$('#errorAnnouncementGlobal').html('There are some error fields!');
+				return false;
+			}
+			var action = "@{save()}?mode=${mode}";
+			loading.dialog('open');
+			
+			//$('#corporateAnnouncementForm').attr("enctype", "multipart/form-data");
+			
+			$('#corporateAnnouncementForm').attr('action', action);
+			$('#corporateAnnouncementForm').submit();
+		});
+		
+		$('#saveCancel').click(function() {
+			var action = "@{CancelCorporateAnnouncements.save()}?mode=${mode}";
+			loading.dialog('open');
+			$('#corporateAnnouncementForm').attr('action', action);
+			$('#corporateAnnouncementForm').submit();
+		});
+		
+		$('#confirm').click(function() {
+			var action = "@{confirm()}?mode=${mode}";
+			loading.dialog('open');
+			$.post(action, $('#corporateAnnouncementForm').serialize(), function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					if ('${mode}'=='entry') {
+						messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Notification", backToEntry);
+					}
+					if ('${mode}'=='edit') {
+						messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Notification", backToList);
+					}
+				} else {
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+				}
+			});
+			//$('#transactionForm').attr('action', action);
+			//$('#transactionForm').submit();
+		});
+		
+		$('#confirmCancel').click(function() {
+			var action = "@{CancelCorporateAnnouncements.confirm()}?mode=${mode}";
+			loading.dialog('open');
+			$.post(action, $('#corporateAnnouncementForm').serialize(), function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Notification", backToListCancel);
+				} else {
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+				}
+			});
+		});
+		
+		$('#back').click(function() {
+			location.href = '@{back()}?id=${corporateAnnouncement?.corporateAnnouncementKey}&mode=${mode}';				
+		});
+		
+		$('#backCancel').click(function() {
+			location.href = '@{CancelCorporateAnnouncements.back()}?id=${corporateAnnouncement?.corporateAnnouncementKey}&mode=${mode}';				
+		});
+
+		$('#clear').click(function() {
+			location.href = "@{entry()}";
+		});
+		
+		$('#close').click(function() {
+			location.href = '@{CorporateAnnouncementsInquiry.list()}'
+		});
+		
+		if ('${mode}'=='edit'){
+			$('#clear').css('display', 'none');
+		}
+		
+		$('#cancel').click(function(){
+			location.href = "@{list()}";
+		})
+		
+		$('#cancelCancel').click(function(){
+			location.href = "@{CancelCorporateAnnouncements.list()}";
+		});
+	});	
+</script>
+<h2>
+	#{if fromCancel == 'fromCancel'}
+		Cancel Corporate Action Announcement
+	#{/if}
+	#{else}
+		Corporate Action Announcement Entry
+	#{/else}
+	
+</h2>
+
+<div id="detail">
+	#{include 'CorporateAnnouncements/detail.html' /}	
+</div>
+<div id="actions" class="buttons">
+#{if inquiry == 'inquiry'}
+	<input type="button" id="close" value="Close" />
+#{/if}
+#{else}
+	#{if confirming}
+		#{if fromCancel == 'fromCancel'}
+			<input type="button" id="confirmCancel" value="Confirm" />
+			<input type="button" id="backCancel" value="Back" />
+		#{/if}
+		#{else}
+			<input type="button" id="confirm" value="Confirm" />
+			<input type="button" id="back" value="Back" />
+		#{/else}
+	#{/if}
+	#{else}
+		#{if fromCancel == 'fromCancel'}
+			<input type="button" id="saveCancel" value="Save" />
+			<input type="button" id="cancelCancel" value="Cancel" />
+		#{/if}
+		#{else}
+			<input type="button" id="save" value="Save" />
+			<input type="button" id="clear" value="Clear" />
+			<input type="button" id="cancel" value="Cancel" />
+		#{/else}
+	#{/else}
+#{/else}
+</div>

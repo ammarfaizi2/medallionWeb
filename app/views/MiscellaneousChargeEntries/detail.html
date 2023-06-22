@@ -1,0 +1,402 @@
+#{set readOnly:((mode!='edit'&& mode!='entry') || confirming) /}
+#{set id: transaction?.transactionKey /}
+#{script 'lookups.js', characterset:'utf-8'/}
+#{script 'lookuppaging.js' /}
+<script type="text/javascript">
+#{include 'RegistrySubscription/Util.js' /}
+	$(function() {			
+		$('#accountNo').dynapopup2({key:'accountKey', help:'accountNoHelp', desc:'accountNoDesc'}, 'PICK_CS_ACCOUNT', '', 'chargeCode', function(data){
+			$('#accountNo').removeClass('fieldError');
+			$('#accountKey').val(data.code);
+			$('#accountNoDesc').val(data.description);
+			$('#h_accountNoDesc').val(data.description);
+		},function(data){
+			$('#accountNo').addClass('fieldError');
+			$('#accountNo').val('');
+			$('#accountKey').val('');
+			$('#accountNoDesc').val('NOT FOUND');
+			$('#h_accountNoDesc').val('');
+		});
+
+		if($("#chargeFrequency").val()=="M") {
+			$("#settlementAccount").attr('disabled', 'disabled');
+			$("#settlementAccountHelp").attr('disabled', 'disabled');
+			$("#paymentType").attr('disabled', 'disabled');
+			$("#paymentTypeHelp").attr('disabled', 'disabled');
+		}
+		
+		$('#chargeCode').lookup({
+			list:'@{Pick.chargesMiscellaneousByCategoryTransaction()}',
+			get: {
+				url:'@{Pick.chargeByCategoryTransaction()}',
+				success: function(data) {
+					if (data) {
+						$('#chargeCode').removeClass('fieldError');
+						$('#chargeKey').val(data.code);
+						$('#chargeCodeDesc').val(data.description);
+						$('#h_chargeCodeDesc').val(data.description);
+						$('#chargeFrequency').val(data.frequencyCode);
+						$('#minValueCharge').val(data.minValue);
+						$('#maxValueCharge').val(data.maxValue);
+						$('#taxCode').val(data.taxCode);
+						$('#taxKey').val(data.taxKey);
+						$('#h_taxKey').val(data.taxKey);
+						$('#taxRate').val(data.taxRate);
+						$('#taxCodeDesc').val(data.taxName);
+						$('#currency').val(data.currency);
+						$('#h_currency').val(data.currency);
+						$('#chargeAmount').val('');
+						$('#chargeAmount').removeClass('fieldError');
+						$('#errChargeAmount').html('');
+						if($("#chargeFrequency").val()=="M") {
+							$("#settlementAccount").attr('disabled', 'disabled');
+							$("#settlementAccountHelp").attr('disabled', 'disabled');
+							$("#paymentType").attr('disabled', 'disabled');
+							$("#paymentTypeHelp").attr('disabled', 'disabled');
+							$("#settlementAccount").val("");
+							$("#settlementAccountName").val("");
+							$("#paymentType").val("");
+						}
+						else{
+							$("#settlementAccount").attr('disabled', false);
+							$("#settlementAccountHelp").attr('disabled', false);
+							$("#paymentType").attr('disabled', false);
+							$("#paymentTypeHelp").attr('disabled', false);
+						}
+						var codeFrequency = $("#chargeFrequency").val();
+						$("#saveChargeFrequency").val(codeFrequency);
+						
+					}
+				},
+				error: function(data) {
+					$('#chargeCode').addClass('fieldError');
+					$('#chargeCode').val('');
+					$('#chargeKey').val('');
+					$('#chargeCodeDesc').val('NOT FOUND');
+					$('#h_chargeCodeDesc').val('');		
+					$('#h_taxKey').val('');
+					$('#h_currency').val('');
+				}
+			},
+			description:$('#chargeCodeDesc'),
+			help:$('#chargeCodeHelp'),
+		});
+
+		$('#chargeAmount').blur(function(){
+			var ca = $("#chargeAmount").val();
+			var chargeAmount = parseFloat($('#chargeAmountStripped').val());
+			var taxRate = $('#taxRate').val();
+			var taxAmount = 0;
+			if ($("#chargeAmount").val() != '') {
+				 if (chargeAmount == 0){
+					$('#chargeAmount').addClass('fieldError');
+					$('#errChargeAmount').html('Amount must not equal 0');
+					return false;
+				}	 
+				taxAmount = (chargeAmount * taxRate) / 100;
+				calculateTotal();
+				$('#taxAmount').val(taxAmount);
+				$('#chargeAmount').removeClass('fieldError');
+				$('#errChargeAmount').html('');
+			}
+		});
+		/* $('#chargeAmount').blur(function() {
+			if ($("#chargeAmount").val() != '') {
+				var minValue = $('#minValueCharge').val();
+				var maxValue = $('#maxValueCharge').val();
+				var chargeAmount = parseFloat($('#chargeAmountStripped').val());
+				minValueA = $.fn.autoNumeric.Format('minValue', minValue);
+				maxValueA = $.fn.autoNumeric.Format('maxValue', maxValue);
+				if ((minValueA != 0) || (maxValueA != 0)) {
+					if (chargeAmount < minValue){
+						$('#chargeAmount').addClass('fieldError');
+						if (maxValueA != 0){
+							$('#errChargeAmount').html('Min Amount = ('+minValueA+') and Max Amount = ('+maxValueA+')');
+						} else {
+							$('#errChargeAmount').html('Min Amount = ('+minValueA+') and Max Amount = (MAX)');
+						}
+						return false
+					}
+					if (maxValue != 0){
+						if (chargeAmount > maxValue){
+							$('#chargeAmount').addClass('fieldError');
+							if (maxValueA != 0){
+								$('#errChargeAmount').html('Min Amount = ('+minValueA+') and Max Amount = ('+maxValueA+')');
+							} else {
+								$('#errChargeAmount').html('Min Amount = ('+minValueA+') and Max Amount = (MAX)');
+							}
+							return false
+						}
+					}
+					$('#chargeAmount').removeClass('fieldError');
+					$('#errChargeAmount').html('');
+				}
+			}
+			calculateTotal();
+		}); */
+		
+		$('#taxCode').lookup({
+			list:'@{Pick.taxMasters()}',
+			get: {
+				url:'@{Pick.taxMaster()}',
+				success: function(data) {
+					if (data) {
+						$('#taxCode').removeClass('fieldError');
+						$('#taxKey').val(data.code);
+						$('#taxCodeDesc').val(data.description);
+						$('#h_taxCodeDesc').val(data.description);
+						$('#taxRate').val(data.taxRate);
+						if ($("#chargeAmount").hasClass("fieldError")){
+							return false
+						} else {
+							// Calculate default tax amount
+							var taxRate = $('#taxRate').val();
+							var chargeAmount = $('#chargeAmountStripped').val();
+							
+							var taxAmount = 0;
+							taxAmount = (chargeAmount * taxRate) / 100;
+				
+							//var $taxAmount = $.fn.autoNumeric.Format('taxAmount', taxAmount);
+							$('#taxAmount').autoNumericSet(taxAmount,{vMin:'-999999999999.'});
+							$('#taxAmountStripped').val(taxAmount);
+							calculateTotal();
+						}
+					}
+				},
+				error: function(data){
+					$('#taxCode').addClass('fieldError');
+					$('#taxCode').val('');
+					$('#taxKey').val('');
+					$('#taxCodeDesc').val('NOT FOUND');
+					$('#h_taxCodeDesc').val('');
+				}		
+			},
+			description:$('#taxCodeDesc'),
+			help:$('#taxCodeHelp')
+		});
+		
+		$('#settlementAccount').change(function(){
+			var el = $(this);
+			var length = el.val().length;
+			var word = el.val();
+			el.removeClass('fieldError');
+			if (!(word.indexOf("|") >= 0)) {
+				el.addClass('fieldError');
+				$('#settlementAccountKey').val('');
+				$('#settlementAccountName').val('NOT FOUND');
+				$('#h_settlementAccountName').val('');
+			}
+		});
+
+		$('#settlementAccount').lookup({
+			list:'@{Pick.bankAccounts()}',
+			get:{
+				url:'@{Pick.bankAccountForSettlementAccountPick()}',
+				success: function(data){
+					$('#settlementAccount').removeClass('fieldError');
+					$('#settlementAccountKey').val(data.code);
+					$('#settlementAccount').val(data.bankAccountNo);
+					$('#settlementAccountName').val(data.description);
+					$('#h_settlementAccountName').val(data.description);
+				}, 
+				error: function(data){
+					$('#settlementAccount').addClass('fieldError');
+					$('#settlementAccount').val('')
+					$('#settlementAccountKey').val('');
+					$('#settlementAccountName').val('NOT FOUND');
+					$('#h_settlementAccountName').val('');
+				}
+			},
+			description:$('#settlementAccountName'),
+			filter : $('#accountKey'),
+			help:$('#settlementAccountHelp')
+		});
+		
+		$('#transactionTemplate').lookup({
+			list:'@{Pick.transactionTemplates()}',
+			get:{
+				url:'@{Pick.transactionTemplate()}',
+				success: function(data) {
+					if (data) {
+						$('#transactionTemplate').removeClass('fieldError');
+						$('#transactionTemplateKey').val(data.code);
+						$('#transactionTemplateDesc').val(data.description);
+						$('#h_transactionTemplateDesc').val(data.description);
+						$('#securityType').val(data.securityType);
+					}	
+				},
+				error: function(data) {
+					$('#transactionTemplate').addClass('fieldError');
+					$('#transactionTemplateDesc').val('NOT FOUND');
+					$('#transactionTemplate').val('');
+					$('#transactionTemplateKey').val('');
+					$('#h_transactionTemplateDesc').val('');
+				}
+			},
+			filter:'USED_BY-4',
+			key:$('#transactionTemplateKey'),
+			description:$('#transactionTemplateDesc'),
+			help:$('#transactionTemplateHelp')
+		});
+		
+		$('#settlementDate').datepicker();
+		$('.calendar').datepicker();
+
+		
+		if ($('#remarksCorrection').val() != '') {
+			$('#needCorrection').attr('checked', true);
+		} else {
+			$('#needCorrection').removeAttr('checked');
+		}
+		
+		if ('${mode}'==='entry') {
+			$('#dvNeedCorrection').css("display","none");
+		} else if ('${approval}'){
+			 $('#dvNeedCorrection').css("display","");
+		}else{
+			 $('#dvNeedCorrection').css("display","");
+			 $('#needCorrection').attr('disabled', 'disabled');
+			 $('#remarksCorrection').attr('disabled', 'disabled');
+			 $('li[id=liRemarksCorrection] label span').html('');
+		}
+		
+		/* $('#taxAmount').change(function() {
+			if ($("#chargeAmount").hasClass("fieldError")){
+				alert("tttt");
+				return false
+			} else {
+				calculateTotal();
+			}
+		}); */
+		
+		if ($.browser.msie){
+			$("#remarks[maxlength]").bind('input propertychange', function() {
+		        var maxLength = $(this).attr('maxlength');  
+		        if ($(this).val().length > maxLength) {  
+		            $(this).val($(this).val().substring(0, maxLength));  
+		        }  
+		    });
+			
+			$("#remarksCorrection[maxlength]").bind('input propertychange', function() {
+		        var maxLength = $(this).attr('maxlength');  
+		        if ($(this).val().length > maxLength) {  
+		            $(this).val($(this).val().substring(0, maxLength));  
+		        }  
+		    });
+		}
+		
+		if (('${from}' !== '') && ($('#remarksCorrection').val() != '')) {
+			$('#needCorrection').attr('checked', 'checked');
+			$('li[id=liRemarksCorrection] label span').html(' *');
+		}else{
+			$('#remarksCorrection').attr('disabled', 'disabled');
+			$('li[id=liRemarksCorrection] label span').html('');
+		}
+		
+	});
+	
+	function validateChargeAmount() {
+		
+		
+	}
+	
+	function calculateTotal() {
+		var chargeAmount = $('#chargeAmountStripped').val();
+		var taxAmount = $('#taxAmount').val();
+
+		var totalCharge = 0; 
+		totalCharge = Number(taxAmount) + Number(chargeAmount);
+		$('#totalCharge').val(totalCharge);
+		$('#h_totalCharge').val(totalCharge);
+	}
+
+
+</script>
+
+<form id="miscellaneousChargeForm" class="form" method="POST">
+#{hidden id:'taxRate', name:'charge.taxMaster.taxRate', value:charge?.taxMaster?.taxRate /}
+#{hidden id:'chargeFrequency', name:'charge.chargeMaster.chargeFrequency.lookupCode', value:charge?.chargeMaster?.chargeFrequency?.lookupCode /}
+#{hidden id:'saveChargeFrequency', name:'charge.chargeFrequency', value:charge?.chargeFrequency /}
+#{hidden id:'securityType', name:'transaction.security.securityType.securityType', value:transaction?.security?.securityType?.securityType /}
+#{hidden id:'minValueCharge', name:'charge.chargeMaster.minimumValue', value:charge?.chargeMaster?.minimumValue /}
+#{hidden id:'maxValueCharge', name:'charge.chargeMaster.maximumValue', value:charge?.chargeMaster?.maximumValue /}
+#{hidden id:'transactionKey',name:'transaction.transactionKey',value:transaction?.transactionKey /}
+
+<table>
+<tr>
+	<td>
+		<div>
+			<ul>
+				<li>
+					#{textBox id:'transactionNo', name:'transaction.transactionNumber', label:'Transaction No', value:transaction?.transactionNumber, class:'capitalize', readOnly:true, width:'120px' /}
+				</li>
+				<li>      
+					#{textBox id:'settlementDate', name:'transaction.settlementDate', label:'Date', value:transaction?.settlementDate?.format(appProp.dateFormat), class:'calendar',width:'120px', required:true, readOnly:readOnly /} (${appProp.displayDateFormat})
+					<span id="settlementDateError" class="error">#{error 'Transaction Date is' /}</span>
+				</li>
+				<li>			
+					#{textBox id:'accountNo', name:'transaction.account.accountNo', label:'Account No', width:'120px', value:transaction?.account?.accountNo,required:true, class:'capitalize',readOnly:readOnly /}
+					#{hidden id:'accountKey', name:'transaction.account.custodyAccountKey', value:transaction?.account?.custodyAccountKey /}
+					#{button id:'accountNoHelp', value:'?', class:'small', readOnly:readOnly /}
+					#{textBox id:'accountNoDesc', name:'transaction.account.name', value:transaction?.account?.name, readOnly:true, width:'241.5px' /}
+					<span class="error">#{error 'Account No is' /}</span>
+				</li>
+				<li>		
+					#{textBox id:'chargeCode', name:'charge.chargeMaster.chargeCode', label:'Charge Code', width:'120px', value:charge?.chargeMaster?.chargeCode,  class:'capitalize',required:true,readOnly:readOnly /} 
+					#{hidden id:'chargeKey', name:'charge.chargeMaster.chargeKey', value:charge?.chargeMaster?.chargeKey /}	
+					#{button id:'chargeCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+				 	#{textBox id:'chargeCodeDesc', name:'charge.chargeMaster.description', value:charge?.chargeMaster?.description, readOnly:true, width:'241.5px' /}
+				 	<span class="error">#{error 'Charge Code is' /}</span>
+				</li>
+				<li>
+					 #{textBox id:'currency', name:'charge.chargeMaster.currency.currencyCode', label:'Currency', value:charge?.chargeMaster?.currency?.currencyCode, class:'capitalize', width:'120px', readOnly:true /}
+				</li>
+				<li>
+					#{textBox id:'chargeAmount', label:'Charge Value',value:charge?.chargeValue,  format:'#,##0.####', class:'numericminus',width:'120px', required:true ,readOnly:readOnly /}
+					#{hidden id:'chargeAmountStripped', name:'charge.chargeValue', value:charge?.chargeValue /}
+					<span class="error">#{error 'Charge Value is' /}</span>
+					<span id="errChargeAmount" class="error"></span>
+				</li>
+				<li>
+					#{hidden id:'taxKey', name:'charge.taxMaster.taxKey', value:charge?.taxMaster?.taxKey /}
+					<span class="error">#{error 'Tax Code is' /}</span>
+				</li>
+				
+				<li>
+					#{hidden id:'transactionTemplate', name:'transaction.transactionTemplate.transactionCode', label:'Transaction Code', value:transaction?.transactionTemplate?.transactionCode, class:'capitalize',required:true, readOnly:readOnly, width:'120px' /}
+					#{hidden id:'transactionTemplateKey', name:'transaction.transactionTemplate.transactionTemplateKey', value:transaction?.transactionTemplate?.transactionTemplateKey, class:'settlement' /}
+				
+					#{hidden id:'taxAmount', name:'charge.taxAmount', value:charge?.taxAmount /}	
+					#{hidden id:'totalCharge', name:'transaction.totalFee', value:transaction?.totalFee /}
+				</li>
+				<li>
+					#{textBox id:'refNo', name:'transaction.reference', label:'External Reference', value:transaction?.reference, class:'capitalize', readOnly:readOnly, width:'120px',maxLength:50 /}
+				</li>
+				<li>
+					#{textArea id:'remarks', name:'transaction.description', label:'Remarks', value:transaction?.description, class:'capitalize', readOnly:readOnly, width:'390px', maxLength:240 /}
+				</li>
+			</ul>
+		</div>
+	</td>
+	<td>
+		<div id="dvNeedCorrection">
+		<fieldset style="width: 350px;">
+			<ul>
+				<li>
+					#{checkBox id:'needCorrection', name:'needCorrection', label:'Need Correction', value:needCorrection, readOnly:editOnly, width:'100px' /}
+				</li>
+				<li id="liRemarksCorrection">
+					<label>Remarks <span class="req"> *</span></label>
+					#{textArea id:'remarksCorrection', name:'transaction.remarkCorrection', value:transaction?.remarkCorrection, class:'capitalize', width:'165px', maxLength:165, readOnly:editOnly /}
+					<span id="remarksCorrectionError" class="error">#{error 'Remarks Correction is' /}</span>
+				</li>
+			</ul>
+		</fieldset>
+	</div>
+	</td>
+</tr>
+</table>
+
+	
+</p>
+</form>

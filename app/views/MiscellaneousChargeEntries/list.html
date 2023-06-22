@@ -1,0 +1,79 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: ' ' /}
+#{set fixData: true /}
+#{set mode: mode /}
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+
+<script type="text/javascript">
+#{include 'RegistrySubscription/Util.js' /}
+#{include 'MiscellaneousChargeEntries/paging.js' /}
+$(document).ready(function() {
+	//InvoiceGenerationPaging($("#root").add("#result").add("#popupDetail"));
+	Paging($("#main"));
+	$('#certificateQuantity').autoNumeric({vMin: '1'});
+});
+</script>
+
+<div id="root">
+	#{if menuEntry}
+	<h3><a href="#">Miscellaneous Charge</a></h3>
+	#{/if}
+	#{else}
+	<h3><a href="#">Miscellaneous Charge Cancel</a></h3>
+	#{/else}
+	<form id="searchForm" class="form">
+		<input id="param" name="params.param" type="hidden" value="${param}"/> 
+		#{hidden id:'query', name:'params.query', value:params?.query /}
+		
+		 <p id="pMiscellaneousFrom">
+            #{textBox id:'miscellaneousFrom', name:'params.miscellaneousFrom', label:'Date', width:'85px', value:params?.csCertificateFrom ,class:'calendar' /} (${appProp.displayDateFormat})
+            <span id="miscellaneousFromError" class="error"></span> <b>To</b>
+            #{textBox id:'miscellaneousTo', name:'params.miscellaneousTo', value:params?.csCertificateTo, class:'calendar'  /} (${appProp.displayDateFormat})
+            <span id="miscellaneousToError" class="error"></span>
+        </p>
+        <p>
+			#{textBox id:'customer', name:'param.customer', value:param?.customer, class:'capitalize',label:'Customer Code',width:'120px' /}
+			#{hidden id:'customerKey', name:'param.customerCodeId', value:param?.customerCodeId/}
+			#{button id:'customerHelp', value:'?', class:'small' /}
+			#{textBox id:'customerDesc', name:'param.customerDesc', value:param?.customerDesc, readOnly:true, width:'300px' /}
+			<span class="error">#{error 'Customer' /}</span>			
+		</p>
+		<p>		
+			#{textBox id:'chargeCode', name:'chargeCode', label:'Charge Code', width:'120px', value:'',  class:'capitalize',readOnly:readOnly /} 
+			#{hidden id:'chargeKey', name:'charge.chargeMaster.chargeKey', value:charge?.chargeMaster?.chargeKey /}	
+			#{button id:'chargeCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+		 	#{textBox id:'chargeCodeDesc', name:'charge.chargeMaster.description', value:charge?.chargeMaster?.description, readOnly:true, width:'300px' /}
+		 	<span class="error">#{error 'Charge Code is' /}</span>
+		</p>
+		<p>
+		    #{dropDownList id:'transactionNoOperator', name:'params.transactionNoOperator', label:'Transaction No', options:transOperators, value:params?.transactionNoOperator /}
+            #{textBox id:'transactionId', name:'params.transactionId', value:params.transactionId, class:'numberOnly', width:'120px' /}
+		</p>
+		<p>
+			<div class="buttons">
+				<input type="button" id="search" value="Search" />				
+				<input type="button" id="reset" value="Reset" />					
+			</div>
+		</p>
+	</form>
+</div>
+<div id="result" style="display:block">
+	<table id="tblMiscellaneous" class="display">
+		<thead>
+			<tr>
+				<th width="100px" field="settlementDate|date|date|center|sort">Date</th>
+				<th width="150px" field="transactionNo|string|none|left|sort">Transaction&nbsp;#</th>
+				<th width="150px" field="accountNo|string|none|left|sort">Account&nbsp;No</th>
+				<th width="150px" field="name|string|none|left|sort">Account&nbsp;Name</th>
+				<th width="150px" field="description|string|none|left|sort">Description</th>
+				<th width="150px" field="chargeValue|number|decimal2|right|sort">Value</th>
+			</tr>
+		</thead>
+	</table>
+</div>
+#{if menuEntry}
+	<div  class="buttons">
+		<input type="button" id="newData" value="New Data" />	
+	</div>
+	#{/if}

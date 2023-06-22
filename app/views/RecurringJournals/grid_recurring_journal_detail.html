@@ -1,0 +1,50 @@
+#{hidden id:'rowNumber' /}
+<table id="gridRecurringJournalDetail" class="display">
+	<thead>
+		<tr>
+			<th>COA No</th>
+			<th>Account Name</th>
+			<th>Subledger</th>
+			<th>Dr/Cr</th>
+			<th width="150px">Amount Debet</th>
+			<th width="150px">Amount Credit</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list faTransaction?.faRecurringDetails, as:'faRecurringDetail'}
+		<tr>
+			<td>
+				${faRecurringDetail?.faCoaMaster?.coaCode}
+			</td>
+			<td>
+				${faRecurringDetail?.faCoaMaster?.description}
+			</td>
+			<td>
+				${faTransactionDetail?.subLedger}
+			</td>
+			<td>
+				${faRecurringDetail?.dorc}
+			</td>
+			<td>
+				${faRecurringDetail?.amount}
+			</td>
+			<td>
+				${faRecurringDetail?.amount}
+			</td>
+			<td>
+				#{hidden id:'detailKey', name:'faRecurringDetails[' + (faRecurringDetail_index-1) + '].detailKey', value:faRecurringDetail?.detailKey /}
+				#{hidden id:'coaCode', name:'faRecurringDetails[' + (faRecurringDetail_index-1) + '].faCoaMaster?.coaCode', value:faRecurringDetail?.faCoaMaster?.coaCode /}
+				#{hidden id:'coaDescription', name:'faRecurringDetails[' + (faRecurringDetail_index-1) + '].faCoaMaster?.description', value:faRecurringDetail?.faCoaMaster?.description /}
+				#{hidden id:'subLedger', name:'faRecurringDetails[' + (faRecurringDetail_index-1) + '].subLedger', value:faRecurringDetail?.subLedger /}
+				#{hidden id:'coaMasterKey', name:'faRecurringDetails[' + (faRecurringDetail_index-1) + '].faCoaMaster?.coaMasterKey', value:faRecurringDetail?.faCoaMaster?.coaMasterKey /}
+				#{hidden id:'transactionKey', name:'faRecurringDetails[' + (faRecurringDetail_index-1) + '].faTransaction.transactionKey', value:faRecurringDetail?.faTransaction?.transactionKey /}
+				#{hidden id:'position', name:'faRecurringDetails[' + (faRecurringDetail_index-1) + '].dorc', value:faRecurringDetail?.dorc /}
+				#{hidden id:'amount', name:'faRecurringDetails[' + (faRecurringDetail_index-1) + '].amount', value:faRecurringDetail?.amount /}
+				
+				<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} /></center>
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>

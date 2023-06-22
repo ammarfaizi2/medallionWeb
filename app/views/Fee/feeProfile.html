@@ -1,0 +1,30 @@
+#{extends 'main.html' /}
+#{set title:'Medallion&#0153;' /}
+#{set pageName:'Fee' /}
+
+#{if flash.error}
+    <p style="color:#c00">
+        ${flash.error}
+    </p>
+#{/if}
+
+	<h2>Fee Profile</h2>
+				<table class="grid" style="text-align:center">
+					<tr class="header">
+			
+						<th width="150px">Fee Profile</th>
+						<th width="100px">Default</th>
+					</tr>
+					<tr class="oddRow">
+						
+						<td><a href="@{Fee.feeProfileDetail()}">Global Fee</a></td>
+						<td>Y</td>
+					</tr>
+					<tr class="evenRow">
+						
+						<td>Special Customer</td>
+						<td>N</td>
+					</tr>
+					
+					
+				</table>

@@ -1,0 +1,33 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Switching' /}
+
+<script type="text/javascript">
+	function doEdit(data) {
+		return true;
+	}
+</script>
+<table class="display">
+	<thead>
+		<tr>
+			<th>Switch Key</th>
+			<th>Switch Date</th>
+			<th>Out Accountnumber</th>
+			<th>In Accountnumber</th>
+			<th>Remarks</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list swts, as:'swt'}
+		<tr>
+			<td>${swt?.switchingKey}</td>
+			<td>${swt?.switchDate?.format('MM/dd/yyyy')}</td>
+			<td>${swt?.rgInvestmentaccountByOutAccountNumber?.accountNumber}</td>
+			<td>${swt?.rgInvestmentaccountByInAccountNumber?.accountNumber}</td>
+			<td>${swt?.remarks}</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>
+	
+
+

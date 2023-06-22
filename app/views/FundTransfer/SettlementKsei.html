@@ -1,0 +1,126 @@
+#{script 'lookuppaging.js' /}
+#{script 'lookups.js' /}
+
+<form id="rootSettlementKsei" class="form">
+	<input id='applicationDateKsei' value="${param.applicationDate}" type="hidden"/>
+	<p>
+		#{textBox id:'fundBatchNoKsei', label:'Fund Batch No', width:'120px', readOnly:true, class:'capitalize', required:false /}
+	</p>
+	<p> 
+		<label>Settlement Date</label>
+		<input id='checkAsOfKseiDate' type='radio' name='checkSettlementDate' checked="checked"/>
+		<b>As Of&nbsp;</b>
+		#{textBox id:'asOfDateKsei', label:'', width:'80px', readOnly:false, class:'calendar', required:false /}
+		<span id="asOfDateKseiErr" class="error"></span>
+	</p>
+	<p>
+		<label>&nbsp;</label>
+		<input id='checkKseiFromTo' type='radio' name='checkSettlementDate'/>
+		<b>From&nbsp;</b>
+		#{textBox id:'kseiDateFrom', label:'', width:'80px', readOnly:true, class:'calendar', required:false /}
+		<b>&nbsp;To&nbsp;</b>
+		#{textBox id:'kseiDateTo', label:'', width:'80px', readOnly:true, class:'calendar', required:false /}
+		<span id="kseiDateFromError" class="error"></span>
+		<span id="kseiDateToError" class="error"></span>
+	</p>	
+	<p>
+		#{textBox id:'accountNoKsei', label:'Account No', width:'120px', readOnly:readOnly, class:'capitalize', required:false /}
+		#{hidden  id:'accountNoKseiKey' /}
+		#{button  id:'accountNoKseiHelp', value:'?', class:'small', readOnly:readOnly/}
+		#{textBox id:'accountNoKseiDesc', readOnly:true, width:'245px' /}
+	</p>
+	<p>
+		#{dropDownList id:'transType', label:'Transaction Type', options:transactionType, readOnly:readOnly,width:'120px', required:true /}
+		<span id="transTypeError" class="error"></span>
+	</p>
+	<p>
+		#{textBox id:'securityType',width:'120px', name:'', label:'Security Type', value:'', class:'capitalize', required:false /}
+		#{hidden id:'securityTypeId', name:'params.securityTypeSearchId', value:params?.securityTypeSearchId /}
+		#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'securityTypeName', name:'transaction.transactionTemplate.securityType.description', value:transaction?.transactionTemplate?.securityType?.description, readOnly:true, width:'245px' /}
+		<span id="securityTypeError" class="error"></span>
+	</p>
+	<p>
+		#{dropDownList id:'transferType', label:'Transfer Type', options:transferType, readOnly:readOnly,width:'120px', required:true /}
+		<span id="transferTypeError" class="error"></span>
+	</p>
+	<p>
+		#{textBox id:'currency', name:'', label:'Currency', class:'capitalize', required:true, readOnly:readOnly, width:'120px', maxLength:'10' /}
+		#{button id:'currencyHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'currencyDesc', name:'', readOnly:true, width:'245px' /}	
+		<span id="currencyError" class="error"></span>	
+	</p>
+	<p>
+		<label>Process Mode</label>
+		<input id='checkDefaultKsei' type='radio' name='checkProcessMode' checked="checked"/><b>&nbsp;Group</b>
+		<input id='checkTransactionKsei' type='radio' name='checkProcessMode'/><b>&nbsp;Transaction</b>
+	</p>	
+	<p>
+		&nbsp;
+	</p>
+	<p>
+		<input id='btnPopulateKsei' type="button" value="Populate" ></input>
+		<input id='btnResetKsei' type="button" value="Reset"></input>
+	</p>
+	<p>
+		<table id='tblFundTransferKsei'>
+			<thead>
+				<tr>
+					<td><input id='checkAllKsei' type="checkbox"/></td>
+					<td>No</td>
+					<td>Date</td>
+					<td>Account&nbsp;No</td>
+					<td>Security</td>
+					<td>Currency</td>
+					<td>Transaction&nbsp;No</td>
+					<td>Payment&nbsp;Amount</td>
+					<td>DR/CR</td>
+					<td>Status</td>
+					<td>Sender&nbsp;Branch&nbsp;Code</td>	
+					<td>Sender&nbsp;Bank&nbsp;Code</td>				
+					<td>Sender&nbsp;A/C&nbsp;No</td>
+					<td>Sender&nbsp;A/C&nbsp;Name</td>
+					<td>Sender&nbsp;Currency</td>
+					<td>Benef&nbsp;Bank&nbsp;Code</td>
+					<td>Benef&nbsp;Bank&nbsp;Name</td>					
+					<td>Benef&nbsp;A/C&nbsp;No</td>
+					<td>Benef&nbsp;A/C&nbsp;Name</td>
+					<td>Benef&nbsp;Currency</td>
+					<td>Charge&nbsp;Amount</td>
+					<td>Net&nbsp;Payment&nbsp;Amount</td>
+					<td>Payment&nbsp;Type&nbsp;Code</td>
+				</tr>
+			</thead>
+		</table>
+	</p>
+	<p>&nbsp;</p>
+	<p>
+		<div>
+			<input id='btnSaveKsei' type="button" value="Save"></input>
+			<input id='btnConfirmKsei' type="button" value="Confirm"></input>
+		</div>
+		<div id='totalKsei' style="float: right;position: relative;display: none;">
+			<p id = 'totalDR'>
+				<b>Total&nbsp;Amount&nbsp;DR&nbsp;<input id='totAmtDrKsei' type="text" disabled="disabled"/></b>
+			</p>
+			<p id = 'totalCR'>
+				<b>Total&nbsp;Amount&nbsp;CR&nbsp;<input id='totAmtCrKsei' type="text" disabled="disabled"/></b>
+			</p>
+			<p>
+				<b>Bank&nbsp;Charges&nbsp;<input id='totCharges' type="text" disabled="disabled"/></b>
+			</p>		
+		</div>
+	</p>	
+	<p>
+		&nbsp;
+	</p>
+	<p>&nbsp;</p>
+	<p>&nbsp;</p>
+</form>
+
+<script type="text/javascript">
+	#{include 'FundTransfer/SettlementKsei.js' /}
+	$(document).ready(function() {
+		SettlementKsei($("#rootSettlementKsei"));
+	});
+</script>

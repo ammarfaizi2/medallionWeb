@@ -1,0 +1,42 @@
+#{if flash.error}
+    <p class="ui-state-error">
+        ${flash.error}
+    </p>
+#{/if}
+<script type="text/javascript">	
+	$(function() {
+		$('.buttons input:button').button();
+		$('.buttons #close').click(function() {
+			$('#dialog').form('close');
+		});
+		$('.buttons #save').click(function() {
+			$('#dialog').form('save', {'id':'#{get "id" /}','mode':'#{get "mode" /}'});
+		});
+		$('.buttons #cancel').click(function() {
+			$('#dialog').form('close');
+		});
+		$('.buttons #confirm').click(function() {
+			$('#dialog').form('confirm', {'id':'#{get "id" /}','mode':'#{get "mode" /}'})
+		});
+		$('.buttons #back').click(function() {
+			$('#dialog').form('back', {'id':'#{get "id" /}','mode':'#{get "mode" /}'})			
+		});
+	})
+</script>
+#{doLayout /}
+<p></p>
+<div class="buttons">
+	#{if model?.mode == 'view'}
+		<input type="button" id="close" value="Close"" />
+	#{/if}
+	#{else}
+		#{if model?.confirming}
+			<input type="button" id="confirm" value="Confirm" />
+			<input type="button" id="back" value="Back" />
+		#{/if}
+		#{else}	
+			<input type="button" id="save" value="Save" />
+			<input type="button" id="cancel" value="Cancel" />
+		#{/else}
+	#{/else}
+</div>

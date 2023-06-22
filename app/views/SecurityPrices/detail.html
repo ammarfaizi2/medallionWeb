@@ -1,0 +1,70 @@
+#{extends 'templates/detail1.html' /}
+#{set pageTitle: 'Security Price' /}
+#{set id:marketPrice?.marketPriceKey /}
+
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{script 'lookups.js' /}
+<script type="text/javascript">
+	$(function() {			
+		$('#address1CountryCode').lookup({
+			list:'@{Pick.lookups()}?group=COUNTRY',
+			get:'@{Pick.lookup()}?group=COUNTRY',
+			key:$('#address1Country'),
+			description:$('#address1CountryDesc'),
+			help:$('#address1CountryHelp'),
+			nextControl:$('#address1StateCode')
+		});
+		$('#address1StateCode').lookup({
+			list:'@{Pick.lookups()}?group=STATE',
+			get:'@{Pick.lookup()}?group=STATE',
+			filter:$('#address1Country'),
+			key:$('#address1State'),
+			description:$('#address1StateDesc'),
+			help:$('#address1StateHelp'),
+			nextControl:$('#address1AreaCode')
+		});
+		$('#address1AreaCode').lookup({
+			list:'@{Pick.lookups()}?group=AREA',
+			get:'@{Pick.lookup()}?group=AREA',
+			filter:$('#address1State'),
+			key:$('#address1Area'),
+			description:$('#address1AreaDesc'),
+			help:$('#address1AreaHelp'),
+			nextControl:$('#address1ZipCode')
+		});
+	})
+</script>
+
+#{hidden name:'marketPrice.organization.organizationId', value:marketPrice?.organization?.organizationId /}
+#{hidden id:'marketPriceKey', name:'marketPrice.marketPriceKey', value:marketPrice?.marketPriceKey /}
+
+<p>
+	#{textBox id:'marketDate', name:'marketPrice.marketDate', label:'Price Date', value:marketPrice?.marketDate?.format(appProp.dateFormat), class:'calendar', required:true, readOnly:readOnly /}(${appProp.displayDateFormat})
+</p>
+<p>
+	#{textBox id:'securitySubtype', name:'security.securityType.id.securitySubtype', label:'Security Type', value:security?.securityType?.id?.securitySubtype, class:'capitalize', width:'85', required:true, readOnly:readOnly /}
+	#{button id:'securitySubtypeHelp', value:'?', class:'small', readOnly:readOnly /}
+	#{textBox id:'securitySubtypeDescription', name:'security.securityType.description', value:security?.securityType?.description, readOnly:true, width:'300px' /}
+</p>	
+<p>
+	#{textBox id:'securityIdSource1', name:'announcement.securityBySecuritySource.securityId', label:'Security Code', value:announcement?.securityBySecuritySource?.securityId, class:'capitalize', width:'85px', readOnly:readOnly /}
+	#{button id:'securityIdSourceHelp', value:'?', class:'small', readOnly:readOnly /}
+	#{textBox id:'securityIdSourceDesc1', name:'announcement.securityBySecuritySource.description', value:announcement?.securityBySecuritySource?.description, readOnly:true, width:'300px' /}
+</p>
+<p>
+	#{radioButton id:'specialForCustomer', name:'securityPrice.specialForCustomer', value:'false', label:'Special For Customer', options:operators, readOnly:readOnly /}
+	#{textBox id:'customerNo', name:'', value:'', class:'capitalize', width:'85', required:true, readOnly:readOnly /}
+	#{button id:'customerNoHelp', value:'?', class:'small', readOnly:readOnly /}
+	#{textBox id:'customerNoDescription', name:'', value:'', readOnly:true, width:'207px' /}
+</p>
+<p>
+	#{textBox id:'high', name:'marketPrice.highestPrice', label:'High', value:marketPrice?.highestPrice, width:'85px', readOnly:readOnly /}
+</p>
+<p>
+	#{textBox id:'low', name:'marketPrice.lowestPrice', label:'Low', value:marketPrice?.lowestPrice, width:'85px', readOnly:readOnly /}
+</p>
+<p>
+	#{textBox id:'close', name:'marketPrice.closingPrice', label:'Close', value:marketPrice?.closingPrice, width:'85px', readOnly:readOnly /}
+</p>
+	
+

@@ -1,0 +1,148 @@
+<!--for coupon schedule only -->
+#{if  security?.isFloatingRate == false }
+#{set readOnlyCoupon: true /}
+#{/if}
+#{else}
+#{set readOnlyCoupon: readOnly /}
+#{/else}
+
+<script type="text/javascript">
+$(function(){
+	gridCoupons();
+	/*
+	$('#gridCoupon tbody tr input[id*=paidInterest]').live('click', function() {
+		
+		
+		if ($(this).is(':checked')) {
+			//$("#h_"+this.id).val(true);
+		} else {
+			//$("#h_"+this.id).val(false);
+		}
+	})
+	
+	
+	//$("#gridCoupon tbody tr").find("input[id*='paidInterest']").click(function(){
+		var checboxs = $("[type=checkbox]", $('#gridCoupon tbody'));
+		$.each(checboxs, function(i, data){
+			
+			
+			if ($(this).is(':checked')) {
+				$(this).attr("checked","checked");
+				$(this).val(true);
+			} else {
+				$(this).attr("checked",false);
+				$(this).val(false);
+			}
+			console.debug("paid ke - "+i+" : "+$(this).is(':checked'));
+		});
+//	})
+*/
+	$('input.securityNumericCS').autoNumeric({vMin: '-999999999999.', vMAx:'999999999999.', mDec:4});
+	$('input.securityNumericCS').live('blur', function() {
+		var el = $(this);
+		var id = this.id;
+		var stripped = "#" + id + "Stripped";
+		var StrippedCoupon = "#" + id + "StrippedCoupon";
+		if (el.val() == '') {
+			el.siblings(stripped).val('');
+			el.siblings(StrippedCoupon).val('');
+			return;
+		}
+		el.siblings(stripped).val(el.autoNumericGet());
+		el.siblings(StrippedCoupon).val(el.autoNumericGet());
+	});
+	
+	$('input.securityNumOnlyCS').autoNumeric({vMin: '0', vMAx:'999999999999', mDec:0});
+	$('input.securityNumOnlyCS').live('blur', function() {
+		var el = $(this);
+		var id = this.id;
+		var stripped = "#" + id + "Stripped";
+		var StrippedCoupon = "#" + id + "StrippedCoupon";
+		if (el.val() == '') {
+			el.siblings(stripped).val('');
+			el.siblings(StrippedCoupon).val('');
+			return;
+		}
+		el.siblings(stripped).val(el.autoNumericGet());
+		el.siblings(StrippedCoupon).val(el.autoNumericGet());
+	});
+	
+	 $('input.numerics').autoNumeric({vMax: '100.000000'});
+	 $('input.numerics').live('blur', function() {
+		var el = $(this);
+		var id = this.id;
+		var stripped = "#" + id + "Stripped";
+		var StrippedCoupon = "#" + id + "StrippedCoupon";
+		if (el.val() == '') {
+			el.siblings(stripped).val('');
+			el.siblings(StrippedCoupon).val('');
+			return;
+		}
+		el.siblings(stripped).val(el.autoNumericGet());
+		el.siblings(StrippedCoupon).val(el.autoNumericGet());
+	}); 
+})
+</script>
+
+<style>
+.center { text-align: center }
+</style>
+<h4><span id="couponError" class="error"></span></h4>
+<table id="gridCoupon" class="display">
+	<thead>
+		<tr>
+			<th width="50px">security key</th>
+			<th width="50px">No</th>
+			<th style="text-align:center" width="200px">Start Date</th>
+			<th style="text-align:center" width="200px">Coupon Date</th>
+			<th style="text-align:center" width="100px">Fraction Ratio</th>
+			<th style="text-align:center" width="100px">Fraction Amount</th>
+			<th style="text-align:center" width="100px">Int. Rate(%)</th>
+			<th style="text-align:center" width="200px">Payment Date</th>
+			<th style="text-align:center" width="100px">Paid</th>
+		</tr>
+	</thead>
+	<tbody>
+		#{list schedules, as:'schedule'}
+		<tr>
+			<td>
+				${schedule?.id?.securityKey}
+			</td>
+			<td align="center">
+				${schedule?.id?.couponNo}
+			</td>
+			<td>
+				#{textBox id:'lastPaymentDate[' + (schedule_index-1) + ']',name:'schedules[' + (schedule_index-1) + '].lastPaymentDate', value:schedule?.lastPaymentDate?.format(appProp.dateFormat), class:'calendar center', readOnly:true /}
+			</td>
+			<td>
+				#{textBox id:'nextPaymentDate[' + (schedule_index-1) + ']',name:'schedules[' + (schedule_index-1) + '].nextPaymentDate', value:schedule?.nextPaymentDate?.format(appProp.dateFormat), class:'coupon center nextDate',readOnly:readOnly /}
+			</td>
+			<td>
+				#{textBox id:'fractionBase[' + (schedule_index-1) + ']',name:'fractionBase[' + (schedule_index-1) + ']', format:'#,##0.####', value:schedule?.fractionBase, width:'85px', readOnly:readOnlyFraction , class:'center securityNumOnlyCS fraction '/}
+				#{hidden id:'fractionBase[' + (schedule_index-1) + ']StrippedCoupon',name:'schedules[' + (schedule_index-1) + '].fractionBase', value:schedule?.fractionBase /}
+			</td>
+			<td>
+				#{textBox id:'fraction[' + (schedule_index-1) + ']',name:'fraction[' + (schedule_index-1) + ']',format:'#,##0.####', value:schedule?.fraction, width:'85px', readOnly:readOnlyFraction, class:'center securityNumericCS fraction'/}
+				#{hidden id:'fraction[' + (schedule_index-1) + ']StrippedCoupon',name:'schedules[' + (schedule_index-1) + '].fraction', value:schedule?.fraction /}
+			</td>
+			<td>
+				#{textBox id:'interestRate[' + (schedule_index-1) + ']',name:'interestRate[' + (schedule_index-1) + ']', format:'#,##0.######', value:schedule?.interestRate, width:'75px', readOnly : readOnlyCoupon, class:'center floating numerics'/}
+				#{hidden id:'interestRate[' + (schedule_index-1) + ']StrippedCoupon',name:'schedules[' + (schedule_index-1) + '].interestRate', value:schedule?.interestRate /}
+			</td>		
+			<td>
+				#{textBox id:'paymentDate[' + (schedule_index-1) + ']',name:'schedules[' + (schedule_index-1) + '].paymentDate', value:schedule?.paymentDate?.format(appProp.dateFormat), class:'coupon center payDate calendar', readOnly: true/}	
+			</td>
+			<td>
+				#{checkBox id:'paidInterest[' + (schedule_index-1) + ']', name:'schedules[' + (schedule_index-1) + '].paidInterest',value:schedule?.paidInterest ,readOnly:readOnly /}
+				#{hidden id:'securityKeyHidden[' + (schedule_index-1) + ']',name:'schedules[' + (schedule_index-1) + '].id.securityKey', value:schedule?.id?.securityKey /}
+				#{hidden id:'couponNoHidden[' + (schedule_index-1) + ']',name:'schedules[' + (schedule_index-1) + '].id.couponNo', value:schedule?.id?.couponNo /}
+	<!-- 		#{hidden id:'lastPaymentDateHidden[' + (schedule_index-1) + ']',name:'schedules[' + (schedule_index-1) + '].lastPaymentDate', value:schedule?.lastPaymentDate?.format('MM/dd/yyyy') /}  -->
+	<!-- 		#{hidden id:'nextPaymentDateHidden[' + (schedule_index-1) + ']',name:'schedules[' + (schedule_index-1) + '].nextPaymentDate', value:schedule?.nextPaymentDate?.format('MM/dd/yyyy') /}  -->
+			
+				#{hidden id:'paymentDateHidden[' + (schedule_index-1) + ']',name:'schedules[' + (schedule_index-1) + '].paymentDate', value:schedule?.paymentDate?.format(appProp.dateFormat), class:'calendar' /}
+		<!--  	#{hidden id:'paidInterestHidden[' + (schedule_index-1) + ']',name:'schedules[' + (schedule_index-1) + '].paidInterest',value:schedule?.paidInterest /}	 -->   
+			</td>
+		</tr>
+		#{/list}	
+	</tbody>
+</table>	

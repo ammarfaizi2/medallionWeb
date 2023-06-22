@@ -1,0 +1,21 @@
+<table id="gridPeriods" class="display" style="width:500px">
+	<thead>
+		<tr>
+			<th>No</th>
+			<th>Periods</th>
+		</tr>
+	</thead>
+	<tbody>
+		#{list periods, as:'period'}
+		<tr>
+			<td>
+				${period_index}
+			</td>
+			<td>
+				#{textBox  value:period, class:'rgNumeric',maxLength:'2', readOnly:readOnly /}
+				#{hidden id:'periodRow', name:'periods' , value:period /}
+			</td>
+		</tr>
+		#{/list}
+	</tbody>
+</table>

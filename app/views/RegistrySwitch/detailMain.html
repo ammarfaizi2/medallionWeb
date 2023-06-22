@@ -1,0 +1,273 @@
+<table>
+    <tr>
+        <td valign="top">
+            <p>
+                #{textBox id:'sKey', name:'switchingKey', label:'Switching No', value:((swt?.switchingKey)? swt?.switchingKey : ''), class:'capitalize', width:'140px', readOnly:true /}
+                
+                #{if from == 'unitRegistry'}
+			        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				&nbsp;&nbsp;#{textBox id:'statusTrans', label:'Status', value:swt?.tradeStatus, width:'120px', readOnly:true /}
+			    #{/if}
+            </p>
+
+            <p>
+                <label>Investor No<span class="req">*</span></label>
+                #{textBox id:'investorNo', name:'investorNo', width:'120px', value:swt?.investor?.customerNo, readOnly:readOnly, class:'capitalize', required:true /}
+                #{hidden  id:'investorNoKey', name:'swt.investor.customerKey', value:swt?.investor?.customerKey /}
+                #{hidden  id:'investorId', name:'swt.investor.customerNo', value:swt?.investor?.customerNo /}
+                #{hidden  id:'investorName', name:'swt.investor.customerName', value:swt?.investor?.customerName /}
+                #{button  id:'investorNoHelp', value:'?', class:'small', readOnly:readOnly /}
+                #{textBox id:'investorNoDesc', value:swt?.investor?.customerName, readOnly:true, width:'235px' /}
+                <span class="error">#{error 'Investor No is' /}</span>
+            </p>
+
+            <p>
+                #{dropDownList id:'switchTypeList', name:'switchingType', label:'Switching Type', options:switchingType, value:swt?.switchingType, readOnly:readOnly, width:'140px', required:true /}
+                #{hidden  id:'switchTypeListHidden', name:'swt.switchingType', value:swt?.switchingType /}
+                <span class="error">#{error 'Switching Type is' /}</span>
+            </p>
+
+            <fieldset>
+                <legend><strong>Switch Out</strong></legend>
+                <p id="errOutFundCodeValidation" class="error"></p>
+                <div id="outNonFundThirdParty">
+                    <p>
+	                    #{textBox id:'outFundCode', name:'outFundCode', label:'Fund Code', value:swt?.rgInvestmentaccountByOutAccountNumber?.rgProduct?.productCode, width:'120px', readOnly:readOnly, class:'capitalize', required:true /}
+	                    #{hidden id:'outFundCodeKey', value:swt?.rgInvestmentaccountByOutAccountNumber?.rgProduct?.productCode /}
+	                    #{hidden id:'outProductCode', name:'swt.rgInvestmentaccountByOutAccountNumber.rgProduct.productCode', value:swt?.rgInvestmentaccountByOutAccountNumber?.rgProduct?.productCode /}
+	                    #{button  id:'outFundCodeHelp', value:'?', class:'small', readOnly:readOnly/}
+	                    #{textBox id:'outFundCodeDesc', name:'swt.rgInvestmentaccountByOutAccountNumber.rgProduct.name', value:swt?.rgInvestmentaccountByOutAccountNumber?.rgProduct?.name, readOnly:true, width:'225px', class:'capitalize' /}
+	                    <span class="error">#{error 'Fund Code (Switch Out) is' /}</span>
+	                </p>
+	
+	                <p>
+	                    #{textBox id:'outCurrencyCode', name:'outCurrencyCode', label:'Currency', value:swt?.rgInvestmentaccountByOutAccountNumber?.rgProduct?.currency?.currencyCode, class:'capitalize', readOnly:true, width:'120px' /}
+	                    #{hidden  id:'outCurrencyCodeHidden', name:'swt.rgInvestmentaccountByOutAccountNumber.rgProduct.currency.currencyCode', value:swt?.rgInvestmentaccountByOutAccountNumber?.rgProduct?.currency?.currencyCode /}
+	                </p>
+	
+	                <p>  
+	                    #{textBox id:'outInvest', label:'Account No', name:'outInvest', value:swt?.rgInvestmentaccountByOutAccountNumber?.accountNumber, width:'120px', readOnly:readOnly, class:'capitalize', required:true /}
+	                    #{hidden  id:'outInvestKey', name:'swt.rgInvestmentaccountByOutAccountNumber.accountNumber', value:swt?.rgInvestmentaccountByOutAccountNumber?.accountNumber /}
+	                    #{hidden  id:'outInvestName', name:'swt.rgInvestmentaccountByOutAccountNumber.name', value:swt?.rgInvestmentaccountByOutAccountNumber?.name /}
+	                    #{button  id:'outInvestHelp', value:'?', class:'small', readOnly:readOnly /}
+	                    #{textBox id:'outInvestDesc', name:'outAccountName', value:swt?.rgInvestmentaccountByOutAccountNumber?.name, readOnly:true, width:'225px', class:'capitalize' /}
+	                    <span class="error">#{error 'Account No (Switch Out) is' /}</span>
+	                </p>
+	
+	                <p>
+	                    #{textBox id:'outFmgrCode', name:'thirdPartyByFundManagerCode', label:'Fund Manager', value:swt?.outThirdPartyByFundManager?.thirdPartyCode, readOnly:true, width:'120px', class:'capitalize' /}
+	                    #{textBox id:'outFmgrName', name:'thirdPartyByFundManagerName', value:swt?.outThirdPartyByFundManager?.thirdPartyName, readOnly:true, width:'252px', class:'capitalize' /}
+	                    #{hidden id:'outThirdPartyByFundManagerKey', name:'swt.outThirdPartyByFundManager.thirdPartyKey', value:swt?.outThirdPartyByFundManager?.thirdPartyKey /}
+                        #{hidden id:'outThirdPartyByFundManagerCode', name:'swt.outThirdPartyByFundManager.thirdPartyCode', value:swt?.outThirdPartyByFundManager?.thirdPartyCode /}
+                        #{hidden id:'outThirdPartyByFundManagerName', name:'swt.outThirdPartyByFundManager.thirdPartyName', value:swt?.outThirdPartyByFundManager?.thirdPartyName /}
+	                </p>
+
+	                <p>
+	                    #{textBox id:'outSaCode', name:'outSaThirdPartyCode', label:'Selling Agent', value:swt?.rgInvestmentaccountByOutAccountNumber?.thirdPartyBySaCode?.thirdPartyCode, readOnly:true, width:'120px', class:'capitalize' /}
+	                    #{textBox id:'outSaCodeName', name:'outSaThirdPartyName', value:swt?.rgInvestmentaccountByOutAccountNumber?.thirdPartyBySaCode?.thirdPartyName, readOnly:true, width:'252px', class:'capitalize' /}
+	                    #{hidden  id:'outSaCodeHidden', name:'swt.rgInvestmentaccountByOutAccountNumber.thirdPartyBySaCode.thirdPartyCode', value:swt?.rgInvestmentaccountByOutAccountNumber?.thirdPartyBySaCode?.thirdPartyCode /}
+	                    #{hidden  id:'outSaCodeKeyHidden', name:'swt.rgInvestmentaccountByOutAccountNumber.thirdPartyBySaCode.thirdPartyKey', value:swt?.rgInvestmentaccountByOutAccountNumber?.thirdPartyBySaCode?.thirdPartyKey /}
+                        #{hidden  id:'outSaCodeNameHidden', name:'swt.rgInvestmentaccountByOutAccountNumber.thirdPartyBySaCode.thirdPartyName', value:swt?.rgInvestmentaccountByOutAccountNumber?.thirdPartyBySaCode?.thirdPartyName /}
+	                </p>
+	
+	                <p>
+	                    #{textBox id:'outCustodianBank', name:'outCustodianBank', label:'Custodian Bank', value:swt?.rgInvestmentaccountByOutAccountNumber?.thirdPartyBySaCode?.custodianBank, class:'capitalize', readOnly:true, width:'146px' /}
+	                    #{hidden  id:'outCustodianBankHidden', name:'swt.rgInvestmentaccountByOutAccountNumber.thirdPartyBySaCode.custodianBank', value:swt?.rgInvestmentaccountByOutAccountNumber?.thirdPartyBySaCode?.custodianBank /}
+	                </p>
+                </div>
+
+                <div id="outFundThirdParty">
+                    <p>
+                        #{textBox id:'outFundCodeThirdParty', name:'productCode', label:'Fund Code', value:swt?.externalProduct?.thirdPartyCode, width:'120px', readOnly:readOnly, class:'capitalize', required:true /}
+                        #{hidden  id:'outFundCodeKeyThirdPartyHidden', name:'swt.externalProduct.thirdPartyKey', value:swt?.externalProduct?.thirdPartyKey /}
+                        #{hidden  id:'outFundCodeCodeThirdPartyHidden', name:'swt.externalProduct.thirdPartyCode', value:swt?.externalProduct?.thirdPartyCode /}
+                        #{hidden  id:'outFundCodeNameThirdPartyHidden', name:'swt.externalProduct.thirdPartyName', value:swt?.externalProduct?.thirdPartyName /}
+                        #{button  id:'outFundCodeHelpThirdParty', value:'?', class:'small', readOnly:readOnly/}
+                        #{textBox id:'outFundCodeDescThirdParty',  name:'productName', value:swt?.externalProduct?.thirdPartyName, readOnly:true, width:'225px', class:'capitalize' /}
+                        <span class="error">#{error 'Fund Code (Switch Out) is' /}</span>
+                    </p>
+
+                    <p>
+                        #{textBox id:'outCurrencyCodeThirdParty', name:'currencyCode', label:'Currency', value:swt?.externalProduct?.currency?.currencyCode, class:'capitalize', readOnly:true, width:'120px' /}
+                        #{hidden  id:'outCurrencyCodeThirdPartyHidden', name:'swt.externalProduct.currency.currencyCode', value:swt?.externalProduct?.currency?.currencyCode /}
+                    </p>
+
+                    <p>
+                        #{textBox id:'outInvestThirdParty', label:'Account No', name:'accountNumber', width:'120px', readOnly:true, class:'capitalize' /}
+                        #{button  id:'outInvestHelpThirdParty', value:'?', class:'small', readOnly:true /}
+                        #{textBox id:'outInvestDescThirdParty', name:'accountName', readOnly:true, width:'225px', class:'capitalize' /}
+                    </p>
+
+                    <p>
+                        #{textBox id:'outFmgrCodeThirdParty', name:'fmgrCode', label:'Fund Manager', value:swt?.externalProduct?.fundManager?.thirdPartyCode, readOnly:true, width:'120px', class:'capitalize' /}
+                        #{textBox id:'outFmgrNameThirdParty', name:'fmgrName', value:swt?.externalProduct?.fundManager?.thirdPartyName, readOnly:true, width:'252px', class:'capitalize' /}
+                        #{hidden  id:'outFmgrKeyThirdPartyHidden', name:'swt.externalProduct.fundManager.thirdPartyKey', value:swt?.externalProduct?.fundManager?.thirdPartyKey /}
+                        #{hidden  id:'outFmgrCodeThirdPartyHidden', name:'swt.externalProduct.fundManager.thirdPartyCode', value:swt?.externalProduct?.fundManager?.thirdPartyCode /}
+                        #{hidden  id:'outFmgrNameThirdPartyHidden', name:'swt.externalProduct.fundManager.thirdPartyName', value:swt?.externalProduct?.fundManager?.thirdPartyName /}
+                    </p>
+
+                    <p>
+                        #{textBox id:'outSaCodeThirdParty', name:'sellingAgentCode', label:'Selling Agent', readOnly:true, width:'120px', class:'capitalize' /}
+                        #{textBox id:'outSaCodeNameThirdParty', name:'sellingAgentName', readOnly:true, width:'252px', class:'capitalize' /}
+                    </p>
+
+                    <p>
+                        #{textBox id:'outCustodianBankThirdParty', name:'custodianBank', label:'Custodian Bank', value:swt?.externalProduct?.custodianBank, class:'capitalize', readOnly:true, width:'146px' /}
+                        #{hidden  id:'outCustodianBankThirdPartyHidden', name:'swt.externalProduct.custodianBank', value:swt?.externalProduct?.custodianBank /}
+                    </p>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend><strong>Switch In</strong></legend>
+                <p id="errInFundCodeValidation" class="error"></p>
+                <div id="inNonFundThirdParty">
+	                <p>
+	                    #{textBox id:'inFundCode', name:'inFundCode', label:'Fund Code', value:swt?.rgInvestmentaccountByInAccountNumber?.rgProduct?.productCode, width:'120px', readOnly:readOnly, class:'capitalize', required:true /}
+	                    #{hidden  id:'inFundCodeKey', value:swt?.rgInvestmentaccountByInAccountNumber?.rgProduct?.productCode /}
+	                    #{hidden  id:'inProductCode', name:'swt.rgInvestmentaccountByInAccountNumber.rgProduct.productCode', value:swt?.rgInvestmentaccountByInAccountNumber?.rgProduct?.productCode /}
+	                    #{button  id:'inFundCodeHelp', value:'?', class:'small', readOnly:readOnly/}
+	                    #{textBox id:'inFundCodeDesc',  name:'swt.rgInvestmentaccountByInAccountNumber.rgProduct.name', value:swt?.rgInvestmentaccountByInAccountNumber?.rgProduct?.name, readOnly:true, width:'225px', class:'capitalize' /}
+	                    <span class="error">#{error 'Fund Code (Switch In) is' /}</span>
+	                </p>
+
+	                <p>
+	                    #{textBox id:'inCurrencyCode', name:'inCurrencyCode', label:'Currency', value:swt?.rgInvestmentaccountByInAccountNumber?.rgProduct?.currency?.currencyCode, class:'capitalize', readOnly:true, width:'120px' /}
+	                    #{hidden  id:'inCurrencyCodeHidden', name:'swt.rgInvestmentaccountByInAccountNumber.rgProduct.currency.currencyCode', value:swt?.rgInvestmentaccountByInAccountNumber?.rgProduct?.currency?.currencyCode /}
+	                </p>
+
+	                <p>
+	                    #{textBox id:'inInvest', label:'Account No', name:'inInvest', value:swt?.rgInvestmentaccountByInAccountNumber?.accountNumber, width:'120px', readOnly:readOnly, class:'capitalize', required:true /}
+                        #{hidden  id:'inInvestKey', name:'swt.rgInvestmentaccountByInAccountNumber.accountNumber', value:swt?.rgInvestmentaccountByInAccountNumber?.accountNumber /}
+                        #{hidden  id:'inInvestName', name:'swt.rgInvestmentaccountByInAccountNumber.name', value:swt?.rgInvestmentaccountByInAccountNumber?.name /}
+                        #{button  id:'inInvestHelp', value:'?', class:'small', readOnly:readOnly /}
+                        #{textBox id:'inInvestDesc', name:'inAccountName', value:swt?.rgInvestmentaccountByInAccountNumber?.name, readOnly:true, width:'225px', class:'capitalize' /}
+                        <span class="error">#{error 'Account No (Switch In) is' /}</span>
+	                </p>
+
+                    <p>
+                        #{textBox id:'inFmgrCode', name:'thirdPartyByFundManagerCode', label:'Fund Manager', value:swt?.inThirdPartyByFundManager?.thirdPartyCode, readOnly:true, width:'120px', class:'capitalize' /}
+                        #{textBox id:'inFmgrName', name:'thirdPartyByFundManagerName', value:swt?.inThirdPartyByFundManager?.thirdPartyName, readOnly:true, width:'252px', class:'capitalize' /}
+                        #{hidden id:'inThirdPartyByFundManagerKey', name:'swt.inThirdPartyByFundManager.thirdPartyKey', value:swt?.inThirdPartyByFundManager?.thirdPartyKey /}
+                        #{hidden id:'inThirdPartyByFundManagerCode', name:'swt.inThirdPartyByFundManager.thirdPartyCode', value:swt?.inThirdPartyByFundManager?.thirdPartyCode /}
+                        #{hidden id:'inThirdPartyByFundManagerName', name:'swt.inThirdPartyByFundManager.thirdPartyName', value:swt?.inThirdPartyByFundManager?.thirdPartyName /}
+                    </p>
+
+	                <p>
+                        #{textBox id:'inSaCode', name:'inSaThirdPartyCode', label:'Selling Agent', value:swt?.rgInvestmentaccountByInAccountNumber?.thirdPartyBySaCode?.thirdPartyCode, readOnly:true, width:'120px', class:'capitalize' /}
+                        #{textBox id:'inSaCodeName', name:'inSaThirdPartyName', value:swt?.rgInvestmentaccountByInAccountNumber?.thirdPartyBySaCode?.thirdPartyName, readOnly:true, width:'252px', class:'capitalize' /}
+                        #{hidden  id:'inSaCodeHidden', name:'swt.rgInvestmentaccountByInAccountNumber.thirdPartyBySaCode.thirdPartyCode', value:swt?.rgInvestmentaccountByInAccountNumber?.thirdPartyBySaCode?.thirdPartyCode /}
+                        #{hidden  id:'inSaCodeKeyHidden', name:'swt.rgInvestmentaccountByInAccountNumber.thirdPartyBySaCode.thirdPartyKey', value:swt?.rgInvestmentaccountByInAccountNumber?.thirdPartyBySaCode?.thirdPartyKey /}
+                        #{hidden  id:'inSaCodeNameHidden', name:'swt.rgInvestmentaccountByInAccountNumber.thirdPartyBySaCode.thirdPartyName', value:swt?.rgInvestmentaccountByInAccountNumber?.thirdPartyBySaCode?.thirdPartyName /}
+                    </p>
+
+	                <p>
+	                    #{textBox id:'inCustodianBank', name:'inCustodianBank', label:'Custodian Bank', value:swt?.rgInvestmentaccountByInAccountNumber?.thirdPartyBySaCode?.custodianBank, class:'capitalize', readOnly:true, width:'146px' /}
+	                    #{hidden  id:'inCustodianBankHidden', name:'swt.rgInvestmentaccountByInAccountNumber.thirdPartyBySaCode.custodianBank', value:swt?.rgInvestmentaccountByInAccountNumber?.thirdPartyBySaCode?.custodianBank /}
+	                </p>
+                </div>
+
+                <div id="inFundThirdParty">
+                    <p>
+                        #{textBox id:'inFundCodeThirdParty', name:'productCode', label:'Fund Code', value:swt?.externalProduct?.thirdPartyCode, width:'120px', readOnly:readOnly, class:'capitalize', required:true /}
+                        #{hidden  id:'inFundCodeKeyThirdPartyHidden', name:'swt.externalProduct.thirdPartyKey', value:swt?.externalProduct?.thirdPartyKey /}
+                        #{hidden  id:'inFundCodeCodeThirdPartyHidden', name:'swt.externalProduct.thirdPartyCode', value:swt?.externalProduct?.thirdPartyCode /}
+                        #{hidden  id:'inFundCodeNameThirdPartyHidden', name:'swt.externalProduct.thirdPartyName', value:swt?.externalProduct?.thirdPartyName /}
+                        #{button  id:'inFundCodeHelpThirdParty', value:'?', class:'small', readOnly:readOnly/}
+                        #{textBox id:'inFundCodeDescThirdParty',  name:'productName', value:swt?.externalProduct?.thirdPartyName, readOnly:true, width:'225px', class:'capitalize' /}
+                        <span class="error">#{error 'Fund Code (Switch In) is' /}</span>
+                    </p>
+
+                    <p>
+                        #{textBox id:'inCurrencyCodeThirdParty', name:'currencyCode', label:'Currency', value:swt?.externalProduct?.currency?.currencyCode, class:'capitalize', readOnly:true, width:'120px' /}
+                        #{hidden  id:'inCurrencyCodeThirdPartyHidden', name:'swt.externalProduct.currency.currencyCode', value:swt?.externalProduct?.currency?.currencyCode /}
+                    </p>
+
+                    <p>
+                        #{textBox id:'inInvestThirdParty', label:'Account No', name:'accountNumber', width:'120px', readOnly:true, class:'capitalize' /}
+                        #{button  id:'inInvestHelpThirdParty', value:'?', class:'small', readOnly:true /}
+                        #{textBox id:'inInvestDescThirdParty', name:'accountName', readOnly:true, width:'225px', class:'capitalize' /}
+                    </p>
+
+                    <p>
+                        #{textBox id:'inFmgrCodeThirdParty', name:'fmgrCode', label:'Fund Manager', value:swt?.externalProduct?.fundManager?.thirdPartyCode, readOnly:true, width:'120px', class:'capitalize' /}
+                        #{textBox id:'inFmgrNameThirdParty', name:'fmgrName', value:swt?.externalProduct?.fundManager?.thirdPartyName, readOnly:true, width:'252px', class:'capitalize' /}
+                        #{hidden  id:'inFmgrKeyThirdPartyHidden', name:'swt.externalProduct.fundManager.thirdPartyKey', value:swt?.externalProduct?.fundManager?.thirdPartyKey /}
+                        #{hidden  id:'inFmgrCodeThirdPartyHidden', name:'swt.externalProduct.fundManager.thirdPartyCode', value:swt?.externalProduct?.fundManager?.thirdPartyCode /}
+                        #{hidden  id:'inFmgrNameThirdPartyHidden', name:'swt.externalProduct.fundManager.thirdPartyName', value:swt?.externalProduct?.fundManager?.thirdPartyName /}
+                    </p>
+
+                    <p>
+                        #{textBox id:'inSaCodeThirdParty', name:'sellingAgentCode', label:'Selling Agent', readOnly:true, width:'120px', class:'capitalize' /}
+                        #{textBox id:'inSaCodeNameThirdParty', name:'sellingAgentName', readOnly:true, width:'252px', class:'capitalize' /}
+                    </p>
+
+                    <p>
+                        #{textBox id:'inCustodianBankThirdParty', name:'custodianBank', label:'Custodian Bank', value:swt?.externalProduct?.custodianBank, class:'capitalize', readOnly:true, width:'146px' /}
+                        #{hidden  id:'inCustodianBankThirdPartyHidden', name:'swt.externalProduct.custodianBank', value:swt?.externalProduct?.custodianBank /}
+                    </p>
+                </div>
+            </fieldset>
+
+            <p>
+                #{textBox id:'tradeDate', name:'swt.switchDate', label:'Transaction Date', value:swt?.switchDate?.format(appProp.dateFormat), class:'calendar', width:'120px', readOnly:readOnly, required:true /}(${appProp.displayDateFormat})
+                <span class="error">#{error 'Transaction Date is' /}</span>
+            </p>
+
+            <p>
+                #{textBox id:'navDate', name:'swt.navDate', label:'NAV Date', value:swt?.navDate?.format(appProp.dateFormat), class:'calendar', width:'120px', readOnly:readOnly, required:true /}(${appProp.displayDateFormat})
+                <span class="error">#{error 'NAV Date is' /}</span>
+            </p>
+
+            <p>
+                #{textBox id:'postDate', name:'swt.postDate', label:'Posting Date', value:swt?.postDate?.format(appProp.dateFormat), class:'calendar', width:'120px', readOnly:readOnly, required:true /}(${appProp.displayDateFormat})
+                <span class="error">#{error 'Posting Date is' /}</span>
+            </p>
+            
+            <p id="pPaymentDate">
+                #{textBox id:'paymentDate', name:'swt.paymentDate', label:'Payment Date', value:swt?.paymentDate?.format(appProp.dateFormat), class:'calendar', width:'120px', readOnly:readOnly, required:true /}(${appProp.displayDateFormat})
+                <span class="error">#{error 'Payment Date is' /}</span>
+            </p>
+
+            <p>
+                #{textBox id:'externalReference', name:'swt.externalReference', label:'External Reference', value:swt?.externalReference , class:'capitalize',  width:'120px', maxLength:20, readOnly:readOnly /}
+            </p>
+
+            <p>
+                #{textArea id:'remarks', name:'swt.remarks', label:'Remarks', value:swt?.remarks, class:'capitalize', width:'390px', maxLength:200, readOnly:readOnly, rows:'5' /}
+      
+            </p>
+        </td>
+        <td valign="top">
+        	<div id="forCancelSwitching" style="display: none;">
+		    
+		    <p>
+		            #{textArea id:'remarkForCancel', label:'Remarks Cancellation', name:'remark', value:swt?.cancelRemark, required:true, class:'capitalize', width:'200px', maxLength:10, readOnly:readOnly, rows:'5' /}
+		            #{hidden id:'remarkForCancelHidden', name:'swt.cancelRemark', value:swt?.cancelRemark /}
+		            #{hidden id:'cancelDateHidden', name:'swt.cancelTradeDate', value:swt?.cancelTradeDate?.format(appProp.dateFormat) /}
+		            #{hidden id:'cancelPostDateHidden', name:'swt.cancelPostDate', value:swt?.cancelPostDate?.format(appProp.dateFormat) /}
+		     </p>
+				
+		     <p>
+		           <span id="remarkForCancelError" class="error"></span>
+		     </p>
+		     </div>
+	        <div id="correction" style="display: none;">
+                <p>
+                    #{checkBox id:'needCorrection', name:'needCorrection', label:'Need Correction', value:needCorrection, readOnly:editOnly, width:'100px' /}
+                </p>
+
+                <p id="pRemarksCorrection">
+                    #{textArea id:'remarksCorrection', label:"Correction Remarks", name:'remarksCorrection', value:swt?.remarksCorrection, class:'capitalize', width:'165px', maxLength:200, readOnly:editOnly /}
+                    #{hidden id:'remarksCorrectionHidden', name:'swt.remarksCorrection', value:swt?.remarksCorrection /}
+                    <span id="remarksCorrectionError" class="error">#{error 'Remarks Correction is' /}</span>
+                </p>
+            </div>
+        </td>
+    </tr>
+</table>
+<script>
+</script>

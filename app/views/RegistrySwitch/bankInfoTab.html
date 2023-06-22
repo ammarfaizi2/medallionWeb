@@ -1,0 +1,126 @@
+<table>
+    <tr>
+        <td>
+            <fieldset style="height:120px;width:430px;">
+                <legend><strong id="outFundName"></strong></legend>
+                <div id="outBankAccountProduct">
+	                <p>
+	                    #{textBox id:'outBankAccountNo', width:'100px', name:'accountNo', label:'Account No', value:swt?.out?.rgProductBnAccount?.accountNo, required:true, class:'capitalize', readOnly:readOnly /}
+	                    #{hidden id:'outBankAccountKey', name:'swt.out.rgProductBnAccount.bankAccountKey', value:swt?.out?.rgProductBnAccount?.bankAccountKey /}
+	                    #{hidden id:'outBankAccountNoHidden', name:'swt.out.rgProductBnAccount.accountNo', value:swt?.out?.rgProductBnAccount?.accountNo /}
+	                    #{hidden id:'outBankThirdPartyCodeHidden', name:'swt.out.rgProductBnAccount.bankCode.thirdPartyCode', value:swt?.out?.rgProductBnAccount?.bankCode?.thirdPartyCode /}
+	                    #{hidden id:'outBankThirdPartyNameHidden', name:'swt.out.rgProductBnAccount.bankCode.thirdPartyName', value:swt?.out?.rgProductBnAccount?.bankCode?.thirdPartyName /}
+	                    #{hidden id:'outBankBeneficiaryNameHidden', name:'swt.out.rgProductBnAccount.name', value:swt?.out?.rgProductBnAccount?.name /}
+	                    #{hidden id:'outBankCurrencyCodeHidden', name:'swt.out.rgProductBnAccount.currency.currencyCode', value:swt?.out?.rgProductBnAccount?.currency?.currencyCode /}
+	                    #{hidden id:'outInvestorBankAccountKey', name:'swt.out.bankAccount.bankAccountKey', value:swt?.out?.bankAccount?.bankAccountKey /}
+	                    #{button id:'outBankAccountNoHelp', value:'?', class:'small', readOnly:readOnly /}
+	                    <span class="error">#{error 'Account No in tab Bank Info (Switch Out) is' /}</span>
+	                </p>
+	
+	                <p>
+	                    #{textBox id:'outBankThirdPartyCode', name:'thirdPartyCode', label:'Bank Code', value:swt?.out?.rgProductBnAccount?.bankCode?.thirdPartyCode, readOnly:true, width:'60px' /}
+	                    #{textBox id:'outBankThirdPartyName', name:'thirdPartyName', value:swt?.out?.rgProductBnAccount?.bankCode?.thirdPartyName, readOnly:true, width:'170px' /}
+	                </p>
+	
+	                <p>
+	                    #{textBox id:'outBankBeneficiaryName', name:'bankName', label:'Beneficiary Name', value:swt?.out?.rgProductBnAccount?.name, class:'capitalize', readOnly:true, width:'230px' /}
+	                </p>
+	
+	                <p>
+	                    #{textBox id:'outBankCurrencyCode', name:'currencyCode', label:'Currency', value:swt?.out?.rgProductBnAccount?.currency?.currencyCode, class:'capitalize', readOnly:true, width:'100px' /}
+	                </p>
+                </div>
+
+                <div id="outBankAccountExternalProduct">
+                    <p>
+                        #{textBox id:'outBankAccountNoExternal', width:'100px', name:'accountNo', label:'Account No', value:swt?.externalProductBank?.accountNo, required:true, class:'capitalize', readOnly:readOnly /}
+                        #{hidden id:'outBankThirdPartyKeyExternalHidden', name:'swt.externalProductBank.thirdPartyBankKey', value:swt?.externalProductBank?.thirdPartyBankKey /}
+                        #{hidden id:'outBankAccountNoExternalHidden', name:'swt.externalProductBank.accountNo', value:swt?.externalProductBank?.accountNo /}
+                        #{hidden id:'outBankAccountNameExternalHidden', name:'swt.externalProductBank.accountName', value:swt?.externalProductBank?.accountName /}
+                        #{hidden id:'outBankCodeThirdPartyKeyExternalHidden', name:'swt.externalProductBank.bankCode.thirdPartyKey', value:swt?.externalProductBank?.bankCode?.thirdPartyKey /}
+                        #{hidden id:'outBankCodeThirdPartyCodeExternalHidden', name:'swt.externalProductBank.bankCode.thirdPartyCode', value:swt?.externalProductBank?.bankCode?.thirdPartyCode /}
+                        #{hidden id:'outBankCodeThirdPartyNameExternalHidden', name:'swt.externalProductBank.bankCode.thirdPartyName', value:swt?.externalProductBank?.bankCode?.thirdPartyName /}
+                        #{hidden id:'outBankCurrencyCodeExternalHidden', name:'swt.externalProductBank.currency.currencyCode', value:swt?.externalProductBank?.currency?.currencyCode /}
+                        #{button id:'outBankAccountNoHelpExternal', value:'?', class:'small', readOnly:readOnly /}
+                        <span class="error">#{error 'Account No in tab Bank Info (Switch Out) is' /}</span>
+                    </p>
+    
+                    <p>
+                        #{textBox id:'outBankThirdPartyCodeExternal', name:'thirdPartyCode', label:'Bank Code', value:swt?.externalProductBank?.bankCode?.thirdPartyCode, readOnly:true, width:'60px' /}
+                        #{textBox id:'outBankThirdPartyNameExternal', name:'thirdPartyName', value:swt?.externalProductBank?.bankCode?.thirdPartyName, readOnly:true, width:'170px' /}
+                    </p>
+    
+                    <p>
+                        #{textBox id:'outBankBeneficiaryNameExternal', name:'bankName', label:'Beneficiary Name', value:swt?.externalProductBank?.accountName, class:'capitalize', readOnly:true, width:'230px' /}
+                    </p>
+    
+                    <p>
+                        #{textBox id:'outBankCurrencyCodeExternal', name:'currencyCode', label:'Currency', value:swt?.externalProductBank?.currency?.currencyCode, class:'capitalize', readOnly:true, width:'100px' /}
+                    </p>
+                </div>
+            </fieldset>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <fieldset style="height:120px;width:430px;">
+                <legend><strong id="inFundName"></strong></legend>
+                <div id="inBankAccountProduct">
+	                <p>
+	                    #{textBox id:'inBankAccountNo', width:'100px', name:'accountNo', label:'Account No', value:swt?.in?.rgProductBnAccount?.accountNo, required:true, class:'capitalize', readOnly:readOnly /}
+	                    #{hidden id:'inBankAccountKey', name:'swt.in.rgProductBnAccount.bankAccountKey', value:swt?.in?.rgProductBnAccount?.bankAccountKey /}
+	                    #{hidden id:'inBankAccountNoHidden', name:'swt.in.rgProductBnAccount.accountNo', value:swt?.in?.rgProductBnAccount?.accountNo /}
+	                    #{hidden id:'inBankThirdPartyCodeHidden', name:'swt.in.rgProductBnAccount.bankCode.thirdPartyCode', value:swt?.in?.rgProductBnAccount?.bankCode?.thirdPartyCode /}
+	                    #{hidden id:'inBankThirdPartyNameHidden', name:'swt.in.rgProductBnAccount.bankCode.thirdPartyName', value:swt?.in?.rgProductBnAccount?.bankCode?.thirdPartyName /}
+	                    #{hidden id:'inBankBeneficiaryNameHidden', name:'swt.in.rgProductBnAccount.name', value:swt?.in?.rgProductBnAccount?.name /}
+	                    #{hidden id:'inBankCurrencyCodeHidden', name:'swt.in.rgProductBnAccount.currency.currencyCode', value:swt?.in?.rgProductBnAccount?.currency?.currencyCode /}
+	                    #{hidden id:'inInvestorBankAccountKey', name:'swt.in.bankAccount.bankAccountKey', value:swt?.in?.bankAccount?.bankAccountKey /}
+	                    #{button id:'inBankAccountNoHelp', value:'?', class:'small', readOnly:readOnly /}
+	                    <span class="error">#{error 'Account No in tab Bank Info (Switch In) is' /}</span>
+	                </p>
+	
+	                <p>
+	                    #{textBox id:'inBankThirdPartyCode', name:'thirdPartyCode', label:'Bank Code', value:swt?.in?.rgProductBnAccount?.bankCode?.thirdPartyCode, readOnly:true, width:'60px' /}
+	                    #{textBox id:'inBankThirdPartyName', name:'thirdPartyName', value:swt?.in?.rgProductBnAccount?.bankCode?.thirdPartyName, readOnly:true, width:'170px' /}
+	                </p>
+	
+	                <p>
+	                    #{textBox id:'inBankBeneficiaryName', name:'bankName', label:'Beneficiary Name', value:swt?.in?.rgProductBnAccount?.name, class:'capitalize', readOnly:true, width:'230px' /}
+	                </p>
+	
+	                <p>
+	                    #{textBox id:'inBankCurrencyCode', name:'currencyCode', label:'Currency', value:swt?.in?.rgProductBnAccount?.currency?.currencyCode, class:'capitalize', readOnly:true, width:'100px' /}
+	                </p>
+                </div>
+
+                <div id="inBankAccountExternalProduct">
+                    <p>
+                        #{textBox id:'inBankAccountNoExternal', width:'100px', name:'accountNo', label:'Account No', value:swt?.externalProductBank?.accountNo, required:true, class:'capitalize', readOnly:readOnly /}
+                        #{hidden id:'inBankThirdPartyKeyExternalHidden', name:'swt.externalProductBank.thirdPartyBankKey', value:swt?.externalProductBank?.thirdPartyBankKey /}
+                        #{hidden id:'inBankAccountNoExternalHidden', name:'swt.externalProductBank.accountNo', value:swt?.externalProductBank?.accountNo /}
+                        #{hidden id:'inBankAccountNameExternalHidden', name:'swt.externalProductBank.accountName', value:swt?.externalProductBank?.accountName /}
+                        #{hidden id:'inBankCodeThirdPartyKeyExternalHidden', name:'swt.externalProductBank.bankCode.thirdPartyKey', value:swt?.externalProductBank?.bankCode?.thirdPartyKey /}
+                        #{hidden id:'inBankCodeThirdPartyCodeExternalHidden', name:'swt.externalProductBank.bankCode.thirdPartyCode', value:swt?.externalProductBank?.bankCode?.thirdPartyCode /}
+                        #{hidden id:'inBankCodeThirdPartyNameExternalHidden', name:'swt.externalProductBank.bankCode.thirdPartyName', value:swt?.externalProductBank?.bankCode?.thirdPartyName /}
+                        #{hidden id:'inBankCurrencyCodeExternalHidden', name:'swt.externalProductBank.currency.currencyCode', value:swt?.externalProductBank?.currency?.currencyCode /}
+                        #{button id:'inBankAccountNoHelpExternal', value:'?', class:'small', readOnly:readOnly /}
+                        <span class="error">#{error 'Account No in tab Bank Info (Switch In) is' /}</span>
+                    </p>
+    
+                    <p>
+                        #{textBox id:'inBankThirdPartyCodeExternal', name:'thirdPartyCode', label:'Bank Code', value:swt?.externalProductBank?.bankCode?.thirdPartyCode, readOnly:true, width:'60px' /}
+                        #{textBox id:'inBankThirdPartyNameExternal', name:'thirdPartyName', value:swt?.externalProductBank?.bankCode?.thirdPartyName, readOnly:true, width:'170px' /}
+                    </p>
+    
+                    <p>
+                        #{textBox id:'inBankBeneficiaryNameExternal', name:'bankName', label:'Beneficiary Name', value:swt?.externalProductBank?.accountName, class:'capitalize', readOnly:true, width:'230px' /}
+                    </p>
+    
+                    <p>
+                        #{textBox id:'inBankCurrencyCodeExternal', name:'currencyCode', label:'Currency', value:swt?.externalProductBank?.currency?.currencyCode, class:'capitalize', readOnly:true, width:'100px' /}
+                    </p>
+                </div>
+            </fieldset>
+        </td>
+    </tr>
+</table>

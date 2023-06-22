@@ -1,0 +1,43 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Cash Transaction' /}
+
+<table class="display">
+	<thead>
+		<tr>
+			<th>Key</th>
+			<th>Transaction No</th>
+			<th>Transaction Date</th>
+			<th>Account No</th>
+			<th>Transaction Code</th>
+			<th>Amount</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:transactions, as:'transaction'}  
+		
+			<tr>
+			<td> 
+				${transaction.transactionKey}
+			</td>
+			<td>
+				${transaction.transactionNumber}
+			</td>
+			<td>
+				${transaction.transactionDate}
+			</td>
+			<td>
+				${transaction.account.accountNo}
+			</td>
+			<td>
+				${transaction.transactionTemplate.transactionCode}
+			</td>
+			<td>
+				${transaction.amount}
+			</td>
+		</tr>
+	 #{/list}	
+     </tbody>
+</table>
+	
+
+

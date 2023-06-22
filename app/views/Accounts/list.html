@@ -1,0 +1,157 @@
+#{extends 'templates/main.html' /}
+#{if param == 'acct-ovr-chg'}
+	#{set pageTitle: 'Account Charge Overwrite' /}
+#{/if}
+#{if param == null || param == "edit"}
+	#{set pageTitle: 'Custody Account Information' /}
+#{/if}
+
+#{set fixData: true /}
+#{set mode: mode /}
+
+<script type="text/javascript">	
+	$(function() {
+		// Search section
+		$('#accordion').accordion({
+			collapsible: true
+		});
+		$('#birthDate').datepicker();
+		/* $('.buttons button:first').button({
+			icons: {
+				primary: 'ui-icon-search'
+			}
+		}).next().button();	
+		$('#search').click(function() {
+			search();
+		}); */
+		// end of Search
+		
+		$('#accountNoOperator').children().eq(0).remove();
+		$('#accountNameOperator').children().eq(0).remove();
+		$("#accountNoOperator").attr('selectedIndex', 1);
+		$("#accountNameOperator").attr('selectedIndex', 1);
+		
+		$('#reset').click(function() {
+			if ("${param}" == 'acct-ovr-chg') {
+				location.href="@{Accounts.list()}?mode=${mode}&param=${param}";
+			} else {
+				location.href="@{Accounts.list()}?mode=${mode}";						
+			}
+		});
+		
+		$('.buttons input:button').button();
+
+		// Focus on first input:text
+		$('form input:text').first().focus();
+	});
+
+	/* var search = function() {
+		$('#result .loading').show();
+		$('#result .response').hide();
+		$('#result').show();
+		$.get('@{search()}', $('#searchForm').serialize(), function(data) {
+			checkRedirect(data);
+			$('#result .response').html(data);
+			$('#result .loading').hide();
+			$('#result .response').show();	
+			setupTable();
+		});
+	};
+	
+	function doEdit(data) {
+		#{if param == 'acct-ovr-chg'}
+			location.href="@{chargeOverride()}/?mode=${mode}&id="+ data[0]+"&status="+data[4];
+			return false;
+		#{/if}
+		
+			if ((data[4] == "New") || (data[4] == "Updated")) {
+				view(data[0]);
+				return false;
+			} 
+			
+		return true;
+	} */
+	//var select = function(id, param) {
+	//	$('#dialog').form('${mode}', { 'id': id, 'param': param });
+	//}
+</script>
+
+<div id="accordion">
+	<h3><a href="#">Search Account</a></h3>
+		<form id="searchForm" class="form">
+#{hidden id:'query', name:'params.query', value:params?.query /}
+				<input id="param" name="params.param" type="hidden" value="${param}"/>
+			<p>
+				#{dropDownList id:'accountNoOperator', name:'params.accountNoOperator', label:'Account No', options:stringOperators, value:params.accountNoOperator /}
+				#{textBox id:'accountSearchNo', name:'params.accountSearchNo', value:params.accountSearchNo, class:'capitalize' /}
+			</p>
+			<p>
+				#{dropDownList id:'accountNameOperator', name:'params.accountNameOperator', label:'Name', options:stringOperators, value:params.accountNameOperator /}
+				#{textBox id:'accountSearchName', name:'params.accountSearchName', value:params.accountName, width:'350px', class:'capitalize' /}
+			</p>
+			<p style="display:none">
+				#{dropDownList id:'identificationNoOperator', name:'params.identificationNoOperator', label:'Identification No', options:stringOperators, value:params.identificationNoOperator /}
+				#{textBox id:'accountSearchIdentificationNo', name:'params.accountSearchIdentificationNo', value:params.accountSearchIdentificationNo, width:'200px' /}
+			</p>
+			<p>
+				<div class="buttons">
+					<input type="button" id="search" value="Search" />
+					<input type="button" id="reset" value="Reset" />
+				</div>
+			</p>
+	</form>
+</div>
+
+<!-- <div id="result" style="display:none">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<div class="response"></div>
+</div> -->
+#{if param != 'acct-ovr-chg'}	
+<div id="result" style="display:none">
+	<table id="tblAccount" class="display">
+		<thead>
+			<tr>
+				<th field="accountNo|string|none|left|sort" width="110px">Account No</th>
+				<th field="name|string|none|left|sort">Name</th>				
+				<th field="balance|number|decimal2|right|sort">Balance</th>
+				<th field="recordStatus|string|decode|left|sort">Status</th>
+				<th field="isActive|boolean|yesno|center|sort">Active</th>				
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+</div>	
+#{/if}
+#{else}
+<div id="result" style="display:none">
+	<table id="tblAccount" class="display">
+		<thead>
+			<tr>
+				<th field="accountNo|string|none|left|sort" width="110px">Account No</th>
+				<th field="name|string|none|left|sort">Name</th>				
+				<th field="chargeProfile.name|string|none|left|sort">Charge Profile</th>
+				<th field="overrideStatus|string|decode|left|sort">Override Status</th>				
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+</div>	
+#{/else}
+	
+#{if param == 'register-cust-acct'}
+<div class="buttons">
+	<label><input type="checkbox" id="notInList"/> Not in the list</label>&nbsp;
+	<input type="button" id="new" value="New" />	
+</div>	
+#{/if}
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'Accounts/paging.js' /}
+	$(document).ready(function() {
+		Paging($("#accordion").add("#result"));
+	});
+</script>
+

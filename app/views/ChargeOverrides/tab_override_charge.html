@@ -1,0 +1,33 @@
+#{set id: account?.custodyAccountKey /}
+
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{script 'lookups.js' /}
+
+<script type="text/javascript">	
+	$(function() {
+		
+
+	})
+	
+</script>
+
+<div id="overrideCharge">
+	<br>
+	<h4><label>Charge Profile: ${chargeProfile?.name}</label></h4>
+	<form id="overrideChargeForm" class="form">
+		<div style="overflow-y:scroll;height:140px">
+			#{include 'ChargeOverrides/grid_charge_item.html' /}
+		</div>
+		<br>
+		<div style="overflow-y:scroll;height:140px">
+			#{include 'ChargeOverrides/grid_charge_profile.html' /}
+		</div>
+		
+		<br>
+		<h4>List Of Overwrite Charges</h4>
+		<div style="overflow-y:scroll;height:140px">
+			#{include 'ChargeOverrides/grid_overwrite_charge.html' /}
+		</div>
+ 	</form>
+</div>
+<br />

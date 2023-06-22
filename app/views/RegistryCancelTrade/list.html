@@ -1,0 +1,109 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'TA - Cancel Transaction' /}
+#{script 'lookups.js' /}
+
+<div id="root">
+    <h3><a href="#">Search Transaction</a></h3>
+
+    <form id="searchForm" class="form">
+        #{hidden id:'selected', name:'param.selected', value:param?.selected /}
+        #{hidden id:'dispatch', name:'param.dispatch', value:param?.dispatch /}
+        #{hidden id:'readOnly', name:'param.readOnly', value:param?.readOnly /}
+        #{hidden id:'query', name:'param.query', value:param?.query /}
+
+        <span id="globalError" class="error"></span>
+
+        <p>
+	        #{textBox id:'fundCode', name:'param.rgProduct.productCode', label:'Fund Code', value:param?.rgProduct?.productCode, width:'120px', readOnly:readOnly, class:'capitalize', required:true/}
+	        #{hidden  id:'fundCodeKey', value:param?.rgProduct?.productCode /}
+	        #{button  id:'fundCodeHelp', value:'?', class:'small', readOnly:readOnly/}
+	        #{textBox id:'fundCodeDesc', name:'param.rgProduct.name', value:param?.rgProduct?.name, readOnly:true, width:'250px' /}
+	        <span id="fundCodeError" class="error"></span>
+	    </p>
+
+        <p>
+            #{dropDownList id:'type', name:'param.type', label:'Transaction Type', options:listType, value:param?.type, readOnly:readOnly, width:'124px' /}
+        </p>
+
+	    <p>
+            #{textBox id:'tradeDateFrom', name:'param.tradeDateFrom', label:'Transaction Date', width:'85px', value:param?.tradeDateFrom ,class:'calendar', required:'true'  /} (${appProp.displayDateFormat})
+            <span id="tradeDateFromError" class="error"></span>
+            <strong>To</strong>
+            #{textBox id:'tradeDateTo', name:'param.tradeDateTo', value:param?.tradeDateTo, class:'calendar' /} (${appProp.displayDateFormat})
+            <span id="tradeDateToError" class="error"></span>
+        </p>
+
+	    <p id="transactionNoP">
+	        #{dropDownList id:'transactionNoOperator', name:'param.transactionNoOperator', label:'Transaction No', options:operators, value:param?.transactionNoOperator /}
+	        #{textBox id:'redemRefKey', name:'param.redemRefKey', value:param?.redemRefKey, readOnly:readOnly, class:'numberOnly', width:'120px' /}
+	    </p>
+
+        <p>
+            <div class="buttons">
+                #{button  id:'search', value:'Search', readOnly:false/}
+                #{button  id:'reset', value:'Reset', readOnly:false/}
+            </div>
+        </p>
+    </form>
+</div>
+
+<p>&nbsp;</p>
+
+<div id="result">
+    <div id="subscribeRedeem">
+	    <table id="tblTransactionSubscribeRedeem" class="display">
+	        <thead>
+	            <tr>
+	                <th width="80px" field="tradeDate|date|date|center|sort">Transaction Date</th>
+	                <th width="100px" field="tradeKey|string|none|center|sort">Transaction #</th>
+	                <th width="100px" field="rgProduct.productCode|string|none|center|sort">Fund Code</th>
+	                <th width="100px" field="rgInvestmentaccount.accountNumber|string|none|center|sort">Account No</th>
+	                <th width="100px" field="rgInvestmentaccount.name|string|none|center|sort">Account Name</th>
+	                <th width="100px" field="unit|number|decimal0|right|sort">Unit</th>
+	                <th width="100px" field="price|number|decimal0|right|sort">Price</th>
+	                <th width="100px" field="netAmount|number|decimal0|right|sort">Amount</th>
+	                <th width="80px" field="tradeStatus|string|decodeData|center|sort">Status</th>
+	            </tr>
+	        </thead>
+	    </table>
+    </div>
+    
+    <div id="switching">
+	    <table id="tblTransactionSwitching" class="display">
+	        <thead>
+	            <tr>
+	                <th width="80px" field="switchDate|date|date|center|sort">Transaction Date</th>
+	                <th width="100px" field="switchingKey|string|none|center|sort">Switching #</th>
+	                <th width="100px" field="rgInvestmentaccountByOutAccountNumber.accountNumber|string|none|left|sort">Investor No</th>
+	                <th width="100px" field="rgInvestmentaccountByOutAccountNumber.name|string|none|left|sort">Investor Name</th>
+	                <th width="80px" field="type|string|none|center|sort">Type</th>
+	                <th width="100px" field="out.rgProduct.productCode|string|none|center|sort">Fund (from)</th>
+	                <th width="100px" field="in.rgProduct.productCode|string|none|center|sort">Fund (to)</th>
+	                <th width="80px" field="tradeStatus|string|decodeData|center|sort">Status</th>
+	            </tr>
+	        </thead>
+	    </table>
+    </div>
+    
+    <div id="dividend">
+	    <table id="tblTransactionDividend" class="display">
+	        <thead>
+	            <tr>
+	                <th width="80px" field="divDate|date|date|center|sort">Dividend Date</th>
+	                <th width="100px" field="fundActionKey|string|none|left|sort">Dividend #</th>
+	                <th width="100px" field="type|string|none|center|sort">Type</th>
+	                <th width="100px" field="amount|number|decimal0|right|sort">Amount</th>
+	                <th width="80px" field="status|string|decodeData|center|sort">Status</th>
+	            </tr>
+	        </thead>
+	    </table>
+    </div>
+</div>
+
+<script type="text/javascript">
+    #{include 'RegistrySubscription/Util.js' /}
+    #{include 'RegistryCancelTrade/cancelTradeList.js' /}
+    $(document).ready(function() {
+    	CancelTrade($("#root").add("#result"));
+    });
+</script>

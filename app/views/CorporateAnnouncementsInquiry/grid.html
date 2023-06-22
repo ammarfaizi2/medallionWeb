@@ -1,0 +1,54 @@
+<script type="text/javascript">
+function doEdit(data) {
+	view(data[0]);
+	return false;
+}
+</script>
+<h3>Search results</h3>
+
+#{if corporateAnnouncements}
+<table id="grid" class="display">
+	<thead>
+		<tr>
+			<th width="100px"></th>
+			<th width="100px">Announcement No</th>
+			<th width="100px">Subject</th>
+			<th width="100px">Announcement Date</th>
+			<th width="100px">Recording Date</th>
+			<th width="100px">Distribution Date</th>
+			<th width="100px">Status</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list corporateAnnouncements, as:'corporateAnnouncement'}
+		<tr>
+			<td>
+				${corporateAnnouncement?.corporateAnnouncementKey}
+			</td>
+			<td>
+				${corporateAnnouncement?.corporateAnnouncementCode}
+			</td>
+			<td>
+				${corporateAnnouncement?.description}
+			</td>
+			<td>
+				${corporateAnnouncement?.announcementDate?.format(appProp.dateFormat)}
+			</td>
+			<td>
+				${corporateAnnouncement?.recordingDate?.format(appProp.dateFormat)}
+			</td>
+			<td>
+				${corporateAnnouncement?.distributionDate?.format(appProp.dateFormat)}
+			</td>
+			<td>
+				${corporateAnnouncement?.status?.decodeDataStatus()}
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>
+
+#{/if}
+#{else}
+<div>No record found</div>
+#{/else}

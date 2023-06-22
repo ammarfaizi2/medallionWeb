@@ -1,0 +1,129 @@
+#{set pageTitle: 'TA - Switching' /}
+#{set id:swt?.switchingKey /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+
+<style type="text/css">
+  .errmsg { color:red; }
+  #outPrice {margin-left:-0.1em;}
+  #outUnit {margin-left:-0.1em;}
+  #header {padding-top:8px;}
+</style>
+
+<!-- MAIN SCREEN -->
+<form id="registrySwitchForm" class="form" method="POST" name="switch">
+    #{hidden id:'dispatch', value:mode /}
+    #{hidden id:'isApproval', value:isApproval /}
+    #{hidden id:'confirming', value:confirming /}
+    #{hidden id:'effectiveDate' /}
+    #{hidden id:'switchingKey', name:'swt.switchingKey',  value:swt?.switchingKey /}
+    #{hidden id:'inTradeKey', name:'swt.inTradeKey',  value:swt?.inTradeKey /}
+    #{hidden id:'outTradeKey', name:'swt.outTradeKey',  value:swt?.outTradeKey /}
+    #{hidden id:'goodFundDate', name:'swt.goodfundDate',  value:swt?.goodfundDate?.format(appProp.dateFormat) /}
+    #{hidden id:'type', name:'swt.type', value:swt?.type /}
+    #{hidden name:'outFeeByForConfirm', value:outFeeByForConfirm /}
+    #{hidden name:'subscriptionFeeForConfirm', value:subscriptionFeeForConfirm /}
+
+    #{hidden id:'lookupSwiTierType' ,name:'swt.rgInvestmentaccountByOutAccountNumber.rgProduct.lookupBySwiTierType.lookupId', value:swt?.rgInvestmentaccountByOutAccountNumber?.rgProduct?.lookupBySwiTierType?.lookupId /}
+
+    #{hidden id:'outRedLock', name:'swt.out.rgProduct.redLock', value:swt?.out?.rgProduct?.redLock /}
+
+    #{hidden id:'outDiscPct', value:swt?.out?.discPct, format:'#,##0.######', class:'numeric' /}
+    #{hidden id:'outDiscPctStripped', name:'swt.out.discPct', value:swt?.out?.discPct /}
+    #{hidden id:'outDiscAmt', name:'swt.out.discAmt', value:0 /}
+
+    #{hidden id:'outTaxPct', value:swt?.out?.taxPct, format:'#,##0.######', class:'numeric' /}
+    #{hidden id:'outTaxPctStripped', name:'swt.out.taxPct', value:swt?.out?.taxPct /}
+    #{hidden id:'outTaxAmt', value:swt?.out?.taxAmt , format:'#,##0.######', class:'numeric'/}
+    #{hidden id:'outTaxAmtStripped', name:'swt.out.taxAmt', value:swt?.out?.amount /}
+    #{hidden id:'outAmount', value:swt?.out?.amount, format:'#,##0.######', class:'numeric' /}
+    #{hidden id:'outAmountStripped', name:'swt.out.amount', value:swt?.out?.amount /}
+
+    #{hidden id:'outAvailBalance', value:swt?.out?.availabelBalance/}
+    #{hidden id:'outTaxCode', name:'swt.out.taxMaster.taxCode', value:swt?.out?.taxMaster?.taxCode /}
+    #{hidden id:'outTaxKey', name:'swt.out.taxMaster.taxKey', value:swt?.out?.taxMaster?.taxKey /}
+
+    #{hidden id:'outCapGainTaxAmount', name:'capGainTaxAmount', value:0 /}
+    #{hidden id:'outOtherPct', value:swt?.out?.otherPct/}
+
+    #{hidden id:'outAmountRoundValue', name:'swt.rgInvestmentaccountByOutAccountNumber.rgProduct.amountRoundValue', value:swt?.rgInvestmentaccountByOutAccountNumber?.rgProduct?.amountRoundValue /}
+    #{hidden id:'outAmountRoundType', name:'swt.rgInvestmentaccountByOutAccountNumber.rgProduct.amountRoundType', value:swt?.rgInvestmentaccountByOutAccountNumber?.rgProduct?.amountRoundType /}
+    #{hidden id:'outUnitRoundValue', name:'swt.rgInvestmentaccountByOutAccountNumber.rgProduct.unitRoundValue', value:swt?.rgInvestmentaccountByOutAccountNumber?.rgProduct?.unitRoundValue /}
+    #{hidden id:'outUnitRoundType', name:'swt.rgInvestmentaccountByOutAccountNumber.rgProduct.unitRoundType', value:swt?.rgInvestmentaccountByOutAccountNumber?.rgProduct?.unitRoundType /}
+    #{hidden id:'outPriceRoundValue', name:'swt.rgInvestmentaccountByOutAccountNumber.rgProduct.priceRoundValue', value:swt?.rgInvestmentaccountByOutAccountNumber?.rgProduct?.priceRoundValue /}
+    #{hidden id:'outPriceRoundType', name:'swt.rgInvestmentaccountByOutAccountNumber.rgProduct.priceRoundType', value:swt?.rgInvestmentaccountByOutAccountNumber?.rgProduct?.priceRoundType /}
+
+    #{hidden id:'inSubLock', name:'swt.in.rgProduct.subLock', value:swt?.in?.rgProduct?.subLock /}
+
+    #{hidden id:'inDiscPct', value:swt?.in?.discPct, format:'#,##0.######', class:'numeric' /}
+    #{hidden id:'inDiscPctStripped', name:'swt.in.discPct', value:swt?.in?.discPct /}
+    #{hidden id:'inDiscAmt', name:'swt.in.discAmt', value:0 /}
+
+    #{hidden id:'inTaxPct', value:swt?.in?.taxPct, format:'#,##0.######', class:'numeric' /}
+    #{hidden id:'inTaxPctStripped', name:'swt.in.taxPct', value:swt?.in?.taxPct /}
+    #{hidden id:'inTaxAmt', value:swt?.in?.taxAmt , format:'#,##0.######', class:'numeric'/}
+    #{hidden id:'inTaxAmtStripped', name:'swt.in.taxAmt', value:swt?.in?.amount /}
+
+    #{hidden id:'inTaxCode', name:'swt.in.taxMaster.taxCode', value:swt?.in?.taxMaster?.taxCode /}
+    #{hidden id:'inTaxKey', name:'swt.in.taxMaster.taxKey', value:swt?.in?.taxMaster?.taxKey /}
+
+    #{hidden id:'inCapGainTaxAmount', name:'capGainTaxAmount', value:0 /}
+    #{hidden id:'inOtherPct', value:swt?.in?.otherPct/}
+
+    #{hidden id:'inAmountRoundValue', name:'swt.rgInvestmentaccountByInAccountNumber.rgProduct.amountRoundValue', value:swt?.rgInvestmentaccountByInAccountNumber?.rgProduct?.amountRoundValue /}
+    #{hidden id:'inAmountRoundType', name:'swt.rgInvestmentaccountByInAccountNumber.rgProduct.amountRoundType', value:swt?.rgInvestmentaccountByInAccountNumber?.rgProduct?.amountRoundType /}
+    #{hidden id:'inUnitRoundValue', name:'swt.rgInvestmentaccountByInAccountNumber.rgProduct.unitRoundValue', value:swt?.rgInvestmentaccountByInAccountNumber?.rgProduct?.unitRoundValue /}
+    #{hidden id:'inUnitRoundType', name:'swt.rgInvestmentaccountByInAccountNumber.rgProduct.unitRoundType', value:swt?.rgInvestmentaccountByInAccountNumber?.rgProduct?.unitRoundType /}
+    #{hidden id:'inPriceRoundValue', name:'swt.rgInvestmentaccountByInAccountNumber.rgProduct.priceRoundValue', value:swt?.rgInvestmentaccountByInAccountNumber?.rgProduct?.priceRoundValue /}
+    #{hidden id:'inPriceRoundType', name:'swt.rgInvestmentaccountByInAccountNumber.rgProduct.priceRoundType', value:swt?.rgInvestmentaccountByInAccountNumber?.rgProduct?.priceRoundType /}
+
+    #{include 'RegistrySwitch/detailMain.html' /}
+
+    <!-- TAB SCREEN -->
+    <div id="switchTab">
+        <ul>
+            <li><a href="#tab-1">Detail</a></li>
+            <li><a href="#tab-2">Bank Info</a></li>
+        </ul>
+        <div class="pane" id="tab-1">
+            #{include 'RegistrySwitch/detailTab.html' /}
+        </div>
+        <div class="pane" id="tab-2">
+            #{include 'RegistrySwitch/bankInfoTab.html' /}
+        </div>
+    </div>          
+</form>
+
+<script type="text/javascript">
+    #{include 'RegistrySubscription/Util.js' /}
+    #{include 'RegistrySubscription/Calculation.js' /}
+    #{include 'RegistrySwitch/registrySwitch.js' /}
+    $(document).ready(function() {
+        Switch($("#main"));
+
+        if('${from}' == 'cancelSwitching')
+        {
+    	    
+            $('#forCancelSwitching').css('display','');
+            $('#cancelDate').removeAttr("disabled");
+            $('#cancelPostDate').removeAttr("disabled");
+            if('${confirming}' != 'true')
+            {
+            	/* $('#remarkForCanceled').removeAttr("disabled"); */
+            	$("#remarkForCancel").attr("disabled", false);
+            }
+        }
+
+        if('${from}' == 'listBatch' || '${from}' == 'singleList')
+        {
+        	if('${type}' == 'approvalCancelSwitching')
+        	{
+        		$('#forCancelSwitching').css('display','');
+                $('#cancelDate').attr("disabled", "disabled");
+                $('#cancelPostDate').attr("disabled", "disabled");
+                $('#remarkForCancel').attr("disabled", "disabled");
+        	}
+        }
+    });
+</script>

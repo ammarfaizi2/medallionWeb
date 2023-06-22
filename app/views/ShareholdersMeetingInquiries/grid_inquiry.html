@@ -1,0 +1,58 @@
+<script type="text/javascript">
+function doEdit(data) {
+	view(data[0]);
+	return false;
+}
+</script>
+<h3>Search results</h3>
+
+#{if csMeetings}
+<table id="grid" class="display">
+	<thead>
+		<tr>
+			<th width="100px">Meeting No</th>
+			<th width="100px">Meeting No</th>
+			<th width="100px">Meeting Subject</th>
+			<th width="100px">Security Type</th>
+			<th width="100px">Security Code</th>
+			<th width="100px">Announcement Date</th>
+			<th width="100px">Meeting Date</th>
+			<th width="40px">Status</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list csMeetings, as:'csMeeting'}
+		<tr>
+			<td>
+				${csMeeting?.meetingKey}
+			</td>
+			<td>
+				${csMeeting?.meetingKey}
+			</td>
+			<td>
+				${csMeeting?.meetingSubject}
+			</td>
+			<td>
+				${csMeeting?.security?.securityType?.securityType}
+			</td>
+			<td>
+				${csMeeting?.security?.securityId}
+			</td>
+			<td>
+				${csMeeting?.announcementDate.format(appProp.dateFormat)}
+			</td>
+			<td>
+				${csMeeting?.meetingDate.format(appProp.dateFormat)}
+			</td>
+			<td>
+				${csMeeting?.meetingStatus?.decodeDataStatus()}
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>
+
+#{/if}
+#{else}
+<div>No record found</div>
+#{/else}

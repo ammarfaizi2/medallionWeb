@@ -1,0 +1,68 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Corporate Action News Announcement' /}
+#{script 'lookups.js', characterset:'utf-8' /}
+#{script 'lookuppaging.js' /}
+
+<div id="root">
+	<h3><a href="#">Corporate Action News Annoucement</a></h3>
+	<form id="caNewsAnnoucementForm" class="form">
+		#{hidden id:'query', value:'0'/}
+			
+		<p id="pFromDateFrom">
+			#{textBox id:'fromDate', label:'News Date', width:'100px', required:'true', class:'calendar' /} 
+			(${appProp.displayDateFormat})
+			<b>To</b>
+			#{textBox id:'toDate', width:'100px', required:'true', class:'calendar' /}
+			(${appProp.displayDateFormat})
+			<span id="newsDateError" class="error"></span>
+		</p>
+		<p>
+			#{textBox id:'securityType', width:'100px', label:'Security Type', class:'capitalize' /}
+			#{hidden id:'securityTypeKey'/}
+			#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'securityTypeDesc', readOnly:true, width:'200px' /}
+			<span id="securityTypeError" class="error"></span>
+		</p>
+		<p>
+			#{textBox id:'securityCode', width:'100px', label:'Security Code', class:'capitalize' /}
+			#{hidden id:'securityCodeKey'/}
+			#{button id:'securityCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'securityCodeDesc', readOnly:true, width:'200px' /}
+			<span id="securityCodeError" class="error"></span>
+		</p>
+		<div class="buttons">
+			<input id="btnSearch" type="button" value="Search" />				
+			<input id="btnReset" type="button" value="Reset" />					
+		</div>
+	</form>
+</div>	
+</p>
+<div id="result" style="display:none;">
+    <table id="tableCaNews">
+		<thead pk="logKey">
+			<th width="100px" field="ca_news_date|string|none|center|sortdasc">News&nbsp;Date</th>
+			<th width="150px" field="security_type|string|none|left|sort">Security&nbsp;Type</th>
+			<th width="150px" field="security_id|string|none|left|sort">Security&nbsp;Code</th>
+			<th width="200px" field="subject|string|none|left|sort">Subject</th>
+			<th width="150px" field="recording_date|string|none|center|sort">Recording&nbsp;Date</th>
+			<th width="100px" field="record_status|string|decode|center|sort">Status</th>
+			<th width="100px" field="active|boolean|yesno|center|sort">Active</th>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+</div>
+
+<div id="btn" class="buttons">
+	<input id="btnAdd" type="button" value="New Data" />	
+</div>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'CANewsAnnouncement/list.js' /}
+	$(document).ready(function() {
+		List($("#main"));
+	});
+</script>
+
+

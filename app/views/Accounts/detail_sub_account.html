@@ -1,0 +1,163 @@
+<script type="text/javascript">
+$(function(){
+	var const_Custody_KSEI_code = '${defaultkseidepositorycode}';
+	var account_category = '${accountcategoryksei}';
+	
+	$('#cancelSubAccount').click(function() {
+		$('#detailSubAccount').dialog('close');
+		return false;
+	});
+	
+	$('#closeSubAccount').click(function() {
+		$('#detailSubAccount').dialog('close');
+		return false;
+	});
+	
+	$("#acctCashUsed").hide();
+	
+	$('#depCode').change(function(){
+		resetSubAccount();
+		$("#acctCashUsed").hide();
+		if ($('#depCode').val() === '') {
+			$('#depKey').val('');
+			$('#depName').val('');
+			$('#h_depName').val('');
+		}else if($('#depCode').val()=='1'){
+			$("#acctCashUsed").show();
+		}
+	});
+	
+	$('#depCode').lookup({
+		list:'@{Pick.lookups()}?group=DEPOSITORY_CODE',
+		get:{
+			url:'@{Pick.lookup()}?group=DEPOSITORY_CODE',
+			success: function(data) {
+						$('#depCode').removeClass('fieldError');
+						$('#depKey').val(data.code);
+						$('#depName').val(data.description);
+						$('#h_depName').val(data.description);
+						
+						if (data.lookupCode === const_Custody_KSEI_code) {
+							if ($('#rowPositionSubAccount').val() == '') {
+								$('#idCodeNoDefault').css("display","none");
+								$('#idCodeDefault').css("display","");
+								
+								$.get("@{getSubAccountCode()}", {'accountCategory':account_category}, function(data) {
+									var startAccountCode = 0;
+									var startSequenceNo = 5;
+									
+									var result = data.generatedsubaccountcode;
+									var accountCode = result.substring(startAccountCode, startSequenceNo);
+									var sequenceNo = result.substring(startSequenceNo, result.length);
+									
+									$('#code1').val(accountCode);
+									//$('#code2').val(sequenceNo);
+								});
+								$('#code2').val('RXXX');
+								$('#code3').val('001');
+								$('#code4').val('XX');
+								$('#codeDefHidden').val($('#code1').val()+$('#code2').val()+$('#code3').val()+$('#code4').val());
+								
+								// make sub account code for default depository disabled
+								$('#code1').attr('disabled', 'disabled');
+								
+								
+								var c = $('#code2').val();
+								if(c=='RXXX')
+									$('#code2').attr('disabled', 'disabled');
+								else
+									$('#code2').removeAttr('disabled');
+								
+								$('#code3').attr('disabled', 'disabled');
+								$('#code4').attr('disabled', 'disabled');
+							} else {
+								if (('${mode}'!='view') && ('${confirming}' != 'true')) {
+									$("#detailSubAccount #subAccountForm #code1").attr('disabled', 'disabled');
+									
+									var c = $('#code2').val();
+									if(c=='RXXX'){
+										$("#detailSubAccount #subAccountForm #code2").attr('disabled', 'disabled');	
+									}else{
+										$("#detailSubAccount #subAccountForm #code2").removeAttr('disabled');
+										$("#detailSubAccount #subAccountForm #code2").removeAttr('readOnly');										
+									}
+									$("#detailSubAccount #subAccountForm #code3").attr('disabled', 'disabled');
+									$("#detailSubAccount #subAccountForm #code4").removeAttr('disabled');
+									$("#detailSubAccount #subAccountForm #code4").removeAttr('readOnly');
+								}
+							}
+						} else {
+							$('#idCodeDefault').css("display","none");
+							$('#idCodeNoDefault').css("display","");
+						}
+						
+						$('#depCode').change();
+					},
+			error: function() {
+					$('#depCode').addClass('fieldError');
+					$('#depKey').val('');
+					$('#depCode').val('');
+					$('#depName').val('NOT FOUND');
+					$('#h_depName').val('');
+				}
+		},
+		description:$('#depName'),
+		help:$(' #depCodeHelp')
+	});
+	
+	$('#code4').blur(function(){
+		$('#codeDefHidden').val($('#code1').val()+$('#code2').val()+$('#code3').val()+$('#code4').val());
+	});
+	
+	$('#code2').blur(function(){
+		$('#codeDefHidden').val($('#code1').val()+$('#code2').val()+$('#code3').val()+$('#code4').val());
+	});
+	
+	$('#codeNoDef').live("blur", function(){
+		$('#codeNoDefHidden').val($(this).val());
+	});
+});
+
+function resetSubAccount(){
+	$("#acctCashUsed").val('');
+	$("#acctCashUsed option:eq(0)").attr('selected',true);
+}
+</script>
+
+<form id="subAccountForm" class="form">
+	<br>
+	#{hidden id:'subAccountKey', name:'subAccount.subAccountKey' /}
+	#{hidden id:'custodyAccountKey', name:'subAccount.account?.custodyAccountKey' /}
+	#{hidden id:'rowPositionSubAccount' /}
+	#{textBox id:'codeDummy', width:'25px', readOnly:readOnly, maxLength:2 /}
+	<p>			
+		#{textBox id:'depCode', name:'subAccount.depository.lookupCode', label:'Depository', value:subAccount?.depository?.lookupCode, class:'capitalize', required:true, readOnly:readOnly, width:'100' /}
+		#{hidden id:'depKey', name:'subAccount.depository.lookupId', value:subAccount?.depository?.lookupId  /}
+		#{button id:'depCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'depName', name:'subAccount.depository.lookupDescription', value:subAccount?.depository?.lookupDescription, readOnly:true, width:'200' /}
+		<span id="errmsgDepository" class="error"></span>
+	</p>
+	
+	<p id="idCodeDefault">
+		<label>Sub Account Code<span class='req'>*</span></label>
+		#{textBox id:'code1', name:'code1', value:code1, width:'45px', class:'capitalize', readOnly:readOnly, maxLength:5 /}-
+		#{textBox id:'code2', name:'code2', value:code2, width:'35px', class:'capitalize noSpace alphaNumeric', readOnly:readOnly, maxLength:4 /}-
+		#{textBox id:'code3', name:'code3', value:code3, width:'30px', class:'capitalize', readOnly:readOnly, maxLength:3 /}-
+		#{textBox id:'code4', name:'code4', value:code4, width:'25px', class:'capitalize', readOnly:readOnly, maxLength:2 /}
+		#{hidden id:'codeDefHidden', name:'subAccount.code', value:subAccount?.code /}
+		<span id="errmsgSubCodeDefault" class="error"></span>
+	</p>
+	
+	<p id="idCodeNoDefault">
+		<label>Sub Account Code<span class='req'>*</span></label>
+		#{textBox id:'codeNoDef', name:'code', value:code, width:'100px', class:'capitalize', readOnly:readOnly, maxLength:60 /}
+		#{hidden id:'codeNoDefHidden', name:'subAccount.code', value:subAccount?.code /}
+		<span id="errmsgSubCodeNoDefault" class="error"></span>
+	</p>
+	
+	<p id="acctCashUsed">
+		#{dropDownList id:'acctCashUsed', name:'subAccount.accountCashUsed.lookupId', label:'Account Cash Used', options:accountCashUsedOpt, value:subAccount?.accountCashUsed?.lookupId, required:true, readOnly:readOnly, width:'175px' /}        
+    	<span id="errMsgAcctCashUsed" class="error"></span>
+	</p>
+	
+</form>

@@ -1,0 +1,50 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Account Charge Overwrite' /}
+#{set id: account?.custodyAccountKey /}
+#{set id: account?.customer?.customerKey /}
+
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{script 'lookups.js' /}
+
+<script type="text/javascript">	
+	
+
+	
+	function isPercent() {
+		$("#tierValueError").html("");
+		$("#tierValue").removeClass('fieldError');
+		var tierValue = parseFloat($("#tierValueStripped").val());
+		
+		if (tierValue > 100) {
+			$("#tierValue").addClass('fieldError');
+			$("#tierValueError").html("Must be less or equal 100").show();
+		} 
+	}
+
+</script>
+<style type="text/css">
+  
+  #gridChargeProfile {width :890px ; table-layout: fixed;}
+  #gridChargeProfile1 {width :900px ; table-layout: fixed;}
+  
+</style>
+#{hidden id:'id', name:'id', value:id /}
+#{hidden id:'custodyAccountKey', name:'account.custodyAccountKey', value:account?.custodyAccountKey /}
+	&nbsp;<span id ="accountStatusError" class="error"></span>
+	<div >
+		#{include 'Accounts/tab_override_charge.html' /}
+	</div>
+	
+<div id="detailOverride">
+			#{include 'Accounts/detail_overwrite_charge.html' /}
+</div>
+
+
+
+<input type="hidden" id="dummy" />
+<input type="hidden" id="maxValidation" />
+<!-- 
+<div class="buttons">	
+	#{button id:'closeOverride', name:'closeOverride', value:'Close' /}				
+</div>
+ -->

@@ -1,0 +1,33 @@
+<h3>Search results</h3>
+
+#{if faUnitTransactions}
+	<table id="injectTotalUnitTable" class="display">
+		<thead>
+			<tr>
+				<th>Fund Key</th>
+				<th>Fund Code</th>
+				<th>Date</th>
+				<th>Total Unit</th>
+				<th>Status</th>
+				<th>Active</th>
+			</tr>
+		</thead>
+		<tbody>
+		#{list faUnitTransactions, as:'faUnitTransaction'}
+			<tr>
+				<td>${faUnitTransaction?.transactionKey}</td>
+				<td>${faUnitTransaction?.faMaster?.fundCode}</td>
+				<td>${faUnitTransaction?.transactionDate?.format(appProp.dateFormat)}</td>
+				<td align="right" name="navAmtCell">${faUnitTransaction?.totalUnit?.format('#,##0.##########')}</td>
+				<td>${faUnitTransaction?.transactionStatus?.decodeStatus()}</td>
+				<td>${(faUnitTransaction?.isActive)? 'Yes':'No' }</td>
+			</tr>
+		#{/list}
+		</tbody>
+	</table>
+#{/if}
+#{else}
+	<div>No record found</div>
+#{/else}	
+
+

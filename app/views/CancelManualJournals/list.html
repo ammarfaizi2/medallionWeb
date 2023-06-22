@@ -1,0 +1,161 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'FA - Cancel Journal' /}
+#{script 'lookups.js', characterset:'utf-8' /}
+#{script 'lookuppaging.js' /}
+
+<script type="text/javascript">
+	$(function(){
+		
+		$("#new").css("display","none");
+		$('#transactionDate').datepicker();
+		
+		$('#searchFundCode').lookup({
+			list:'@{Pick.faFundSetups()}',
+			get:{
+				url:'@{Pick.faFundSetup()}',
+				success: function(data){
+					$('#searchFundCode').removeClass('fieldError');
+					$('#searchFundKey').val(data.code);
+					$('#searchFundCodeDesc').val(data.description);
+					$('#h_searchFundCodeDesc').val(data.description);
+				},
+				error: function(data){
+					$('#searchFundCode').addClass('fieldError');
+					$('#searchFundCode').val('');
+					$('#searchFundKey').val('');
+					$('#searchFundCodeDesc').val('NOT FOUND');
+					$('#h_searchFundCodeDesc').val('');
+				}
+			},
+			key:$('#searchFundCodeKey'),
+			description:$('#searchFundCodeDesc'),
+			help:$('#searchFundCodeHelp')
+		});
+		
+		$('.buttons button:first').button({
+			icons: {
+				primary: 'ui-icon-search'
+			}
+		}).next().button();	
+		
+		$('#transactionDateFrom').change(function(){
+			var dateFrom = $(this).datepicker('getDate');
+			var dateTo = $('#transactionDateTo').datepicker('getDate');
+			var origin = 'from';
+			var id = '#transactionDate';
+			if ((($(this).val()!='') || ($(this).hasClass('fieldError'))) && ($('#transactionDateTo').val()!='')) {
+				//compareDateFromTo(dateFrom, dateTo, origin, id);
+				compareDateFromToEqual(dateFrom, dateTo, origin, id);
+			}
+
+			//validateDate("From");
+			var checkError = $("input").hasClass('fieldError');
+			if (checkError){
+				$('#search').button('disable');
+			}  else {
+				$('#search').button('enable');
+			}
+		});
+		
+		$('#transactionDateTo').change(function(){
+			var dateFrom = $('#transactionDateFrom').datepicker('getDate');
+			var dateTo = $(this).datepicker('getDate');
+			var origin = 'to';
+			var id = '#transactionDate';
+			if ((($(this).val()!='') || ($(this).hasClass('fieldError'))) && ($('#transactionDateFrom').val()!='')) {
+				//compareDateFromTo(dateFrom, dateTo, origin, id);
+				compareDateFromToEqual(dateFrom, dateTo, origin, id);
+			}
+
+            //validateDate("To");
+			var checkError = $("input").hasClass('fieldError');
+			if (checkError){
+				$('#search').button('disable');
+			}  else {
+				$('#search').button('enable');
+			}
+		});
+
+		$('#reset').click(function() {
+			location.href="@{list()}";	
+			return false;
+		});
+		
+		$('.buttons input:button').button();
+		
+	});
+	
+	/* function doEdit(data) {
+		location.href='@{view()}/?key=' + data[0];
+		return false;
+	} */
+
+</script>
+
+<style type="text/css">
+  .error { color:red; }
+</style>
+
+<div id="accordion">
+	<h3><a href="#">Search Cancel Journal</a></h3>
+		<form id="searchForm" class="form">
+			#{hidden id:'query', name:'params.query', value:params?.query /} 
+			<p>		
+				#{textBox id:'searchFundCode', name:'faTransaction.faMaster.fundCode', label:'Fund Code', value:faTransaction?.faMaster?.fundCode, width:'120px', readOnly:readOnly, class:'capitalize', required:'true' /}
+				#{hidden  id:'searchFundCodeKey', name:'params.faTransactionSearchFundKey', value:params?.faTransactionSearchFundKey /}
+				#{button  id:'searchFundCodeHelp', value:'?', class:'small', readOnly:readOnly/}
+				#{textBox id:'searchFundCodeDesc', name:'faTransaction.faMaster.fundDescription', value:faTransaction?.faMaster?.fundDescription, readOnly:true, width:'340px' /}
+				<span id="errmsgSearchFundCode" class="error"></span>
+			</p>
+			<p>
+				#{textBox id:'transactionDateFrom', name:'params.faTransactionSearchTransactionDateFrom', label:'Journal Date', value:params?.faTransactionSearchTransactionDateFrom?.format(appProp.dateFormat), width:'85px', class:'calendar', required:'true'  /} (${appProp.displayDateFormat})
+				<span id="transactionDateFromError" class="error"></span> <b>To</b>
+				#{textBox id:'transactionDateTo', name:'params.faTransactionSearchTransactionDateTo', value:params?.faTransactionSearchTransactionDateTo?.format(appProp.dateFormat), class:'calendar'  /} (${appProp.displayDateFormat})
+				<span id="transactionDateToError" class="error"></span>
+			</p>
+			<p>
+				#{dropDownList id:'TransactionNoOperator', name:'params.TransactionNoOperator', label:'Transaction No', options:stringOperators, removeEmpty:'true', value:params?.TransactionNoOperator /}
+				#{textBox id:'transactionSearchNoOperator', name:'params.transactionSearchNoOperator', value:params?.transactionSearchNoOperator, class:'numericnosep' /}
+			</p>
+			<p>
+				#{radioButton id:'journalType', name:'journalType', label:'Journal Type', value:'MANUAL', options:journalTypeOperators, readOnly:readOnly /}
+			</p>
+			<p>
+				<div class="buttons">
+					<input type="button" id="search" value="Show" />
+					<input type="button" id="reset" value="Reset" />
+				</div>
+			</p>
+		</form>
+</div>
+
+<!-- <div id="result" style="display:none">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<div class="response"></div>
+</div> -->
+
+<div id="result" style="display:none">
+	<table id="tableCancelJurnal" class="display">
+		<thead>
+			<tr>
+				<th field="transactionKey|string|none|left|sort">Transaction No</th>
+				<th field="name|string|none|left|sort">Name</th>
+				<th field="totalAmount|number|decimal4|right|sort">Total Amount</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+	
+</div>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'CancelManualJournals/pagingCancelManualJurnal.js' /}
+	$(document).ready(function() {
+		Paging($("#accordion").add("#result"));
+	});
+</script>
+	
+
+

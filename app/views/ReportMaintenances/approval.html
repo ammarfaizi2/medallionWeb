@@ -1,0 +1,74 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Report Maintenance Approval' /}
+
+<script type="text/javascript">
+	$(function() {
+		$('#approve').button();
+		$('#reject').button();
+		
+		$('#approve').insertBefore('#close');
+		$('#reject').insertBefore('#close');
+
+		$('#approve').click(function() {
+			var action = "@{approve()}?taskId=${taskId}&maintenanceLogKey=${maintenanceLogKey}&operation=${operation}";
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+	    		loading.dialog('close');
+				if (data.status == 'success') {
+					alert("Report No ${report?.sequenceNo} is Approved " + data);
+					if ($("#from").val() == 'listBatch') {
+						location = "@{Approvals.listbatch()}";
+					} else {
+						location = "@{Approvals.list()}";
+					}
+				}else{
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+				}
+			});			
+		});
+		
+		$('#reject').click(function() {
+			var action = "@{reject()}?taskId=${taskId}&maintenanceLogKey=${maintenanceLogKey}&operation=${operation}";
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+				if (data.status == 'success') {
+					alert("Report No ${report?.sequenceNo} is Rejected " + data);
+					if ($("#from").val() == 'listBatch') {
+						location = "@{Approvals.listbatch()}";
+					} else {
+						location = "@{Approvals.list()}";
+					}
+				}else{
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+				}
+			});
+		});
+		
+		$('#close').click(function() {
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			}
+		});
+		//$(".buttons").css("display","none");
+		//$("#approval-actions").css("display","block");
+	});
+
+</script>
+
+<div id="detail">
+	<form id="form" class="form">
+		#{include 'ReportMaintenances/detail.html' /}
+	</form>
+</div>	
+
+<input type="button" id="approve" value="Approve" />
+<input type="button" id="reject" value="Reject" style="margin:5px;"/>		
+	
+<span id="approval-actions">
+	#{hidden id:'taskId', name:'taskId', value:taskId /}
+	#{hidden id:'maintenanceLogKey', name:'maintenanceLogKey', value:maintenanceLogKey /}
+	#{hidden id:'operation', name:'operation', value:operation /}
+	#{hidden id:'from', name:'from', value:from /}	
+</span>

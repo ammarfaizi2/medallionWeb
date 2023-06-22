@@ -1,0 +1,157 @@
+#{extends 'templates/main.html' /}
+
+<script type="text/javascript">
+	$(function() {
+		$(".btn").button();
+		
+		var backToApprovalList = function() {
+			loading.dialog('open');
+			location = "@{Approvals.list()}";
+		}
+		
+		var closeDialogMessage = function() {
+			$("#dialog-message").dialog("close");
+		}
+		
+		// Action buttons 
+		$('#save').click(function() {
+			var resume = true;
+			if (typeof doSave == 'function') { 
+				resume = doSave();
+			}
+			if (resume) {		
+				console.debug("submit1 " + new Date());
+				//$('#h_effectiveDate').val($('#effectiveDate').val());
+				//$('#h_maturityDate').val($('#maturityDate').val());
+				var action ="@{save()}?mode=${mode}&taskId=${taskId}";
+				loading.dialog('open');
+				/* var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+				loading.dialog({
+					closeOnEscape: false,
+					draggable: false,
+					modal: true,
+					resizable: false,
+					open:function() {
+						$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+					} 
+				}); */
+				$('#entitlementForm').attr('action', action);
+				console.debug("submit2 " + new Date());
+				$('#entitlementForm').submit();
+				//$.post('@{Entitlements.save()}/' + $('#corporateAnnouncementKey').val(), $('#entitlementForm').serialize());
+				//$('#entitlementForm').post(url:'@{Entitlements.save()}', data:$('#entitlementForm').serialize());
+				//return false;
+			}
+		});
+		$('#confirm').click(function() {
+			var action = "@{confirm()}?mode=${mode}&taskId=${taskId}";
+			loading.dialog('open');
+			/*var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+			 	loading.dialog({
+				closeOnEscape: false,
+				draggable: false,
+				modal: true,
+				resizable: false,
+				open:function() {
+					$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+				} 
+			}); */
+			$.post(action, $('#entitlementForm').serialize(), function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Notification", backToApprovalList);
+					//alert("Your Entitlement No is #" + data);
+					//location = "@{Approvals.list()}";
+				} else {
+					messageAlertOk("Failed saving data !", "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+					//alert("Failed saving data !");
+				}
+			});
+			//$('#transactionForm').attr('action', action);
+			//$('#transactionForm').submit();
+		});
+		$('#back').click(function() {
+			//var action = "@{back()}?mode=${mode}#{if taskId}&taskId=${taskId}#{/if}";
+			//$.post(action, $('#entitlementForm').serialize(), function(data, status, xhr) {
+				//if (status == 'success') {
+				//	$('#detail').html(data);
+				//	$("#actions #confirming").css('display', 'none');
+				//	$('#actions #editing').css('display', '');
+				//}
+			//});
+			//location.href="@{back(keyId)}?mode=${mode}#{if group}&group=${group}#{/}";
+			//return false;
+			location.href = "@{back()}?mode=${mode}&taksId=" + $('#taskId').val() + "&keyId=" + $('#keyId').val() +"&from=" + $('#from').val();				
+		});
+		$('#cancel').click(function() {
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			}
+		});
+		/*		
+		$('#clear').click(function() {
+			var action = "@{clear()}?mode=${mode}#{if taskId}&taskId=${taskId}#{/if}";
+			$.post(action, $('#transactionForm').serialize(), function(data, status, xhr) {
+	    		checkRedirect(data);
+				if (status == 'success') {
+					$('#detail').html(data);
+					$("#actions #confirming").css('display', 'none');
+					$('#actions #editing').css('display', '');
+				}
+			});	
+		});
+		*/
+	});	
+
+	function submit(action, id) {
+		var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Sending data to server ...</div>').appendTo('body');
+		loading.dialog({
+			closeOnEscape: false,
+			draggable: false,
+			modal: true,
+			resizable: false,
+			open:function() {
+				$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+			} 
+		});
+		$('#form').attr('action', action);
+		$('#form').submit();
+	}
+	
+	// validate populate
+	function doSave() {
+		if ($('#announcementDetailKey').val()== null) {
+			messageAlertOk("Please populate your Entitlement before saved", "ui-icon1 ui-icon-alert", "Warning Message", closeDialogMessage);
+			//alert("Please populate your Entitlement before saved");
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+</script>
+<h2>Corporate Action Entitlement Entry</h2>
+<div id="detail">
+	#{include 'EntitlementReprocess/master_detail.html' /}	
+</div>
+<div id="actions" class="buttons">
+	#{if confirming}
+		<!--  
+		<input type="button" id="confirm" value="Confirm" />
+		<input type="button" id="back" value="Back" />
+		-->
+		#{button id:'confirm', name:'confirm', value:'Confirm', class:'btn'/}
+		#{button id:'back', name:'back', value:'Back', class:'btn'/}
+	#{/if}
+	#{else}
+		#{button id:'save', name:'save', value:'Save', class:'btn'/}
+		#{button id:'cancel', name:'cancel', value:'Cancel', class:'btn'/}
+		<!--  
+		<input type="button" id="save" value="Save" />
+		<input type="button" id="clear" value="Clear" />
+		-->
+	#{/else}
+</div>

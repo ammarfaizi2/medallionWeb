@@ -1,0 +1,50 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Fund Action' /}
+
+<script type="text/javascript">
+	function doEdit(data) {
+		return false;
+	}
+</script>
+<table class="display">
+	<thead>
+		<tr>
+			<th>FundActionKey</th>
+			<th>&nbsp;</th>
+			<th>Fund Code</th>
+			<th>Dividen Type</th>
+			<th>Dividen Date</th>
+			<th>Remarks</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list fas, as:'fa'}
+		<tr>
+			<td>${fa?.fundActionKey}</td>
+			<td align="center"><input name="option" type="radio" value=${fa?.fundActionKey}></td>
+			<td>${fa?.rgProduct?.productCode}</td>
+			<td>${fa?.type}</td>
+			<td>${fa?.divDate?.format('MM/dd/yyyy')}</td>
+			<td>${fa?.remarks}</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>
+<div class="buttons" style="padding-top:5px;">
+	<input type="button" value="Process" id="btnProcess" />				
+</div>	
+
+	
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	$(document).ready(function() {     
+		$('.buttons input:button').button();
+		
+		var html = $("#main");
+		html.id("btnProcess").click(function(){
+			var id = html.name("option").checked();
+			if (id) { location.href='@{data()}/' + id; }
+		});
+	});
+</script>
+

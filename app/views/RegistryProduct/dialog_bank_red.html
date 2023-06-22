@@ -1,0 +1,47 @@
+<form></form>
+<form id="bankAccountFormRed" class="form">
+    <span id="errmsgNullRed" class="errmsg" ></span>
+	#{hidden id:'rowPositionRed' /}
+	#{hidden id:'oldDefaultRgProductBankAccountRed' /}
+	#{hidden id:'bankAccountKeyRed', name:'ba.bankAccountKey', value:ba?.bankAccountKey /}
+
+    <p>
+        #{textBox id:'bankAccountNoRed', width:'100px', name:'ba.bnAccount.accountNo', label:'Account No', labelwidth:'155px', value:ba?.bnAccount?.accountNo, required:true, class:'capitalize', readOnly:readOnly /}
+        #{button id:'bankAccountNoRedHelp', value:'?', class:'small', readOnly:readOnly /}
+        <span id="bankAccountNoRedError" class="error"></span>
+    </p>
+
+    <p>
+        #{textBox id:'thirdPartyCodeRed', name:'ba.bnAccount.thirdPartyCode', label:'Bank Code', value:ba?.bnAccount?.thirdPartyCode, readOnly:true, width:'60px' /}
+        #{textBox id:'thirdPartyNameRed', name:'ba.bnAccount.thirdPartyName', value:ba?.bnAccount?.thirdPartyName, readOnly:true, width:'170px' /}
+        #{hidden id:'thirdPartyKeyRed', name:'ba.bnAccount.thirdPartyKey', value:ba?.bnAccount?.thirdPartyKey /}
+    </p>
+
+    <p>
+        #{textBox id:'beneficiaryNameRed', name:'ba.bnAccount.customer.customerName', label:'Beneficiary Name', value:ba?.bnAccount?.customer?.customerName, class:'capitalize', readOnly:true, width:'230px' /}
+    </p>
+
+    <p>
+        #{textBox id:'currencyCodeRed', name:'ba.currency.currencyCode', label:'Currency', value:ba?.currency?.currencyCode, class:'capitalize', readOnly:true, width:'100px' /}
+    </p>
+
+    <p>
+        #{textBox id:'branchRed', name:'ba.branch', label:'Branch', value:ba?.branch, class:'capitalize', readOnly:true, width:'100px' /}
+    </p>
+
+    <p>
+        #{textBox id:'descriptionBankRed', name:'ba.description', label:'Description', value:ba?.description, class:'capitalize', readOnly:true, width:'100px' /}
+    </p>
+</form>
+
+<script type="text/javascript">
+    $(function(){
+        $("#cancelBankDialogRed").click(function() {
+        	$("#dialogBankAccountRed #bankAccountFormRed #bankAccountNoRed").removeClass('fieldError');
+        	$("#dialogBankAccountRed #bankAccountFormRed #errmsgNullRed").html("");
+        	$("#dialogBankAccountRed #bankAccountFormRed #bankAccountNoRedError").html("");
+            $("#dialogBankAccountRed").dialog('close');
+            return false;
+        });
+    });
+</script>

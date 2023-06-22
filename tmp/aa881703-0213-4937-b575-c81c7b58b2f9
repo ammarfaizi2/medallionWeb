@@ -1,0 +1,857 @@
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="param"
+
+edit
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="status"
+
+A 
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="account.custodyAccountKey"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="account.name"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="account.settlementAccount.accountNo"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="account.settlementAccount.name"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.organization.organizationId"
+
+2FE3AD52-C618-484F-857E-A9D530EF716A
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.customerKey"
+
+48792
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="currentDate"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.customerKey"
+
+48792
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.customerType.lookupId"
+
+CUSTOMER_TYPE-I
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.customerNo"
+
+RITEIID0-008453
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.firstName"
+
+TAN IE LIENG
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.middleName"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.lastName"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customerName"
+
+TAN IE LIENG
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.customerName"
+
+TAN IE LIENG
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.customerCategory.lookupId"
+
+CUSTOMER_CATEGORY-DIRECT
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.directId"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.custRetailFlag"
+
+true
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.customerGroup.thirdPartyCode"
+
+RITELKPDSINARMAS
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.customerGroup.thirdPartyKey"
+
+89629
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.customerGroup.thirdPartyName"
+
+RITEL_KPD_SINARMAS
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.externalNo"
+
+RITEIID0-008453
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="currencyCode"
+
+IDR
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.currency.currencyCode"
+
+IDR
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.currency.description"
+
+INDONESIAN RUPIAH
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.taxProfile.taxProfileCode"
+
+IND
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.taxProfile.description"
+
+INDIVIDU DALAM NEGERI
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.lkpbu.lookupCode"
+
+S14
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.lkpbu.lookupId"
+
+LKPBU_CODE-XXX
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.lkpbu.lookupDescription"
+
+Perorangan
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.cisNo"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.isActive"
+
+true
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.jointDate"
+
+25/07/2022
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.lastModifDate"
+
+27/10/2022
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.lastModifDateWithTime"
+
+27/10/2022 10:32:15
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.flagNoChangeData"
+
+false
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.cashProjection"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.amlCustomer.amlId"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="amlKey"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.taxId.lookupCode"
+
+1010
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.taxId.lookupId"
+
+TAX_ID-1010
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.taxId.lookupDescription"
+
+INDIVIDUAL – DOMESTIC
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.nationality.lookupCode"
+
+ID
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.nationality.lookupId"
+
+COUNTRY-ID
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.nationality.lookupDescription"
+
+INDONESIA
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.birthPlace.lookupCode"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.birthPlace.lookupId"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.birthPlace.lookupDescription"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.birthArea.lookupCode"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.birthArea.lookupId"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.birthArea.lookupDescription"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.birthPlaceOther"
+
+CIREBON
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.birthDate"
+
+05/12/1953
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.religion.lookupId"
+
+RELIGION-2
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.gender.lookupId"
+
+GENDER-F
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.maritalStatus.lookupId"
+
+MARITAL_STATUS-2
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.spouseName"
+
+SUAMI
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.motherName"
+
+TAN PEK KIOK NIO
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.heirName"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.heirRelation"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.educationBackground.lookupId"
+
+EDUCATION-SMA
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.educationBackgroundOthers"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.occupation.lookupId"
+
+OCCUPATION-4
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.occupationOthers"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.occupationDescription"
+
+BISNIS SENDIRI
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.annualIncomeRange.lookupId"
+
+INCOME_IND-3
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.npwp"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.npwpDate"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="identificationType1"
+
+IDENTIFICATION_TYPE-1
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.identificationType1.lookupId"
+
+IDENTIFICATION_TYPE-1
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.identification1No"
+
+3274024512530003
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.identification1Expiry"
+
+31/12/9998
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.identificationType2.lookupId"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.identification2No"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.identification2Expiry"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.identificationType3.lookupId"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.identification3No"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.identification3Expiry"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.identificationType4.lookupId"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.identification4No"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.identification4Expiry"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[1].addressType.lookupId"
+
+ADDRESS_TYPE-2
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[1].addressType.lookupDescription"
+
+2'ND ADDRESS
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[1].address1"
+
+JLN KARANGGETAS 229/231 RT/RW 001/009 CIREBON
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[1].address1Area.lookupCode"
+
+154
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[1].address1Area.lookupId"
+
+AREA-154
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[1].address1Area.lookupDescription"
+
+CIREBON
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[1].address1Phone1"
+
++62-231203172
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[1].address1Country.lookupCode"
+
+ID
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[1].address1Country.lookupId"
+
+COUNTRY-ID
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[1].address1Country.lookupDescription"
+
+INDONESIA
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[1].address1State.lookupCode"
+
+8
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[1].address1State.lookupId"
+
+STATE-8
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[1].address1State.lookupDescription"
+
+JAWA BARAT
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[1].address1ZipCode"
+
+45112
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[1].address1Phone2"
+
++62-87829927536
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[1].address1Phone3"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[1].addressExt1"
+
+JLN KARANGGETAS 229/231 RT/RW 001/009 CIREBON
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[1].addressExt2"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[1].addressExt3"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[1].isCustomer"
+
+true
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[1].contactKey"
+
+96492
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[0].addressType.lookupId"
+
+ADDRESS_TYPE-1
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[0].addressType.lookupDescription"
+
+MAIN ADDRESS
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[0].address1"
+
+JLN KARANGGETAS 229/231 RT/RW 001/009 CIREBON
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[0].address1Area.lookupCode"
+
+154
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[0].address1Area.lookupId"
+
+AREA-154
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[0].address1Area.lookupDescription"
+
+CIREBON
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[0].address1Phone1"
+
++62-231203172
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[0].address1Country.lookupCode"
+
+ID
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[0].address1Country.lookupId"
+
+COUNTRY-ID
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[0].address1Country.lookupDescription"
+
+INDONESIA
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[0].address1State.lookupCode"
+
+8
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[0].address1State.lookupId"
+
+STATE-8
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[0].address1State.lookupDescription"
+
+JAWA BARAT
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[0].address1ZipCode"
+
+45112
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[0].address1Phone2"
+
++62-87829927536
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[0].address1Phone3"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[0].addressExt1"
+
+JLN KARANGGETAS 229/231 RT/RW 001/009 CIREBON
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[0].addressExt2"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[0].addressExt3"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[0].isCustomer"
+
+true
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="contacts[0].contactKey"
+
+96493
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.email"
+
+mirna.muryani@sinarmas-am.co.id;sinta.kurniawan@sinarmas-am.co.id;rofi.hartawan@sinarmas-am.co.id;fixedincome@sinarmas-am.co.id;research.sam2@sinarmas-am.co.id
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.password"
+
+DH0022022
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.correspondenceAddress.lookupId"
+
+ADDRESS_TYPE-2
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+SRC_OF_FUND_IND-9
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="hidSourceOfFunds"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.sourceOfFundOthers"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="hidInvestObjs"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="hidInvestObjs"
+
+PURPOSE_OF_INV_IND-3
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="hidInvestObjs"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="hidInvestObjs"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="hidInvestObjs"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.purposeOfInvestmentOthers"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.swiftCode"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.swiftStatus.lookupId"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.assetOwner.lookupId"
+
+ASSET_OWNER-1
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.remarks"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="isAttachment"
+
+false
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.attachment"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.flagAttachFile"
+
+false
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="accounts[0].custodyAccountKey"
+
+13958
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="accounts[0].accountNo"
+
+DH002DFSTANILI00
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="accounts[0].name"
+
+KPD TAN IE LIENG
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="accounts[0].balance"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="bankAccounts[0].bankAccountKey"
+
+18011
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="bankAccounts[0].accountNo"
+
+7202771763
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="bankAccounts[0].name"
+
+TAN  IE LIENG
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="bankAccounts[0].balance"
+
+109687500
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="bankAccounts[1].bankAccountKey"
+
+17764
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="bankAccounts[1].accountNo"
+
+0026040779
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="bankAccounts[1].name"
+
+TAN  IE LIENG
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="bankAccounts[1].balance"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.flagChangeBankAccount"
+
+false
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.oriBankAccountInvoice.accountNo"
+
+0026040779
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.oriBankAccountInvoice.bankAccountKey"
+
+17764
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.oriBankAccountInvoice.name"
+
+TAN  IE LIENG
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="accountNo"
+
+0026040779
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.bankAccountInvoice.accountNo"
+
+0026040779
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.bankAccountInvoice.bankAccountKey"
+
+17764
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.bankAccountInvoice.name"
+
+TAN  IE LIENG
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.oriBankAccountInvoice.currency.currencyCode"
+
+IDR
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.oriBankAccountInvoice.currency.description"
+
+INDONESIAN RUPIAH
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="currencyCode"
+
+IDR
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.bankAccountInvoice.currency.currencyCode"
+
+IDR
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.bankAccountInvoice.currency.description"
+
+INDONESIAN RUPIAH
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.exchangeRateRef.lookupCode"
+
+BI
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.exchangeRateRef.lookupId"
+
+EXCHANGE_RATE_REF-BI
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.customer.lookupDescription"
+
+BI MIDDLE RATE
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.paymentMethod.lookupCode"
+
+1
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.paymentMethod.lookupId"
+
+PAYMENT_METHOD-1
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="customer.customer.lookupDescription"
+
+POOL ACCOUNT
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="udfs[0].value"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="udfs[0].fieldName"
+
+FATCA
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="udfs[0].displayType.lookupId"
+
+DISPLAY_TYPE-2
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="udfs[0].dataType.lookupId"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="udfs[0].label"
+
+FATCA
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="udfs[0].lookupGroup.lookupGroup"
+
+LOOKUP_YN
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="udfs[0].sequence"
+
+1
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="udfs[1].value"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="udfs[1].fieldName"
+
+TIN
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="udfs[1].displayType.lookupId"
+
+DISPLAY_TYPE-1
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="udfs[1].dataType.lookupId"
+
+DATA_TYPE-STR
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="udfs[1].label"
+
+TAXPAYER ID NO
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="udfs[1].lookupGroup.lookupGroup"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="udfs[1].sequence"
+
+2
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="udfs[2].value"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="udfs[2].fieldName"
+
+BRANCH_CODE
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="udfs[2].displayType.lookupId"
+
+DISPLAY_TYPE-1
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="udfs[2].dataType.lookupId"
+
+DATA_TYPE-STR
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="udfs[2].label"
+
+BRANCH CODE
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="udfs[2].lookupGroup.lookupGroup"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="udfs[2].sequence"
+
+3
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="udfs[3].value"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="udfs[3].fieldName"
+
+DORMANT
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="udfs[3].displayType.lookupId"
+
+DISPLAY_TYPE-2
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="udfs[3].dataType.lookupId"
+
+
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="udfs[3].label"
+
+DORMANT
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="udfs[3].lookupGroup.lookupGroup"
+
+LOOKUP_YN
+------WebKitFormBoundaryJjj1io769rbRszpA
+Content-Disposition: form-data; name="udfs[3].sequence"
+
+4
+------WebKitFormBoundaryJjj1io769rbRszpA--

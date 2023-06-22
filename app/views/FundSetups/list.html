@@ -1,0 +1,130 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'FA Fund Setup' /}
+#{set fixData: true /}
+#{set mode: mode /}
+#{script 'lookups.js' /}
+#{script 'external/Util.js' /}
+
+<script type="text/javascript"><!--
+	$(function() {
+		
+		$('.buttons button').button()
+		$('#new').click(function() {
+			location.href='@{entry()}';
+		});
+		
+	/*	var table = document.getElementsByTagName("table")[0];
+		var tbody = table.getElementsByTagName("tbody")[0];
+		tbody.onclick = function (e) {
+		    e = e || window.event;
+		    var data = [];
+		    var target = e.srcElement || e.target;
+		    while (target && target.nodeName !== "TR") {
+		        target = target.parentNode;
+		    }
+		    if (target) {
+		        var cells = target.getElementsByTagName("td");
+		        for (var i = 0; i < cells.length; i++) {
+		            data.push(cells[i].innerHTML);
+		        }
+		    }
+		    //alert(data[0]);
+		   doEdit2(data);
+		};*/
+	});
+	function doEdit2(data) {
+		if ((data[5] == "New") || (data[5] == "Updated")) {
+			location.href='@{view()}/' +data[0];
+			return false;
+		} else {
+			location.href='@{edit()}/' +data[0];
+			return false;
+		}
+	}
+
+	
+	function doEdit(data) {
+		if ((data[5] == "New") || (data[5] == "Updated")) {
+			view(data[0]);
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	
+--></script>
+
+
+<!-- table id="grid" class="display">
+	<thead>
+		<tr>
+			<th>key</th>
+			<th width="50px">Fund Code</th>
+			<th width="150px">Fund Name</th>
+			<th width="100px">Customer No</th>
+			<th width="50px">Fund Manager Code</th>
+			<th width="50px">Status</th>
+			<th width="50px">Active</th>
+		</tr>
+	</thead>
+	<tbody>
+		#{list items:faMasters, as:'faMaster'}
+		<tr>
+			<td>${faMaster?.fundKey} </td>
+			<td>${faMaster?.fundCode} </td>
+			<td>${faMaster?.fundDescription}</td>
+			<td>${faMaster?.customer?.customerNo}</td>
+			<td>${faMaster?.fundManager?.thirdPartyCode}</td>
+			<td>
+				${faMaster?.recordStatus?.decodeStatus()}
+			</td>
+			<td>
+				 ${faMaster?.isActive ? 'Yes':'No'}
+			</td>	
+			
+		</tr>
+		#{/list}
+	</tbody>
+</table -->
+
+<div id="result" style="display:none">
+	<table id="tableFundSetup" class="display">
+		<thead>
+			<tr>
+				<!-- th id="hid" field="fundKey|string|none|left|sort">Key</th -->
+				<th field="fundCode|string|none|left|sort">Fund Code</th>
+				<th field="fundDescription|string|none|left|sort">Fund Name</th>
+				<th field="customer.customerNo|string|none|left|sort">Customer Code</th>
+				<th field="fundManager.thirdPartyCode|string|none|left|sort">Fund Manager Code</th>
+				<th field="recordStatus|string|decode|center|sort">Status</th>
+				<th field="isActive|boolean|yesno|center|sort">Active</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+	
+
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'FundSetups/fundSetupPaging.js' /}
+	$(document).ready(function() {
+		Paging($("#accordion").add("#result"));
+	});
+</script>
+
+<div id="accordion">
+	<form id="searchForm" class="form" style="border:none">
+		<div class="buttons">
+			<button id="new">New</button>
+		</div>
+	</form>
+</div>
+
+	
+</div>
+	
+
+

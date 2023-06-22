@@ -1,0 +1,217 @@
+<script type="text/javascript" language="javascript"  src="/public/javascripts/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" language="javascript"  src="/public/javascripts/jquery-ui-1.8.13.min.js"></script>
+<script type="text/javascript" language="javascript"  src="/public/javascripts/autoNumeric-1.7.1.js"></script>
+
+#{script 'date.format.js' /}
+
+<script type="text/javascript">	
+	$(document).ready(function() {
+		#{include 'RegistrySubscription/Util.js' /}
+		
+		// set digitParameter ===================================================================================================
+		var digitAmount = $("#digitAmount").val();
+		var digitUnit = $("#digitUnit").val();
+		var digitPrice = $("#digitPrice").val();
+		var typeAmount = $("#typeAmount").val();
+		var typeUnit = $("#typeUnit").val();
+		var typePrice = $("#typePrice").val();
+		formatAmount(digitAmount, typeAmount);
+		formatUnit(digitUnit, typeUnit);
+		formatPrice(digitPrice, typePrice);
+		// ======================================================================================================================
+		
+		// for date info ========================================================================================================
+		var dateFrom = $('#dateFrom').val();
+		var dateTo = $('#dateTo').val();
+		console.debug("dateFrom = " + dateFrom +  " dateTo = " + dateTo);
+		var current = new Date($('#currentDate').val());
+		var currentDate = new Date($('#currentDate').val());
+		current.setDate(1);
+		var begin = new Date(current);
+		
+		$("#beginInqy").html(begin.format("dd-mmm-yyyy"));
+		$("#currentInqy").html(currentDate.format("dd-mmm-yyyy"));
+		
+		if (($('#dateFrom').val() != '') && ($('#dateTo').val() != '')) {
+			$("#beginInqy").html(dateFrom);
+			$("#currentInqy").html(dateTo);
+		}
+		
+		
+		// ======================================================================================================================
+			
+		$('#printAction').button();
+		$('#printAction').click(function(){
+			$('#printAction').css('display', 'none');
+			window.print();
+		});
+	});
+	
+	// setting digit parameter and rounding for amount ==========================================================================
+	function formatAmount(digitAmount, typeAmount) {
+		$("td[name=amountCell]", $("#grid-investor-inquiry")).each(function() {
+			console.debug($('#amountRoundValue').val());
+			var amount = $(this).html();
+			$("#formatAmount").valueRnd(amount.toNumber(","), true, digitAmount, typeAmount);
+			$(this).html($("#formatAmount").val());
+		});
+		
+		$("td[name=amountCell]", $("#grid-unit-valuation")).each(function() {
+			console.debug($('#amountRoundValue').val());
+			var amount = $(this).html();
+			$("#formatAmount").valueRnd(amount.toNumber(","), true, digitAmount, typeAmount);
+			$(this).html($("#formatAmount").val());
+		});
+	}
+	// ==========================================================================================================================
+	
+	// setting digit parameter and rounding for unit ============================================================================
+	function formatUnit(digitUnit, typeUnit) {
+		$("td[name=unitCell]", $("#grid-investor-inquiry")).each(function() {
+			var unit = $(this).html();
+			$("#formatUnit").valueRnd(unit.toNumber(","), true, digitUnit, typeUnit);
+			$(this).html($("#formatUnit").val());
+		});
+		
+		$("td[name=unitCell]", $("#grid-unit-valuation")).each(function() {
+			var unit = $(this).html();
+			$("#formatUnit").valueRnd(unit.toNumber(","), true, digitUnit, typeUnit);
+			$(this).html($("#formatUnit").val());
+		});
+	}
+	// ==========================================================================================================================
+	
+	// setting digit parameter and rounding for price ===========================================================================
+	function formatPrice(digitPrice, typePrice) {
+		$("td[name=priceCell]", $("#grid-investor-inquiry")).each(function() {
+			var price = $(this).html();
+			$("#formatPrice").valueRnd(price.toNumber(","), true, digitPrice, typePrice);
+			$(this).html($("#formatPrice").val());
+		});
+		
+		$("td[name=priceCell]", $("#grid-unit-valuation")).each(function() {
+			var price = $(this).html();
+			$("#formatPrice").valueRnd(price.toNumber(","), true, digitPrice, typePrice);
+			$(this).html($("#formatPrice").val());
+		});
+	}
+	// ==========================================================================================================================
+</script>
+
+<style type="text/css">
+	#printAction { 
+		margin-top:5px; 
+		margin-left:15px;
+		width:100px;
+	}
+	
+	.infoHolder {
+		margin-top: -8px;	
+	}
+	
+	body { 
+        font-family: Arial;  
+        font-size: 12px;  
+        color: #000000;  
+  	}
+  	
+  	table {
+ 		font-size : 10px; 	
+  	}
+  	
+  	hr {
+  		margin-top:0;
+  		height:10;
+  		background-color:#CCCCCC;
+  		border-style: none;
+  	}
+  	
+</style>
+
+#{hidden id:'formatAmount'/}
+#{hidden id:'formatPrice'/}
+#{hidden id:'formatUnit'/}
+#{hidden id:'digitAmount', name:'inv.rgProduct.amountRoundValue', value:inv?.rgProduct?.amountRoundValue /}
+#{hidden id:'digitUnit', name:'inv.rgProduct.unitRoundValue', value:inv?.rgProduct?.unitRoundValue /}
+#{hidden id:'digitPrice', name:'inv.rgProduct.priceRoundValue', value:inv?.rgProduct?.priceRoundValue /}
+#{hidden id:'typeAmount', name:'inv.rgProduct.amountRoundType', value:inv?.rgProduct?.amountRoundType /}
+#{hidden id:'typeUnit', name:'inv.rgProduct.unitRoundType', value:inv?.rgProduct?.unitRoundType /}
+#{hidden id:'typePrice', name:'inv.rgProduct.priceRoundType', value:inv?.rgProduct?.priceRoundType /}
+#{hidden id:'currentDate', name:'currentDate', value:currentDate /}
+#{hidden id:'dateFrom', name:'dateFrom', value:dateFrom?.format('dd-MMM-yyyy') /}
+#{hidden id:'dateTo', name:'dateTo', value:dateTo?.format('dd-MMM-yyyy') /}
+
+<title>Investor Inquiry View</title>
+<html>
+	<body>
+		<div>
+			<img src="/public/images/logo.png">
+			<h2 align="center">Investor Transaction Inquiry</h2>
+			<h4 class="infoHolder" align="center"><span id ='beginInqy'></span> s/d <span id ='currentInqy'></span></h4>
+			<table id="grid-investor-inquiry" width=100%>
+				<thead>
+					<tr bgcolor="#CCCCCC">
+						<th width="60px" style=":margin:0px;">Txn. No</th>
+						<th width="120px" style="margin:0px;">Goodfund Date</th>
+						<th width="120x">Post Date</th>
+						<th width="200px">Type</th>
+						<th width="200px">Gross Amount</th>
+						<th width="200px">Fee</th>
+						<th width="200px">Net Amount</th>
+						<th width="200px">Price</th>
+						<th width="200px">Unit</th>
+					</tr>
+				</thead>
+				<tbody>
+					#{list invsInquirys, as:'invInq'}
+						<tr>
+							<td width="60px">
+								${invInq?.tradeKey}
+							</td>
+							<td width="120px">
+								${invInq?.goodfundDate?.format('MM/dd/yyyy')}
+							</td>
+							<td>
+								${invInq?.postDate?.format('MM/dd/yyyy')}
+							</td>
+							<td>
+								${invInq?.type}
+							</td>
+							<td align="right" name="amountCell">
+								#{if invInq?.rgTransaction?.type == 'S'}
+									${invInq?.rgTransaction?.amount?.format('##,##0.######')}
+								#{/if}
+								#{else}
+									${invInq?.rgTransaction?.netAmount?.format('##,##0.######')}
+								#{/else}
+							</td>
+							<td align="right" name="amountCell">
+								${invInq?.rgTransaction?.totalFeeAmount?.format('##,##0.######')}
+							</td>
+							<td align="right" name="amountCell">
+								#{if invInq?.rgTransaction?.type == 'S'}
+									${invInq?.rgTransaction?.netAmount?.format('##,##0.######')}
+								#{/if}
+								#{else}
+									${invInq?.rgTransaction?.amount?.format('##,##0.######')}
+								#{/else}
+							</td>
+							<td align="right" name="priceCell">
+								${invInq?.rgTransaction?.price?.format('##,##0.##########')}
+							</td>
+							<td align="right" name="unitCell">
+								${invInq?.rgTransaction?.unit?.format('##,##0.########')}
+							</td>
+						</tr>		
+					#{/list}
+				</tbody>
+			</table>
+			<hr>
+		</div>
+	</body>
+	<footer>
+		<div>
+			<input type="button" id="printAction" value="Print" />
+		</div>
+	</footer>
+</html>

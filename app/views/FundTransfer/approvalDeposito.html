@@ -1,0 +1,180 @@
+#{extends 'templates/list2.html' /}
+#{set pageTitle: 'Fund Transfer Approval' /}
+#{script 'lookuppaging.js' /}
+#{script 'lookups.js' /}
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	$(function() {
+		// DECLARE CLASS BTN
+		$(".btn").button();
+		$(".btn").css("width", "100px");
+		//===============
+		$('#approve').button();
+		$('#reject').button();
+		
+		$(".buttons").css("display","none");
+		$("#approval-actions").css("display","block");
+		
+		$("#accountNoPl").dynapopup('PICK_CS_ACCOUNT_FUND_TRANSFER', '', 'btnPopulatePa');
+		
+		var backToWorkList = function() {
+			loading.dialog('open');
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			};
+		}
+		
+		$('#approve').click(function() {
+			var action = "@{approve()}?taskId=${taskId}&maintenanceLogKey=${maintenanceLogKey}&operation=${operation}";
+			loading.dialog('open');
+			$.post(action, function(data, status, xhr) {
+				loading.dialog('close');
+				if (data.status == 'success') {
+					messageAlertOk("Fund Transfer with no ${fundTransfer.batchKey} is Approved", "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+				} else {
+					messageAlertOk(data.message, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialog);
+				}
+			});			
+		});
+		
+		$('#reject').click(function() {
+			var action = "@{reject()}?taskId=${taskId}&maintenanceLogKey=${maintenanceLogKey}&operation=${operation}";
+			loading.dialog('open');
+			$.post(action, function(data, status, xhr) {
+				loading.dialog('close');
+				if (status == 'success') {
+					messageAlertOk("Fund Transfer with no ${fundTransfer.batchKey} is Rejected", "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+				} else {
+					messageAlertOk(data.message, "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+				}
+			});
+		});
+		
+		$('#closeWorkflow').click(function() {
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			}
+		});
+		
+		var closeDialog = function(){
+			$("#dialog-message").dialog("close");
+		};
+		
+		if("${fundTransfer.endSettleDate}" == ""){
+			$("#dateFrom").val("");
+			$("#checkAsOfDate").attr('checked',true);
+			$("#checkEuroFromTo").attr('checked',false);
+
+			$("#asOfDate").val("${fundTransfer.startSettleDate.format(appProp.dateFormat)}");
+			$("#dateFrom").val("");
+			$("#dateTo").val("");
+		}else{
+			$("#dateFrom").val("${fundTransfer.startSettleDate.format(appProp.dateFormat)}");
+			$("#dateTo").val("${fundTransfer.startSettleDate.format(appProp.dateFormat)}");
+			$("#checkAsOfDate").attr('checked',false);
+			$("#checkEuroFromTo").attr('checked',true);
+		}
+		
+		if("${fundTransfer.accountNo}" == ""){
+			$("accountNoPl").val("");
+		}else{
+			$("accountNoPl").val("${fundTransfer.accountNo}");
+		}
+		$("accountNoPl").trigger("change");
+		$('#accountNoPl').attr('disabled', 'disabled');
+		$('#accountNoPlHelp').attr('disabled', 'disabled');
+	});
+
+</script>
+
+<div id="detail">
+	<form id="form" class="form">
+		<p>
+			#{textBox id:'fundBatchNo', label:'Fund Batch No', value:fundTransfer?.batchKey, width:'120px', readOnly:true, class:'capitalize', required:false /}
+		</p>
+		<p> 
+			<label>Payment Date</label>
+			<input id='checkAsOfDate' type='radio' name='checkSettlementDate' checked="checked" disabled="disabled"/>
+			<b>As Of&nbsp;</b>
+			#{textBox id:'asOfDate', label:'', width:'80px', readOnly:true, class:'calendar', required:false /}
+		</p>
+		<p>
+			<label>&nbsp;</label>
+			<input id='checkEuroFromTo' type='radio' name='checkSettlementDate'  disabled='disabled'/>
+			<b>From&nbsp;</b>
+			#{textBox id:'dateFrom', label:'', width:'80px', readOnly:true, class:'calendar', required:false /}
+			<b>&nbsp;To&nbsp;</b>
+			#{textBox id:'dateTo', label:'', width:'80px', readOnly:true, class:'calendar', required:false /}
+		</p>
+		
+		<p>
+			#{textBox id:'accountNoPl', label:'Account No', width:'120px', readOnly:readOnly, class:'capitalize', required:false /}
+			#{hidden  id:'accountNoPlKey' /}
+			#{button  id:'accountNoPlHelp', value:'?', class:'small', readOnly:readOnly/}
+			#{textBox id:'accountNoPlDesc', readOnly:true, width:'245px' /}
+		</p>
+		<p>&nbsp;</p>
+		<table id="grid" class="display">
+			<thead>
+				<tr>
+					<th>code</th>
+					<td>No</td>
+					<td>Date</td>
+					<td>Account&nbsp;No</td>
+					<td>Security</td>
+					<td>Currency</td>
+					<td>Deposito&nbsp;No</td>
+					<td>Amount</td>
+					<td>Sender&nbsp;A/C&nbsp;No</td>
+					<td>Sender&nbsp;A/C&nbsp;Name</td>
+					<td>Benef&nbsp;A/C&nbsp;No</td>
+					<td>Benef&nbsp;Bank</td>
+					<td>Benef&nbsp;A/C&nbsp;Name</td>
+					<td>Type</td>
+					<td>Charge&nbsp;Amount</td>
+					<td>Net&nbsp;Payment&nbsp;Amount</td>
+					<td>Payment&nbsp;Type&nbsp;Code</td>
+				</tr>
+			</thead>
+			<tbody>
+			#{list items:details, as:'detail'}
+				<tr>
+					<td class="capitalize">${detail.noSeq}</td>
+					<td class="capitalize">${detail.noSeq}</td>
+					<td class="capitalize">${detail.valueDate.format(appProp.dateFormat)}</td>
+					<td class="capitalize">${detail.acctNo}</td>		
+					<td class="capitalize">${detail.security}</td>
+					<td class="capitalize">${detail.currency}</td>
+					<td class="capitalize">${detail.transactionNo}</td>	
+					<td class="capitalize" align="right">${detail.amountStr}</td>	
+					<td class="capitalize">${detail.senderAcctNo}</td>
+					<td class="capitalize">${detail.senderAcctName}</td>
+					<td class="capitalize">${detail.benefAccNo}</td>		
+					<td class="capitalize">${detail.benefBankName}</td>		
+					<td class="capitalize">${detail.benefAccName}</td>
+					<td class="capitalize">${detail.transType}</td>	
+					<td class="capitalize" align="right">${detail.chargeAmountStr}</td>
+					<td class="capitalize" align="right">${detail.netAmountStr}</td>
+					<td class="capitalize">${detail.paymentTypeCode}</td>
+				</tr>
+			#{/list}
+			</tbody>
+		</table>
+	</form>
+</div>	
+
+<input type="button" id="approve" value="Approve" class="btn" />
+<input type="button" id="reject" value="Reject" style="margin:5px;" class="btn" />		
+<input type="button" id="closeWorkflow" value="Cancel" class="btn" />
+	
+<span id="approval-actions">
+	#{hidden id:'taskId', name:'taskId', value:taskId /}
+	#{hidden id:'maintenanceLogKey', name:'maintenanceLogKey', value:maintenanceLogKey /}
+	#{hidden id:'operation', name:'operation', value:operation /}
+	#{hidden id:'from', name:'from', value:from /}
+</span>

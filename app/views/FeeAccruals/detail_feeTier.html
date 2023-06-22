@@ -1,0 +1,57 @@
+
+<script type="text/javascript">
+$(function(){
+	$('#cancelFeeTier').click(function() {
+		$("#detailFeeTier").dialog('close');
+		$("#tierValueError").html("");
+		$("#tierValue").removeClass('fieldError');
+		return false;
+	});
+	
+	$('#tierMaximumRange').blur(function(){
+		$('#newMaxRange').val($('#tierMaximumRangeStripped').val());
+	});
+	
+});
+</script>
+<style type="text/css">
+   #errTierMax {color:red; }
+   #errTierVal {color:red; }
+</style>
+<form>
+</form>
+<form id="feeTierForm" class="form">
+<p>
+	#{hidden id:'rowPosition' /}
+	#{hidden id:'oldMaxRange' /}
+	#{hidden id:'newMaxRange' /}
+	#{hidden id:'tierFeeKey', name:'faFeeTier.id.feeKey', value:faFeeTier?.id?.feeKey /}
+	#{hidden id:'tierRowNumber', name:'faFeeTier.id.rowNumber', value:faFeeTier?.id?.rowNumber /}
+	#{hidden id:'tierSequence', name:'faFeeTier.id.tierSequence', value:faFeeTier?.id?.tierSequence /}
+</p>
+
+&nbsp;<span id="tierValueError" class="error"></span>
+<p>
+	#{textBox id:'tierMaximumRange', name:'tierMaximumRange', label:'Tier Maximum', value:faFeeTier?.tierMaximumRange, format:'#,##0.####', class:'numeric', required:true, readOnly:readOnly, width:'100px'/}
+	#{hidden id:'tierMaximumRangeStripped', name:'faFeeTier.tierMaximumRange', value:faFeeTier?.tierMaximumRange /}
+	<span id="errTierMax"></span>
+</p>
+<p>
+	#{textBox id:'tierValue', name:'tierValue', label:'Tier Value', value:faFeeTier?.tierValue, format:'#,##0.####', class:'numeric', required:true, readOnly:readOnly, width:'100px'/}
+	#{hidden id:'tierValueStripped', name:'faFeeTier.tierValue', value:faFeeTier?.tierValue /} <span id="percent">%</span>
+	<span id="errTierVal"></span>
+</p>
+<p>
+	<div class="buttons">
+		#{ifnot confirming}
+		#{ifnot approval}
+		<button id="addFeeTier">Save</button>
+		<button id="cancelFeeTier">Cancel</button>
+		#{/ifnot}
+		#{/ifnot}
+		#{if confirming || mode=='view' || approval}
+		<button id="cancelFeeTier">Close</button>
+		#{/if}
+	</div>
+</p>
+</form>

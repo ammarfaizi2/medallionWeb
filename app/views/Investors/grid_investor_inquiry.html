@@ -1,0 +1,88 @@
+<script type="text/javascript">		
+	$(document).ready(function() {
+		investorInquiry();
+	});
+	
+	//gridInvestorInquiry();
+	//formatAmount(digitAmount, typeAmount);
+	//formatUnit(digitUnit, typeUnit);
+	//formatPrice(digitPrice, typePrice);
+</script>
+
+
+
+<div class ="tabs">
+	<ul>
+		<li><a href="#tabs-1">Investor Transaction Inquiry</a></li>
+	</ul>
+	<div class="pane" id="tabs-1">
+		<h4 class="infoHolder"><span id ='beginInqy'></span> s/d <span id ='currentInqy'></span></h4>
+		<table id="grid-investor-inquiry" class="display">
+			<thead>
+				<tr>
+					<th>Key</th>
+					<th width="60px">Txn. No</th>
+					<th width="85px">Goodfund Date</th>
+					<th width="85x">Post Date</th>
+					<th width="70px">Type</th>
+					<th width="200px">Gross Amount</th>
+					<th width="200px">Fee</th>
+					<th width="200px">Net Amount</th>
+					<th width="200px">Price</th>
+					<th width="200px">Unit</th>
+				</tr>
+			</thead>
+			<tbody>
+			#{list invsInquirys, as:'invInq'}
+				<tr>
+					<td>
+						${invInq?.tradeKey}
+					</td>
+					<td>
+						${invInq?.tradeKey}
+					</td>
+					<td>
+						${invInq?.goodfundDate?.format('MM/dd/yyyy')}
+					</td>
+					<td>
+						${invInq?.postDate?.format('MM/dd/yyyy')}
+					</td>
+					<td>
+						${invInq?.type}
+					</td>
+					<td align="right" name="amountCell">
+						#{if invInq?.rgTransaction?.type == 'S'}
+							${invInq?.rgTransaction?.amount?.format('##,##0.######')}
+						#{/if}
+						#{else}
+							${invInq?.rgTransaction?.netAmount?.format('##,##0.######')}
+						#{/else}
+					</td>
+					<td align="right" name="amountCell">
+						${invInq?.rgTransaction?.totalFeeAmount?.format('##,##0.######')}
+					</td>
+					<td align="right" name="amountCell">
+						#{if invInq?.rgTransaction?.type == 'S'}
+							${invInq?.rgTransaction?.netAmount?.format('##,##0.######')}
+						#{/if}
+						#{else}
+							${invInq?.rgTransaction?.amount?.format('##,##0.######')}
+						#{/else}
+					</td>
+					<td align="right" name="priceCell">
+						${invInq?.rgTransaction?.price?.format('##,##0.##########')}
+					</td>
+					<td align="right" name="unitCell">
+						${invInq?.rgTransaction?.unit?.format('##,##0.########')}
+					</td>
+				</tr>		
+			#{/list}
+			</tbody>
+		</table>	
+		<br />
+		<div id="button-investor-inquiry">
+			<button id="printInvestorInquiry" class="btn">Print</button>
+			<button id="historyInvestor" class="btn">History</button>
+		</div>
+	</div>
+</div>

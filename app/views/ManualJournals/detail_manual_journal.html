@@ -1,0 +1,87 @@
+<script type="text/javascript">
+	$(function(){
+		/*
+		$('#coaCode').lookup({
+			list:'@{Pick.coaMastersNotParent()}',
+			get:'@{Pick.coaMasterNotParent()}',
+			key:$('#coaMasterKey'),
+			description:$('#coaDescription'),
+			//filter:$('#securityType'),
+			help:$('#coaHelp')
+		});
+		*/
+		
+		$('#coaCode').dynapopup2({key:'coaMasterKey', help:'coaHelp', desc:'coaDescription'},'PICK_FA_COA_BOTTOM_LEVEL', '', 'position', function(data){
+			if (data) {
+				$('#coaCode').removeClass('fieldError');
+				$('#coaMasterKey').val(data.code);
+				$('#coaDescription').val(data.description);
+				$('#h_coaDescription').val(data.description);
+			}
+		},function(data){
+			$('#coaCode').addClass('fieldError');
+			$('#coaMasterKey').val('');
+			$('#coaCode').val('');
+			$('#coaDescription').val('NOT FOUND');
+			$('#h_coaDescription').val('');
+		});
+
+		$('#cancelManualJournalDetail').click(function() {
+			$('#coaCode').removeClass('fieldError');
+			$("#detailForManualJournalDetails").dialog('close');
+			return false;
+		})
+		
+		$('#coaCode').blur(function(){
+			// di comment sebab menyebabkan text DATA NOT FOUND ke hapus
+			//if ($('#coaCode').val()=="") {
+				//$('#coaMasterKey').val('');
+				//$('#coaCode').val('');
+				//$('#coaDescription').val('');
+				//$('#h_coaDescription').val('');
+			//}
+		});
+	});
+	
+</script>
+<style type="text/css">
+  .errmsg { color:red; }
+</style>
+<form></form>
+<form id="manualJournalDetailForm" class="form">
+<span id="errmsgNull" class="errmsg" ></span>
+<p>
+		#{hidden id:'oldMaxRange' /}
+		#{hidden id:'newMaxRange' /}
+		#{hidden id:'rowPosition' /}
+		#{hidden id:'transactionKey', name:'faTransactionDetail.faTransaction.transactionKey', value:faTransactionDetail?.faTransaction?.transactionKey /}
+		#{hidden id:'detailKey', name:'faTransactionDetail.detailKey', value:faTransactionDetail?.detailKey /}
+	</p>
+	<p>
+		#{textBox id:'coaCode', name:'faTransactionDetail.faCoaMaster.coaCode', label:'COA No', value:faTransactionDetail?.faCoaMaster?.coaCode, class:'capitalize', width:'100px', required:true, readOnly:readOnly /}
+		#{hidden id:'coaMasterKey', name:'faTransactionDetail.faCoaMaster.coaMasterKey', value:faTransactionDetail?.faCoaMaster?.coaMasterKey /}
+		#{button id:'coaHelp', value:'?', class:'small', readOnly:readOnly /}
+		&nbsp; <span id="coaCodeError" class="error"></span>
+	</p>
+	<p>
+		#{textBox id:'coaDescription', name:'faTransactionDetail.faCoaMaster.Description', label:'Name', class:'capitalize', value:faTransactionDetail?.faCoaMaster?.Description, readOnly:true, width:'250px' /}
+	</p>
+	<p>
+		#{textBox id:'subLedger', name:'faTransactionDetail.subLedger', label:'Subledger', value:faTransactionDetail?.subLedger, width:'120px', maxLength:20, readOnly:readOnly, class:'capitalize' /}		
+	</p>
+	<p>
+	<!--
+		#{radioButton id:'position', name:'position', value:((faTransactionDetail?.dorc == "C")?"C":"D"), label:'position', options:debitCredit, readOnly:readOnly /}
+	 	#{hidden id:'hiddenPosition', name:'faTransactionDetail.dorc', value:faTransactionDetail?.dorc /}
+	 -->	
+	 	#{dropDownList id:'position', name:'faTransactionDetail.dorc', label:'Position', value:faTransactionDetail?.dorc, options:debitCredit, required:true, width:'104px', readOnly:readOnly /}  
+		&nbsp; <span id="positionError" class="error"></span>
+	</p>	
+	<p>			
+		#{textBox id:'amount', label:'Amount', value:faTransactionDetail?.amount, format:'#,##0.####', class:'numericManualJournal', required:true, readOnly:readOnly, width:'100px' /}
+		#{hidden id:'amountStripped', name:'faTransactionDetail.amount', value:faTransactionDetail?.amount /}
+		&nbsp; <span id="amountError" class="error"></span>
+	</p>
+	<p>
+	</p>
+</form>

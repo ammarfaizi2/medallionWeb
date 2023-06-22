@@ -1,0 +1,840 @@
+
+#{script 'validation/numericOnly.js' /}
+
+<script type="text/javascript">	
+$(function() {
+	$('#accordionContact').accordion({
+		collapsible: false,
+		autoHeight: false 
+	});
+
+	$('.calendar').datepicker();
+	
+	$('#address12CountryCode').change(function(){
+		if (($('#address12CountryCode').val() == "") || ($('#address12CountryCode').isChange())) {
+			$('#address12Country').val("");
+			$('#h_address12CountryDesc').val("");
+			$('#address12CountryCode').removeClass('fieldError');
+			
+			$('#address12StateCode').val("");
+			$('#address12State').val("");
+			$('#address12StateDesc').val("");
+			$('#address12StateCode').removeClass('fieldError');
+			
+			$('#address12AreaCode').val("");
+			$('#address12Area').val("");
+			$('#address12AreaDesc').val("");
+			$('#address12AreaCode').removeClass('fieldError');
+			
+			state2("");
+			area2("");
+		}
+	});
+	
+	$('#address12StateCode').change(function(){
+		if (($('#address12StateCode').val() == "") || ($('#address12StateCode').isChange())) {
+			$('#address12State').val("");
+			$('#address12StateDesc').val("");
+			$('#h_address12StateDesc').val("");
+			$('#address12StateCode').removeClass('fieldError');
+			
+			$('#address12AreaCode').val("");
+			$('#address12Area').val("");
+			$('#address12AreaDesc').val("");
+			$('#address12AreaCode').removeClass('fieldError');
+			
+			area2("");
+		}
+	});
+	
+	$('#address12AreaCode').change(function(){
+		if ($('#address12AreaCode').val() == "") {
+			$('#address12AreaCode').val("");
+			$('#address12Area').val("");
+			$('#address12AreaDesc').val("");
+			$('#h_address12AreaDesc').val("");
+			$('#address12AreaCode').removeClass('fieldError');
+		}
+	});
+	
+	var stateFilter2 ="";
+	if($('#address12CountryCode').val() != ""){
+		stateFilter2 = "STATE";
+	}
+	state2(stateFilter2);
+	
+	var areaFilter2 ="";
+	if($('#address12StateCode').val() != ""){
+		areaFilter2 = "AREA";
+	}
+	area2(areaFilter2);
+		
+	/* $('#address12CountryCode').lookup({
+		list:'@{Pick.lookups()}?group=COUNTRY',
+		get:{
+			url:'@{Pick.lookup()}?group=COUNTRY',
+			success: function(data) {
+				if (data) {
+					$('#address12CountryCode').removeClass('fieldError');
+					$('#address12Country').val(data.code);
+					$('#address12CountryDesc').val(data.description);
+					$('#h_address12CountryDesc').val(data.description);
+					
+					$('#address12StateCode').val("");
+					$('#address12State').val("");
+					$('#address12StateDesc').val("");
+					$('#address12StateCode').removeClass('fieldError');
+					
+					$('#address12AreaCode').val("");
+					$('#address12Area').val("");
+					$('#address12AreaDesc').val("");
+					$('#address12AreaCode').removeClass('fieldError');
+					
+					state2("STATE");
+				}
+			},
+			error : function(data) {
+				$('#address12CountryCode').addClass('fieldError');
+				$('#address12CountryDesc').val('NOT FOUND');
+				$('#address12CountryCode').val('');
+				$('#address12Country').val('');
+				$('#h_address12CountryDesc').val('');
+			}
+		},
+		key:$('#address12Country'),
+		description:$('#address12CountryDesc'),
+		help:$('#address12CountryHelp'),
+		nextControl:$('#address12StateCode')
+	}); */
+	
+	 $('#address12CountryCode').dynapopup2({key:'address12Country',help:'address12CountryHelp', desc:'address12CountryDesc'},'PICK_GN_LOOKUP', "COUNTRY", "address12StateCode", 
+				function(data){
+					if (data) {
+						$('#address12CountryCode').removeClass('fieldError');
+						$('#address12Country').val(data.code);
+						$('#address12CountryDesc').val(data.description);
+						$('#h_address12CountryDesc').val(data.description);
+						
+						$('#address12StateCode').val("");
+						$('#address12State').val("");
+						$('#address12StateDesc').val("");
+						$('#address12StateCode').removeClass('fieldError');
+						
+						$('#address12AreaCode').val("");
+						$('#address12Area').val("");
+						$('#address12AreaDesc').val("");
+						$('#address12AreaCode').removeClass('fieldError');
+						
+						state2("STATE");
+						area2("");
+					}
+				},
+				function(data){
+					$('#address12CountryCode').addClass('fieldError');
+					$('#address12CountryCode').val('');
+					$('#address12Country').val('');
+					$('#address12CountryDesc').val('NOT FOUND');
+					$('#h_address12CountryDesc').val('');
+				}
+		);
+	
+	/* $('#address1CountryCode').dynapopup2({help:'address1CountryHelp', desc:'address1CountryDesc'},'PICK_GN_LOOKUP', "COUNTRY", "address1StateCode", 
+			function(data){
+				if (data) {
+					$('#address1CountryCode').removeClass('fieldError');
+					$('#address1Country').val(data.code);
+					$('#address1CountryDesc').val(data.description);
+					$('#h_address1CountryDesc').val(data.description);
+					state("STATE");
+					area("_");
+				}
+			},
+			function(data){
+				$('#address1CountryCode').addClass('fieldError');
+				$('#address1CountryCode').val('');
+				$('#address1Country').val('');
+				$('#address1CountryDesc').val('NOT FOUND');
+				$('#h_address1CountryDesc').val('');
+			}
+	); */
+	
+	// for check identification type 1 in tab contacts ======================================================================
+	$('#identificationType1Tab').change(function() {
+		checkIden();
+		$('#identification1NoTab').val('');
+		$('#identification1ExpiryConTab').val('');
+		$('#identification1ExpiryConTab').removeClass('fieldError');
+		$('#identification1ExpiryConTabError').html('');
+	});
+	// ======================================================================================================================
+	
+	// for check identification type 2 in tab contacts ======================================================================
+	$('#identificationType2Tab').change(function() {
+		checkIden();
+		$('#identification2NoTab').val('');
+		$('#identification2ExpiryConTab').val('');
+		$('#identification2ExpiryConTab').removeClass('fieldError');
+		$('#identification2ExpiryConTabError').html('');
+	});
+	// ======================================================================================================================
+	
+	// for check identification type 3 in tab contacts ======================================================================
+	$('#identificationType3Tab').change(function() {
+		checkIden();
+		$('#identification3NoTab').val('');
+		$('#identification3ExpiryConTab').val('');
+		$('#identification3ExpiryConTab').removeClass('fieldError');
+		$('#identification3ExpiryConTabError').html('');
+	});
+	// ======================================================================================================================
+		
+	// for check identification type 4 in tab contacts ======================================================================
+	$('#identificationType4Tab').change(function() {
+		checkIden();
+		$('#identification4NoTab').val('');
+		$('#identification4ExpiryConTab').val('');
+		$('#identification4ExpiryConTab').removeClass('fieldError');
+		$('#identification4ExpiryConTabError').html('');
+	});
+	// ======================================================================================================================
+	
+	// ================ start document ============//
+	
+	$('#documentType1Tab').change(function() {
+		checkDoc();
+		$('#document1NoTab').val('');
+		$('#document1ExpiryConTab').val('');
+		$('#document1ExpiryConTab').removeClass('fieldError');
+		$('#document1ExpiryConTabError').html('');
+	});
+	// ======================================================================================================================
+	
+	// for check document 2 in tab contacts ======================================================================
+	$('#documentType2Tab').change(function() {
+		checkDoc();
+		$('#document2NoTab').val('');
+		$('#document2ExpiryConTab').val('');
+		$('#document2ExpiryConTab').removeClass('fieldError');
+		$('#document2ExpiryConTabError').html('');
+	});
+	// ======================================================================================================================
+	
+	// for check Document type 3 in tab contacts ======================================================================
+	$('#documentType3Tab').change(function() {
+		
+		checkDoc();
+		$('#document3NoTab').val('');
+		$('#document3ExpiryConTab').val('');
+		$('#document3ExpiryConTab').removeClass('fieldError');
+		$('#document3ExpiryConTabError').html('');
+	});
+	// ======================================================================================================================
+		
+	// for check identification type 4 in tab contacts ======================================================================
+	$('#documentType4Tab').change(function() {
+		checkDoc();
+		$('#document4NoTab').val('');
+		$('#document4ExpiryConTab').val('');
+		$('#document4ExpiryConTab').removeClass('fieldError');
+		$('#document4ExpiryConTabError').html('');
+	});
+		
+	// ================ end document ==============//
+});
+
+function checkIden(){
+	var checkCombo = true;
+	if (($("#identificationType1Tab").val() == $("#identificationType2Tab").val()) || ($("#identificationType2Tab").val() == $("#identificationType1Tab").val())) {
+		if(checkCombo){
+			$('#identificationType3Tab').removeClass('fieldError');
+			$('#errmsgIDType3Tab').html("");
+			$('#identificationType4Tab').removeClass('fieldError');
+			$('#errmsgIDType4Tab').html("");
+			if (($("#identificationType1Tab").val() !="") && ($("#identificationType2Tab").val() !="")) {
+				$('#identificationType2Tab').addClass('fieldError');
+				$('#errmsgIDType2Tab').html("can not same with Identification 1");
+				checkCombo = false;
+			}
+		}
+	} 
+	if (($("#identificationType1Tab").val() == $("#identificationType3Tab").val()) || ($("#identificationType3Tab").val() == $("#identificationType1Tab").val())) {
+		if(checkCombo){
+			$('#identificationType2Tab').removeClass('fieldError');
+			$('#errmsgIDType2Tab').html("");
+			$('#identificationType4Tab').removeClass('fieldError');
+			$('#errmsgIDType4Tab').html("");
+			if (($("#identificationType1Tab").val() !="") && ($("#identificationType3Tab").val() !="")) {
+				$('#identificationType3Tab').addClass('fieldError');
+				$('#errmsgIDType3Tab').html("can not same with Identification 1");
+				checkCombo = false;
+			}
+		}
+	} 
+	if (($("#identificationType1Tab").val() == $("#identificationType4Tab").val()) || ($("#identificationType4Tab").val() == $("#identificationType1Tab").val())) {
+		if(checkCombo){
+			$('#identificationType2Tab').removeClass('fieldError');
+			$('#errmsgIDType2Tab').html("");
+			$('#identificationType3Tab').removeClass('fieldError');
+			$('#errmsgIDType3Tab').html("");
+			if (($("#identificationType1Tab").val() != "") && ($("#identificationType4Tab").val() != "")) {
+				$('#identificationType4Tab').addClass('fieldError');
+				$('#errmsgIDType4Tab').html("can not same with Identification 1");
+				checkCombo = false;
+			}
+		}
+	} 
+	if (($("#identificationType2Tab").val() == $("#identificationType3Tab").val()) || ($("#identificationType3Tab").val() == $("#identificationType2Tab").val())) {
+		if(checkCombo){
+			$('#identificationType2Tab').removeClass('fieldError');
+			$('#errmsgIDType2Tab').html("");
+			$('#identificationType4Tab').removeClass('fieldError');
+			$('#errmsgIDType4Tab').html("");
+			if (($("#identificationType2Tab").val() !="") && ($("#identificationType3Tab").val() !="")) {
+				$('#identificationType3Tab').addClass('fieldError');
+				$('#errmsgIDType3Tab').html("can not same with Identification 2");
+				checkCombo = false;
+			} else {
+				$('#identificationType3Tab').removeClass('fieldError');
+				$('#errmsgIDType3Tab').html("");
+			}
+		}
+	} 
+	if (($("#identificationType2Tab").val() == $("#identificationType4Tab").val()) || ($("#identificationType4Tab").val() == $("#identificationType2Tab").val())) {
+		if(checkCombo){
+			$('#identificationType2Tab').removeClass('fieldError');
+			$('#errmsgIDType2Tab').html("");
+			$('#identificationType3Tab').removeClass('fieldError');
+			$('#errmsgIDType3Tab').html("");
+			if (($("#identificationType2Tab").val() != "") && ($("#identificationType4Tab").val() != "")) {
+				$('#identificationType4Tab').addClass('fieldError');
+				$('#errmsgIDType4Tab').html("can not same with Identification 2");
+				checkCombo = false;
+			} else {
+				$('#identificationType4Tab').removeClass('fieldError');
+				$('#errmsgIDType4Tab').html("");
+			}
+		}
+	} 
+	if (($("#identificationType3Tab").val() == $("#identificationType4Tab").val()) || ($("#identificationType4Tab").val() == $("#identificationType3Tab").val())) {
+		if(checkCombo){
+			$('#identificationType2Tab').removeClass('fieldError');
+			$('#errmsgIDType2Tab').html("");
+			$('#identificationType3Tab').removeClass('fieldError');
+			$('#errmsgIDType3Tab').html("");
+			if (($("#identificationType3Tab").val() != "") && ($("#identificationType4Tab").val() != "")) {
+				$('#identificationType4Tab').addClass('fieldError');
+				$('#errmsgIDType4Tab').html("can not same with Identification 3");
+				checkCombo = false;
+			} else {
+				$('#identificationType4Tab').removeClass('fieldError');
+				$('#errmsgIDType4Tab').html("");
+			}
+		}
+	} 
+	if (checkCombo){
+		$('#identificationType2Tab').removeClass('fieldError');
+		$('#errmsgIDType2Tab').html("");
+		$('#identificationType3Tab').removeClass('fieldError');
+		$('#errmsgIDType3Tab').html("");
+		$('#identificationType4Tab').removeClass('fieldError');
+		$('#errmsgIDType4Tab').html("");
+	}
+}
+
+function checkDoc(){
+	var checkCombo = true;
+	if (($("#documentType1Tab").val() == $("#documentType2Tab").val()) || ($("#documentType2Tab").val() == $("#documentType1Tab").val())) {
+		$('#documentType3Tab').removeClass('fieldError');
+		$('#documentType3TabError').html("");
+		$('#documentType4Tab').removeClass('fieldError');
+		$('#documentType4TabError').html("");
+		if (($("#documentType1Tab").val() !="") && ($("#documentType2Tab").val() !="")) {
+			$('#documentType2Tab').addClass('fieldError');
+			$('#documentType2TabError').html("can not same with Document 1");
+			checkCombo = false;
+		}
+	} 
+	if (($("#documentType1Tab").val() == $("#documentType3Tab").val()) || ($("#documentType3Tab").val() == $("#documentType1Tab").val())) {
+		if(checkCombo){
+			$('#documentType2Tab').removeClass('fieldError');
+			$('#documentType2TabError').html("");
+			$('#documentType4Tab').removeClass('fieldError');
+			$('#documentType4TabError').html("");
+			if (($("#documentType1Tab").val() !="") && ($("#documentType3Tab").val() !="")) {
+				$('#documentType3Tab').addClass('fieldError');
+				$('#documentType3TabError').html("can not same with Document 1");
+				checkCombo = false;
+			}
+		}
+	}
+	if (($("#documentType1Tab").val() == $("#documentType4Tab").val()) || ($("#documentType4Tab").val() == $("#documentType1Tab").val())) {
+		if(checkCombo){
+			$('#documentType2Tab').removeClass('fieldError');
+			$('#documentType2TabError').html("");
+			$('#documentType3Tab').removeClass('fieldError');
+			$('#documentType3TabError').html("");
+			if (($("#documentType1Tab").val() != "") && ($("#documentType4Tab").val() != "")) {
+				$('#documentType4Tab').addClass('fieldError');
+				$('#documentType4TabError').html("can not same with Document 1");
+				checkCombo = false;
+			}
+		}
+		
+	}
+	if (($("#documentType2Tab").val() == $("#documentType3Tab").val()) || ($("#documentType3Tab").val() == $("#documentType2Tab").val())) {
+		if(checkCombo){
+			$('#documentType2Tab').removeClass('fieldError');
+			$('#documentType2TabError').html("");
+			$('#documentType4Tab').removeClass('fieldError');
+			$('#documentType4TabError').html("");
+			
+			if (($("#documentType2Tab").val() !="") && ($("#documentType3Tab").val() !="")) {
+				$('#documentType3Tab').addClass('fieldError');
+				$('#documentType3TabError').html("can not same with Document 2");
+				checkCombo = false;
+			} else {
+				$('#documentType3Tab').removeClass('fieldError');
+				$('#documentType3TabError').html("");
+			}
+		}
+		
+	}
+	if (($("#documentType2Tab").val() == $("#documentType4Tab").val()) || ($("#documentType4Tab").val() == $("#documentType2Tab").val())) {
+		if(checkCombo){
+			$('#documentType2Tab').removeClass('fieldError');
+			$('#documentType2TabError').html("");
+			$('#documentType3Tab').removeClass('fieldError');
+			$('#documentType3TabError').html("");
+			if (($("#documentType2Tab").val() != "") && ($("#documentType4Tab").val() != "")) {
+				$('#documentType4Tab').addClass('fieldError');
+				$('#documentType4TabError').html("can not same with Document 2");
+				checkCombo = false;
+			} else {
+				$('#documentType4Tab').removeClass('fieldError');
+				$('#documentType4TabError').html("");
+			}
+		}
+		
+	} 
+	if (($("#documentType3Tab").val() == $("#documentType4Tab").val()) || ($("#documentType4Tab").val() == $("#documentType3Tab").val())) {
+		if(checkCombo){
+			$('#documentType2Tab').removeClass('fieldError');
+			$('#documentType2TabError').html("");
+			$('#documentType3Tab').removeClass('fieldError');
+			$('#documentType3TabError').html("");
+			if (($("#documentType3Tab").val() != "") && ($("#documentType4Tab").val() != "")) {
+				$('#documentType4Tab').addClass('fieldError');
+				$('#documentType4TabError').html("can not same with Document 3");
+				checkCombo = false;
+			} else {
+				$('#documentType4Tab').removeClass('fieldError');
+				$('#documentType4TabError').html("");
+			}
+		}
+		
+	} 
+	if(checkCombo){
+		$('#documentType2Tab').removeClass('fieldError');
+		$('#documentType2TabError').html("");
+		$('#documentType3Tab').removeClass('fieldError');
+		$('#documentType3TabError').html("");
+		$('#documentType4Tab').removeClass('fieldError');
+		$('#documentType4TabError').html("");
+	}
+}
+
+function state2(data) {
+	$('#address12StateCode').lookup({
+		list:'@{Pick.lookups()}?group='+data,
+		get:{
+			url:'@{Pick.lookup()}?group='+data,
+			success: function(data) {
+				if (data) {
+					if ($('#address12CountryCode').val() == "" || $('#address12CountryCode').val() == null) {
+						$('#address12StateCode').addClass('fieldError');
+						$('#address12StateDesc').val('NOT FOUND');
+						$('#address12StateCode').val('');
+						$('#address12State').val('');
+						$('#h_address12StateDesc').val('');
+						return false;
+					}
+					$('#address12StateCode').removeClass('fieldError');
+					$('#address12State').val(data.code);
+					$('#address12StateDesc').val(data.description);
+					$('#h_address12StateDesc').val(data.description);
+					area2("AREA");
+				}
+			},
+			error : function(data) {
+				$('#address12StateCode').addClass('fieldError');
+				$('#address12StateDesc').val('NOT FOUND');
+				$('#address12StateCode').val('');
+				$('#address12State').val('');
+				$('#h_address12StateDesc').val('');
+			}
+		},
+		filter: {'key':'1','value':$('#address12Country')},
+		key:$('#address12State'),
+		description:$('#address12StateDesc'),
+		help:$('#address12StateHelp'),
+		nextControl:$('#address12AreaCode')
+	});
+	// ======================================================================================================================
+}
+
+function area2(data) {
+	// address 1 area lookup at tab contacts ================================================================================
+	$('#address12AreaCode').lookup({
+		list:'@{Pick.lookups()}?group='+data,
+		get:{
+			url:'@{Pick.lookup()}?group='+data,
+			success: function(data) {
+				if (data) {
+					if ($('#address12StateCode').val() == "" || $('#address12StateCode').val() == null) {
+						$('#address12AreaCode').addClass('fieldError');
+						$('#address12AreaDesc').val('NOT FOUND');
+						$('#address12AreaCode').val('');
+						$('#address12Area').val('');
+						$('#h_address12AreaDesc').val('');
+						return false;
+					}
+					$('#address12AreaCode').removeClass('fieldError');
+					$('#address12Area').val(data.code);
+					$('#address12AreaDesc').val(data.description);
+					$('#h_address12AreaDesc').val(data.description);
+				}
+			},
+			error : function(data) {
+				$('#address12AreaCode').addClass('fieldError');
+				$('#address12AreaDesc').val('NOT FOUND');
+				$('#address12AreaCode').val('');
+				$('#address12Area').val('');
+				$('#h_address12AreaDesc').val('');
+			}
+		},
+		filter:{'key':'2','value':$('#address12State')},
+		key:$('#address12Area'),
+		description:$('#address12AreaDesc'),
+		help:$('#address12AreaHelp'),
+		nextControl:$('#address12ZipCode')
+	});
+	// ======================================================================================================================
+}
+</script>
+
+<fieldset>
+	<legend><b>ID Card Information</b></legend>
+	<p id="classNpwpNo">
+		<label>NPWP Number<span class="req"> </span></label>
+		#{textBox id:'npwp', name:'customer.npwp', value:customer?.npwp, readOnly:readOnly, width:'300px', maxLength:50, class:'capitalize' /}
+		<span class="error">#{error 'NPWP Number in tab ID Info is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'npwpDate', name:'customer.npwpDate', label:'NPWP Registration Date', value:customer?.npwpDate?.format(appProp.dateFormat), class:'calendar', readOnly:readOnly, maxLength:10 /} (${appProp.displayDateFormat})
+		<span id="npwpDateError" class="error"></span>
+	</p>
+	<br>
+	<div class="individual_only">
+		<table style="width: 80%;">
+			<tr>
+				<td width="100px"></td>
+				<td width="100px">
+					<label style="margin-left: 10px; width: 70px">ID Type</label>
+				</td>
+				<td align="center" width="100px">
+					<label>ID Number</label>
+				</td>
+				<td align="center" width="60px" >
+					<label>Expiry Date</label>
+				</td>
+			</tr>
+			<tr>
+				<td >
+					<label>Identification 1 <span class="req">*</span> </label>
+				</td>
+				<td >
+					#{dropDownList id:'identificationType1Tab', name:'identificationType1Tab', value:customer?.identificationType1?.lookupId, options:identificationTypes, readOnly:readOnly, class:'dropdown forIndi', required:true /}
+					#{hidden id:'identificationType1Hide', name:'customer.identificationType1.lookupId', value:customer?.identificationType1?.lookupId, class:'forIndi' /}
+				</td>
+				<td align="center">
+					#{textBox id:'identification1NoTab', name:'customer.identification1No', value:customer?.identification1No, readOnly:readOnly, width:'218px', class:'capitalize forIndi', maxLength:50 /}	
+				</td>
+				<td align="center">
+					#{textBox id:'identification1ExpiryConTab', name:'customer.identification1Expiry', value:customer?.identification1Expiry?.format(appProp.dateFormat), readOnly:readOnly, class:'calendar expiryDate invalidDateFormat forIndi', maxLength:10 /}
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><span id="errmsgIDType1Tab" class="errorMessage">#{error 'Identification 1 in tab ID Info is' /}</span></td> 
+				<td align="center"><span id="identification1NoTabError" class="errorMessage">#{error 'Identification 1 Number in tab ID Info is' /}</span></td> 
+				<td align="center"><span id="identification1ExpiryConTabError" class="errorMessage">#{error 'Identification 1 Expiry Date in tab ID Info is' /}</span></td>
+			</tr>
+			<tr>
+				<td >
+					<label>Identification 2</label>
+				</td>
+				<td>
+					#{dropDownList id:'identificationType2Tab', name:'customer.identificationType2.lookupId', value:customer?.identificationType2?.lookupId, options:identificationTypes, readOnly:readOnly, class:'dropdown forIndi' /}
+				</td>
+				<td align="center">
+					#{textBox id:'identification2NoTab', name:'customer.identification2No', value:customer?.identification2No, readOnly:readOnly, width:'218px', class:'capitalize forIndi', maxLength:50 /}
+				</td>
+				<td align="center">
+					#{textBox id:'identification2ExpiryConTab', name:'customer.identification2Expiry', value:customer?.identification2Expiry?.format(appProp.dateFormat), readOnly:readOnly, class:'calendar expiryDate invalidDateFormat forIndi', maxLength:10 /}
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><span id="errmsgIDType2Tab" class="errorMessage"></span></td> 
+				<td align="center"><span id="identification2NoTabError" class="errorMessage">#{error 'Identification 2 Number in tab ID Info is' /}</span></td> 
+				<td align="center"><span id="identification2ExpiryConTabError" class="errorMessage">#{error 'Identification 2 Expiry Date in tab ID Info is' /}</span></td>
+			</tr>
+			<tr>
+				<td>
+					<label>Identification 3</label>
+				</td>
+				<td>
+					#{dropDownList id:'identificationType3Tab', name:'customer.identificationType3.lookupId', value:customer?.identificationType3?.lookupId, options:identificationTypes, readOnly:readOnly, class:'dropdown forIndi' /}
+				</td>
+				<td align="center">
+					#{textBox id:'identification3NoTab', name:'customer.identification3No', value:customer?.identification3No, readOnly:readOnly, width:'218px', class:'capitalize forIndi', maxLength:50 /}
+				</td>
+				<td align="center">
+					#{textBox id:'identification3ExpiryConTab', name:'customer.identification3Expiry', value:customer?.identification3Expiry?.format(appProp.dateFormat), readOnly:readOnly, class:'calendar expiryDate invalidDateFormat forIndi', maxLength:10 /}
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><span id="errmsgIDType3Tab" class="errorMessage"></span></td> 
+				<td align="center"><span id="identification3NoTabError" class="errorMessage">#{error 'Identification 3 Number in tab ID Info is' /}</span></td> 
+				<td align="center"><span id="identification3ExpiryConTabError" class="errorMessage">#{error 'Identification 3 Expiry Date in tab ID Info is' /}</span></td>
+			</tr>
+			<tr>
+				<td >
+					<label>Identification 4</label>
+				</td>
+				<td>
+					#{dropDownList id:'identificationType4Tab', name:'customer.identificationType4.lookupId', value:customer?.identificationType4?.lookupId, options:identificationTypes, readOnly:readOnly, class:'dropdown forIndi' /}
+				</td>
+				<td align="center">
+					#{textBox id:'identification4NoTab', name:'customer.identification4No', value:customer?.identification4No, readOnly:readOnly, width:'218px', class:'capitalize forIndi', maxLength:50 /}
+				</td>
+				<td align="center">
+					#{textBox id:'identification4ExpiryConTab', name:'customer.identification4Expiry', value:customer?.identification4Expiry?.format(appProp.dateFormat), readOnly:readOnly, class:'calendar expiryDate invalidDateFormat forIndi', maxLength:10 /}
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><span id="errmsgIDType4Tab" class="errorMessage"></span></td> 
+				<td align="center"><span id="identification4NoTabError" class="errorMessage">#{error 'Identification 4 Number in tab ID Info is' /}</span></td> 
+				<td align="center"><span id="identification4ExpiryConTabError" class="errorMessage">#{error 'Identification 4 Expiry Date in tab ID Info is' /}</span></td>
+			</tr>
+		</table>
+	</div>	
+</fieldset>			
+<br />
+
+<div class="individual_only">
+	<fieldset>
+		<legend><b>ID Address</b></legend>
+		<p>			
+			#{textBox id:'address2Ext1', name:'customer.cfContact2.addressExt1', label:'Address', value:customer?.cfContact2?.addressExt1, readOnly:readOnly, class:'capitalize', width:'328px', maxLength:150 /}
+			<span id="addressExt1Error" class="errorMessage"></span>
+		</p>
+		<p>			
+			#{textBox id:'address2Ext2', name:'customer.cfContact2.addressExt2', label:' ', value:customer?.cfContact2?.addressExt2, readOnly:readOnly, class:'capitalize', width:'328px', maxLength:40 /}
+		</p>
+		<p>			
+			#{textBox id:'address2Ext3', name:'customer.cfContact2.addressExt3', label:' ', value:customer?.cfContact2?.addressExt3, readOnly:readOnly, class:'capitalize', width:'328px', maxLength:35 /}		
+		</p>
+		<p>			
+			#{textBox id:'address12ZipCode', name:'customer.cfContact2.address1ZipCode', label:'Postal Code', value:customer?.cfContact2?.address1ZipCode, readOnly:readOnly, class:'capitalize', width:'80px', maxLength:50 /}
+		</p>
+		<p>
+			#{textBox id:'address12CountryCode', name:'customer.cfContact2.address1Country.lookupCode', label:'Country', value:customer?.cfContact2?.address1Country?.lookupCode,  class:'capitalize', readOnly:readOnly, width:'80px' /}
+			#{hidden id:'address12Country', name:'customer.cfContact2.address1Country.lookupId', value:customer?.cfContact2?.address1Country?.lookupId /}
+			#{button id:'address12CountryHelp', value:'?', class:'small', readOnly:readOnly /}	
+			#{textBox id:'address12CountryDesc', name:'customer.cfContact2.address1Country.lookupDescription', value:customer?.cfContact2?.address1Country?.lookupDescription, readOnly:true, width:'220px' /}
+			<span id="address12CountryCodeError" class="errorMessage"></span>
+			
+		</p>
+		<p>
+			#{textBox id:'address12StateCode', name:'customer.cfContact2.address1State.lookupCode', label:'State', value:customer?.cfContact2?.address1State?.lookupCode, class:'capitalize', readOnly:readOnly, width:'80px' /}
+			#{hidden id:'address12State', name:'customer.cfContact2.address1State.lookupId', value:customer?.cfContact2?.address1State?.lookupId /}
+			#{button id:'address12StateHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'address12StateDesc', name:'customer.cfContact2.address1State.lookupDescription', value:customer?.cfContact2?.address1State?.lookupDescription, readOnly:true, width:'220px' /}&nbsp;<span class="errmsg"></span>
+			<span id="address12StateCodeError" class="errorMessage"></span>
+			
+		</p>
+		<p>
+			#{textBox id:'address12AreaCode', name:'customer.cfContact2.address1Area.lookupCode', label:'Area', value:customer?.cfContact2?.address1Area?.lookupCode, class:'capitalize', readOnly:readOnly, width:'80px' /}
+			#{hidden id:'address12Area', name:'customer.cfContact2.address1Area.lookupId', value:customer?.cfContact2?.address1Area?.lookupId /}
+			#{button id:'address12AreaHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'address12AreaDesc', name:'customer.cfContact2.address1Area.lookupDescription', value:customer?.cfContact2?.address1Area?.lookupDescription, readOnly:true, width:'220px' /}&nbsp;<span class="errmsg"></span>
+			<span id="address12AreaCodeError" class="errorMessage"></span>
+						
+		</p>
+	</fieldset>
+</div>
+
+<div class="corporate_only">
+	<fieldSet>
+		<legend><b>Supplementary Documents</b></legend>
+
+			<p >
+				#{textBox id:'articleOfAssociation', name:'customer.articleOfAssociation', label:'Article of Associate', value:customer?.articleOfAssociation, readOnly:readOnly, class:'corporate capitalize', width:'121px', maxLength:50 /}
+				<span class="error">#{error 'Article of Asosiaciate in tab ID Info is' /}</span>
+			</p>
+			<p id="liSiupNo">
+				#{textBox id:'siupNo', name:'customer.siupNo', label:'Business Reg Cert No', value:customer?.siupNo, readOnly:readOnly, class:'corporate capitalize', width:'300px', maxLength:50 /}
+				<span class="error">#{error 'Bussines Reg Cert No in tab Corporate is' /}</span>
+			</p>
+			<p>
+				#{textBox id:'expDateBusinesRegCert', name:'customer.siupExDate', label:'Exp. Date of Bussines Reg Cert No.', value:customer?.siupExDate?.format(appProp.dateFormat), readOnly:readOnly, class:'calendar corporate', maxLength:10 /} (${appProp.displayDateFormat})
+				<span id="expDateBusinesRegCertError" class="error">#{error 'Exp. Date of Bussines Reg Cert No. in tab Corporate is' /}</span>
+			</p>
+			<p id="skdNoLi" class="corporate_only">
+				#{textBox id:'skdNo', name:'customer.skdNo', value:customer?.skdNo, label:'SKD Number',readOnly:readOnly, width:'300px', maxLength:50, class:'corporate capitalize' /}
+				<span class="error">#{error 'SKD Number is' /}</span>
+				
+			</p>
+			<p id="skdDateLi" class="corporate_only">
+				#{textBox id:'skdDate', name:'customer.skdDate', label:'SKD Expired Date',value:customer?.skdDate?.format(appProp.dateFormat), readOnly:readOnly, class:'calendar corporate', maxLength:10 /}(${appProp.displayDateFormat})
+				<span id="skdDateError" class="error">#{error 'SKD Expired Date in tab Corporate is' /}</span>
+			</p>
+		
+		<table width="100%">
+		<tr>
+			<th width="50px"></th>
+			<th>
+				Document Type
+			</th>
+			<th>
+				Document No
+			</th>
+			<th>
+				Expiry Date
+			</th>
+		</tr>
+		<tr>
+			<td align="center" id="tdDocType">
+				<label> Document 1</label>
+			</td>
+			<td align="center">
+				#{dropDownList id:'documentType1Tab', name:'customer.identificationType1Tamp.lookupId', value:customer?.identificationType1Tamp?.lookupId, options:supplementDoc, readOnly:readOnly, class:'dropdown corporate forCorp' /}
+				
+				<span class="error">#{error 'Document 1 Type in tab Corporate is' /}</span>
+			</td>
+			<td align="center">
+				#{textBox id:'document1NoTab', name:'customer.identification1NoTamp', value:customer?.identification1NoTamp, required:true, readOnly:readOnly, class:'corporate capitalize forCorp', width:'218px', maxLength:50 /}	
+			</td>
+			<td align="center">
+				#{textBox id:'document1ExpiryConTab', name:'customer.identification1ExpiryTamp', value:customer?.identification1ExpiryTamp?.format(appProp.dateFormat), required:true, readOnly:readOnly, class:'calendar corporate expiryDate invalidDateFormat forCorp', maxLength:10 /}
+			</td>
+			
+		</tr>
+		<tr>
+			<td></td>
+			<td align="center">
+				<span id="documentType1TabError" class="error"></span>
+			</td>
+			<td align="center">
+				<span class="error">#{error 'Document 1 No in tab ID Info is' /}</span>
+			</td>
+			<td align="center">
+				<span class="error">#{error 'Document 1 Expiry Date in tab Corporate is' /}</span>
+				<span id="document1ExpiryConTabError" class="error"></span>
+			</td>
+			
+		</tr>
+		<tr>
+			<td align="center">
+				<label>Document 2</label>
+			</td>
+			<td align="center">
+				#{dropDownList id:'documentType2Tab', name:'customer.identificationType2Tamp.lookupId',value:customer?.identificationType2Tamp?.lookupId, options:supplementDoc, readOnly:readOnly, class:'dropdown corporate forCorp' /}
+			</td>
+			<td align="center">
+				#{textBox id:'document2NoTab', name:'customer.identification2NoTamp', value:customer?.identification2NoTamp, required:true, readOnly:readOnly, class:'corporate capitalize forCorp', width:'218px', maxLength:50 /}
+			</td>
+			<td align="center">
+				#{textBox id:'document2ExpiryConTab', name:'customer.identification2ExpiryTamp', value:customer?.identification2ExpiryTamp?.format(appProp.dateFormat), readOnly:readOnly, class:'calendar corporate expiryDate invalidDateFormat forCorp', maxLength:10/}
+			</td>
+			
+		</tr>
+		<tr>
+			<td></td>
+			<td align="center">
+				<span id="documentType2TabError" class="error"></span>
+			</td>
+			<td align="center">
+				<span class="error">#{error 'Document 2 No in tab ID Info is' /}</span>
+			</td>
+			<td align="center">
+				<span class="error">#{error 'Document 2 Expiry Date in tab ID Info is' /}</span>
+				<span id="document2ExpiryConTabError" class="error"></span>
+			</td>
+			
+		</tr>
+		<tr>
+			<td align="center">
+				<label>Document 3</label>
+			</td>
+			<td align="center">
+				#{dropDownList id:'documentType3Tab', name:'customer.identificationType3Tamp.lookupId',value:customer?.identificationType3Tamp?.lookupId, options:supplementDoc, readOnly:readOnly, class:'dropdown corporate forCorp' /}
+			</td>
+			<td align="center">
+				#{textBox id:'document3NoTab', name:'customer.identification3NoTamp', value:customer?.identification3NoTamp, required:true, readOnly:readOnly, class:'corporate capitalize forCorp', width:'218px', maxLength:50 /}
+			</td>
+			<td align="center">
+				#{textBox id:'document3ExpiryConTab', name:'customer.identification3ExpiryTamp', value:customer?.identification3ExpiryTamp?.format(appProp.dateFormat), readOnly:readOnly, class:'calendar corporate expiryDate invalidDateFormat forCorp', maxLength:10/}
+			</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td align="center">
+				<span id="documentType3TabError" class="error"></span>
+			</td>
+			<td align="center">
+				<span class="error">#{error 'Document 3 No in tab ID Info is' /}</span>
+			</td>
+			<td align="center">
+				<span class="error">#{error 'Document 3 Expiry Date in tab ID Info is' /}</span>
+				<span id="document3ExpiryConTabError" class="error"></span>
+			</td>
+			
+		</tr>
+		<tr>
+			<td align="center">
+				<label>Document 4</label>
+			</td>
+			<td align="center">
+				#{dropDownList id:'documentType4Tab', name:'customer.identificationType4Tamp.lookupId', value:customer?.identificationType4Tamp?.lookupId, options:supplementDoc, readOnly:readOnly, class:'dropdown corporate forCorp' /}
+			</td>
+			<td align="center">
+				#{textBox id:'document4NoTab', name:'customer.identification4NoTamp', value:customer?.identification4NoTamp, required:true, readOnly:readOnly, class:'corporate capitalize forCorp', width:'218px', maxLength:50 /}
+			</td>
+			<td align="center">
+				#{textBox id:'document4ExpiryConTab', name:'customer.identification4ExpiryTamp', value:customer?.identification4ExpiryTamp?.format(appProp.dateFormat), readOnly:readOnly, class:'calendar corporate expiryDate invalidDateFormat forCorp', maxLength:10/}
+			</td>
+			
+		</tr>
+		<tr>
+			<td></td>
+			<td align="center">
+				<span id="documentType4TabError" class="error"></span>
+			</td>
+			<td align="center">
+				<span class="error">#{error 'Document 4 No in tab ID Info is' /}</span>
+			</td>
+			<td align="center">
+				<span class="error">#{error 'Document 4 Expiry Date in tab ID Info is' /}</span>
+				<span id="document4ExpiryConTabError" class="error"></span>
+			</td>
+		</tr>
+	</table>
+	</fieldSet>
+</div>
+
+
+

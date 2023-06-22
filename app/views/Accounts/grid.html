@@ -1,0 +1,112 @@
+<script type="text/javascript">
+$(document).ready(function(){
+	// This is the hack for IE
+	if ($.browser.msie) {
+	  $('#notInList').click(function() {
+	    this.blur();
+	    this.focus();
+	  });
+	}
+
+	$('#notInList').change(function() {
+		if ($('#notInList').is(':checked')) 
+        	$('.buttons #new').show();
+		else 
+			$('.buttons #new').hide();
+	});
+	
+	$(function() {
+		$('.buttons input:button').button();
+		$('.buttons #new').hide();
+		$('.buttons #new').click(function() {
+			entry();
+		});
+	})	
+})
+
+	function doEdit(data) {
+		#{if param == 'acct-ovr-chg'}
+			location.href="@{edit()}/?mode=${mode}&id="+ data[0]+"&status="+data[4];
+			return false;
+		#{/if}
+		
+			if ((data[4] == "New") || (data[4] == "Updated")) {
+				view(data[0]);
+				return false;
+			} 
+			
+		return true;
+	}
+</script>
+
+<h3>Search results</h3>
+
+#{if accounts}
+<table id="grid" class="display">
+	<thead>
+		<tr>
+			<th>Key</th>
+			<th width="100px">Account No</th>
+			<th width="150px">Name</th>
+			#{if param != 'acct-ovr-chg'}
+			<th width="120px">Balance</th>
+				<th width="80px">Status</th>
+				<th width="50px">Active</th>
+			#{/if}
+			#{else}
+				<th width="80px">Charge Profile</th>
+				<th width="80px">Override Status</th>
+			#{/else}
+		</tr>
+	</thead>
+	
+	<tbody>
+	#{list items:accounts, as:'account'}
+		<tr>
+			<td>
+				${account.custodyAccountKey}
+			</td>
+			<td>
+				${account.accountNo}
+			</td>
+			<td>
+				${account.name}
+			</td>
+			
+			#{if param != 'acct-ovr-chg'}
+				<td align="right">
+					#{if account.balance != null}
+						${account?.balance.format('##,###.00')}
+					#{/if}
+				</td>
+				<td>
+					${account?.recordStatus?.decodeStatus()}
+				</td>
+				<td>
+					${(account?.isActive) ? 'Yes' : 'No'}
+				</td>
+			#{/if}
+			#{else}
+				<td>
+					${account?.chargeProfile?.name}
+				</td>
+				<td>
+					${account?.overrideStatus?.decodeStatus()}
+				</td>
+			#{/else}
+			
+		</tr>
+	#{/list}
+	</tbody>
+</table>
+	#{if param == 'register-cust-acct'}
+		<div class="buttons">
+			<label><input type="checkbox" id="notInList"/> Not in the list</label>&nbsp;
+			<input type="button" id="new" value="New" />	
+		</div>	
+	#{/if}
+
+#{/if}
+#{else}
+<div>No record found</div>
+#{/else}

@@ -1,0 +1,27 @@
+#{if _label}<label #{if _labelwidth}style="width:${_labelwidth}"#{/if}>${_label} #{if _required}<span class="req">*</span>#{/if}</label>#{/if}
+#{if _readOnly}
+<select id="${_id}" disabled="disabled" #{if _class}class="${_class}"#{/if} #{if _width}style="width:${_width}"#{/if}>
+	#{if !_removeEmpty}
+	<option></option>
+	#{/if}
+	#{list items:_options, as:'option'}
+		<option value="${option.value}" #{if _value}#{if option.value == _value}selected="selected"#{/if}#{/if}#{else}#{if option.selected}selected="selected"#{/if}#{/else}>		
+			${option.text}
+		</option>
+	#{/list}
+</select>
+<input #{if _name}name="${_name}"#{/if} type="hidden" value="${_value}" />
+#{/if}
+#{else}
+<select id="${_id}" name="${_name}"#{if _disabled} disabled="disabled"#{/if}#{if _class} class="${_class}"#{/if} #{if _width}style="width:${_width}"#{/if}>
+	#{if !_removeEmpty}
+	<option></option>
+	#{/if}
+	#{list items:_options, as:'option'}
+		<option value="${option.value}" #{if _value}#{if option.value == _value}selected="selected"#{/if}#{/if}#{else}#{if option.selected}selected="selected"#{/if}#{/else}>		
+			${option.text}
+		</option>
+	#{/list}
+</select>
+#{/else}
+ 

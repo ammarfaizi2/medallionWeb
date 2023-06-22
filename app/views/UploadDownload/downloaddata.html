@@ -1,0 +1,65 @@
+#{extends 'templates/detail1.html' /}
+#{set pageTitle: ' ' /}
+#{set fixData: true /}
+#{set mode: mode /}
+#{script 'lookups.js' /}
+
+<div id="accordion">
+	<h3>Download Data</h3>
+	<form id="downloadDataForm" class="form">
+		#{hidden id:'separatorCsv', name:'profile.separatorCsv', value:profile?.separatorCsv, width:'150px', maxLength:50, size:50/}
+		#{hidden id:'separatorTxt', name:'profile.separatorTxt', value:profile?.separatorTxt, width:'150px', maxLength:50, size:50/}
+		<p>
+		#{textBox id:'template', name:'template', class:'capitalize', value:'', label:'Profile ID', required:true, readOnly:readOnly, width:'100px', maxLength:50 /}
+		#{hidden id:'templateKey', name:'profile.profileKey', value:profile?.profileKey /}
+		#{button id:'templateHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'templateDesc', name:'templateDesc' , value:'', class:'capitalize', required:true, readOnly:true, width:'250px' /}
+		<span id="errTemplate" class="error"></span>
+		</p>
+		<br />
+		<b><span id='errGlobalDownload' class="error"></span></b>
+		<div id="filterDownload">
+		</div>
+		<br/>		
+		<div id="actions" class="buttons">
+			<input id='btnPopulate' type="button" value="Populate" ></input>
+			<input id='btnClear' type="button" value="Clear" />
+			<input id='btnReset' type="button" value="Reset" style="display: none"/>
+		</div>
+		
+		<div style="width:100%">
+			<div id="actions" class="buttons buttonDownloadFile" style="display: none; " align="right">
+				<input id='btnDownloadXls' type="button" value="Xls" style="background-image: url('/public/images/xls_hover.png');background-repeat: no-repeat;background-position: left;"/>
+				<input id='btnDownloadXlsx' type="button" value="Xlsx" style="background-image: url('/public/images/xls_hover.png');background-repeat: no-repeat;background-position: left;"/>
+				<input id='btnDownloadCsv' type="button" value="Csv" style="background-image: url('/public/images/csv_hover.png');background-repeat: no-repeat;background-position: left;"/>
+				<input id='btnDownloadTxt' type="button" value="Txt" style="background-image: url('/public/images/csv_hover.png');background-repeat: no-repeat;background-position: left;"/>
+				<input id='btnDownloadXml' type="button" value="XML" style="background-image: url('/public/images/csv_hover.png');background-repeat: no-repeat;background-position: left;"/>
+			</div>	
+			<p id="idTablePopulate">
+				<table id="tblPopulate" width="100%">
+					<thead id="tblHead"></thead>
+					<tbody id="tblBody"></tbody>
+				</table>
+			</p>
+		</div>
+		
+		
+	</form>
+</div>	
+
+<div id="result" style="display:none">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<div class="response"></div>
+</div>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'UploadDownload/DownloadData.js' /}
+	$(document).ready(function() {
+		$('#btnPopulate').button();
+		$('#cancel').remove();
+		$('#save').remove();
+		$('.buttons input:button').button();
+		DownloadData($("#html"));
+	});
+</script>

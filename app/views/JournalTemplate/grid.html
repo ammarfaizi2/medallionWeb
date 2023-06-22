@@ -1,0 +1,32 @@
+<h3>Search results</h3> 
+
+#{if faJournalMasters}
+	<table id="FaJournalMasterTable" class="display">
+		<thead>
+			<tr>
+				<th>Key</th>
+				<th>ID</th>
+				<th>Name</th>
+				<th>Status</th>
+				<th>Active</th>
+				
+			</tr>
+		</thead>
+		<tbody>
+		#{list faJournalMasters, as:'faJournalMasters'}
+			<tr>
+				<td>${faJournalMasters?.journalMasterKey}</td>
+				<td>${faJournalMasters?.id}</td>
+				<td>${faJournalMasters?.name}</td>
+				<td>${faJournalMasters?.recordStatus?.decodeStatus()}</td>
+				<td>${(faJournalMasters?.isActive)? 'Yes':'No'}</td>
+			</tr>
+		#{/list}
+		</tbody>
+	</table>
+#{/if}
+#{else}
+	<div>No record found</div>
+#{/else}	
+
+

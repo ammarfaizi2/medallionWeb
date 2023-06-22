@@ -1,0 +1,354 @@
+#{extends 'templates/main.html' /}
+#{script 'lookups.js' /}
+#{set readOnly:((mode!='entry')||(confirming)) /}
+
+<h2>Cancel Instruction</h2>
+<form id="cancelForm" class="form" method="POST">
+	<div id="accordion">
+		<input id="param" name="params.param" type="hidden" value="${param}"/>
+		<p>
+			#{dropDownList id:'cancelmessagetype', name:'cBestMessage.data.cancelmessagetype', label:'Message Type', value:cBestMessage?.data?.cancelmessagetype, options:cancelMessageType, readOnly:readOnly, removeEmpty:'true' /}
+		</p>
+		<p>
+			#{textBox id:'externalreference', name:'cBestMessage.data.externalreference', value:cBestMessage?.data?.externalreference, required:true, class:'capitalize', label:'External Reference', readOnly:readOnly, width:'150px', maxLength:14 /}
+			#{button id:'groupExternalReferenceHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'uniqueidentifier', name:'cBestMessage.data.uniqueidentifier', value:cBestMessage?.data?.uniqueidentifier, width:'250px', readOnly:true/}
+			<span id="externalreferenceError" class="error"></span>
+		</p>
+		<div class="buttons">
+			<p>
+				#{button id:'cancel', value:'Cancel', class:'buttons ui-button ui-widget ui-state-default ui-corner-all'/}
+				#{button id:'reset', value:'Reset', class:'buttons ui-button ui-widget ui-state-default ui-corner-all' /}
+			</p>
+		</div>
+	</div>
+</form>
+
+<form id="m_OTC" class="form" method="POST">
+	<fieldset>
+		<legend><b>General Information</b></legend>
+			<p>
+				#{textBox id:'externalreference', name:'cBestMessage.data.externalreference', label:'External Reference', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'instructiontype', name:'cBestMessage.data.instructiontype', label:'Instruction Type', readOnly:'true' /}
+			</p>
+	</fieldset>
+	<fieldset>
+		<legend><b>Settlement Information</b></legend>
+			<p>
+				#{textBox id:'participantcode', name:'cBestMessage.data.participantcode', label:'Participant Code', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'participantaccount', name:'cBestMessage.data.participantaccount', label:'Participant Account', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'participantaccountcash', name:'cBestMessage.data.participantaccountcash', label:'Participant Account Cash', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'counterpartcode', name:'cBestMessage.data.counterpartcode', label:'Counterpart Code', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'securitycodetype', name:'cBestMessage.data.securitycodetype', label:'Security Code Type', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'securitycode', name:'cBestMessage.data.securitycode', label:'Security Code', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'numberofsecurities', name:'cBestMessage.data.numberofsecurities', class:'numeric', label:'Security Quantity', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'currencycode', name:'cBestMessage.data.currencycode', label:'Currency Code', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'settlementamount', name:'cBestMessage.data.settlementamount', class:'numeric', label:'Settlement Amount', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'tradedate', name:'cBestMessage.data.tradedate', label:'Trade Date', class:'calendar', readOnly:'true' /}&nbsp;&nbsp;(dd/mm/yyyy)
+			</p>
+			<p>
+				#{textBox id:'settlementdate', name:'cBestMessage.data.settlementdate', class:'calendar', label:'Settlement Date', readOnly:'true' /}&nbsp;&nbsp;(dd/mm/yyyy)
+			</p>
+			<p>
+				#{textArea id:'description', name:'cBestMessage.data.description', label:'Description', readOnly:'true', class:'capitalize', width:'318px', maxLength:240, readOnly:'true' /}
+			</p>
+	</fieldset>
+</form>
+
+<form id="m_OTCBond" class="form" method="POST">
+	<fieldset>
+		<legend><b>General Information</b></legend>
+			<p>
+				#{textBox id:'externalreference', name:'cBestMessage.data.externalreference', label:'External Reference', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'ctpreference', name:'cBestMessage.data.ctpreference', label:'CTP Reference', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'instructiontype', name:'cBestMessage.data.instructiontype', label:'Instruction Type', readOnly:'true' /}
+			</p>
+	</fieldset>
+	<fieldset>
+		<legend><b>Settlement Information</b></legend>
+			<p>
+				#{textBox id:'participantcode', name:'cBestMessage.data.participantcode', label:'Participant Code', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'participantaccount', name:'cBestMessage.data.participantaccount', label:'Participant Account', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'participantaccountcash', name:'cBestMessage.data.participantaccountcash', label:'Participant Account Cash', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'counterpartcode', name:'cBestMessage.data.counterpartcode', label:'Counterpart Code', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'counterparttype', name:'cBestMessage.data.counterparttype', label:'Counterpart Type', readOnly:'true' /}
+			</p>
+			<p>
+				#{radioButton id:'taxsubmittedbyksei', name:'cBestMessage.data.taxsubmittedbyksei', label:'Tax Submitted by KSEI', options:taxsubmittedbykseis, readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'securitycodetype', name:'cBestMessage.data.securitycodetype', label:'Security Code Type', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'securitycode', name:'cBestMessage.data.securitycode', label:'Security Code', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'currencycode', name:'cBestMessage.data.currencycode', label:'Currency Code', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'maturitydate', name:'cBestMessage.data.maturitydate', label:'Maturity Date', class:'calendar', readOnly:'true' /}&nbsp;&nbsp;(dd/mm/yyyy)
+			</p>
+			<p>
+				#{textBox id:'tradedate', name:'cBestMessage.data.tradedate', label:'Trade Date', class:'calendar', readOnly:'true' /}&nbsp;&nbsp;(dd/mm/yyyy)
+			</p>
+			<p>
+				#{textBox id:'settlementdate', name:'cBestMessage.data.settlementdate', class:'calendar', label:'Settlement Date', readOnly:'true' /}&nbsp;&nbsp;(dd/mm/yyyy)
+			</p>
+			<p>
+				#{textBox id:'facevalue', name:'cBestMessage.data.facevalue', class:'numeric', label:'Face Value', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'price', name:'cBestMessage.data.price', label:'Price', readOnly:'true' /}
+				<span id="percentage">%</span>
+			</p>
+			<p>
+				#{textBox id:'yield', name:'cBestMessage.data.yield', label:'Yield', class:'percent', readOnly:'true' /}
+				<span id="percentage">%</span>
+			</p>
+			<p>
+				#{textBox id:'interestrate', name:'cBestMessage.data.interestrate', class:'percent', label:'Interest Rate', readOnly:'true' /}
+				<span id="percentage">%</span>
+			</p>
+			<p>
+				#{textBox id:'accrueddays', name:'cBestMessage.data.accrueddays', class:'numeric', label:'Accrued Days', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'accruedinterest', name:'cBestMessage.data.accruedinterest', class:'percent', label:'Accrued Interest', readOnly:'true' /}
+				<span id="percentage">%</span>
+			</p>
+			<p>
+				#{textBox id:'miscamount', name:'cBestMessage.data.miscamount', class:'numeric', label:'Miscellaneous Amount', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'capitalgaintax', name:'cBestMessage.data.capitalgaintax', class:'numeric', label:'Capital Gain Tax', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'accruedinteresttax', name:'cBestMessage.data.accruedinteresttax', label:'Accrued Interest Tax', class:'numeric', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'netproceeds', name:'cBestMessage.data.netproceeds', label:'Net Proceeds', class:'numeric', readOnly:'true' /}
+			</p>
+			<p>
+				#{textArea id:'description', name:'cBestMessage.data.description', label:'Description', readOnly:'true', class:'capitalize', width:'318px', maxLength:240  /}
+			</p>
+	</fieldset>
+</form>
+
+<form id="m_BondTransfer" class="form" method="POST">
+	<fieldset>
+		<legend><b>General Information</b></legend>
+			<p>
+				#{textBox id:'externalreference', name:'cBestMessage.data.externalreference', label:'External Reference', readOnly:'true' /}
+			</p>
+	</fieldset>
+	<fieldset>
+		<legend><b>Settlement Information</b></legend>
+			<p>
+				#{textBox id:'participantcode', name:'cBestMessage.data.participantcode', label:'Participant Code', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'participantaccount', name:'cBestMessage.data.participantaccount', label:'Participant Account', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'sourceaccount', name:'cBestMessage.data.sourceaccount', label:'Source Account', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'targetaccount', name:'cBestMessage.data.targetaccount', label:'Target Account', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'securitycodetype', name:'cBestMessage.data.securitycodetype', label:'Security Code Type', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'securitycode', name:'cBestMessage.data.securitycode', label:'Security Code', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'numberofsecurities', name:'cBestMessage.data.numberofsecurities', class:'numeric', label:'Security Quantity', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'cleanprice', name:'cBestMessage.data.cleanprice', class:'percent', label:'Price', readOnly:'true' /}
+				<span id="percentage">%</span>
+			</p>
+			<p>
+				#{textBox id:'yield', name:'cBestMessage.data.yield', label:'Yield', class:'percent', readOnly:'true' /}
+				<span id="percentage">%</span>
+			</p>
+			<p>
+				#{textBox id:'accruedinterestamount', name:'cBestMessage.data.accruedinterestamount', class:'numeric', label:'Accrued Interest Amount', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'netproceeds', name:'cBestMessage.data.netproceeds', label:'Net Proceeds', class:'numeric', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'settlementdate', name:'cBestMessage.data.settlementdate', class:'calendar', label:'Settlement Date', readOnly:'true' /}&nbsp;&nbsp;(dd/mm/yyyy)
+			</p>
+			<p>
+				#{textArea id:'description', name:'cBestMessage.data.description', label:'Description', readOnly:'true', class:'capitalize', width:'318px', maxLength:240  /}
+			</p>
+	</fieldset>
+</form>
+
+<form id="m_SecuritiesTransfer" class="form" method="POST">
+	<fieldset>
+		<legend><b>General Information</b></legend>
+			<p>
+				#{textBox id:'externalreference', name:'cBestMessage.data.externalreference', label:'External Reference', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'instructiontype', name:'cBestMessage.data.instructiontype', label:'Instruction Type', readOnly:'true' /}
+			</p>
+	</fieldset>
+	<fieldset>
+		<legend><b>Settlement Information</b></legend>
+			<p>
+				#{textBox id:'participantcode', name:'cBestMessage.data.participantcode', label:'Participant Code', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'sourceaccount', name:'cBestMessage.data.sourceaccount', label:'Source Account', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'targetaccount', name:'cBestMessage.data.targetaccount', label:'Target Account', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'securitycodetype', name:'cBestMessage.data.securitycodetype', label:'Security Code Type', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'securitycode', name:'cBestMessage.data.securitycode', label:'Security Code', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'numberofsecurities', name:'cBestMessage.data.numberofsecurities', class:'numeric', label:'Security Quantity', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'settlementdate', name:'cBestMessage.data.settlementdate', class:'calendar', label:'Settlement Date', readOnly:'true', /}&nbsp;&nbsp;(dd/mm/yyyy)
+			</p>
+			<p>
+				#{textArea id:'description', name:'cBestMessage.data.description', label:'Description', readOnly:'true', class:'capitalize', width:'318px', maxLength:240  /}
+			</p>
+	</fieldset>
+</form>
+
+<form id="m_prematchdata" class="form" method="POST">
+	<fieldset>
+		<legend><b>General Information</b></legend>
+			<p>
+				#{textBox id:'ctpreference', name:'cBestMessage.data.ctpreference', label:'CTP Reference', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'instructiontype', name:'cBestMessage.data.instructiontype', label:'Instruction Type', readOnly:'true' /}
+			</p>
+	</fieldset>
+	<fieldset>
+		<legend><b>Settlement Information</b></legend>
+			<p>
+				#{textBox id:'participantcode', name:'cBestMessage.data.participantcode', label:'Participant Code', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'participantaccount', name:'cBestMessage.data.participantaccount', label:'Participant Account', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'participantaccountcash', name:'cBestMessage.data.participantaccountcash', label:'Participant Account Cash', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'counterpartcode', name:'cBestMessage.data.counterpartcode', label:'Counterpart Code', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'counterparttype', name:'cBestMessage.data.counterparttype', label:'Counterpart Type', readOnly:'true' /}
+			</p>
+			<p>
+				#{radioButton id:'taxsubmittedbyksei', name:'cBestMessage.data.taxsubmittedbyksei', label:'Tax Submitted by KSEI', options:taxsubmittedbykseis, readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'securitycodetype', name:'cBestMessage.data.securitycodetype', label:'Security Code Type', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'securitycode', name:'cBestMessage.data.securitycode', label:'Security Code', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'currencycode', name:'cBestMessage.data.currencycode', label:'Currency Code', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'maturitydate', name:'cBestMessage.data.maturitydate', label:'Maturity Date', class:'calendar', readOnly:'true' /}&nbsp;&nbsp;(dd/mm/yyyy)
+			</p>
+			<p>
+				#{textBox id:'tradedate', name:'cBestMessage.data.tradedate', label:'Trade Date', class:'calendar', readOnly:'true' /}&nbsp;&nbsp;(dd/mm/yyyy)
+			</p>
+			<p>
+				#{textBox id:'settlementdate', name:'cBestMessage.data.settlementdate', class:'calendar', label:'Settlement Date', readOnly:'true' /}&nbsp;&nbsp;(dd/mm/yyyy)
+			</p>
+			<p>
+				#{textBox id:'facevalue', name:'cBestMessage.data.facevalue', class:'numeric', label:'Face Value', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'price', name:'cBestMessage.data.price', class:'percent', label:'Price', readOnly:'true' /}
+				<span id="percentage">%</span>
+			</p>
+			<p>
+				#{textBox id:'yield', name:'cBestMessage.data.yield', label:'Yield', class:'percent', readOnly:'true' /}
+				<span id="percentage">%</span>
+			</p>
+			<p>
+				#{textBox id:'interestrate', name:'cBestMessage.data.interestrate', class:'percent', label:'Interest Rate', readOnly:'true' /}
+				<span id="percentage">%</span>
+			</p>
+			<p>
+				#{textBox id:'accrueddays', name:'cBestMessage.data.accrueddays', class:'numeric', label:'Accrued Days', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'accruedinterestamount', name:'cBestMessage.data.accruedinterestamount', class:'numeric', label:'Accrued Interest Amount', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'miscamount', name:'cBestMessage.data.miscamount', class:'numeric', label:'Miscellaneous Amount', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'capitalgaintax', name:'cBestMessage.data.capitalgaintax', class:'numeric', label:'Capital Gain Tax', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'accruedinteresttax', name:'cBestMessage.data.accruedinteresttax', label:'Accrued Interest Tax', class:'numeric', readOnly:'true' /}
+			</p>
+			<p>
+				#{textBox id:'netproceeds', name:'cBestMessage.data.netproceeds', label:'Net Proceeds', class:'numeric', readOnly:'true' /}
+			</p>
+			<p>
+				#{textArea id:'description', name:'cBestMessage.data.description', label:'Description', readOnly:'true', value:cBestMessage?.data?.description, class:'capitalize', width:'318px', maxLength:240  /}
+			</p>
+	</fieldset>
+</form>
+
+<script type="text/javascript">	
+	#{include 'CancelInstructions/detail.js' /}
+	
+	$(document).ready(function() {
+		detail($("#html"));
+	});
+</script>

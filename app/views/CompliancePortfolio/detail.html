@@ -1,0 +1,150 @@
+#{if mode == 'edit' || mode == 'entry' || porto?.status == 'O ' || porto?.status == 'N ' || porto?.status == 'U '}
+	#{set pageTitle: 'Positive Portfolio' /}
+#{/if}
+#{else}
+	#{set pageTitle: 'Positive Portfolio Approval' /}
+#{/else}
+
+#{set id:porto?.portfolioLimitKey /}
+
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+<style type="text/css">
+  .errmsg { color:red; }
+  #header {padding-top:8px;}
+</style>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'CompliancePortfolio/CpPortfolio.js' /}
+
+	function doSave(){
+		/*if (tablePortfolio.fnGetNodes().length < 1){
+			$('#errPortfolioDetail').html("*Error saving! Make sure there is a minimum of one data in 'Portfolio Detail'");
+			return false;
+		}*/
+		
+		return true;
+	};
+	
+	function doEdit(data) {
+		if ((data[9] == "New") || (data[9] == "Updated")) {
+			view(data[0]);
+			return false;
+		} else {
+			return true;
+		}
+	}
+</script>
+
+<form id="portfolioForm" class="form" method="POST">
+	#{hidden id:'dispatch', value:mode /}
+	#{hidden id:'portfolioLimitKey', name:'porto.portfolioLimitKey', value:porto?.portfolioLimitKey /}
+	#{hidden id:'status', name:'porto.status', value:porto?.status /}
+	<p>
+		#{textBox id:'ruleCode', name:'porto.complianceRule.ruleCode', label:'Rule Code', value:porto?.complianceRule?.ruleCode, class:'capitalize', required:true, readOnly:((mode=='entry') ? confirming : true ), width:'120px' /}
+		#{hidden id:'ruleId', name:'porto.complianceRule.ruleId', value:porto?.complianceRule?.ruleId /}
+		#{button id:'ruleHelp', value:'?', class:'small', readOnly:((mode=='entry') ? confirming : true ) /}
+		<span id="ruleCodeError" class="error">#{error 'Rule Code' /}</span>
+	</p>
+	<p>
+		#{textArea id:'ruleDesc', name:'porto.complianceRule.description', label:'Description', value:porto?.complianceRule?.description, readOnly:true, width:'318px', maxLength:'255' /}
+	</p>
+	<p>
+		#{radioButton id:'isActive', name:'isActive', value:((porto?.active)?'true':'false'), label:'Active', options:operators, readOnly:readOnly /}
+		#{hidden id:'active', name:'porto.active', value:((porto?.active)?'true':'false') /} 
+	</p>		
+	<br/>
+	<b><span id="errPortfolioDetail" class="error"></span></b>
+	<p></p>	
+	<table id="gridPortfolio" class="display" >
+		<thead>
+			<tr>
+				<th width="15%" align="center">Security Type</th>
+				<th width="15%" align="center">Security Code</th>
+				<th width="30%" align="center">Name</th>
+				<th width="15%" align="center">Min(%)</th>
+				<th width="15%" align="center">Max(%)</th>
+				<th width="10%" align="center">Action</th>
+			</tr>
+		</thead>
+		<tbody>
+		#{list porto.portfolioDetails, as:'portfolioDetails'}
+			<tr>
+				<td align="left">${portfolioDetails?.security?.securityType.securityType}</td>
+				<td align="left">${portfolioDetails?.security?.securityId}</td>
+				<td align="left">${portfolioDetails?.security?.description}</td>
+				<td align="left">${portfolioDetails?.minimumRange}</td>
+				<td align="left">${portfolioDetails?.maximumRange}</td>
+				<td>
+					#{hidden name:'portfolioDetails[' + (portfolioDetails_index-1) + '].portfolioLimitDetail', value:portfolioDetails?.portfolioLimitDetail /}
+					#{hidden name:'portfolioDetails[' + (portfolioDetails_index-1) + '].security.securityKey', value:portfolioDetails?.security?.securityKey /}
+					#{hidden name:'portfolioDetails[' + (portfolioDetails_index-1) + '].range', value:portfolioDetails?.range /}
+					#{hidden name:'portfolioDetails[' + (portfolioDetails_index-1) + '].maximumRange', value:portfolioDetails?.maximumRange /}
+					#{hidden name:'portfolioDetails[' + (portfolioDetails_index-1) + '].minimumRange', value:portfolioDetails?.minimumRange /}
+					<center>#{button  id:'deleteButton', value:'Delete', readOnly:readOnly/}</center>
+				</td> 
+			</tr>
+		#{/list}
+		</tbody>
+	</table>
+	<div class="buttons">
+		#{button  id:'btnNewPortfolioDetail', value:'New Data', readOnly:readOnly/} 
+	</div>
+</form>
+<form></form>
+<input type="hidden" id="dummy" />
+<div id="detailPortfolio" title="Positive Securities">
+	<form id="dialogPortfolioForm" class="form">
+		#{hidden id:'rowPosition'/}
+		#{hidden id:'oldSecurityType' /}
+		#{hidden id:'newSecurityType' /}
+		#{hidden id:'oldSecurityKey' /}
+		#{hidden id:'newSecurityKey' /}
+		#{hidden id:'portfolioLimitDetail', name:'portfolioDetail.portfolioLimitDetail', value:portfolioDetail?.portfolioLimitDetail /}
+		<br>
+		<b><span id="errDetailPortfolioGlobal" class="error"></span></b>
+		<p>
+			<span class="ui-helper-hidden-accessible"><input type="text"/></span>
+			#{textBox id:'securityType', name:'portfolioDetail.security.securityType.securityType', label:'Security Type', value:portfolioDetail?.security?.securityType?.securityType, width:'90px', readOnly:readOnly, class:'capitalize', required:true, maxLength:50/}
+			#{button  id:'securityTypeHelp', value:'?', class:'small', readOnly:readOnly/}
+			#{textBox id:'securityTypeDesc', name:'portfolioDetail.security.securityType.description', value:portfolioDetail?.security?.securityType?.description, readOnly:true, width:'245px' /}
+			<span id="securityTypeError" class="error">#{error 'Security Type is' /}</span> 
+		</p>
+		<p>
+			#{textBox id:'securityCode', name:'portfolioDetail.security.securityId', label:'Security Code', value:portfolioDetail?.security?.securityId, width:'90px', readOnly:readOnly, class:'capitalize', required:true, maxLength:50/}
+			#{hidden  id:'securityKey', name:'portfolioDetail.security.securityKey', value:portfolioDetail?.security?.securityKey /}
+			#{button  id:'securityHelp', value:'?', class:'small', readOnly:readOnly/}
+			#{textBox id:'securityDesc', name:'portfolioDetail.security.description', value:portfolioDetail?.security?.description, readOnly:true, width:'245px' /}
+			<span id="securityCodeError" class="error">#{error 'Security Code is' /}</span> 
+		</p>
+		<p>
+			#{checkBox id:'range', name:'portfolioDetail.range', readOnly:readOnly, value:portfolioDetail?.range /}<b>Set limit for this security</b>
+		</p>
+		<p>
+			#{textBox id:'minimumRange', name:'minimumRange', label:'Minimum', value:portfolioDetail?.minimumRange, format:'#,##0.####', class:'range', required:true, readOnly:readOnly, width:'86'/}
+			#{hidden id:'minimumRangeStripped', name:'portfolioDetail.minimumRange', value:portfolioDetail?.minimumRange /} 
+			%
+			&nbsp;<span id="minimumRangeError" class="error"></span>
+		</p>
+		<p>
+			#{textBox id:'maximumRange', name:'maximumRange', label:'Maximum', value:portfolioDetail?.maximumRange, format:'#,##0.####', class:'range', required:true, readOnly:readOnly, width:'86'/}
+			#{hidden id:'maximumRangeStripped', name:'portfolioDetail.maximumRange', value:portfolioDetail?.maximumRange /} 
+			%
+			&nbsp;<span id="maximumRangeError" class="error"></span>
+		</p>
+		<p>&nbsp;</p>
+		#{if readOnly}
+			<div class="buttons">
+				<button id="btnClosePortfolio">Close</button>
+			</div>
+		#{/if}
+		#{else}
+			<div class="buttons">
+				<button id="btnSavePortfolio">Save</button>
+				<button id="btnCancelPortfolio">Cancel</button>
+			</div>
+		#{/else}
+	</form>
+</div>

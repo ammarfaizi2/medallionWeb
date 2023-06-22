@@ -1,0 +1,40 @@
+<table id="gridPledging" class="display">
+	<thead>
+		<tr>
+			<th>Account No</th>
+			<th>Description</th>
+			<th>Qty to Block</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list pledging?.plTransactionDetails, as:'pledgingDetails'}
+		<tr>
+			<td>${pledgingDetails?.account?.accountNo}</td>
+			<td>${pledgingDetails?.security?.securityType?.securityType} || ${pledgingDetails?.security?.securityId}</td>
+			<td>${pledgingDetails?.amount}</td>
+			<td>
+				#{hidden name:'pledgingDetails[' + (pledgingDetails_index-1) + '].accountType.lookupDescription', value:pledgingDetails?.accountType?.lookupDescription /}
+				#{hidden name:'pledgingDetails[' + (pledgingDetails_index-1) + '].accountType.lookupId', value:pledgingDetails?.accountType?.lookupId /}
+				#{hidden name:'pledgingDetails[' + (pledgingDetails_index-1) + '].account.accountNo', value:pledgingDetails?.account?.accountNo /}
+				#{hidden name:'pledgingDetails[' + (pledgingDetails_index-1) + '].account.custodyAccountKey', value:pledgingDetails?.account?.custodyAccountKey /}
+				#{hidden name:'pledgingDetails[' + (pledgingDetails_index-1) + '].account.name', value:pledgingDetails?.account?.name /}
+				#{hidden name:'pledgingDetails[' + (pledgingDetails_index-1) + '].security.securityType.securityType', value:pledgingDetails?.security?.securityType?.securityType /}
+				#{hidden name:'pledgingDetails[' + (pledgingDetails_index-1) + '].security.securityType.description', value:pledgingDetails?.security?.securityType?.description /}
+				#{hidden name:'pledgingDetails[' + (pledgingDetails_index-1) + '].security.securityKey', value:pledgingDetails?.security?.securityKey /}
+				#{hidden name:'pledgingDetails[' + (pledgingDetails_index-1) + '].security.securityId', value:pledgingDetails?.security?.securityId /}
+				#{hidden name:'pledgingDetails[' + (pledgingDetails_index-1) + '].security.description', value:pledgingDetails?.security?.description /}
+				#{hidden name:'pledgingDetails[' + (pledgingDetails_index-1) + '].amount', value:pledgingDetails?.amount /}
+				#{hidden name:'pledgingDetails[' + (pledgingDetails_index-1) + '].transactionDetailKey', value:pledgingDetails?.transactionDetailKey /}
+				#{hidden name:'pledgingDetails[' + (pledgingDetails_index-1) + '].portfolio.portfolioKey', value:pledgingDetails?.portfolio?.portfolioKey /}
+				//#{hidden name:'pledgingDetails[' + (pledgingDetails_index-1) + '].portfolio.classification.lookupDescription', value:pledgingDetails?.portfolio?.classification?.lookupDescription /}
+				#{hidden name:'pledgingDetails[' + (pledgingDetails_index-1) + '].classification.lookupId', value:pledgingDetails?.classification?.lookupId /}
+				#{hidden name:'pledgingDetails[' + (pledgingDetails_index-1) + '].holdingRefs', value:pledgingDetails?.holdingRefs /}
+				#{hidden name:'pledgingDetails[' + (pledgingDetails_index-1) + '].portoQuantity', value:pledgingDetails?.portoQuantity /}
+				#{hidden name:'pledgingDetails[' + (pledgingDetails_index-1) + '].availableQuantity', value:pledgingDetails?.availableQuantity /}
+				<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} /></center>
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>

@@ -1,0 +1,220 @@
+#{extends 'templates/detail1.html' /}
+#{set pageTitle: 'Security Information Maintenance' /}
+#{set id:security?.securityKey /}
+
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{if mode=='edit'}
+    #{set checkCategory:checkCategory /}
+#{/if}
+#{else}
+    #{set checkCategory:false  /}
+#{/else}
+
+#{script 'date.format.js' /}
+#{script 'lookuppaging.js' /}
+#{script 'lookups.js' /}
+#{script 'external/Util.js' /}
+
+<style type="text/css">
+  #errmsg { color:red; }
+  .coupon { width: 85px;}
+  .numericNoMin { text-align: right; }
+  .securityNumeric { text-align: right; }
+  .securityNumOnly { text-align: right; }
+  .percentIntRate { text-align: right; }
+</style>
+
+#{hidden name:'security.organization.organizationId', value:security?.organization?.organizationId /}
+#{hidden id:'securityKey', name:'security.securityKey', value:security?.securityKey /}
+#{hidden id:'category', name:'security.securityType.category', value:security?.securityType?.category /}
+#{hidden id:'securityCategory', name:'security.securityCategory', value:security?.securityCategory /}
+#{hidden id:'todayPlusOne', name:'security.todayPlusOne', value:security?.securityCategory /}
+#{hidden id:'checkIsExpire', name:'checkIsExpire', value:checkIsExpire/}
+#{hidden id:'fairValueTrade', name:'fairValueTrade', value:fairValueTrade /}
+#{hidden id:'amortizedTrade', name:'amortizedTrade', value:amortizedTrade /}
+#{hidden id:'fairValueAFS', name:'fairValueAFS', value:fairValueAFS /}
+#{hidden id:'amortizedAFS', name:'amortizedAFS', value:amortizedAFS /}
+#{hidden id:'fairValueHTM', name:'fairValueHTM', value:fairValueHTM /}
+#{hidden id:'amortizedHTM', name:'amortizedHTM', value:amortizedHTM /}
+#{hidden id:'nextPaymentDateHidden', name:'security.nextPaymentDate', value:security?.nextPaymentDate?.format(appProp.dateFormat) /}
+#{hidden id:'lastPaymentDateHidden', name:'security.lastPaymentDate', value:security?.lastPaymentDate?.format(appProp.dateFormat) /}
+#{hidden id:'status', name:'status', value:status /}
+#{hidden id:'isPrice', name:'security.securityType.isPrice', value:security?.securityType?.isPrice /}
+#{hidden id:'isDiscounted', name:'security.securityType.isDiscounted', value:security?.securityType?.isDiscounted /}
+#{hidden id:'priceUnit', name:'security.securityType.priceUnit', value:security?.securityType?.priceUnit /}
+#{hidden id:'hasInterest', name:'security.securityType.hasInterest', value:security?.securityType?.hasInterest /}
+#{hidden id:'isreload', name:'isreload', value:isreload /}
+<div id="tabs"> 
+    <ul>
+        <li><a href="#tabs-1">Primary</a></li>
+        <li><a href="#tabs-3">Details</a></li>
+        <li><a href="#tabs-2">More Information</a></li>
+        <li><a href="#tabs-4">Coupon Schedule</a></li>  
+        <li><a href="#tabs-5">User Defined Fields</a></li>  
+    </ul>
+    <div class="pane" id="tabs-1">
+        #{include 'Securities/securitiesPrimary.html' /}
+    </div>
+
+    <div class="pane" id="tabs-2">
+        #{include 'Securities/securitiesMoreInformation.html' /}
+    </div>
+
+    <div class="pane" id="tabs-3">
+        #{include 'Securities/securitiesDetails.html' /}
+    </div>
+
+    <div class="pane" id="tabs-4">
+        <div id="result" style="display:none">
+            <div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+            <div class="response"></div>
+        </div>
+        <div id="coupon" style="overflow-y:scroll;height:400px">
+            #{include 'Securities/gridFixedIncome.html'/}
+        </div>
+    </div>
+
+    <div class="pane" id="tabs-5">
+       #{include 'templates/udf.html'/} 
+    </div>
+</div>
+
+<script type="text/javascript">
+	#{include 'Utility/Util.js' /}
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'Securities/securitiesDetail.js' /}
+	
+    function popUpIssuer() {
+		$('#issuer').dynapopup('PICK_GN_THIRD_PARTY', 'THIRD_PARTY-ISSUER', 'currency', 
+			function(data){
+		   	$('#issuer').removeClass('fieldError');
+		       $('#issuerKey').val(data.code);
+		       $('#issuerDesc').val(data.description);
+		       $('#h_issuerDesc').val(data.description);
+			},
+			function(){
+				$('#issuer').addClass('fieldError');
+		       $('#issuer').val('');
+		       $('#issuerKey').val('');
+		       $('#issuerDesc').val('NOT FOUND');
+		       $('#h_issuerDesc').val('');
+			}
+		);
+    }
+    
+    $(document).ready(function() {
+    	$('#securityType').blur( function() {
+    	
+    		var result = null;
+    		if($('#securityType').val() != '')
+    			result = setValuationDefaultValues($('#securityType').val());
+			
+    		if(result != null && ('${mode}'=='entry')){
+    			
+    			$('#valuationMethodTrade').val(result.valuationMethodTrade);
+    			$('#valuationMethodAFS').val(result.valuationMethodAFS);
+    			$('#valuationMethodHTM').val(result.valuationMethodHTM);
+    			$('#marketPriceTrade').val(result.marketPriceTrade);
+    			$('#marketPriceAFS').val(result.marketPriceAFS);
+    			$('#marketPriceHTM').val(result.marketPriceHTM);
+    			$('#amortizationMethodTrade').val(result.amortizationMethodTrade);
+    			$('#amortizationMethodAFS').val(result.amortizationMethodAFS);
+    			$('#amortizationMethodHTM').val(result.amortizationMethodHTM);
+    			
+    			$('#marketPriceTradeHidden').val(result.marketPriceTrade);
+    			$('#marketPriceAFSHidden').val(result.marketPriceAFS);
+    			$('#marketPriceHTMHidden').val(result.marketPriceHTM);
+    			$('#amortizationMethodTradeHidden').val(result.amortizationMethodTrade);
+    			$('#amortizationMethodAFSHidden').val(result.amortizationMethodAFS);
+    			$('#amortizationMethodHTMHidden').val(result.amortizationMethodHTM);
+    			
+    			//$('input[name=isTrade]').attr('checked', true);
+                //if($('#valuationMethodTrade').val() == '' || $('#marketPriceTrade').val() == '' || $('#amortizationMethodTrade').val() == ''){
+                //	$('input[name=isTrade]').attr('checked', true);
+                //	$('#valuationMethodTrade').attr('disabled', 'disabled');
+                //	$('#marketPriceTrade').attr('disabled', 'disabled');
+                //	$('#amortizationMethodTrade').attr('disabled', 'disabled');
+                //}
+                $('input[name=isAfs]').attr('checked', false);
+                if($('#valuationMethodAFS').val() != '' || $('#marketPriceAFS').val() != '' || $('#amortizationMethodAFS').val() != ''){
+                	$('input[name=isAfs]').attr('checked', true);
+                	$('#valuationMethodAFS').attr('disabled', false);
+                	$('#marketPriceAFS').attr('disabled', false);
+                	$('#amortizationMethodAFS').attr('disabled', false);
+                	
+                	$('#marketPriceAFSHidden').attr('disabled', false);
+                	$('#amortizationMethodAFSHidden').attr('disabled', false);
+                }
+                $('input[name=isHtm]').attr('checked', false);
+                if($('#valuationMethodHTM').val() != '' || $('#marketPriceHTM').val() != '' || $('#amortizationMethodHTM').val() != ''){
+                	$('input[name=isHtm]').attr('checked', true);
+                	$('#valuationMethodHTM').attr('disabled', false);
+                	$('#marketPriceHTM').attr('disabled', false);
+                	$('#amortizationMethodHTM').attr('disabled', false);
+                	
+                	$('#marketPriceHTMHidden').attr('disabled', false);
+                	$('#amortizationMethodHTMHidden').attr('disabled', false);
+                }
+
+    			//valuationMethod();
+    			if ((('${mode}' == 'entry') || ('${mode}' == 'edit')) && ('${confirming}' != 'true')) {
+    	            setChecked();
+    	            doChecked();
+    	            valuationMethod();
+    	            //changeCombo(); -- tidak dipakai lagi diganti dengan function dibawahnya
+    	            valueDropdownWhenEdit();
+    	            changeParPrice();
+    	        }
+    			valuationMethodNA();
+    			
+                if($('#marketPriceTrade').val() != '' || $('#marketPriceAFS').val() != '' || $('#marketPriceHTM').val() != ''){
+                	$("td[id=tdMarketPrice] label span").html(" *");
+                }
+                if($('#amortizationMethodTrade').val() != '' || $('#amortizationMethodAFS').val() != '' || $('#amortizationMethodHTM').val() != ''){
+                	$("td[id=tdAmortization] label span").html(" *");
+                }
+				
+    		}
+    	}); 
+    
+    	function setValuationDefaultValues(securityType) {
+
+    		var valuationMethodTrade = "";
+			var valuationMethodAFS = "";
+			var valuationMethodHTM = "";
+			var marketPriceTrade = "";
+			var marketPriceAFS = "";
+			var marketPriceHTM = "";
+			var amortizationMethodTrade = "";
+			var amortizationMethodAFS = "";
+			var amortizationMethodHTM = "";
+    	
+    		$.ajaxSetup({async : false});
+    		$.get("@{Securities.getValuationDefaultValues()}", {'securityType' : securityType}, function(data){
+    			valuationMethodTrade = (data.valuationMethodTrade != null?data.valuationMethodTrade.lookupId:"");
+    			valuationMethodAFS = (data.valuationMethodAFS != null?data.valuationMethodAFS.lookupId:"");
+    			valuationMethodHTM = (data.valuationMethodHTM != null?data.valuationMethodHTM.lookupId:"");
+    			marketPriceTrade = (data.marketPriceTrade != null?data.marketPriceTrade.lookupId:"");
+    			marketPriceAFS = (data.marketPriceAFS != null?data.marketPriceAFS.lookupId:"");
+    			marketPriceHTM = (data.marketPriceHTM != null?data.marketPriceHTM.lookupId:"");
+    			amortizationMethodTrade = (data.amortizationMethodTrade != null?data.amortizationMethodTrade.lookupId:"");
+    			amortizationMethodAFS = (data.amortizationMethodAFS != null?data.amortizationMethodAFS.lookupId:"");
+    			amortizationMethodHTM = (data.amortizationMethodHTM != null?data.amortizationMethodHTM.lookupId:"");
+    		});
+    	
+    		var valuationVals = {
+        		"valuationMethodTrade" : valuationMethodTrade,
+    			"valuationMethodAFS" : valuationMethodAFS,
+    			"valuationMethodHTM" : valuationMethodHTM,
+    			"marketPriceTrade" : marketPriceTrade,
+    			"marketPriceAFS" : marketPriceAFS,
+    			"marketPriceHTM" : marketPriceHTM,
+    			"amortizationMethodTrade" : amortizationMethodTrade,
+    			"amortizationMethodAFS" : amortizationMethodAFS,
+    			"amortizationMethodHTM" : amortizationMethodHTM
+        	};
+    	
+			return valuationVals;
+    	}
+    });
+</script>

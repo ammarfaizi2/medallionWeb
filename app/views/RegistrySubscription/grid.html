@@ -1,0 +1,37 @@
+<h3>Search results</h3>
+
+#{if subs}
+	<table id="FaTransactionTable" class="display">
+		<thead>
+			<tr>
+				<th>Transaction Key</th>
+				<th>Transaction Date</th>
+				<th>Transaction No</th>
+				<th>Fund Code</th>
+				<th>Account No</th>
+				<th>Account Name</th>
+				<th>Net Amount</th>
+				<th>Price</th>
+				<th>Unit</th>
+			</tr>
+		</thead>
+		<tbody>
+		#{list subs, as:'sub'}
+			<tr>
+				<td>${sub?.tradeKey}</td>
+				<td>${sub?.tradeDate?.format(appProp.dateFormat)}</td>
+				<td>${sub?.tradeKey}</td>
+				<td>${sub?.rgProduct?.productCode}</td>
+				<td>${sub?.rgInvestmentaccount?.accountNumber}</td>
+				<td>${sub?.rgInvestmentaccount?.name}</td> 
+				<td align="right">${sub?.netAmount?.format('#,##0.##########')}</td>		
+				<td>${sub?.price}</td>
+				<td>${sub?.unit}</td>
+			</tr>
+		#{/list}
+		</tbody>
+	</table>
+#{/if}
+#{else}
+	<div>No record found</div>
+#{/else}

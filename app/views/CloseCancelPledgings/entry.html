@@ -1,0 +1,86 @@
+#{extends 'templates/main.html' /}
+<script type="text/javascript">
+	$(function() {
+
+		$('#save').click(function(){
+			var resume = true;
+			if(typeof doSave == 'function') {
+				resume = doSave();
+			}
+			
+			if (resume){
+				var action = "@{save()}?mode=${mode}";
+				var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+				loading.dialog({
+					closeOnEscape: false,
+					draggable: false,
+					modal: true,
+					resizable: false,
+					open:function() {
+						$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+					} 
+				});
+				$("#masterCancelPledgingForm").attr('action', action);
+				$("#masterCancelPledgingForm").submit(); 
+			}
+		});
+
+		$('#confirm').click(function(){
+			var action = "@{confirm()}?mode=${mode}";
+			var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+			loading.dialog({
+				closeOnEscape: false,
+				draggable: false,
+				modal: true,
+				resizable: false,
+				open:function() {
+					$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+				} 
+			});
+			/* 	$.post(action, $('#masterCancelPledgingForm').serialize(), function(data, status) {
+				loading.dialog('close');
+				if (data.status == 'success') {
+					//var backToEntry = function() {
+						location = "@{entry()}";
+					//}
+					//messageAlertOk("Your Transaction No is " + data.transactionNo, "ui-icon ui-icon-circle-check", "Notification", backToEntry);
+					
+				} else {
+				//	alert("Failed saving data!");
+				var closeDialogMessage = function() {
+					$(this).dialog("close");
+				}
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+				} 
+			});*/
+			$("#masterCancelPledgingForm").attr('action', action);
+			$("#masterCancelPledgingForm").submit(); 
+		});
+
+		$('#back').click(function(){
+			location.href = '@{back()}?id=${id}&mode=${mode}';
+		});
+		
+		$('#cancel').click(function(){
+			location.href = '@{list()}';
+		}); 
+		
+	});
+</script>
+
+<h2>Release Pledging Transaction</h2>
+
+<div id="detail">
+	#{include 'CloseCancelPledgings/detail.html' /}	
+</div>
+
+<div id="actions" class="buttons">
+	#{if confirming}
+		<input type="button" id="confirm" value="Confirm" />
+		<input type="button" id="back" value="Back" />
+	#{/if}
+	#{else}
+		<input type="button" id="save" value="Save" />
+		<input type="button" id="cancel" value="Cancel" />
+	#{/else}
+</div>

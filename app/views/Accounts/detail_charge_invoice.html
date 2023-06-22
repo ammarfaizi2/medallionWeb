@@ -1,0 +1,174 @@
+<script type="text/javascript">
+$(function(){
+	$('#cancelCharge').click(function() {
+		$('#detailChargeInvoice').dialog('close');
+		return false;
+	});
+	
+	
+	$('#chargeInvoiceForm #taxCode').lookup({
+		list:'@{Pick.taxMasters()}',
+		get:{
+			url:'@{Pick.taxMaster()}',
+			success: function(data) {
+						$('#chargeInvoiceForm #taxCode').removeClass('fieldError');
+						$('#chargeInvoiceForm #taxKey').val(data.code);
+						$('#chargeInvoiceForm input#taxCode').val(data.taxCode);
+						$('#chargeInvoiceForm #taxName').val(data.description);
+						$('chargeInvoiceForm #h_taxName').val(data.description);
+						//$('#errmsgTaxCode').html('');
+					},
+			error: function() {
+					$('#chargeInvoiceForm #taxCode').addClass('fieldError');
+					$('#chargeInvoiceForm #taxKey').val('');
+					$('#chargeInvoiceForm #taxCode').val('');
+					$('#chargeInvoiceForm #taxName').val('NOT FOUND');
+					$('chargeInvoiceForm #h_taxName').val('');
+				}
+		},
+		key:$('#chargeInvoiceForm #taxKey'),
+		help:$('#chargeInvoiceForm #taxCodeHelp'),
+		nextControl:$('#chargeInvoiceForm #tierValue')
+	});
+	
+	$('#chargeInvoiceForm #maxCharge').blur(function(){
+		var max = parseFloat($("#chargeInvoiceForm #maxChargeStripped").val());
+		var min = parseFloat($("#chargeInvoiceForm #minChargeStripped").val());
+		if (min > max) {
+			$('#chargeInvoiceForm #maxCharge').addClass('fieldError');
+			$('#errmsgMaxCharge').html('Max Value must be greather than Min Value');
+		} else {
+			$('#chargeInvoiceForm #maxCharge').removeClass('fieldError');
+			$('#errmsgMaxCharge').html('');
+		}
+	});
+	
+	$('#chargeInvoiceForm #minCharge').blur(function(){
+		var max = parseFloat($("#chargeInvoiceForm #maxChargeStripped").val());
+		var min = parseFloat($("#chargeInvoiceForm #minChargeStripped").val());
+		if (min > max) {
+			$('#chargeInvoiceForm #maxCharge').addClass('fieldError');
+			$('#errmsgMaxCharge').html('Max Value must be greather than Min Value');
+		} else {
+			$('#chargeInvoiceForm #maxCharge').removeClass('fieldError');
+			$('#errmsgMaxCharge').html('');
+		}
+	});
+	
+	/*$('#chargeInvoiceForm #chargeGroup').change(function(){
+		$('#chargeInvoiceForm #chargeGroup').removeClass('fieldError');
+		$('#errmsgChargeGroup').html('');
+	});
+	*/
+});
+
+/*
+var selectedRow;
+function editChargeInvoice(row) {
+	//alert(row);
+	selectedRow = ($('#listChargeInvoice #gridChargeInvoice').dataTable().fnGetNodes(row));
+	$('#chargeInvoiceForm #accountChargeKey').val($(selectedRow).find('input[name$="accountCharges[' + row + '].accountChargeKey"]').val());
+	$('#chargeInvoiceForm #custodyAccountKey').val($(selectedRow).find('input[name$="accountCharges[' + row + '].account.custodyAccountKey"]').val());
+	$('#chargeInvoiceForm #chargeGroup').val($(selectedRow).find('input[name$="accountCharges[' + row + '].invoiceCharge.lookupId"]').val());
+	$('#chargeInvoiceForm #chargeGroupDesc').val($(selectedRow).find('input[name$="accountCharges[' + row + '].invoiceCharge.lookupDescription"]').val());
+	$('#chargeInvoiceForm #minCharge').val($(selectedRow).find('input[name$="accountCharges[' + row + '].minimumValue"]').val());
+	$('#chargeInvoiceForm #maxCharge').val($(selectedRow).find('input[name$="accountCharges[' + row + '].maximumValue"]').val());		
+	$('#chargeInvoiceForm #chargeGroup').trigger('change');
+	if ($('#chargeInvoiceForm #chargeGroup').val() != ""){
+		$('#chargeInvoiceForm #chargeGroup').attr('disabled', 'disabled');	
+	}
+	if ($('#chargeInvoiceForm #chargeGroup').val() == ""){
+		$('#chargeInvoiceForm #chargeGroup').attr('disabled', false);
+	}
+
+}
+
+function saveAccountCharge() {
+	
+	if (selectedRow) {
+		$(selectedRow).find(':nth-child(1)').html($('#chargeInvoiceForm #chargeGroupDesc').val());
+		$(selectedRow).find(':nth-child(2)').html($('#chargeInvoiceForm #minCharge').val());
+		$(selectedRow).find(':nth-child(3)').html(($('#chargeInvoiceForm #maxCharge').val() == "")? "*MAX" : $('#chargeInvoiceForm #maxCharge').val());	
+		
+		$(selectedRow).find('#accountChargeKeyX').val($('#chargeInvoiceForm #accountChargeKey').val());
+		$(selectedRow).find('#custodyAccountKeyX').val($('#chargeInvoiceForm #custodyAccountKey').val());
+		$(selectedRow).find('#chargeGroupX').val($('#chargeInvoiceForm #chargeGroup').val());
+		$(selectedRow).find('#chargeGroupDescX').val($('#chargeInvoiceForm #chargeGroupDesc').val());
+		$(selectedRow).find('#minChargeX').val($('#chargeInvoiceForm #minCharge').val());
+		$(selectedRow).find('#maxChargeX').val($('#chargeInvoiceForm #maxCharge').val());
+
+	//	alert($(selectedRow).find('#maxChargeX').val());
+	
+		//alert($('#gridChargeInvoice #accountChargeKey').val());
+		if(($('#chargeInvoiceForm #chargeGroup').val() == '')||($('#chargeInvoiceForm #minCharge').val() == '')){
+			alert("Empty form! Check tax code and tier value field");
+			return false;
+		}
+		
+	} else {
+ 	
+		$('#listChargeInvoice #gridChargeInvoice .dataTables_empty').each(function() {
+			$(this).parent().remove();
+		});
+		
+
+		if(($('#chargeInvoiceForm #chargeGroup').val() == '')||($('#chargeInvoiceForm #minCharge').val() == '')){
+			alert("Empty form! Check tax code and tier value field");
+			return false;
+		}
+
+		var rows = ($('#listChargeInvoice #gridChargeInvoice').dataTable().fnGetNodes().length);
+		$('#listChargeInvoice #gridChargeInvoice').dataTable().fnAddData([
+		                                        "",
+		                                        "",
+		                          				$('#chargeInvoiceForm #chargeGroupDesc').val(),
+		                          				$('#chargeInvoiceForm #minCharge').val(),
+		                          				(($('#chargeInvoiceForm #maxCharge').val() ==  "") ? "*MAX" : $('#chargeInvoiceForm #maxCharge').val()),
+		                          				"<input type='hidden' name='accountCharges[" + rows + "].accountChargeKey' value='" + $('#chargeInvoiceForm #accountChargeKey').val() + "'>" +
+		                          				"<input type='hidden' name='accountCharges[" + rows + "].account.custodyAccountKey' value='" + $('#chargeInvoiceForm #custodyAccountKey').val() + "'>" +
+		                          				"<input type='hidden' name='accountCharges[" + rows + "].invoiceCharge.lookupId' value='" + $('#chargeInvoiceForm #chargeGroup').val() + "'>" +
+		                          				"<input type='hidden' name='accountCharges[" + rows + "].invoiceCharge.lookupDescription' value='" + $('#chargeInvoiceForm #chargeGroupDesc').val() + "'>" +
+		                          				"<input type='hidden' name='accountCharges[" + rows + "].minimumValue' value='" + $('#chargeInvoiceForm #minCharge').val() + "'>" +
+		                          				"<input type='hidden' name='accountCharges[" + rows + "].maximumValue' value='" + $('#chargeInvoiceForm #maxCharge').val() + "'>" +
+		                          				"<center><input type='button' value='Delete' id='deleteButton' /></center>"
+		                          			]);
+			rows++;
+ 	}
+	selectedRow = null;
+}
+*/
+</script>
+
+<form id="chargeInvoiceForm" class="form">
+	<br>
+	#{hidden id:'accountChargeKey', name:'accountCharge.accountChargeKey' /}
+	#{hidden id:'custodyAccountKey', name:'accountCharge.account?.custodyAccountKey' /}
+	#{hidden id:'rowPosition' /}
+	<p>
+		#{dropDownList id:'chargeGroup', name:'accountCharge.invoiceCharge.lookupId', label:'Charge Group', value:accountCharge?.invoiceCharge?.lookupId, options:invoiceCharge, required:true, readOnly:readOnly /}
+		#{hidden id:'chargeGroupDesc', name:'accountCharge.invoiceCharge.lookupDescription', value:accountCharge?.invoiceCharge?.lookupDescription /}
+		<span id="errmsgChargeGroup"></span>
+	</p>
+	<p>			
+		#{textBox id:'taxCode', name:'accountCharge.taxMaster.taxCode', label:'Tax Code', value:accountCharge?.taxMaster?.taxCode, class:'capitalize', required:true, readOnly:readOnly, width:'100' /}
+		#{hidden id:'taxKey', name:'accountCharge.taxMaster.taxKey', value:accountCharge?.taxMaster?.taxKey  /}
+		#{button id:'taxCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'taxName', name:'accountCharge.taxMaster.description', value:accountCharge?.taxMaster?.description, readOnly:true, width:'200' /}
+		<span id="errmsgTaxCode"></span>
+	</p>
+	<p>
+		#{textBox id:'minCharge',label:'Min Charge', value:accountCharge?.minimumValue, format:'#,##0.####', class:'numeric', width:'100px', required:true, readOnly:readOnly /}
+		#{hidden id:'minChargeStripped', name:'accountCharge.minimumValue', value:accountCharge?.minimumValue /}
+		<span id="errmsgMinCharge"></span>
+		
+	</p>
+	<p>
+		#{textBox id:'maxCharge', label:'Max Charge', value:accountCharge?.maximumValue, format:'#,##0.####', class:'numeric', width:'100px', readOnly:readOnly /}
+		#{hidden id:'maxChargeStripped', name:'accountCharge.maximumValue',  value:accountCharge?.maximumValue /}
+		<span id="errmsgMaxCharge"></span>
+	</p>
+	
+</form>
+
+
+			

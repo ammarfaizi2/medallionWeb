@@ -1,0 +1,777 @@
+#{set readOnly: ((mode != 'edit' && mode != 'entry') || confirming || settlement) /}
+#{set settle: ((mode != 'edit' && mode != 'entry') || confirming) /}
+#{if flash.error || errors}
+    <div class="error">
+    	<b>Error when saving data!</b><br/><br/>
+    	#{if flash.error}
+<li>${flash.error}</li>
+		#{/if}
+		#{ifErrors}
+			#{errors}
+<li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}
+#{script 'date.js', characterset:'utf-8' /}
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+#{script 'transaction.js' /}
+
+<script type="text/javascript">
+	var holidays = [												
+                #{list items:holidays, as:'holiday'}
+					${holiday.id.calendarDate.time},
+                #{/list}
+                ];
+	
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'Transactions/yieldByEIR.js' /}
+	#{include 'Transactions/calculateYield.js' /}
+	#{include 'Transactions/detail.js' /}
+	
+	$(function(){
+		$("#remarkForCancelTrade").bind('input propertychange', function() {
+            var maxLength = 255;  
+            if ($(this).val().length > maxLength) {  
+                $(this).val($(this).val().substring(0, maxLength));  
+            };
+            $("#description").val($(this).val());
+        });
+		$('#remarkForCancelTrade').live('blur', function() {
+			var maxLength = 255;  
+            if ($(this).val().length > maxLength) {  
+                $(this).val($(this).val().substring(0, maxLength));  
+            };
+            $("#description").val($(this).val());
+		});
+
+	/*	$("#remarkForCancelTrade[maxlength]").bind('input propertychange', function() {
+	        var maxLength = $(this).attr('maxlength'); 
+	        alert(maxLength)
+	        if ($(this).val().length > maxLength) {  
+	            $(this).val($(this).val().substring(0, maxLength));  
+	        }  
+	    });
+	*/
+
+		if (($('#ctpRequired').val()=='true') && ($('#marketOfRisk').val() == '${countryId}'))
+		{
+			if ($("input[name='transaction.sentToInterface']").val() =='true')
+			{
+		        $('p[id="pCtpRef"] label span').html(" *");
+		    } else {
+		        $('p[id="pCtpRef"] label span').html("");
+		    }
+		}
+	
+		if($('#settlementReasonKey').val() == '${OTHR}'){
+			$("#descriptionLbl span.req").show();
+		}
+		
+		$("#pScript").hide();
+		//$("#divBankInfoRight").hide();
+		$("#pb1").hide();
+		$("#pb2").hide();
+		$("#pb3").hide();
+		$("#accInt").hide();
+		
+		if($('#hidChk').val()=='true'){
+			$('#cekBoxWaiveAccInt').attr('checked',true);
+		}else{
+			$('#cekBoxWaiveAccInt').attr('checked',false);
+		}
+		
+		if($('#cekBoxWaiveAccInt').is(':checked')){
+			$('#accruedInterest').removeClass('fieldError');
+			$('#accruedInterestError').html('');
+			$('#accruedInterest').attr('disabled', 'disabled');
+			$('#accruedInterest').val(0);
+			$('#accruedInterestStripped').val(0);
+		}
+		
+		if($("#chkIsTransferAsset").is(':checked')){
+			$("#isTransferAsset").val("true");
+		}else{
+			$("#isTransferAsset").val("false");
+		}
+		
+		if("${paramPrematch}"=="${param}"){
+			if($("#transferMethod").val()==""){
+				$("#transferMethod").val("${transferMethodFile}");
+			}
+			
+			var secClass = $("#securityClass").val();
+			if(secClass=='${secClassEQ}' && $("#settlementAgentCode").val()==""){
+				$("#settlementAgentCode").val($("#counterPartyCode").val()).blur();
+			}
+		}
+		
+		if("${fromInquiry}"=="fromInquiry"){
+			$("#settlementAgentCodeLbl").find('span').hide();
+		}
+	});
+</script>
+<style type="text/css">
+	#remaks {height: 50px;}
+	#remarkCorrection {height: 50px;}
+	textarea {resize:none;}
+</style>
+<form id="transactionForm" class="form" method="POST">
+	#{hidden id:'adjustmentManual', name:'transaction.adjustmentManual', value:transaction?.adjustmentManual /}
+	#{hidden id:'hasInterest', name:'transaction.transactionTemplate.securityType.hasInterest', value:transaction?.transactionTemplate?.securityType?.hasInterest /}
+	#{hidden id:'cbestMessageType', name:'transaction.security.securityType.cbestMessageType.lookupId', value:transaction?.security?.securityType?.cbestMessageType?.lookupId /}
+	#{hidden id:'isFraction', name:'transaction.security.isFraction', value:transaction?.security?.isFraction /}
+	#{hidden id:'fractionRatioSource', name:'transaction.security.fractionRatioSource', value:transaction?.security?.fractionRatioSource /}
+	#{hidden id:'fractionRatioTarget', name:'transaction.security.fractionRatioTarget', value:transaction?.security?.fractionRatioTarget /}
+
+	#{hidden id:'custRetailGroup', name:'transaction.account.customer.customerGroup.thirdPartyCode', value:transaction?.account?.customer?.customerGroup?.thirdPartyCode /}
+	#{hidden id:'depoCode', name:'transaction.security.depositoryCode.lookupCode', value:transaction?.security?.depositoryCode?.lookupCode /}
+	
+	#{hidden name:'mode', value:mode /}
+	#{hidden name:'param', value:param /}
+	#{hidden id:'isreload', name:'isreload', value:isreload /}
+	#{hidden id:'isUpload', name:'transaction.isUpload', value:transaction?.isUpload /}
+	
+	#{hidden id:'custodyTransactionCode', name:'transaction.transactionTemplate.portfolioTransaction.custodyTransactionCode', value:transaction?.transactionTemplate?.portfolioTransaction?.custodyTransactionCode /}
+	#{hidden id:'currTrans', name:'transaction.security.currency.currencyCode', value:transaction?.security?.currency?.currencyCode /}
+	
+	#{hidden id:'priceUnit', name:'transaction.transactionTemplate.securityType.priceUnit', value:transaction?.transactionTemplate?.securityType?.priceUnit /}
+	#{hidden id:'discounted', name:'transaction.transactionTemplate.securityType.isDiscounted', value:transaction?.transactionTemplate?.securityType?.isDiscounted /}
+	#{hidden id:'portfolioTransactionKey', name:'transaction.transactionTemplate.portfolioTransaction.transactionMasterKey', value:transaction?.transactionTemplate?.portfolioTransaction?.transactionMasterKey /}
+	#{hidden id:'transactionType', name:'transaction.transactionTemplate.portfolioTransaction.transactionType.lookupCode', value:transaction?.transactionTemplate?.portfolioTransaction?.transactionType?.lookupCode /}
+	#{hidden id:'transactionTypeId', name:'transaction.transactionTemplate.portfolioTransaction.transactionType.lookupId', value:transaction?.transactionTemplate?.portfolioTransaction?.transactionType?.lookupId /}
+	#{hidden id:'defaultCorebanking', name:'transaction.transactionTemplate.settlementTransaction.defaultCorebanking', value:transaction?.transactionTemplate?.settlementTransaction?.defaultCorebanking /}
+	#{hidden id:'frequency', name:'transaction.security.frequency.lookupId', value:transaction?.security?.frequency?.lookupId /}
+	#{hidden id:'minTrxQuantity', name:'transaction.security.minTrxQuantity', value:transaction?.security?.minTrxQuantity /}
+	#{hidden id:'isPrice', name:'transaction.transactionTemplate.securityType.isPrice', value:transaction?.transactionTemplate?.securityType?.isPrice /}
+	#{hidden id:'settTransKey', name:'transaction.transactionTemplate.settlementTransaction.transactionTemplateKey', value:transaction?.transactionTemplate?.settlementTransaction?.transactionTemplateKey /}
+	#{hidden id:'settlementNumber', name:'transaction.settlementNumber', value:transaction?.settlementNumber /}
+	#{hidden id:'cashTransCode', name:'transaction.transactionTemplate.settlementTransaction.cashTransaction.bankTransactionCode', value:transaction?.transactionTemplate?.settlementTransaction?.cashTransaction?.bankTransactionCode /}
+	#{hidden id:'cashTransCodeSett', name:'transaction.transactionTemplate.cashTransaction.bankTransactionCode', value:transaction?.transactionTemplate?.cashTransaction?.bankTransactionCode /}
+	#{hidden id:'valuationTrade', name:'transaction.valuationTrade', value:transaction?.valuationTrade /}
+	#{hidden id:'valuationAFS', name:'transaction.valuationAFS', value:transaction?.valuationAFS /}
+	#{hidden id:'valuationHTM', name:'transaction.valuationHTM', value:transaction?.valuationHTM /}
+	#{hidden id:'amortizationTrade', name:'transaction.amortizationTrade', value:transaction?.amortizationTrade /}
+	#{hidden id:'amortizationAFS', name:'transaction.amortizationAFS', value:transaction?.amortizationAFS /}
+	#{hidden id:'amortizationHTM', name:'transaction.amortizationHTM', value:transaction?.amortizationHTM /}
+	#{hidden id:'valuationMethod' /}
+	#{hidden id:'amortizationMethod' /}
+	#{hidden id:'viewClassification', name:'transaction.viewClassification', value:transaction?.viewClassification /}
+	#{hidden id:'yieldPorto', name:'transaction.yieldPorto', value:transaction?.yieldPorto /}
+	#{hidden id:'parPrice', name:'transaction.security.parUnitValue', value:transaction?.security?.parUnitValue /}
+	#{hidden id:'depositoryCode', name:'transaction.security.depositoryCode.lookupId', value:transaction?.security?.depositoryCode?.lookupId /}
+	#{hidden id:'dailyPortfolioFlag', name:'transaction.dailyPortfolioFlag', value:transaction?.dailyPortfolioFlag /}
+	#{hidden id:'source', name:'transaction.source', value:transaction?.source /}
+	#{hidden id:'sumOfChargeNetAmount', name:'sumOfChargeNetAmount', value:sumOfChargeNetAmount /}
+	#{hidden id:'securityClass', name:'transaction.transactionTemplate.securityType.securityClass.lookupCode', value:transaction?.transactionTemplate?.securityType?.securityClass?.lookupCode /} <!-- security class is doubled assign from below -->
+	#{hidden id:'securityClassId', name:'transaction.transactionTemplate.securityType.securityClass.lookupId', value:transaction?.transactionTemplate?.securityType?.securityClass?.lookupId /}
+	#{hidden id:'ctpRequired', name:'transaction.transactionTemplate.securityType.ctpRequired', value:transaction?.transactionTemplate?.securityType?.ctpRequired /}
+	#{hidden id:'marketOfRisk', name:'transaction.security.marketOfRisk.lookupId', value:transaction?.security?.marketOfRisk?.lookupId /}
+	#{hidden id:'prematchRequiredTemp', name:'transaction.transactionTemplate.defPrematch', value:transaction?.transactionTemplate?.defPrematch /}
+	#{hidden id:'isSentToDepository', value:transaction.sentToInterface /}
+	#{hidden id:'holdingType', name:'transaction.transactionTemplate.securityType.holdingType.lookupId', value:transaction?.transactionTemplate?.securityType?.holdingType?.lookupId /}
+	#{hidden id:'customerKey' /}
+	
+	#{hidden id:'blockedAccount', name:'blockedAccount', value:blockedAccount /}
+	#{hidden id:'expiredDate', name:'transaction.security.expiredDate', value:transaction?.security?.expiredDate?.format(appProp.dateFormat) , class:'calendar'/}
+	#{hidden id:'isExpiredDate', name:'transaction.security.isExpire', value:transaction?.security?.isExpire /}
+	#{hidden id:'postingDate', name:'transaction.postingDate', value:transaction?.postingDate?.format(appProp.dateFormat) /}
+	#{hidden id:'transactionStatus', name:'transaction.transactionStatus', value:transaction?.transactionStatus /}
+	#{hidden id:'createdBy', name:'transaction.createdBy', value:transaction?.createdBy /}
+	#{hidden id:'createdDate', name:'transaction.createdDate', value:transaction?.createdDate?.format(appProp.dateFormat) /}
+	#{hidden id:'currentDate', name:'currentDate', value:currentDate, class:'calendar' /}
+	#{hidden id:'warningMsg', name:'warningMsg', value:false /}
+	#{hidden id:'warningMsg2', name:'warningMsg2', value:false /}
+	#{hidden id:'firstCouponDate', name:'transaction.security.firstCouponDate', value:transaction?.security?.firstCouponDate?.format(appProp.dateFormat) /}
+	#{hidden id:'issueDate', name:'transaction.security.issueDate', value:transaction?.security?.issueDate?.format(appProp.dateFormat) /}
+	
+	#{hidden id:'counterPartyTypeDescAccountCode', value:transaction?.settlementAgent?.cbestAccount?.accountCode /}
+	#{hidden id:'counterPartyTypeDescAccountAgentCode', value:transaction?.settlementAgent?.cbestAccount?.accountAgentCode /}
+
+<div class="mainEntry">
+	<div class="leftTrx" style="width:60%;float:left;">
+		<!-- <table>
+			<tr>
+				<td> -->
+					<p>
+						#{textBox id:'transactionNo', name:'transaction.transactionNumber', label:'Transaction No', value:transaction?.transactionNumber, required:true, readOnly:true /}
+						#{hidden id:'transactionKey', name:'transaction.transactionKey', value:transaction?.transactionKey /}
+					</p>
+					#{if fromView == 'viewCsCancelTrade' || transaction?.cancelledDate}
+						<p>
+							#{textBox id:'cancelDate', name:'transaction.cancelledDate', label:'Cancel Date', value:transaction?.cancelledDate?.format(appProp.dateFormat), required:true, class:'calendar', readOnly:readOnly /}
+							(${appProp.displayDateFormat})
+							<span id="cancelDateError" class="error"></span>
+							<span class="error">#{error 'Cancel Date is' /}</span> 
+						</p>
+					#{/if}
+					<p>
+						#{textBox id:'transactionDate', name:'transaction.transactionDate', label:'Transaction Date', value:transaction?.transactionDate?.format(appProp.dateFormat), required:true, class:'calendar', readOnly:readOnly /}
+						(${appProp.displayDateFormat})
+						<span id="transactionDateError" class="error"></span>
+						<span class="error">#{error 'Transaction Date is' /}</span> 
+					</p>
+					<p>
+						#{textBox id:'accountNo', name:'transaction.account.accountNo', label:'Account No', value:transaction?.account?.accountNo, required:true, class:'capitalize', readOnly:readOnly, width:'100px' /}
+						#{hidden id:"accountNoKey", name:'transaction.account.custodyAccountKey', value:transaction?.account?.custodyAccountKey /}
+						#{button id:'accountNoHelp', value:'?', class:'small', readOnly:readOnly /}
+						#{textBox id:'accountNoDesc', name:'transaction.account.name', value:transaction?.account?.name, readOnly:true, width:'245px' /}
+						<span id="accountNoError" class="error">#{error 'Account No is' /}</span> 
+					</p>
+					<p>
+						#{textBox id:'transactionCode', name:'transaction.transactionTemplate.transactionCode', label:'Transaction Code', value:transaction?.transactionTemplate?.transactionCode, class:'capitalize', required:true, readOnly:readOnly, width:'100px' /}
+						#{hidden id:'transactionTemplateKey', name:'transaction.transactionTemplate.transactionTemplateKey', value:transaction?.transactionTemplate?.transactionTemplateKey /}
+						#{button id:'transactionHelp', value:'?', class:'small', readOnly:readOnly /}
+						#{textBox id:'transactionCodeDesc', name:'transaction.transactionTemplate.description', value:transaction?.transactionTemplate?.description, readOnly:true, width:'245px' /}
+						#{checkBox id:'chkIsTransferAsset', name:'transferAsset', value:((transaction?.isTransferAsset)?'true':'false'), readOnly:readOnly/} Asset Transfer
+						#{hidden id:'isTransferAsset', name:'transaction.isTransferAsset', value:transaction?.isTransferAsset /}
+						<span class="error">#{error 'Transaction Code is' /}</span>
+					</p>
+					<!--
+				 	<p>
+						#{textBox id:'securityClass', name:'transaction.transactionTemplate.securityType.securityClass.lookupCode', label:'Security Class', value:transaction?.transactionTemplate?.securityType?.securityClass?.lookupCode, readOnly:true, width:'100px' /}
+						#{textBox id:'securityClassDesc', name:'transaction.transactionTemplate.securityType.securityClass.lookupDescription', value:transaction?.transactionTemplate?.securityType?.securityClass?.lookupDescription, readOnly:true, width:'270px' /}
+						#{hidden id:'securityClassId', name:'transaction.transactionTemplate.securityType.securityClass.lookupId', value:transaction?.transactionTemplate?.securityType?.securityClass?.lookupId  /}
+					</p>
+					-->
+					<p>
+						#{textBox id:'securityType', name:'transaction.transactionTemplate.securityType.securityType', label:'Security Type', value:transaction?.transactionTemplate?.securityType?.securityType, readOnly:true, width:'100px' /}
+						#{textBox id:'securityTypeDesc', name:'transaction.transactionTemplate.securityType.description', value:transaction?.transactionTemplate?.securityType?.description, readOnly:true, width:'270px' /}
+					</p>
+					<p>
+						#{textBox id:'securityId', name:'transaction.security.securityId', label:'Security Code', value:transaction?.security?.securityId, required:true, class:'capitalize', readOnly:readOnly, width:'100px' /}
+						#{hidden id:'securityKey', name:'transaction.security.securityKey', value:transaction?.security?.securityKey /}
+						#{button id:'securityHelp', value:'?', class:'small', readOnly:readOnly /}
+						<span id="errmsgSec" class="error"></span>
+						<span class="error">#{error 'Security Code is' /}</span>
+					</p>
+					<p>
+						#{textArea id:'securityDesc', label:' ', name:'transaction.security.description', value:transaction?.security?.description, readOnly:true, width:'379px' /}					
+					</p>
+					<p>
+						#{textBox id:'currencyCode', name:'currencyCodeDisplayVal', label:'Currency', value:currencyCodeDisplay, class:'capitalize', readOnly:true, width:'100px' /}
+						#{hidden id:'currencyCodeHid', name:'currencyCodeDisplay', value:currencyCodeDisplay /}
+					</p>
+					<p>
+						#{textBox id:'counterPartyCode', name:'transaction.counterParty.thirdPartyCode', label:"Broker", value:transaction?.counterParty?.thirdPartyCode, required:true, class:'capitalize', readOnly:readOnly, width:'100px' /}
+						#{hidden id:'counterPartyKey', name:'transaction.counterParty.thirdPartyKey', value:transaction?.counterParty?.thirdPartyKey /}
+						#{button id:'counterPartyHelp', value:'?', class:'small', readOnly:readOnly /}
+						#{textBox id:'counterPartyName', name:'transaction.counterParty.thirdPartyName', value:transaction?.counterParty?.thirdPartyName, readOnly:true, width:'245px' /}
+						<span class="error">#{error 'Broker is' /}</span>
+					</p>
+					<p>
+						<label id="settlementAgentCodeLbl">Counter Party<span class="req"> *</span></label>
+						#{textBox id:'settlementAgentCode', name:'transaction.settlementAgent.thirdPartyCode', value:transaction?.settlementAgent?.thirdPartyCode, class:'capitalize', readOnly:readOnlyPrematch, width:'100px' /}
+						#{hidden id:'settlementAgentKey', name:'transaction.settlementAgent.thirdPartyKey', value:transaction?.settlementAgent?.thirdPartyKey /}
+						#{button id:'settlementAgentHelp', value:'?', class:'small', readOnly:readOnlyPrematch /}
+						#{textBox id:'settlementAgentName', name:'transaction.settlementAgent.thirdPartyName', value:transaction?.settlementAgent?.thirdPartyName, readOnly:true, width:'245px' /}
+						<span id="settlementAgentCodeError" class="error">#{error 'Counter Party is' /}</span>
+					</p>
+					<p id='pCounterPartyType'>
+						<label id="counterPartyTypeLbl">Counter Party Type<span class="req"> *</span></label>
+						#{dropDownList id:'dropdowncounterPartyType', name:'dropdowncounterPartyType', options:counterPartyType, value:transaction?.counterPartyType, readOnly:readOnlyPrematch /}
+						#{hidden id:'counterPartyType', name:'transaction.counterPartyType', value:transaction?.counterPartyType /}
+						#{textBox id:'txtCounterPartyTypeDesc', value:transaction?.counterPartyTypeDesc, readOnly:readOnly/}
+						#{hidden id:'counterPartyTypeDesc', name:'transaction.counterPartyTypeDesc', value:transaction?.counterPartyTypeDesc /}
+						<span id="counterPartyTypeError" class="error">#{error 'Counter Party Type is' /}</span>
+					</p>
+					<p id="pScript">
+						#{radioButton id:'isScript', name:'isScript', label:'Script', value:((transaction?.isScript)?'true':'false'), options:operators, readOnly:readOnly /}
+						#{hidden id:'isScriptHidden', name:'transaction.isScript', value:((transaction?.isScript)?'true':'false') /}
+					</p>
+					<p>
+						<!-- #{dropDownList id:'classification', name:'transaction.classification.lookupId', label:'Classification', value:transaction?.classification?.lookupId, options:classifications, required:true, readOnly:readOnly, width:'143px'/} -->
+						#{textBox id:'classification', name:'transaction.classification.lookupCode', label:'Classification', value:transaction?.classification?.lookupCode,class:'capitalize', required:true, readOnly:readOnly, width:'100px' /}
+						#{hidden id:'classificationId', name:'transaction.classification.lookupId', value:transaction?.classification?.lookupId /}
+						#{button id:'classificationHelp', value:'?', class:'small', readOnly:readOnly /}
+						#{textBox id:'classificationDesc', name:'transaction.classification.lookupDescription', value:transaction?.classification?.lookupDescription, readOnly:true, width:'245px' /}
+						<span id="classificationError" class="error">#{error 'Classification is' /}</span>								
+						
+						<!--  <span type hidden>
+							#{dropDownList id:'classificationOriginal', name:'classificationOriginal', label:'Classification', value:transaction?.classification?.lookupId, options:classifications /}
+							#{hidden id:'classificationHide', name:'transaction.classification.lookupId', value:transaction?.classification?.lookupId /}
+						</span>
+						-->
+					</p>
+					<!--
+					<p>
+						#{radioButton id:'prematchRequired', name:'prematchRequired', value:((transaction?.prematchRequired)?'true':'false'), label:'Prematch Required', options:operators, readOnly:readOnly /}
+						#{hidden id:'prematchRequiredHidden', name:'transaction.prematchRequired', value:((transaction?.prematchRequired)?'true':'false') /}
+					</p>
+					-->
+					<p>
+						#{textBox id:'settlementDate', name:'transaction.settlementDate', label:'Settlement Date', value:transaction?.settlementDate?.format(appProp.dateFormat), required:true, class:'calendar', readOnly:settle /}
+						(${appProp.displayDateFormat})
+						<span id="settlementDateError" class="error">#{error 'Settlement Date is' /}</span>
+					</p>
+					
+					<p id="pHoldingRef">
+						<label>Holding Ref <span class="req">*</span></label>
+						#{textBox id:'holdingRefs', name:'transaction.holdingRefs', value:transaction?.holdingRefs, class:'capitalize', readOnly:true, width:'100px' /}
+						#{button id:'holdingHelp', value:'?', class:'small', readOnly:true /}
+						#{textBox id:'holdingQuantity', name:'transaction.holdingQuantity', value:transaction?.holdingQuantity, format:'#,##0.####', readOnly:true, width:'245px' /}
+						#{hidden id:'holdingQuantityStripped', name:'transaction.holdingQuantity', value:transaction?.holdingQuantity, readOnly:true, width:'245px' /}
+						<span class="error">#{error 'Holding Ref is' /}</span>
+					</p>
+					<p id="pCtpRef">
+						<!-- <label>CTP Reference <span class="req">*</span></label> -->
+						#{textBox id:'ctpNo', name:'ctpNo', value:transaction?.ctpNo, class:'numberOnly',label:'CTP Reference', required:true, maxLength:'20', readOnly:readOnly, width:'100px' /}
+						#{hidden id:'ctpNoHidden', name:'transaction.ctpNo', value:transaction?.ctpNo /}
+						<span id="ctpNoError" class="error">#{error 'CTP Reference is' /}</span>
+					</p>
+					<p>
+						#{textBox id:'externalReference', name:'transaction.externalReference', label:'External Reference', value:transaction?.externalReference, maxLength:'20', class:'capitalize', readOnly:readOnly, width:'100px' /}
+					</p>
+					<p>
+						#{textArea id:'remaks', name:'transaction.remaks', label:'Remarks', value:transaction?.remaks, class:'capitalize', width:'373px', readOnly:readOnly, maxLength:240 /}
+					</p>
+					<!--
+					<p>
+						#{textBox id:'settlementAccount', name:'transaction.settlementAccount.accountNo', label:'Settlement Account', value:transaction?.settlementAccount?.accountNo, required:true, readOnly:settle, width:'100px' /}
+						#{hidden id:'settlementAccountKey', name:'transaction.settlementAccount.bankAccountKey', value:transaction?.settlementAccount?.bankAccountKey /}
+						#{button id:'settlementAccountHelp', value:'?', class:'small', readOnly:settle /}
+						#{textBox id:'settlementAccountName', name:'transaction.settlementAccount.name', value:transaction?.settlementAccount?.name, readOnly:true, width:'245px' /}
+						<span id="settlementAccountError" class="error">#{error 'Settlement Account is' /}</span>
+					</p>
+					-->
+					<!--
+					<span id='generalSettlement' style='display: none;'>
+						<p>
+							#{radioButton id:'generalSentToInterface', name:'transaction.sentToInterface', label:'Sent to Interface', value:((transaction?.sentToInterface)?'true':'false'), options:operators, readOnly:readOnly /}
+						</p>
+					</span>
+					-->
+					#{if fromView == 'viewCsCancelTrade' || transaction?.cancelledDate}
+						<p>
+							#{textBox id:'remarkForCancelTrade', name:'transaction.remarkForCancelTrade', label:'Remarks Cancellation', value:transaction?.description, readOnly:readOnly, width:'373px', class:'capitalize',maxLength:'255' /}
+							#{hidden id:'description', name:'transaction.description', value:transaction?.description, class:'capitalize' /}
+						</p>
+					#{/if}
+				<!-- </td> -->
+				<!-- <td id="forSettlePrematch" style="display: none; vertical-align:top;"> -->
+						
+<!-- 				</td>
+			</tr>
+		</table> -->
+	</div>
+	<div class="rightBuyCell" style="float:left;overflow:auto;">
+				#{if fromInquiry == 'fromInquiry'}
+						<p> 
+							#{textBox id:'statusTrans', labelwidth:'120px',label:'Status Transaction', value:statusTrans, width:'200px',readOnly:true /}
+						</p>
+					#{/if}		
+					<div id="forSettlePrematch" style="display: none;">
+						#{set readOnlyPrematch: false /}
+						#{if param == 'settlement-prematch-view' || transaction?.prematchStatus?.lookupId == '${prematchP}' || transaction?.prematchStatus?.lookupId == '${prematchW}'}
+							#{set readOnlyPrematch: true /}
+						#{/if}
+						
+						
+						#{if fromInquiry != 'fromInquiry'}
+						<p> 
+							#{dropDownList id:'dropdownPrematchStatus', labelwidth:'120px', name:'dropdownPrematchStatus', label:'Prematch Status', value:transaction?.prematchStatus?.lookupId, options:prematchStatus,  width:'200px', readOnly:true /}
+							#{hidden id:'prematchStatus', name:'transaction.prematchStatus.lookupId', value:transaction?.prematchStatus?.lookupId /}
+						</p>
+						#{/if}
+						<p>
+							#{textBox id:'depositoryDesc', labelwidth:'120px',label:'Depository', name:'transaction.security.depositoryCode.lookupDescription', value:transaction?.security?.depositoryCode?.lookupDescription, width:'200px',readOnly:true /}
+						</p>
+<!-- 						<p> -->
+<!-- 							#{radioButton id:'autoPrematchType', labelwidth:'120px', name:'transaction.autoPrematchType', label:'Auto Prematch', value:((transaction?.autoPrematchType)?'true':'false'), options:prematchTypeUI,readOnly:readOnlyPrematch /} -->
+<!-- 							<label style="margin-right: -45px;">Auto Prematch</label> -->
+<!-- 							#{checkBox id:'autoPrematchType', name:'transaction.autoPrematchType', value:transaction?.autoPrematchType, readOnly:readOnlyPrematch /} -->
+<!-- 							C-BEST -->
+<!-- 						</p> -->
+						<p>
+							#{radioButton id:'sentToInterface', labelwidth:'120px', name:'sentToInterface', label:'Sent to Depository', value:((transaction?.sentToInterface)?'true':'false'), options:operators, readOnly:readOnlyPrematch /}
+							#{hidden id:'sentToInterfaceHidden', name:'transaction.sentToInterface',  value:((transaction?.sentToInterface)?'true':'false') /}
+						</p>
+						<p>
+							<label id="transferMethodLbl" style='width:120px'>Fund Transfer Method<span class="req"> *</span></label>
+							#{dropDownList id:'transferMethod', name:'transaction.transferMethod.lookupId', value:transaction?.transferMethod?.lookupId, required:true, options:transferMethod, readOnly:readOnlyPrematch /}
+							<span id="transferMethodError" class="error">#{error 'Fund Transfer Method is' /}</span>
+						</p>
+<!-- 						<p id="pMatchStatus"> -->
+<!-- 							#{dropDownList id:'matchStatus', labelwidth:'120px', name:'transaction.matchStatus.lookupId', label:'Match Status', value:transaction?.matchStatus?.lookupId, options:matchStatus,  width:'100px', required:true, readOnly:readOnlyPrematch/} -->
+<!-- 							#{hidden id:'sentToCoreBanking', name:'transaction.sentToCoreBanking', value:transaction?.transactionTemplate?.defaultCorebanking /} -->
+<!-- 							<span id="matchStatusError" class="error">#{error 'Match Status is' /}</span> -->
+<!-- 						</p> -->
+						<!-- <p>
+							#{radioButton id:'sentToCoreBanking', labelwidth:'120px', name:'transaction.sentToCoreBanking', label:'Sent To Core Banking', value:((transaction?.sentToCoreBanking)?'true':'false'), options:operators,readOnly:readOnlyPrematch /}
+						</p> -->
+<!-- 						<p id="pRemarkForPrematch"> -->
+<!-- 							<label>Un-Match Description<span class="req"> *</span></label> -->
+<!-- 							<span id="remarkForPrematchError" class="error">#{error 'Un-Match Description is' /}</span> -->
+<!-- 						</p> -->
+<!-- 						<p> -->
+<!-- 							#{textArea id:'remarkForPrematch', name:'transaction.matchDescription', value:transaction?.matchDescription, class:'capitalize prematch', width:'325px', maxLength:'225', rows:'5', required:true,readOnly:readOnlyPrematch /} -->
+							
+<!-- 						</p> -->
+
+			<fieldset>
+				<p>
+					<label id="yieldPrematchLbl" style='width:110px'>Yield<span class="req"> *</span></label>
+					#{textBox id:'yieldPrematch', value:transaction?.yieldPrematch, format:'#,##0.####', class:'percentTax', required:true, readOnly:readOnlyPrematch, width: '85px' /}
+					#{hidden id:'yieldPrematchStripped', name:'transaction.yieldPrematch', value:transaction?.yieldPrematch /}
+					<span id="yieldPrematchError" class="error">#{error 'Yield is' /}</span>
+				</p>
+				<p>
+					<label id="purposeLbl" style='width:110px'>Purpose<span class="req"> *</span></label>
+					#{dropDownList id:'settlementPurpose', name:'transaction.settlementPurpose.lookupId', value:transaction?.settlementPurpose?.lookupId, required:true, options:settlementPurpose, readOnly:readOnlyPrematch/}
+				</p>
+				<p><span id="settlementPurposeForPrematchError" class="error">#{error 'Purpose is' /}</span></p>
+				<p>
+					<label id="referenceLbl" style='width:110px'>Reference<span class="req"> *</span></label>
+					#{textBox id:'settlementReference', name:'transaction.settlementReference', value:transaction?.settlementReference, readOnly:readOnlyPrematch, class:'capitalize', maxLength:50 /}
+				</p>
+				<p><span id="settlementReferenceForPrematchError" class="error">#{error 'Purpose is' /}</span></p>
+				<p>
+					<label id="reasonLbl" style='width:110px'>Reason<span class="req"> *</span></label>
+					#{textBox id:'settlementReasonCode', name:'transaction.settlementReason.lookupCode', value:transaction?.settlementReason?.lookupCode, class:'capitalize', readOnly:readOnlyPrematch, width:'70px'/}
+					#{hidden id:'settlementReasonKey', name:'transaction.settlementReason.lookupId', value:transaction?.settlementReason?.lookupId /}
+					#{button id:'settlementReasonHelp', value:'?', class:'small', readOnly:readOnlyPrematch /}
+					#{textBox id:'settlementReasonName', name:'transaction.settlementReason.lookupDescription', value:transaction?.settlementReason?.lookupDescription, readOnly:true, width:'110px'/}
+				</p>
+				<p><span id="settlementReasonCodeForPrematchError" class="error">#{error 'Reason is' /}</span></p>
+				<p>
+					<label id="descriptionLbl" style='width:110px'>Description<span class="req"> *</span></label>
+					#{if fromView != 'viewCsCancelTrade' || !transaction?.cancelledDate}
+						#{textBox id:'descriptionForPrematch', name:'transaction.description', value:transaction?.description, class:'capitalize', readOnly:readOnlyPrematch, maxLength:50/}
+					#{/if}
+					#{else}
+						#{textBox id:'descriptionForPrematch', name:'', value:transaction?.description, class:'capitalize', readOnly:readOnlyPrematch, maxLength:50/}
+					#{/else}
+					
+				</p>
+				<p><span id="descriptionForPrematchError" class="error">#{error 'Description is' /}</span></p>
+			</fieldset>
+			<fieldset>
+				<p>
+			        #{textBox id:'inhouseReference', width:'100px', name:'transaction.inhouseReference', label:'In House Transfer', labelwidth:'110px', value:transaction?.inhouseReference, class:'numberOnly', readOnly:readOnlyPrematch /}
+			        #{button id:'inhouseReferenceHelp', value:'?', class:'small', readOnly:readOnlyPrematch /}
+			        <span id="bankAccountNoRedError" class="error"></span>
+			    </p>
+			</fieldset>
+		</div>
+
+		<div id="correction" style="width:285px;">
+			<p>
+				#{checkBox id:'needCorrection', name:'transaction.needCorrection', label:'Need Correction', value:transaction?.needCorrection, width:'100px' /}
+			</p>
+			<p id="pRemarkCorrection">
+				<label>Remarks Correction <span class="req">*</span></label>
+			</p>
+			<p>
+				#{textArea id:'remarkCorrection', name:'remarkCorrection', value:transaction?.remarkCorrection, class:'capitalize', width:'263px', maxLength:200 /}
+				#{hidden id:'remarkCorrectionHide', name:'transaction.remarkCorrection', value:transaction?.remarkCorrection /}
+				<span id="remarkCorrectionError" class="error">#{error 'Remarks Correction is' /}</span>
+			</p>
+		</div>
+	</div>
+	<div class="divclear"></div>
+</div>
+<p><b><span id="errGlobal" class="error"></span></b></p>
+
+	<div id="tabs" style="height:430px;width:850px">
+		<ul>
+			<li><a href="#tab1">Detail</a></li>
+			<li><a href="#tab2">Charges</a></li>
+			<li><a href="#tab3">Bank Info</a></li>
+			<li><a href="#tab4">Additional</a></li>
+		</ul>
+		<div id="tab1">
+			<div style="height:370px">
+				<div style="float:left;height:100%">
+					<p>
+						#{checkBox id:'chkIsInpNominal', name:'isInpNominal', value:((transaction?.isInpNominal)?'true':'false'), readOnly:readOnly/} Input By Nominal
+						#{hidden id:'isInpNominal', name:'transaction.isInpNominal', value:transaction?.isInpNominal /}
+					</p>
+					<p>
+						#{textBox id:'quantity', label:'Quantity', value:transaction?.quantity, format:'#,##0.###############', class:'numeric netAmount', required:true, readOnly:readOnly /}
+						#{hidden id:'quantityStripped', name:'transaction.quantity', value:transaction?.quantity /}
+						<span class="error">#{error 'Quantity/Face Value is' /}</span>
+					</p>
+					<p><span id="errQuantity" class="error"></span>
+					</p>
+					<p id="pPrice">
+						#{textBox id:'price', label:'Price', value:transaction?.price, format:'#,##0.###############', class:'numeric netAmount', required:true, readOnly:readOnly /}
+						#{hidden id:'priceStripped', name:'transaction.price', value:transaction?.price /}
+						<span id="percentage">%</span><span class="error">#{error 'Price is' /}</span>
+					</p>
+					<p id="pNetAmount">
+						#{textBox id:'netAmount',  label:'<i>Nominal</i>', value:transaction?.amount, format:'#,##0.###############', class:'numeric', required:true, readOnly:true /}
+						#{hidden id:'netAmountStripped', name:'transaction.amount', value:transaction?.amount /}
+						<span id="netAmtErr" class="error">#{error 'Nominal is' /}</span>
+					</p>
+					<p>
+						#{textBox id:'discountAmount', label:'Discount Amount', value:transaction?.discountAmount, format:'#,##0.###############', required:false, class:'numeric calculate netAmount', readOnly:true /}
+						#{hidden id:'discountAmountStripped', name:'transaction.discountAmount', value:transaction?.discountAmount /}
+					</p>
+					<p id="pDiscountTaxCode">
+						#{textBox id:'discountTaxCode', name:'transaction.discountTaxMaster.taxCode', label:'&nbsp;&nbsp;&nbsp;Tax Code', value:transaction?.discountTaxMaster?.taxCode, class:'capitalize calculate', readOnly:true, width:'60px' /}
+						#{hidden id:'discountTaxKey', name:'transaction.discountTaxMaster.taxKey', value:transaction?.discountTaxMaster?.taxKey /}
+						#{button id:'discountTaxHelp', value:'?', class:'small', readOnly:true /}
+						#{textBox id:'discountTaxDesc', name:'transaction.discountTaxMaster.description', value:transaction?.discountTaxMaster?.description, readOnly:true, width:'100px' /}
+						#{hidden id:'discountTaxRate', name:'transaction.discountTaxMaster.taxRate', value:transaction?.discountTaxMaster?.taxRate /}
+						<span class="error">#{error 'Tax Code (Discount) is' /}</span>
+					</p>
+					<p id="pDiscountTax">
+						#{textBox id:'discountTax', label:'&nbsp;&nbsp;&nbsp;Tax Amount', value:transaction?.discountTax, format:'#,##0.###############', class:'numeric calculate netAmount', readOnly:true /}
+						#{hidden id:'discountTaxStripped', name:'transaction.discountTax', value:transaction?.discountTax /}
+						<span class="error">#{error 'Tax Amount (Discount) is' /}</span>
+					</p>
+					<p>
+						#{textBox id:'discountNet', label:'&nbsp;&nbsp;&nbsp;Disc. after Tax', value:transaction?.discountNet, format:'#,##0.###############', class:'numeric numericminus', readOnly:true /}
+						#{hidden id:'discountNetStripped',  name:'transaction.discountNet',value:transaction?.discountNet /}
+					</p>
+					<p>
+						#{textBox id:'totalCharges', label:'<i>Total Charges</i>', value:transaction?.totalFee, format:'#,##0.##########', class:'rgNumeric', readOnly:true /}
+						#{hidden id:'totalChargesStripped',  name:'transaction.totalFee', value:transaction?.totalFee /}
+						<input type="button" id="showCharges" value="&#187;" #{if readOnly}disabled="disabled"#{/if} />
+					</p>
+					<p>
+						#{textBox id:'grossAmount',label:'<i>Amount After Charges</i>', value:transaction?.grossAmount, format:'#,##0.###############', class:'numeric', readOnly:true /}
+						#{hidden id:'grossAmountStripped',  name:'transaction.grossAmount',value:transaction?.grossAmount /}
+					</p>
+					<p>
+						#{textBox id:'taxOfCharges', label:'<i>Tax Of Charges</i>', value:transaction?.taxOfCharges, format:'#,##0.##########', class:'rgNumeric', readOnly:true /}
+						#{hidden id:'taxOfChargesStripped',  name:'transaction.taxOfCharges', value:transaction?.taxOfCharges /}
+					</p>
+				</div>
+				<div class="right">
+					<p id='pInterestRate'>
+						#{textBox id:'interestRate', label:'Interest Rate', value:transaction?.interestRate, format:'#,##0.####', class:'percent', required:true, readOnly:true, width: '85px' /} %
+						#{hidden id:'interestRateStripped', name:'transaction.interestRate', value:transaction?.interestRate /}
+						<span class="error">#{error 'Interest Rate is' /}</span>
+					</p>
+					<p>
+						#{textBox id:'yield', label:'YTM', value:transaction?.yield, format:'#,##0.####', class:'numeric', readOnly:true, width: '85px' /} %
+						#{hidden id:'yieldStripped', name:'transaction.yield', value:transaction?.yield /}
+					</p>
+					<div id='effMatDate'>
+						<p>
+							#{textBox id:'effectiveDate', name:'effectiveDate', label:'Effective Date', value:transaction?.effectiveDate?.format(appProp.dateFormat), required:false, class:'calendar', readOnly:true /}(${appProp.displayDateFormat})
+							#{hidden id:'effectiveDateHidden', name:'transaction.effectiveDate', class:'calendar', value:transaction?.effectiveDate?.format(appProp.dateFormat) /}
+							
+						</p>
+						<p id='pMaturityDate'>
+							#{textBox id:'maturityDate', name:'maturityDate', label:'Maturity Date', value:transaction?.maturityDate?.format(appProp.dateFormat), required:true, class:'calendar', readOnly:true /}
+							#{hidden id:'maturityDateHidden', name:'transaction.maturityDate', class:'calendar', value:transaction?.maturityDate?.format(appProp.dateFormat) /}
+							
+							<span id="maturityDateError" class="error">#{error 'Maturity Date is' /}</span>
+							(${appProp.displayDateFormat})
+						</p>
+					</div>
+					<div id='lastNextDate' style="display: none;">
+						<p>
+							#{textBox id:'lastPaymentDate', name:'lastPaymentDate', label:'Last Payment Date', value:transaction?.lastPaymentDate?.format(appProp.dateFormat), required:false, class:'calendar', readOnly:true /}
+							#{hidden id:'lastPaymentDateHidden', name:'transaction.lastPaymentDate', class:'calendar', value:transaction?.lastPaymentDate?.format(appProp.dateFormat) /}
+							(${appProp.displayDateFormat})
+						</p>
+						<p>
+							#{textBox id:'nextPaymentDate', name:'nextPaymentDate', label:'Next Payment Date', value:transaction?.nextPaymentDate?.format(appProp.dateFormat), required:false, class:'calendar', readOnly:true /}
+							#{hidden id:'nextPaymentDateHidden', name:'transaction.nextPaymentDate', class:'calendar', value:transaction?.nextPaymentDate?.format(appProp.dateFormat) /}
+							(${appProp.displayDateFormat})
+							#{hidden id:'accrualBase', name:'transaction.security.accrualBase.lookupId', value:transaction?.security?.accrualBase?.lookupId /}
+							#{hidden id:'yearBase', name:'transaction.security.yearBase.lookupId', value:transaction?.security?.yearBase?.lookupId /}
+						</p>
+					</div>
+					<p id='pAccruedDays'>
+						#{textBox id:'accruedDays', label:'Accrued Days', value:transaction?.accruedDays, readOnly:true, class:'numeric', width: '85px' /}
+						#{hidden id:'accruedDaysStripped', name:'transaction.accruedDays', value:transaction?.accruedDays /}
+						<span class="error">#{error 'Accrued Days is' /}</span>						
+					</p>
+					<p id='pAccruedInterest'>
+						#{textBox id:'accruedInterest', label:'Accrued Interest', value:transaction?.accruedInterest, format:'#,##0.###############', class:'numeric calculate', required:true, readOnly:true /}
+						#{hidden id:'accruedInterestStripped', name:'transaction.accruedInterest', value:transaction?.accruedInterest /}
+						#{hidden id:'waveAccruedInterest', name:'transaction.waveAccrued', value:transaction?.waveAccrued /}
+						#{checkBox id:'cekBoxWaiveAccInt', value:transaction?.waiveAccruedInterest, readOnly:true/} Waive
+						#{hidden id:'hidChk', name:'transaction.waiveAccruedInterest', value:transaction?.waiveAccruedInterest /}
+					</p>
+						<label></label>
+						<span id="accruedInterestError" class="error">#{error 'Accrued Interest is' /}</span>
+					<p id='pTaxOnInterestCode'>
+						#{textBox id:'taxOnInterestCode', name:'transaction.taxOnInterestMaster.taxCode', label:'&nbsp;&nbsp;&nbsp;Tax Code', value:transaction?.taxOnInterestMaster?.taxCode, class:'capitalize calculate', readOnly:true, width:'60px' /}
+						#{hidden id:'taxOnInterestKey', name:'transaction.taxOnInterestMaster.taxKey', value:transaction?.taxOnInterestMaster?.taxKey /}
+						#{button id:'taxOnInterestHelp', value:'?', class:'small', readOnly:true /}
+						#{textBox id:'taxOnInterestDesc', name:'transaction.taxOnInterestMaster.description', value:transaction?.taxOnInterestMaster?.description, readOnly:true, width:'100px' /}
+						#{hidden id:'taxOnInterestRate', name:'transaction.taxOnInterestMaster.taxRate', value:transaction?.taxOnInterestMaster?.taxRate /}
+						<span class="error">#{error 'Tax Code (Accrued) is' /}</span>
+					</p>
+					<p id='pTaxOnInterest'>
+						#{textBox id:'taxOnInterest', label:'&nbsp;&nbsp;&nbsp;Tax Amount', value:transaction?.taxOnInterest, format: '#,##0.0000', class:'numeric calculate', required:true, readOnly:true /}
+						#{hidden id:'taxOnInterestStripped', name:'transaction.taxOnInterest', value:transaction?.taxOnInterest /}
+						<span class="error">#{error 'Tax Amount (Accrued) is' /}</span>
+					</p>
+					<p>
+						#{textBox id:'taxOnInterestNet',  label:'&nbsp;&nbsp;&nbsp;Interest after Tax', value:transaction?.taxOnInterestNet, format:'#,##0.###############', class:'numeric', readOnly:true /}
+						#{hidden id:'taxOnInterestNetStripped',name:'transaction.taxOnInterestNet', value:transaction?.taxOnInterestNet/}
+					</p>
+					<p class="spacer"></p>
+					<p>
+						#{textBox id:'proceed', label:'<i>Proceed</i>', value:transaction?.proceed, format:'#,##0.###############', class:'numeric', readOnly:true /}
+						#{hidden id:'proceedStripped',name:'transaction.proceed', value:transaction?.proceed/}
+					</p>
+					<p>
+						#{textBox id:'capitalGainTaxCode', name:'transaction.capitalGainTaxMaster.taxCode', label:'Capital Gain Tax', value:transaction?.capitalGainTaxMaster?.taxCode, class:'capitalize calculate', required:false, readOnly:readOnly, width:'60px' /}
+						#{hidden id:'capitalGainTaxKey', name:'transaction.capitalGainTaxMaster.taxKey', value:transaction?.capitalGainTaxMaster?.taxKey /}
+						#{button id:'capitalGainTaxHelp', value:'?', class:'small', readOnly:readOnly /}
+						#{textBox id:'capitalGainTaxDesc', name:'transaction.capitalGainTaxMaster.description', value:transaction?.capitalGainTaxMaster?.description, readOnly:true, width:'100px' /}
+						#{hidden id:'capitalGainTaxRate', name:'transaction.capitalGainTaxMaster.taxRate', value:transaction?.capitalGainTaxMaster?.taxRate /}
+						
+					</p>
+					<p>
+						#{textBox id:'capitalGainTax', label:'&nbsp;&nbsp;&nbsp;Tax Amount', value:transaction?.capitalGainTax, format:'#,##0.###############', class:'numeric calculate', required:true, readOnly:readOnly /}
+						#{hidden id:'capitalGainTaxStripped', name:'transaction.capitalGainTax', value:transaction?.capitalGainTax /}
+						<span class="error">#{error 'Tax Amount (Capital Gain) is' /}</span>
+					</p>
+					<p>
+						#{textBox id:'settlementAmount', label:'Settlement Amount', value:transaction?.settlementAmount, format:'#,##0.###############', class:'numeric', readOnly:true /}
+						#{hidden id:'settlementAmountStripped', name:'transaction.settlementAmount', value:transaction?.settlementAmount /}
+					</p>
+					<p id='forSettlePrematch2' style="display: none;">
+						#{textBox id:'settlementAmountAdj', label:'Settlement Amount Adjustment', value:transaction?.settlementAmountAdj, format:'#,##0.###############', class:'numeric', readOnly:readOnlyPrematch /}
+						#{hidden id:'settlementAmountAdjStripped', name:'transaction.settlementAmountAdj', value:transaction?.settlementAmountAdj /}
+					</p>
+					<!--
+					<p>
+						#{textBox id:'netProceed', label:'<i>Net Proceed</i>', value:transaction?.netProceed, format:'#,##0.####', class:'numeric', readOnly:true /}
+						#{hidden id:'netProceedStripped', name:'transaction.netProceed', value:transaction?.netProceed /}
+						#{hidden id:'currency', name:'transaction.currency.currencyCode', value:'IDR' /}
+						#{hidden id:'exchangeRate', name:'transaction.exchangeRate', value:'1' /}
+					</p>
+					-->
+				</div>
+			</div>
+			<div class="buttons" style="position:relative;top:-30px">
+				<input type="button" id="prev1" value="&lt; Previous" disabled="disabled" />
+				<input type="button" id="next1" value="Next &gt;" />
+			</div>
+		</div>
+		<div id="tab2">
+			<div style="height:290px">
+				<div id="chargeDiv" style="overflow-y:scroll;max-height:170px;width:100%">
+					#{include 'Transactions/chargeList.html' /}
+				</div>
+				<div class="buttons" style="padding-top:5px;">
+					<input type="button" value="Add" id="addCharge" #{if readOnly}disabled="disabled"#{/if} />				
+					<input type="button" value="Reload" id="resetCharge" #{if readOnly}disabled="disabled"#{/if} />		
+					<input type="button" value="Done" id="chargeDone" style="display:none" />
+					#{hidden id:'chargeKey', name:'chargeKey', value:''  /}
+				</div>		
+			</div>
+			<div class="buttons">
+				<input type="button" id="prev2" value="&lt; Previous" />
+				<input type="button" id="next2" value="Next &gt;" />
+			</div>
+		</div>
+		<div id="tab3">
+			<!-- <div> -->
+			<p id="pTransferType" style="display:none">
+				#{dropDownList id:'dTransferType', labelwidth:'150px', name:'transaction.transferType.lookupId', label:'Transfer Type', value:transaction?.transferType?.lookupId, options:transferType,  width:'100px', required:true, readOnly:readOnlyPrematch /}
+				<span id="dTransferTypeError" class="error">#{error 'Place of Settlement is' /}</span>
+			</p>
+				<fieldset>
+				<legend><b>Custodian</b></legend>
+					<div style="float:left;height:auto">
+						<p>
+							<input type='radio' id='cashAccount' name='customerOption' value='' disabled="disabled" />
+							<label>CASH ACCOUNT</label>
+						</p>
+						<p>
+							#{textBox id:'bankAccountNo', name:'a1234', label:'Account No', class:'capitalize', readOnly:true, width:'250px', value:bankAccount?.accountNo /}
+						</p>
+						<p>
+							#{textBox id:'bankCode', name:'b1234', label:'Bank Code', value:bankAccount?.bankCode?.thirdPartyCode, readOnly:true, width:'50px', maxLength:'25', class:'capitalize' /}
+							#{hidden id:'bankCodeKey', name:'c1234', value:bankAccount?.bankCode?.thirdPartyKey /}
+							#{button id:'bankCodeHelp', value:'?', class:'small', readOnly:true /}
+							#{textBox id:'bankCodeName', name:'d1234', value:bankAccount?.bankCode?.thirdPartyName, readOnly:true, width:'222px' /}
+						</p>
+						<p>
+							#{textBox id:'currencyCode456', name:'e1234', label:'Beneficiary Name', class:'capitalize', readOnly:true, width:'250px', value:bankAccount?.name /}
+						</p>
+						<p>
+							#{textBox id:'currencyCode789', name:'f1234', label:'Currency', class:'capitalize', readOnly:true, width:'250px', value:bankAccount?.currency?.currencyCode /}
+						</p>
+					</div>
+					<div id="divBankInfoRight" class="right">
+						<p id="pb1">
+							<input type='radio' id='glAccount' name='customerOption' value='' disabled="disabled" />
+							<label>GL ACCOUNT</label>
+						</p>
+						<p id="pb2">
+							#{textBox id:'currencyCode1011', name:'g1234', label:'COA CODE', class:'capitalize', readOnly:true, width:'100px' /}
+						</p>
+						<p id="pb3">
+							#{textBox id:'currencyCode1213', name:'h1234', label:'COA NAME', class:'capitalize', readOnly:true, width:'100px' /}
+						</p>
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<p id="pCustodianAmount">
+							#{textBox id:'custodianAmountType', label:'Credit Amount', value:transaction?.settlementAmount, format:'#,##0.####', class:'numeric', readOnly:true, width:'100px' /}
+						</p>
+					</div>
+				</fieldset>
+			<!-- </div>
+			<div> -->
+				<fieldset>
+				<legend><b>Customer's Cash Account</b></legend>
+					<div style="float:left;height:auto">
+						<p>
+							#{textBox id:'settlementAccount', name:'transaction.settlementAccount.accountNo', label:'Account No', value:transaction?.settlementAccount?.accountNo, class:'capitalize', required:true, readOnly:readOnly, width:'100px' /}
+							#{hidden id:'settlementAccountKey', name:'transaction.settlementAccount.bankAccountKey', value:transaction?.settlementAccount?.bankAccountKey /}
+							#{button id:'settlementAccountHelp', value:'?', class:'small', readOnly:readOnly /}
+							<!-- #{textBox id:'settlementAccountName', name:'transaction.settlementAccount.name', value:transaction?.settlementAccount?.name, readOnly:true, width:'170px' /} -->
+							#{hidden id:'settlementAccountName', name:'transaction.settlementAccount.name', value:transaction?.settlementAccount?.name, readOnly:true, width:'170px' /}
+							<span id="settlementAccountError" class="error">#{error 'Settlement Account is' /}</span>
+						</p>
+						<p>
+							#{textBox id:'settlementBankAccount', name:'transaction.settlementAccount.bankCode.thirdPartyCode', label:'Bank Code', value:transaction?.settlementAccount?.bankCode?.thirdPartyCode, width:'100px', maxLength:'25', class:'capitalize', readOnly:true /}
+							#{hidden id:'settlementBankAccountKey', name:'transaction.settlementAccount.bankCode.thirdPartyKey', value:transaction?.settlementAccount?.bankCode?.thirdPartyKey /}
+							#{button id:'settlementBankAccountHelp', value:'?', class:'small', readOnly:true /}
+							#{textBox id:'settlementBankAccountName', name:'transaction.settlementAccount.bankCode.thirdPartyName', value:transaction?.settlementAccount?.bankCode?.thirdPartyName, readOnly:true, class:'capitalize', width:'170px' /}
+						</p>
+						<p>
+							#{textBox id:'settlementAccountBeneficiary', name:'settlementAccountBeneficiary', label:'Beneficiary Name', value:transaction?.settlementAccount?.name, class:'capitalize', readOnly:true, width:'250px' /}
+						</p>
+						<p>
+							#{textBox id:'settlementAccountCurrency', name:'transaction.settlementAccount.currency.currencyCode', label:'Currency', value:transaction?.settlementAccount?.currency?.currencyCode, class:'capitalize', readOnly:true, width:'150px' /}
+						</p>
+					</div>
+					<div class="right">
+						<p class="spacer"></p>
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<p id="pCustomerCashAmount">
+							#{textBox id:'customerCashAmountType', label:'Debet Amount', value:transaction?.settlementAmount, format:'#,##0.####', class:'numeric', readOnly:true, width:'100px' /}
+						</p>
+					</div>
+				</fieldset>
+			<!-- </div> -->
+			<div class="buttons">
+				<input type="button" id="prev3" value="&lt; Previous" />
+				<input type="button" id="next3" value="Next &gt;" />
+			</div>
+		</div>
+		<div id="tab4">
+			<div style="height:290px">
+				<!--  <div id="charges" style="overflow-y:scroll;max-height:170px;"> -->
+					#{include 'templates/udf.html' /}
+				 <!-- </div> -->
+			</div>
+			<div class="buttons">
+				<input type="button" id="prev4" value="&lt; Previous" />
+				<input type="button" id="next4" value="Next &gt;" disabled="disabled" />
+			</div>
+		</div>
+	</div>
+</form>
+<input type="hidden" id="dummy" />

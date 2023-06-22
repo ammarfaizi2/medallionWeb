@@ -1,0 +1,90 @@
+#{extends 'templates/main.html' /}
+
+<script type="text/javascript">
+	$(function() {
+		$(".btn").button();
+		$(".btn").css("width", "100px");
+		
+		var closeDialogMessage = function() {
+			$("#dialog-message").dialog("close");
+		}
+
+		$('#newContact').disabled();
+		$('input[name=amlInterfaceRadio][value=aml.tipeIndividu]').attr('disabled', true);
+		$('input[name=amlInterfaceRadio][value=aml.tipeIndividu.bo]').attr('disabled', true);
+		
+		var backToWorkList = function() {
+			loading.dialog('open');
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			};
+		}
+		
+		$('#approve').click(function() {
+			var action = "@{approve()}?keyId=${amlCustomer?.amlKey}&taskId=${taskId}&maintenanceLogKey=${maintenanceLogKey}&operation=${operation}";
+			loading.dialog('open');
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+
+				if (data.status == 'success') {
+					//alert("Lookup Code ${lookup?.lookupCode} is Approved " + data);
+					messageAlertOk("AML Key '${amlCustomer?.amlId}' is Approved", "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+				} else {
+					messageAlertOk("Code : '${amlCustomer?.amlId}' can not approve cause "+data.message+" ${amlCustomer?.amlId}", "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);	
+				}
+					
+			});			
+		});
+		$('#reject').click(function() {
+			var action = "@{reject()}?keyId=${amlCustomer?.amlKey}&taskId=${taskId}&maintenanceLogKey=${maintenanceLogKey}&operation=${operation}";
+			loading.dialog('open');
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					messageAlertOk("Code : '${amlCustomer?.amlKey}' is Rejected", "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+				}else{
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+				}
+			});
+		});
+		
+		$('#close').css('display','none');
+		$("#approval-actions").css("display","block");
+		
+		$('#closeWorkflow').click(function() {
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			}
+		});
+	});
+
+	function changeTitle(custNo){
+		var custName = "Customer : "+custNo+" - "+$("#customerName").val();
+		$("#detail h2").text(custName);
+	}
+</script>
+
+<h2>AmlCustomer Maintenance Approval</h2>
+
+<div id="detail">
+	<form id="form" class="form">
+		#{include 'AmlMaintenance/detail.html' /}
+	</form>
+</div>	
+
+<div id="approval-actions">
+	<input type="button" id="approve" value="Approve" class="btn" />
+	<input type="button" id="reject" value="Reject" class="btn" />	
+	<input type="button" id="closeWorkflow" value="Cancel" class="btn" />
+
+	#{hidden id:'taskId', name:'taskId', value:taskId /}
+	#{hidden id:'maintenanceLogKey', name:'maintenanceLogKey', value:maintenanceLogKey /}
+	#{hidden id:'operation', name:'operation', value:operation/}
+	#{hidden id:'from', name:'from', value:from /}
+</div>

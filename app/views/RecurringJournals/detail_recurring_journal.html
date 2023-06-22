@@ -1,0 +1,72 @@
+<script type="text/javascript">
+	$(function(){
+		$('#coaCode').dynapopup2({key:'coaMasterKey', help:'coaHelp', desc:'coaDescription'},'PICK_FA_COA_BOTTOM_LEVEL', '', 'position', function(data){
+			if (data) {
+				$('#coaCode').removeClass('fieldError');
+				$('#coaMasterKey').val(data.code);
+				$('#coaDescription').val(data.description);
+				$('#h_coaDescription').val(data.description);
+			}			
+		},function(data){
+			$('#coaCode').addClass('fieldError');
+			$('#coaMasterKey').val('');
+			$('#coaCode').val('');
+			$('#coaDescription').val('NOT FOUND');
+			$('#h_coaDescription').val('');			
+		});
+		
+		$('#cancelRecurringJournalDetail').click(function() {
+			$('#coaCode').removeClass('fieldError');
+			$("#detailForRecurringJournalDetails").dialog('close');
+			return false;
+		})
+		
+		$('#coaCode').blur(function(){
+			// di comment sebab menyebabkan text DATA NOT FOUND ke hapus
+			//if ($('#coaCode').val()=="") {
+				//$('#coaMasterKey').val('');
+				//$('#coaCode').val('');
+				//$('#coaDescription').val('');
+				//$('#h_coaDescription').val('');
+			//}
+		});
+	});
+	
+</script>
+<style type="text/css">
+  .errmsg { color:red; }
+</style>
+<form></form>
+<form id="recurringDetailForm" class="form">
+<span id="errmsgNull" class="errmsg" ></span>
+<p>
+		#{hidden id:'oldMaxRange' /}
+		#{hidden id:'newMaxRange' /}
+		#{hidden id:'rowPosition' /}
+		#{hidden id:'recurringKey', name:'faRecurringDetail.faRecurring.recurringKey', value:faRecurringDetail?.faRecurring?.recurringKey /}
+		#{hidden id:'recurringDetailKey', name:'faRecurringDetail.recurringDetailKey', value:faRecurringDetail?.recurringDetailKey /}
+	</p>
+	<p>
+		#{textBox id:'coaCode', name:'faRecurringDetail.faCoaMaster.coaCode', label:'COA No', value:faRecurringDetail?.faCoaMaster?.coaCode, class:'capitalize', width:'100px', required:true, readOnly:readOnly /}
+		#{hidden id:'coaMasterKey', name:'faRecurringDetail.faCoaMaster.coaMasterKey', value:faRecurringDetail?.faCoaMaster?.coaMasterKey /}
+		#{button id:'coaHelp', value:'?', class:'small', readOnly:readOnly /}
+		&nbsp; <span id="coaCodeError" class="error"></span>
+	</p>
+	<p>
+		#{textBox id:'coaDescription', name:'faRecurringDetail.faCoaMaster.Description', label:'COA Name', class:'capitalize', value:faRecurringDetail?.faCoaMaster?.Description, readOnly:true, width:'250px' /}
+	</p>
+	<p>
+		#{textBox id:'subLedger', name:'faRecurringDetail.subLedger', label:'Subledger', value:faRecurringDetail?.subLedger, width:'120px', maxLength:20, readOnly:readOnly, class:'capitalize'  /}		
+	</p>
+	<p>	
+	 	#{dropDownList id:'position', name:'faRecurringDetail.dorc', label:'Position', value:faRecurringDetail?.dorc, options:debitCredit, required:true, width:'104px', readOnly:readOnly /}  
+		&nbsp; <span id="positionError" class="error"></span>
+	</p>	
+	<p>			
+		#{textBox id:'amount', label:'Amount', value:faRecurringDetail?.amount, format:'#,##0.####', class:'numericManualJournal', required:true, readOnly:readOnly, width:'100px' /}
+		#{hidden id:'amountStripped', name:'faRecurringDetail.amount', value:faRecurringDetail?.amount /}
+		&nbsp; <span id="amountError" class="error"></span>
+	</p>
+	<p>
+	</p>
+</form>

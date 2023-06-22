@@ -1,0 +1,176 @@
+<script type="text/javascript">
+	entitlementDetailGrid();
+</script>
+
+<table id="grid" class="display">
+	<thead>
+		<tr>
+			<th>Entitlement Detail Key</th>
+			<th id="accounNoHeader">Account No</th>
+			<th>Total Holding</th>
+			<th>Security Type Source</th>
+			<th>Security Code Source</th>
+			<th>Classification</th>
+			<th>Transaction Code</th>
+			<th>Transaction Desc.</th>
+			<th>Total Charges</th>
+			<th>Total Tax</th>
+			<th>Execution Price</th>
+			<th>Quantity Transaction</th>
+			<th>Cash Amount</th>
+			<th>Security Type Target</th>
+			<th>Security Code Target</th>
+			<th>Classification</th>
+			<th>Transaction Code</th>
+			<th>Transaction Desc.</th>
+			<th>Total Charges</th>
+			<th>Total Tax</th>
+			<th>Execution Price</th>
+			<th>Quantity Transaction</th>
+			<th>Cash Amount</th>
+		</tr>		
+	</thead>
+	<tbody>
+	#{list entitlementDetails, as:'entitlementDetail'}
+		#{if entitlementDetail?.totalHolding > 0}
+			<tr>
+				<td>
+					${entitlementDetail?.entitlementDetailKey}				
+				</td>
+				<td>	
+					${entitlementDetail?.account?.accountNo}
+				</td>
+				<td class="numeric">
+					${entitlementDetail?.totalHolding?.format('#,##0.####')}
+				</td>
+				<td class="capitalize">
+					#{if entitlementDetail?.sourceQuantity != null}
+						${entitlementDetail?.announcementDetail?.securityTypeSource?.securityType}
+					#{/if}
+				</td>
+				<td class="capitalize">
+					#{if entitlementDetail?.sourceQuantity != null}
+						${entitlementDetail?.announcementDetail?.securitySource?.securityId}
+					#{/if}
+				</td>
+				<td>
+					#{if entitlementDetail?.sourceQuantity != null}
+						${entitlementDetail?.classification?.lookupDescription}
+					#{/if}
+				</td>
+				<td>
+					#{if entitlementDetail?.sourceQuantity != null}
+						${entitlementDetail?.announcementDetail?.actionTemplate?.sourceTransaction?.transactionCode}	
+					#{/if}
+				</td>
+				<td>
+					#{if entitlementDetail?.sourceQuantity != null}
+						${entitlementDetail?.announcementDetail?.actionTemplate?.sourceTransaction?.description}		
+					#{/if}
+				</td>
+				<td class="numeric">
+					${entitlementDetail?.sourceTotalCharges?.format('#,##0.####')}
+				</td>
+				<td class="numeric">
+					${entitlementDetail?.sourceTaxOnInterest?.format('#,##0.####')}
+				</td>
+				<td class="numeric">
+					#{if entitlementDetail?.sourceQuantity != null}
+						${entitlementDetail?.announcementDetail?.corporateAnnouncement?.executionPrice}	
+					#{/if}
+				</td>
+				<td class="numeric">
+					${entitlementDetail?.sourceQuantity?.format('#,##0.####')} 
+				</td>
+				<td class="numeric">
+					${entitlementDetail?.sourceCashAmount?.format('#,##0.####')}
+				</td>
+				<td class="capitalize">
+					#{if entitlementDetail?.targetQuantity != null}
+						${entitlementDetail?.announcementDetail?.securityTypeTarget?.securityType}	
+					#{/if}
+				</td>
+				<td class="capitalize">
+					#{if entitlementDetail?.targetQuantity != null}
+						${entitlementDetail?.announcementDetail?.securityTarget?.securityId}
+					#{/if}
+				</td>
+				<td>
+					#{if entitlementDetail?.targetQuantity != null}
+						${entitlementDetail?.classification?.lookupDescription}
+					#{/if}
+				</td>
+				<td>
+					#{if entitlementDetail?.targetQuantity != null}
+						${entitlementDetail?.announcementDetail?.actionTemplate?.targetTransaction?.transactionCode}
+					#{/if}
+				</td>
+				<td>
+					#{if entitlementDetail?.targetQuantity != null}
+						${entitlementDetail?.announcementDetail?.actionTemplate?.targetTransaction?.description}
+					#{/if}
+				</td>
+				<td class="numeric">
+					${entitlementDetail?.targetTotalCharges?.format('#,##0.####')}
+				</td>
+				<td class="numeric">
+					${entitlementDetail?.targetTaxOnInterest?.format('#,##0.####')}
+				</td>
+				<td class="numeric">
+					#{if entitlementDetail?.targetHoldingRefs != null}
+						${entitlementDetail?.announcementDetail?.corporateAnnouncement?.executionPrice}	
+					#{/if}
+				</td>
+				<td class="numeric">
+					#{if entitlementDetail?.announcementDetail?.actionTemplate?.targetType?.lookupId == 'CA_TARGET_TYPE-C'}
+						0
+					#{/if}
+					#{else}
+						${entitlementDetail?.targetQuantity?.format('#,##0.####')} 
+					#{/else}
+				</td>
+				<td class='numeric'>
+					${entitlementDetail?.targetCashAmount?.format('#,##0.####')}
+					
+					#{hidden id:'isChecked', name:'entitlementDetails[' + (entitlementDetail_index-1) + '].isChecked', value:entitlementDetail?.isChecked /}
+					#{hidden id:'announcementDetailKey', name:'entitlementDetails[' + (entitlementDetail_index-1) + '].announcementDetail.announcementDetailKey', value:entitlementDetail?.announcementDetail?.announcementDetailKey /}
+					#{hidden id:'accountKey', name:'entitlementDetails[' + (entitlementDetail_index-1) + '].account.custodyAccountKey', value:entitlementDetail?.account?.custodyAccountKey /}
+					#{hidden id:'accountNo', name:'entitlementDetails[' + (entitlementDetail_index-1) + '].account.accountNo', value:entitlementDetail?.account?.accountNo /}
+					#{hidden id:'securityTypeSource', name:'entitlementDetails[' + (entitlementDetail_index-1) + '].announcementDetail.securityTypeSource.securityType', value:entitlementDetail?.announcementDetail?.securityTypeSource?.securityType /}
+					#{hidden id:'securityClassSource', name:'entitlementDetails[' + (entitlementDetail_index-1) + '].announcementDetail.securityTypeSource.securityClass.lookupId', value:entitlementDetail?.announcementDetail?.securityTypeSource?.securityClass?.lookupId /}
+					#{hidden id:'securitySource', name:'entitlementDetails[' + (entitlementDetail_index-1) + '].announcementDetail.securitySource.securityId', value:entitlementDetail?.announcementDetail?.securitySource?.securityId /}
+					#{hidden id:'classification', name:'entitlementDetails[' + (entitlementDetail_index-1) + '].classification.lookupId', value:entitlementDetail?.classification?.lookupId /}
+					#{hidden id:'classificationDescription', name:'entitlementDetails[' + (entitlementDetail_index-1) + '].classification.lookupDescription', value:entitlementDetail?.classification?.lookupDescription /}
+					#{hidden id:'sourceTransaction',  name:'entitlementDetails[' + (entitlementDetail_index-1) + '].announcementDetail.actionTemplate.sourceTransaction.transactionTemplateKey', value:entitlementDetail?.announcementDetail?.actionTemplate?.sourceTransaction?.transactionTemplateKey /}
+					#{hidden id:'sourceTransactionCode',  name:'entitlementDetails[' + (entitlementDetail_index-1) + '].announcementDetail.actionTemplate.sourceTransaction.transactionCode', value:entitlementDetail?.announcementDetail?.actionTemplate?.sourceTransaction?.transactionCode /}
+					#{hidden id:'sourceTransactionDescription',  name:'entitlementDetails[' + (entitlementDetail_index-1) + '].announcementDetail.actionTemplate.sourceTransaction.description', value:entitlementDetail?.announcementDetail?.actionTemplate?.sourceTransaction?.description /}
+					#{hidden id:'sourceHoldingRefs', name:'entitlementDetails[' + (entitlementDetail_index-1) + '].sourceHoldingRefs', value:entitlementDetail?.sourceHoldingRefs /}
+					#{hidden id:'sourceAccuredInterest', name:'entitlementDetails[' + (entitlementDetail_index-1) + '].sourceAccuredInterest', value:entitlementDetail?.sourceAccuredInterest /}				
+					#{hidden id:'sourceHolding', name:'entitlementDetails[' + (entitlementDetail_index-1) + '].sourceHolding', value:entitlementDetail?.sourceHolding /}
+					#{hidden id:'sourceTotalCharges', name:'entitlementDetails[' + (entitlementDetail_index-1) + '].sourceTotalCharges', value:entitlementDetail?.sourceTotalCharges /}
+					#{hidden id:'sourceTaxOnInterest', name:'entitlementDetails[' + (entitlementDetail_index-1) + '].sourceTaxOnInterest', value:entitlementDetail?.sourceTaxOnInterest /}
+					#{hidden id:'sourceTaxOnInterest', name:'entitlementDetails[' + (entitlementDetail_index-1) + '].announcementDetail.corporateAnnouncement.executionPrice', value:entitlementDetail?.announcementDetail?.corporateAnnouncement?.executionPrice /}
+					#{hidden id:'sourceQuantity', name:'entitlementDetails[' + (entitlementDetail_index-1) + '].sourceQuantity', value:entitlementDetail?.sourceQuantity /}
+					#{hidden id:'sourceCashAmount', name:'entitlementDetails[' + (entitlementDetail_index-1) + '].sourceCashAmount', value:entitlementDetail?.sourceCashAmount /}
+					#{hidden id:'securityTypeTarget', name:'entitlementDetails[' + (entitlementDetail_index-1) + '].announcementDetail.securityTypeTarget.securityType', value:entitlementDetail?.announcementDetail?.securityTypeTarget?.securityType /}
+					#{hidden id:'securityClassTarget', name:'entitlementDetails[' + (entitlementDetail_index-1) + '].announcementDetail.securityTypeTarget.securityClass.lookupId', value:entitlementDetail?.announcementDetail?.securityTypeTarget?.securityClass?.lookupId /}
+					#{hidden id:'securityTarget', name:'entitlementDetails[' + (entitlementDetail_index-1) + '].announcementDetail.securityTarget.securityId', value:entitlementDetail?.announcementDetail?.securityTarget?.securityId /}
+					#{hidden id:'targetTransaction',  name:'entitlementDetails[' + (entitlementDetail_index-1) + '].announcementDetail.actionTemplate.targetTransaction.transactionTemplateKey', value:entitlementDetail?.announcementDetail?.actionTemplate?.targetTransaction?.transactionTemplateKey /}
+					#{hidden id:'targetTransactionCode',  name:'entitlementDetails[' + (entitlementDetail_index-1) + '].announcementDetail.actionTemplate.targetTransaction.transactionCode', value:entitlementDetail?.announcementDetail?.actionTemplate?.targetTransaction?.transactionCode /}
+					#{hidden id:'targetTransactionDescription',  name:'entitlementDetails[' + (entitlementDetail_index-1) + '].announcementDetail.actionTemplate.targetTransaction.description', value:entitlementDetail?.announcementDetail?.actionTemplate?.targetTransaction?.description /}
+					#{hidden id:'targetHoldingRefs', name:'entitlementDetails[' + (entitlementDetail_index-1) + '].targetHoldingRefs', value:entitlementDetail?.targetHoldingRefs /}
+					#{hidden id:'targetAccuredInterest', name:'entitlementDetails[' + (entitlementDetail_index-1) + '].targetAccuredInterest', value:entitlementDetail?.targetAccuredInterest /}
+					#{hidden id:'targetHolding', name:'entitlementDetails[' + (entitlementDetail_index-1) + '].targetHolding', value:entitlementDetail?.targetHolding /}
+					#{hidden id:'targetTotalCharges', name:'entitlementDetails[' + (entitlementDetail_index-1) + '].targetTotalCharges', value:entitlementDetail?.targetTotalCharges /}
+					#{hidden id:'targetTaxOnInterest', name:'entitlementDetails[' + (entitlementDetail_index-1) + '].targetTaxOnInterest', value:entitlementDetail?.targetTaxOnInterest /}
+					#{hidden id:'targetQuantity', name:'entitlementDetails[' + (entitlementDetail_index-1) + '].targetQuantity', value:entitlementDetail?.targetQuantity /}
+					#{hidden id:'targetCashAmount', name:'entitlementDetails[' + (entitlementDetail_index-1) + '].targetCashAmount', value:entitlementDetail?.targetCashAmount /}
+					#{hidden id:'currency',name:'entitlementDetails[' + (entitlementDetail_index-1) + '].currency.currencyCode', value:entitlementDetail?.currency?.currencyCode /}
+					#{hidden id:'price',name:'entitlementDetails[' + (entitlementDetail_index-1) + '].price', value:entitlementDetail?.price /}
+					#{hidden id:'status',name:'entitlementDetails[' + (entitlementDetail_index-1) + '].status', value:entitlementDetail?.status/}		
+				</td>				
+			</tr>		
+		#{/if}
+	#{/list}
+	</tbody>
+</table>

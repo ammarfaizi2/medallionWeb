@@ -1,0 +1,103 @@
+#{extends 'templates/main.html' /}
+#{set transactionKey:transaction?.transactionKey /}
+
+<script type="text/javascript">
+	$(function() {
+		var backToSettlement = function() {
+			loading.dialog('open');
+			location = "@{settlement()}";
+		}
+		
+		var closeDialogMessage = function() {
+			$("#dialog-message").dialog("close");
+		}
+		
+		// Action buttons 
+		$('#save').click(function() {
+/* 			if (($('#settlementDate').val()=='') ||($('#settlementAccount').val()=='')){
+				if ($('#settlementDate').val()==''){
+					$('#settlementDateError').html('Required');
+				}
+				
+				if ($('#settlementAccount').val()=='') {
+					$('#settlementAccountError').html('Required');
+					
+				}
+				return false;
+			}
+ */			var action = "@{save()}?settlement=true";
+ 			loading.dialog('open');
+			/* var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+			loading.dialog({
+				closeOnEscape: false,
+				draggable: false,
+				modal: true,
+				resizable: false,
+				open:function() {
+					$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+				} 
+			}); */
+			$('#transactionForm').attr('action', action);
+			$('#transactionForm').submit(); 
+		});
+		$('#confirm').click(function() {
+			var action = "@{confirmSettle()}";
+			/* var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+			loading.dialog({
+				closeOnEscape: false,
+				draggable: false,
+				modal: true,
+				resizable: false,
+				open:function() {
+					$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+				} 
+			}); */
+			loading.dialog('open');
+			$.post(action, $('#transactionForm').serialize(), function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					//alert(data.message);
+					//location = "@{settlement()}";
+					messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Notification", backToSettlement);
+				} else {
+					//alert(data.error);
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+				}
+			});
+		});
+		$('#back').click(function() {
+			/*
+			var action = "@{back()}?mode=${mode}#{if taskId}&taskId=${taskId}#{/if}&settlement=true&transactionKey=${transactionKey}";
+			alert($('#transactionForm').serialize());
+			$.post(action, $('#transactionForm').serialize(), function(data, status, xhr) {
+				if (status == 'success') {
+					//alert(data);
+					$('#detail').html(data);
+					$("#actions #confirming").css('display', 'none');
+					$('#actions #editing').css('display', '');
+				}
+			});
+			*/
+			location.href='@{back()}?mode=${mode}#{if taskId}&taskId=${taskId}#{/if}&settlement=true&transactionKey=${transactionKey}';
+			return false;
+		});
+		$('#return').click(function() {
+			location.href="@{settlement()}";			
+		});
+	});	
+</script>
+<h2>Settlement</h2>
+<div id="detail">
+	#{include 'Transactions/detail.html' /}		
+</div>
+<div id="actions" class="buttons">
+	#{if confirming}
+		<input type="button" id="confirm" value="Confirm" />
+		<input type="button" id="back" value="Back" />
+	#{/if}
+	#{else}
+		<input type="button" id="save" value="Settle" />
+		<input type="button" id="return" value="Back" />
+	#{/else}
+</div>

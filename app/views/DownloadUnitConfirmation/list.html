@@ -1,0 +1,106 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Download unit Confirmation Notice' /}
+#{set fixData: true /}
+#{set mode: mode /}
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+
+<div id="accordion">
+	<h3>Generate Unit Confirmation for DATANET</h3>
+	<form id="searchForm" class="form">
+		#{hidden id:'post', name:'post'/}
+		#{hidden id:'email', name:'email'/}
+        <p>
+        	<label style="width: 150px">Fund Code</label>
+			<input type='radio' id='fundAll' name='fundOption' value='params.isFund' />
+			<input type="hidden" id='fundAllHidden' name='params.isFund' value='params.isFund' />
+			<label>ALL</label>
+		</p>
+
+		<p>
+			<label style="width: 150px">&nbsp;</label>
+			<input type='radio' id='fundBlank' name='fundOption' value='params.isFund' />
+			<input type="hidden" id='fundBlankHidden' name='params.isFund' value='params.isFund' />
+			
+			#{textBox id:'fundCode', name:'', class:'capitalize', readOnly:readOnly, width:'100px', maxLength:50 /}
+			#{hidden id:'fundKey', name:'params.fundKey', value:params?.fundKey /}
+			#{button id:'fundHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'fundDesc', name:'', class:'capitalize', readOnly:true, width:'250px' /}
+			<span id="errFund" class="error"></span>
+		</p>
+
+        <p>
+            <label style="width: 150px">Selling Agent</label>
+            <input type='radio' id='saCodeAll' name='saCodeOption' value='params.isSaCode' />
+            <input type="hidden" id='saCodeAllHidden' name='params.isSaCode' value='params.isSaCode' />
+            <label>ALL</label>
+        </p>
+
+        <p>
+            <label style="width: 150px">&nbsp;</label>
+            <input type='radio' id='saCodeBlank' name='saCodeOption' value='params.isSaCode' />
+            <input type="hidden" id='saCodeBlankHidden' name='params.isSaCode' value='params.isSaCode' />
+
+            #{textBox id:'saCode', name:'', class:'capitalize', readOnly:readOnly, width:'100px', maxLength:50 /}
+            #{hidden id:'saCodeKey', name:'params.saCodeKey', value:params?.saCodeKey /}
+            #{button id:'saCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+            #{textBox id:'saCodeDesc', name:'', class:'capitalize', readOnly:true, width:'250px' /}
+            <span id="errSaCode" class="error"></span>
+        </p>
+
+        <p>
+            <label style="width: 150px">CIF No.</label>
+            <input type='radio' id='accountNoAll' name='accountOption' value='params.isAccount' />
+			<input type="hidden" id='accountNoAllHidden' name='params.isAccount' value='params.isAccount' />
+			<label>ALL</label>
+        </p>
+
+        <p>
+        	<label style="width: 150px">&nbsp;</label>
+			<input type='radio' id='accountBlank' name='accountOption' value='params.isAccount' />
+			<input type="hidden" id='accountBlankHidden' name='params.isAccount' value=params.isAccount />
+			
+            #{textBox id:'accountCode', name:'', class:'capitalize', readOnly:readOnly, width:'100px', maxLength:50 /}
+            #{hidden id:'accountCodeKey', name:'params.accountKey', value:params?.accountKey  /}
+            #{button id:'accountCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+            #{textBox id:'accountCodeDesc', name:'', class:'capitalize', readOnly:true, width:'250px' /}
+            <span id="errAccount" class="error"></span>
+        </p>
+
+        <p>
+            #{textBox id:'tradeDateFrom', name:'params.tradeDateFrom', label:'Transaction Date', width:'85px' ,class:'calendar', required:true /} (${appProp.displayDateFormat})
+            <span id="tradeDateFromError" class="error"></span> <strong>To</strong>
+            #{textBox id:'tradeDateTo', name:'params.tradeDateTo', class:'calendar' /} (${appProp.displayDateFormat})
+            <span id="tradeDateToError" class="error"></span>
+        </p>
+
+        <p>
+            &nbsp;
+        </p>
+
+		<div id="actions" class="buttons">
+			<input id='btnGenerate' type="button" value="Generate"/>
+			<input id='btnReset' type="button" value="Reset" />
+		</div>
+		<br>
+		<label id="idPost" style="width: 250px;"> For Via Post, Download it <a id="reportPost" href="@{DownloadUnitConfirmation.downloadReport()}">here</a> </label><br>
+		<label id="idEmail" style="width: 250px;"> For Via E-mail, Download it <a id="reportMail" href="@{DownloadUnitConfirmation.downloadReport()}">here</a></label>
+
+	</form>
+</div>	
+
+<div id="result" style="display:none">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<div class="response"></div>
+</div>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'DownloadUnitConfirmation/DownloadUnitConfirmation.js' /}
+	$(document).ready(function() {
+		//DownloadUnitTrust($("#main"));
+		$('#btnGenerate').button();
+		$('#btnReset').button();
+		DownloadUnitConfirmation($("#main"));
+	});
+</script>

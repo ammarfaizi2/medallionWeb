@@ -1,0 +1,27 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Report Mapping Maintenance' /}
+#{set subList: true /}
+#{set fixData: true /}
+
+<table class="display">
+	<thead>
+		<tr>
+			<th>Key</th>
+			<th>Report Name</th>
+			
+		</tr>
+	</thead>
+	<tbody>
+		
+		#{list items:lookups, as:'lookup'}
+			<tr>
+				<td>
+					${lookup.lookupId} 
+				</td>
+				<td>
+					${lookup.lookupDescription} 
+				</td>
+			</tr>
+		#{/list}
+	</tbody>
+</table>

@@ -1,0 +1,519 @@
+
+#{set readOnly: (((mode != 'edit')&&(mode != 'entry')) || (confirming))  /}
+
+#{script 'date.js', characterset:'utf-8' /}
+#{script 'external/Util.js' /}
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+
+<script type="text/javascript">
+#{include 'RegistrySubscription/Util.js' /}
+	$(function() {
+		$('.buttons button').button();
+		$( "#dialog-message-1" ).css("display","none");
+		
+		$('#tabsPostingRuleDetail').tabs();
+		$('#newPostingRuleDetail').button();
+		$('#addPostingRuleDetail').button();
+		$('#cancelPostingRuleDetail').button();
+		
+		var closeDialog = function() {
+			$("#dialog-message").dialog('close');	
+		}
+		
+		var data = new Object();
+		tabPostingRule(data);
+		
+		if (('${mode}'=='entry') || (('${mode}'=='edit') && (('${faPostingRule?.recordStatus?.decodeStatus()}' == 'Reject')|| ($("#status").val() == 'R' )))) {
+			$('input[name=isActive]').attr("disabled", "disabled");
+		}
+		
+		
+		
+		$('input[name=isActive]').change(function(){
+			$("input[name='faPostingRule.isActive']").val($("input[name='isActive']:checked").val());
+		});
+
+		if ($('#postingTreated').val()=='POSTING_TREATED-T'){
+				$('#asRecap').removeAttr("disabled");
+		}
+		
+		if ('${confirming}'=='true'){
+			$('#asRecap').attr("disabled", "disabled");
+		}
+		
+		if ('${mode}'=='view') {
+			$("#newPostingRuleDetail").button("option", "disabled", true);
+			$('#asRecap').attr('disabled', 'disabled');
+		}
+		
+		$('#transactionTemplateCode').dynapopup2({key:'transactionTemplateKey',help:'transactionTemplateHelp',desc:'transactionTemplateDesc'},'PICK_FA_TRX_MASTER', '','autoReversal', function(data){
+			if (data) {
+				$('#transactionTemplateCode').removeClass('fieldError');
+				$('#transactionTemplateKey').val(data.code);
+				$('#transactionTemplateDesc').val(data.description);
+				$('#h_transactionTemplateDesc').val(data.description);
+				/* if(($('#postingTreated').val() == data.instructionType) || ($('#postingTreated').val()=="")){
+					$('#postingTreated').val(data.instructionType);
+					$('#postingTreatedHidden').val(data.instructionType);
+				} */
+				
+				$('#postingTreated').val(data.instructionType);
+				$('#postingTreatedHidden').val(data.instructionType);
+				
+				if (data.instructionType == 'POSTING_TREATED-T'){
+					$('#asRecap').removeAttr("disabled");
+					//$('#asRecap').attr('checked', false);
+				} else {
+					$('#asRecap').attr('disabled', 'disabled');
+					$('#asRecap').attr('checked', false);
+					$('input[name=faPostingRule.asRecap]').val(false);
+				}
+			}
+		}, function(data){
+			$('#transactionTemplateCode').addClass('fieldError');
+			$('#transactionTemplateKey').val('');
+			$('#transactionTemplateCode').val('')
+			$('#transactionTemplateDesc').val('NOT FOUND');
+			$('#h_transactionTemplateDesc').val('');
+			$('#postingTreated').val('');
+			$('#postingTreatedHidden').val('');
+			$('#asRecap').attr('disabled', 'disabled');
+			$('#asRecap').attr('checked', false);
+			$('input[name=faPostingRule.asRecap]').val(false);
+		});
+		
+//		$('#transactionTemplateCode').blur(function(){
+//			if (($('#transactionTemplateCode').val() == "") || ($('#transactionTemplateCode').isChange())){
+//				$('#transactionTemplateCode').removeClass('fieldError');
+//				$('#transactionTemplateDesc').val("");
+//				$('#h_transactionTemplateDesc').val("");
+//				$('#transactionTemplateKey').val("");
+//				$('#postingTreated').val('');
+//				$('#postingTreatedHidden').val('');
+//			}	
+//		})
+		
+		$('#asRecap').change(function(){
+			if ($('#asRecap').is(':checked')){
+				$('input[name=faPostingRule.asRecap]').val(true);
+			} else {
+				$('input[name=faPostingRule.asRecap]').val(false);
+			}
+		});
+		
+		$( "#detailPostingRules" ).dialog({
+			autoOpen:false,
+			modal:true,
+			heigth:'700px',
+			width:'650px',
+			resizable:false
+		});
+		
+		// ============ EVENT DELETE ROW IN GRID POSTING RULE DETAIL =============== //
+		$('#listPostingRuleDetail #gridPostingRuleDetail tbody tr #deleteButton').live('click', function() {
+			if ('${mode}' != 'view') {
+				var row = $(this).parents('tr');
+				var rowNumber = ($('#listPostingRuleDetail #gridPostingRuleDetail').dataTable().fnGetPosition(row[0]));
+				var deletePostingRuleDetail = function() {
+					tablePostingRuleDetail.fnDeleteRow(rowNumber);
+					var idTable = $("#listPostingRuleDetail #gridPostingRuleDetail");
+					var trs = $("tr", idTable);
+					$.each(trs, function(idx, data){
+						var hiddens = $("[type=hidden]", $(this));
+						// 	$(hiddens).eq(0).attr("name", "items["+(idx-1)+"].chargeItemKey");
+							$(hiddens).eq(0).attr("name", "faPostingRuleDetails["+(idx-1)+"].faCoaMaster.coaMasterKey");
+							$(hiddens).eq(1).attr("name", "faPostingRuleDetails["+(idx-1)+"].faCoaMaster.coaCode");
+							$(hiddens).eq(2).attr("name", "faPostingRuleDetails["+(idx-1)+"].faCoaMaster.coaMasterKey");
+							$(hiddens).eq(3).attr("name", "faPostingRuleDetails["+(idx-1)+"].faCoaMaster.description");
+							$(hiddens).eq(4).attr("name", "faPostingRuleDetails["+(idx-1)+"].postingDc");
+							$(hiddens).eq(5).attr("name", "faPostingRuleDetails["+(idx-1)+"].postingField.lookupId");
+							$(hiddens).eq(6).attr("name", "faPostingRuleDetails["+(idx-1)+"].postingField.lookupCode");
+							$(hiddens).eq(7).attr("name", "faPostingRuleDetails["+(idx-1)+"].postingField.lookupDescription");
+							$(hiddens).eq(8).attr("name", "faPostingRuleDetails["+(idx-1)+"].postingDetailKey");
+					});
+					$("#dialog-message").dialog("close");
+				}
+				/* $("#dialog-message-1").dialog({
+					autoOpen:false,
+					height:120,
+					width:250,
+					modal:true,
+					resizable : false,
+					buttons: {
+						"Yes": function() {
+							tablePostingRuleDetail.fnDeleteRow(rowNumber);
+							var idTable = $("#listPostingRuleDetail #gridPostingRuleDetail");
+							var trs = $("tr", idTable);
+							$.each(trs, function(idx, data){
+								var hiddens = $("[type=hidden]", $(this));
+								// 	$(hiddens).eq(0).attr("name", "items["+(idx-1)+"].chargeItemKey");
+									$(hiddens).eq(0).attr("name", "faPostingRuleDetails["+(idx-1)+"].faCoaMaster.coaMasterKey");
+									$(hiddens).eq(1).attr("name", "faPostingRuleDetails["+(idx-1)+"].faCoaMaster.coaCode");
+									$(hiddens).eq(2).attr("name", "faPostingRuleDetails["+(idx-1)+"].faCoaMaster.coaMasterKey");
+									$(hiddens).eq(3).attr("name", "faPostingRuleDetails["+(idx-1)+"].faCoaMaster.description");
+									$(hiddens).eq(4).attr("name", "faPostingRuleDetails["+(idx-1)+"].postingDc");
+									$(hiddens).eq(5).attr("name", "faPostingRuleDetails["+(idx-1)+"].postingField.lookupId");
+									$(hiddens).eq(6).attr("name", "faPostingRuleDetails["+(idx-1)+"].postingField.lookupCode");
+									$(hiddens).eq(7).attr("name", "faPostingRuleDetails["+(idx-1)+"].postingField.lookupDescription");
+									$(hiddens).eq(8).attr("name", "faPostingRuleDetails["+(idx-1)+"].postingDetailKey");
+							});
+							$("#dialog-message-1").dialog("close");
+						},
+						"No ": function() {
+							$("#dialog-message-1").dialog("close");
+						}	
+					}
+				});
+				$('#dialog-message-1').css('overflow','hidden');
+				$("#dialog-message-1").dialog('open'); */
+				messageAlertYesNo("Are you sure to delete data ?", "ui-icon ui-icon-notice", "Confirmation Message", deletePostingRuleDetail, closeDialog);
+			}
+		});
+		//==========================================================================================//
+		
+		//==================== EVENT BUTTON SAVE / ADD IN DETAIL POSTING RULE ============================//
+		
+		$('#addPostingRuleDetail').die("click");
+		$('#addPostingRuleDetail').live("click", function(){
+			var table = $('#listPostingRuleDetail #gridPostingRuleDetail').dataTable();
+			var rowPosition = $('#detailPostingRules #ruleDetailForm #rowPosition').val();
+			savePostingRuleDetail();
+			
+			function savePostingRuleDetail(){
+				if ($('#detailPostingRules #ruleDetailForm #sourceCode').val()==''){
+					$('#detailPostingRules #ruleDetailForm #sourceCode').removeClass('fieldError');
+					$('#detailPostingRules #ruleDetailForm #sourceDesc').val('');
+				}
+				$("#errorCoaNo").html("");
+				$("#errorPos").html("");
+				if (($('#detailPostingRules #ruleDetailForm #coaNoCode').val()=='')&&($('#detailPostingRules #ruleDetailForm #position').val()=='')){
+					$("#errorCoaNo").html("Required");
+					$("#errorPos").html("Required");
+				} else if ($('#detailPostingRules #ruleDetailForm #coaNoCode').val()==''){
+					$("#errorCoaNo").html("Required");
+					//alert("Empty field ! Please fill the required field(*)");
+				} else if ($('#detailPostingRules #ruleDetailForm #position').val()==''){
+					$("#errorPos").html("Required");
+					//alert("Empty field ! Please fill the required field(*)");
+				} else {
+					
+					// === SAVE POSTING RULE DETAIL WHEN DATA ALREADY (EDIT DATA) ===//
+					var dataPosting = table.fnGetData(parseFloat(rowPosition));
+					if (rowPosition != "") {
+						var found = false;
+						var rows = table.fnGetNodes().length;
+						for(i=0; i<rows; i++) {
+							var cells = table.fnGetData(i);
+						}
+						if (!found) {
+//							table.fnUpdate(dataPosting.postingDetailKey = $('#detailPostingRules #ruleDetailForm #posRuleDetailKey').val(), parseFloat(rowPosition),0);
+							dataPosting.postingDetailKey = $('#detailPostingRules #ruleDetailForm #posRuleDetailKey').val();
+							table.fnUpdate(((dataPosting.faCoaMaster.coaCode = $('#detailPostingRules #ruleDetailForm #coaNoCode').val())&&(dataPosting.faCoaMaster.coaMasterKey = $('#detailPostingRules #ruleDetailForm #coaNoKey').val())), parseFloat(rowPosition),0);
+							table.fnUpdate(dataPosting.faCoaMaster.description = $('#detailPostingRules #ruleDetailForm #coaNoDesc').val(), parseFloat(rowPosition),1);
+							table.fnUpdate(dataPosting.postingDc = $('#detailPostingRules #ruleDetailForm #hiddenPosition').val(), parseFloat(rowPosition),2);
+
+							if($('#detailPostingRules #ruleDetailForm #sourceCode').val()==''){
+						//		alert("null");
+								dataPosting.postingField = new Object();
+								table.fnUpdate(((dataPosting.postingField.lookupDescription = '')&&(dataPosting.postingField.lookupId = '')
+										&&(dataPosting.postingField.lookupCode = '')), parseFloat(rowPosition),3);	
+							} else {  	
+							//	alert("notnull");
+								dataPosting.postingField = new Object();
+							table.fnUpdate(((dataPosting.postingField.lookupDescription = $('#detailPostingRules #ruleDetailForm #sourceDesc').val())&&(dataPosting.postingField.lookupId = $('#detailPostingRules #ruleDetailForm #sourceKey').val())
+									&&(dataPosting.postingField.lookupCode = $('#detailPostingRules #ruleDetailForm #sourceCode').val())), parseFloat(rowPosition),3);
+							}
+							$('#detailPostingRules').dialog('close');
+						}
+					} else {
+						
+						// === SAVE POSTING RULE DETAIL WHEN DATA EMPTY (NEW DATA) ===//
+						var found = false;
+						var rows = table.fnGetNodes().length;
+						for(i=0; i<rows; i++) {
+							var cells = table.fnGetData(i);
+						}
+						if (!found) {
+							var dataPosting = new Object();
+							dataPosting.faCoaMaster = new Object();
+							dataPosting.postingField = new Object();
+							dataPosting.postingDetailKey = $('#detailPostingRules #ruleDetailForm #posRuleDetailKey').val();
+							dataPosting.faCoaMaster.coaMasterKey = $('#detailPostingRules #ruleDetailForm #coaNoKey').val();
+							dataPosting.faCoaMaster.coaCode = $('#detailPostingRules #ruleDetailForm #coaNoCode').val();
+							dataPosting.faCoaMaster.description = $('#detailPostingRules #ruleDetailForm #coaNoDesc').val();
+							dataPosting.postingDc = $('#detailPostingRules #ruleDetailForm #hiddenPosition').val();
+							if ($('#detailPostingRules #ruleDetailForm #sourceCode').val()==''){
+								dataPosting.postingField.lookupId = '';
+								dataPosting.postingField.lookupDescription = '';
+								dataPosting.postingField.lookupCode = '';
+							} else {
+								dataPosting.postingField.lookupId = $('#detailPostingRules #ruleDetailForm #sourceKey').val()
+								dataPosting.postingField.lookupDescription = $('#detailPostingRules #ruleDetailForm #sourceDesc').val();
+								dataPosting.postingField.lookupCode = $('#detailPostingRules #ruleDetailForm #sourceCode').val();
+							}
+							table.fnAddData(dataPosting);
+							$('#detailPostingRules').dialog('close');
+						}
+					}
+					return false;
+				}
+			}
+		});
+		
+		// === EVENT BUTTON NEW DATA FOR DETAIL POSTING RULE ===//
+		$('.buttons #newPostingRuleDetail').click(function() {
+			if($('#position').val() != null) {
+				$('#ruleDetailForm #position').val("");
+			}
+			selectedRow = null;
+			$("#detailPostingRules").dialog('open');
+			$('.ui-widget-overlay').css('height',$('body').height());
+			$("#detailPostingRules input:text").val(""); 
+			$("#detailPostingRules input:hidden").val(""); 
+			$("#errorCoaNo").html("");
+			$("#errorPos").html("");
+			return false;
+		});
+		// ======================================================//
+	});
+	
+	function tabPostingRule(data) {
+		var posrulDetails;
+		#{if '${posrulDetails}' != null }
+			posrulDetails = ${posrulDetails.raw()};
+		#{/if}
+		#{if '${posrulDetails}' == null }
+			posrulDetails = new Array();
+		#{/if}
+		
+		// ================== TABLE POSTING RULE DETAIL ===============================//
+			tablePostingRuleDetail = $('#postingRuleForm #listPostingRuleDetail #gridPostingRuleDetail').dataTable({
+				aaData: posrulDetails,
+				aoColumns:[ 
+/*				            {
+								bVisible:false,
+								fnRender: function(obj){
+									var controls;
+									controls = obj.aData.postingDetailKey;
+									controls += '<input type="hidden" name="faPostingRuleDetails[' + obj.iDataRow + '].postingDetailKey" value="' + obj.aData.postingDetailKey + '" />';
+									return controls;
+								}
+							},
+*/							{
+								fnRender: function(obj){
+									var controls;
+									controls = obj.aData.faCoaMaster.coaCode;
+									controls += '<input type="hidden" name="faPostingRuleDetails[' + obj.iDataRow + '].faCoaMaster.coaMasterKey" value="' + obj.aData.faCoaMaster.coaMasterKey + '" />';
+									controls += '<input type="hidden" name="faPostingRuleDetails[' + obj.iDataRow + '].faCoaMaster.coaCode" value="' + obj.aData.faCoaMaster.coaCode + '" />';
+									return controls;
+								}
+							},
+							{
+								fnRender: function(obj){
+									var controls;
+									controls = obj.aData.faCoaMaster.description;
+									controls += '<input type="hidden" name="faPostingRuleDetails[' + obj.iDataRow + '].faCoaMaster.coaMasterKey" value="' + obj.aData.faCoaMaster.coaMasterKey + '" />';
+									controls += '<input type="hidden" name="faPostingRuleDetails[' + obj.iDataRow + '].faCoaMaster.description" value="' + obj.aData.faCoaMaster.description + '" />';
+									return controls;
+								}
+							},
+							{
+								fnRender: function(obj){
+									var controls;
+									controls = obj.aData.postingDc;
+									controls += '<input type="hidden" name="faPostingRuleDetails[' + obj.iDataRow + '].postingDc" value="' + obj.aData.postingDc + '" />';
+									return controls;
+								}
+							},
+							{
+								fnRender: function(obj){
+									var controls;
+									if (obj.aData.postingField != null){
+										controls = obj.aData.postingField.lookupDescription;
+										controls += '<input type="hidden" name="faPostingRuleDetails[' + obj.iDataRow + '].postingField.lookupId" value="' + obj.aData.postingField.lookupId + '" />';
+										controls += '<input type="hidden" name="faPostingRuleDetails[' + obj.iDataRow + '].postingField.lookupCode" value="' + obj.aData.postingField.lookupCode + '" />';
+										controls += '<input type="hidden" name="faPostingRuleDetails[' + obj.iDataRow + '].postingField.lookupDescription" value="' + obj.aData.postingField.lookupDescription + '" />';
+									} else {
+										controls = '';
+									}
+									return controls;
+								}
+							},
+							{
+								fnRender: function(obj) {
+								 	var controls;
+								 	controls = '<center><input id="deleteButton" type="button" value="Delete" #{if readOnly}disabled="disabled"#{/if} /></center>';
+								 	controls += '<input type="hidden" name="faPostingRuleDetails[' + obj.iDataRow + '].postingDetailKey" value="' + obj.aData.postingDetailKey + '" />';
+								 	return controls;
+							 	}
+							}
+							],
+					aaSorting:[[0,'asc']],
+					bAutoWidth: false,		
+					bFilter: false,
+					bInfo: false,
+					bJQueryUI: true,
+					bPaginate: false,
+					bSearch: false,
+					bLengthChange: false
+				});
+			// ====================== END TABLE POSTING RULE DETAIL ====================//
+			
+			// ===================== EVENT EDIT POSTING RULE DETAIL ====================//
+			$("#listPostingRuleDetail #gridPostingRuleDetail").removeAttr('style');
+			$("#listPostingRuleDetail #gridPostingRuleDetail tbody tr td").die('click');
+			$("#listPostingRuleDetail #gridPostingRuleDetail tbody tr td").live('click', function(){
+				
+				var txt = $(this).text();
+				if(txt == 'No data available in table')
+				{
+					return false;
+				}else{
+				var rowPos = $(this).parents('tr');
+				var rowPosNumber = tablePostingRuleDetail.fnGetPosition(rowPos[0]);
+				var pos = tablePostingRuleDetail.fnGetPosition(this);
+				
+				cell = tablePostingRuleDetail.fnGetData(this.parentNode);
+				
+				
+				if (pos[1] != 4){
+					dataPosrul = tablePostingRuleDetail.fnGetData(this.parentNode);
+					
+					$("#ruleDetailForm #position").trigger('change');
+
+					$('#detailPostingRules #ruleDetailForm #rowPosition').val(rowPosNumber);
+					$('#detailPostingRules #ruleDetailForm #posRuleDetailKey').val(dataPosrul.postingDetailKey);
+					$('#detailPostingRules #ruleDetailForm #coaNoKey').val(dataPosrul.faCoaMaster.coaMasterKey);
+					$('#detailPostingRules #ruleDetailForm #coaNoCode').val(dataPosrul.faCoaMaster.coaCode);
+					$('#detailPostingRules #ruleDetailForm #coaNoDesc').val(dataPosrul.faCoaMaster.description);
+					$('#detailPostingRules #ruleDetailForm #position').val(dataPosrul.postingDc);
+					$('#detailPostingRules #ruleDetailForm #hiddenPosition').val(dataPosrul.postingDc);
+					if ((dataPosrul.postingField == null)||(dataPosrul.postingField.lookupCode == '')){
+						var dataPosrul = new Object();
+						dataPosrul.postingField = new Object();
+						dataPosrul.postingField.lookupId = '';
+						dataPosrul.postingField.lookupCode = '';
+						dataPosrul.postingField.lookupDescription = '';
+						$('#detailPostingRules #ruleDetailForm #sourceKey').val(dataPosrul.postingField.lookupId);
+						$('#detailPostingRules #ruleDetailForm #sourceCode').val(dataPosrul.postingField.lookupCode);
+						$('#detailPostingRules #ruleDetailForm #sourceDesc').val(dataPosrul.postingField.lookupDescription);
+					} else {
+						$('#detailPostingRules #ruleDetailForm #sourceKey').val(dataPosrul.postingField.lookupId);
+						$('#detailPostingRules #ruleDetailForm #sourceCode').val(dataPosrul.postingField.lookupCode);
+						$('#detailPostingRules #ruleDetailForm #sourceDesc').val(dataPosrul.postingField.lookupDescription);
+					}
+					$('#detailPostingRules').dialog('open');
+					$('.ui-widget-overlay').css('height',$('body').height());
+				}
+			}
+			});
+			
+	}
+	
+		function doCancel() {
+			location.href='@{PostingRules.list(faPostingRule?.faPostingProfile?.postingProfileKey)}';
+		}
+		
+	
+ 		function doSave(){
+ 			
+ 			if (tablePostingRuleDetail.fnGetNodes().length < 1) {
+ 				$('#errPosrulDetail').html("*Error saving! Make sure there is a minimum of one data in 'Posting Rules Detail'");
+ 				return false;
+ 			}
+ 			
+ 			return true;
+		} 
+	
+</script>
+
+<style type="text/css">
+  #errmsg { color:red; }
+  .errMsg { color:red; }
+  #autoReversal {margin-left:0px;}
+</style>
+<form id="postingRuleForm" class="form" method="POST">
+	#{hidden id:'profilKey', name:'faPostingRule.faPostingProfile.postingProfileKey', value:faPostingRule?.faPostingProfile?.postingProfileKey /}
+	#{hidden id:'postingRuleKey', name:'faPostingRule.postingRuleKey', value:faPostingRule?.postingRuleKey, required:true, readOnly:readOnly /}
+	#{hidden id:'status', name:'status', value:status /}
+	<ul>
+		<li>
+			#{textBox id:'profile', name:'faPostingRule.faPostingProfile.profileName', label:'Profile', value:faPostingRule?.faPostingProfile?.profileName, class:'capitalize', readOnly:true /}
+		</li>
+		<li>
+			#{textBox id:'postingRulesId', name:'faPostingRule.postingRuleCode', label:'Posting Rules ID', value:faPostingRule?.postingRuleCode, class:'capitalize', required:true, readOnly:readOnly , maxLength:50/}
+			<span class="error">#{error 'Posting Rules ID is' /}</span>
+		</li>
+		<li>
+			#{textBox id:'postingRulesName', name:'faPostingRule.description', label:'Posting Rules Name', value:faPostingRule?.description, class:'capitalize', required:true, readOnly:readOnly, width:'448px' , maxLength:100/}
+			<span class="error">#{error 'Posting Rules Name is' /}</span>
+		</li>
+		<li>
+			#{textBox id:'transactionTemplateCode', name:'faPostingRule.faTransactionMaster.transactionCode', label:'Transaction Template', width:'120px', value:faPostingRule?.faTransactionMaster?.transactionCode, dataold:faPostingRule?.faTransactionMaster?.transactionCode, required:true, readOnly:readOnly, class:'capitalize' , maxLength:50/}
+			#{hidden id:'transactionTemplateKey', name:'faPostingRule.faTransactionMaster.transactionMasterKey', value:faPostingRule?.faTransactionMaster?.transactionMasterKey /}
+			#{button id:'transactionTemplateHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'transactionTemplateDesc', name:'faPostingRule.faTransactionMaster.transactionDescription', value:faPostingRule?.faTransactionMaster?.transactionDescription, readOnly:true, width:'300px' /}
+			<span class="error">#{error 'Transaction Template is' /}</span>
+		</li>
+		<li>
+			#{checkBox id:'autoReversal', name:'faPostingRule.autoReversal', label:'Auto Reversal On BOD', value:faPostingRule?.autoReversal, readOnly:readOnly /}Yes
+		</li>
+		<li>
+			#{dropDownList id:'postingTreated', name:'postingTreated', label:'Instruction Type', value:faPostingRule?.postingTreated?.lookupId, options:postingTreated, required:true, readOnly:true , width:'143px'/}
+			#{hidden id:'postingTreatedHidden', name:'faPostingRule.postingTreated.lookupId', value:faPostingRule?.postingTreated?.lookupId /}
+			<span class="error">#{error 'Instruction Type is' /}</span>
+			#{checkBox id:'asRecap', name:'faPostingRule.asRecap', value:faPostingRule?.asRecap, readOnly:true /}As Recap
+		</li>
+		<li>
+			#{dropDownList id:'classification', name:'faPostingRule.classification.lookupId', label:'Classification', value:faPostingRule?.classification?.lookupId, options:classification, readOnly:readOnly, removeEmpty:true ,width:'143px'/}
+		</li>
+		<li>
+			#{radioButton id:'isActive', name:'isActive', value:((faPostingRule?.isActive)?'true':'false'), label:'Active', options:operators, readOnly:readOnly /}
+			#{hidden id:'isActiveHidden', name:'faPostingRule.isActive', value:((faPostingRule?.isActive)?'true':'false') /}
+		</li>
+	</ul>
+
+
+<br>
+<b><span id="errPosrulDetail" class="error"></span></b>
+<p> </p>
+<div id="tabsPostingRuleDetail">
+	<ul>
+		<li><a href="#postingRuleDetail">Posting Rules Detail</a></li>
+	</ul>
+	
+	<div class="pane" id="postingRuleDetail">	
+		<div id="listPostingRuleDetail" style="overflow-y:scroll;height:120px">
+			#{include 'PostingRules/grid_postingRule.html' /}
+		</div>
+		<br/>
+		<div class="buttons">
+			#{ifnot confirming}
+				<button id="newPostingRuleDetail">New Data</button>
+			#{/ifnot}
+		</div>	
+	</div>
+</div>
+<form></form>
+<div id="detailPostingRules" title="Detail Posting Rule">
+	#{include 'PostingRules/detail_postingRule.html' /}
+	<div class="buttons">
+			#{if (mode=='entry' || mode == 'edit')&& (!(confirming))}
+			<!-- <button id="addPostingRuleDetail">Save</button> jgn button krn button akan jadi default focus --> 
+			<input id="addPostingRuleDetail" type="button" value='Save'/>
+			<button id="cancelPostingRuleDetail">Cancel</button>
+			#{/if}
+			#{else}
+				#{if confirming || mode=='view' }
+			<button id="cancelPostingRuleDetail">Close</button>
+				#{/if}
+			#{/else}	
+	</div>
+</div>
+</form>
+<div id="dialog-message-1" title="Message Confirmation">
+	<p>
+	<span class="ui-icon ui-icon-notice" style="float:left; margin:0 7px 50px 0;"></span>
+	Are you sure to delete data ? </p>
+</div>

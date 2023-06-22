@@ -1,0 +1,107 @@
+#{extends 'templates/main.html' /}
+#{set id:profile?.chargeProfileKey /}
+#{set mode: mode /}
+<script type="text/javascript">
+	$(function() {
+		$('#save').button();
+		$('#cancel').button();
+		$('#confirm').button();
+		$('#back').button();
+		$('#close').button();
+		// Action buttons 
+//		$('#save').insertBefore('#cancel')
+		$('#save').click(function() {
+			var resume = true;
+			if (typeof doSave == 'function') { 
+				resume = doSave();
+			}
+			if (resume)submit('@{save()}?mode=${mode}#{if group}&group=${group}#{/}');
+			
+		});
+		$('#confirm').click(function() {
+		/*	var action = "@{confirm()}?mode=${mode}#{if group}&group=${group}#{/}";
+			$.ajax({
+				  url: submit(action),
+				  success: function() {
+					  location.href='@{list()}#{if group}/${group}#{/}';
+				  } 
+			});
+		*/	var resume = true;
+			if(typeof doConfirm == 'function') {
+				resume = doConfirm();
+			}
+			if (resume) submit('@{confirm()}?mode=${mode}#{if group}&group=${group}#{/}');
+			
+		});
+		$('#back').click(function() {
+			location.href='@{back(id)}?mode=${mode}#{if status}&status=${status}#{/}#{if group}&group=${group}#{/}';
+		});
+		$('#cancel').click(function() {
+			var resume = true;
+			if (typeof doCancel == 'function') {
+				resume = doCancel();
+			}
+			if (resume) location.href='@{list()}#{if group}/${group}#{/}';
+		});
+
+		$('#close').click(function() {
+			history.back();
+		});
+		
+		if ($.browser.msie){
+			$("#remarks[maxlength]").bind('input propertychange', function() {
+		        var maxLength = $(this).attr('maxlength');  
+		        if ($(this).val().length > maxLength) {  
+		            $(this).val($(this).val().substring(0, maxLength));  
+		        }  
+		    });
+		}
+		
+	});	
+		
+		function submit(action, id) {
+			var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+			loading.dialog({
+				closeOnEscape: false,
+				draggable: false,
+				modal: true,
+				resizable: false,
+				open:function() {
+					$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+				} 
+			});
+			$('#chargeProfileForm').attr('action', action);
+			$('#chargeProfileForm').submit();
+		}
+</script>
+<h2>Charges Profile Maintenance</h2>
+#{if flash.error || errors }
+    <div class="error">
+    	Error when saving data!<br/>
+		<li>${flash.error}</li>
+		#{ifErrors}
+			#{errors}
+				 <li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}
+<br />
+<div id="detail">
+	#{include 'ChargeProfiles/form.html' /}	
+</div>
+<div id="actions" class="buttons">
+	#{if mode == 'view'}
+	<input type="button" id="cancel" value="Close" />
+	#{/if}
+	#{else}	
+		#{if confirming}
+			<input type="button" id="confirm" value="Confirm" />
+			<input type="button" id="back" value="Back" />
+		#{/if}
+		#{else}
+			<input type="button" id="save" value="Save" />
+			<input type="button" id="cancel" value="Cancel" />
+		#{/else}
+	#{/else}
+</div>

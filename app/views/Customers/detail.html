@@ -1,0 +1,201 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: ' ' /}
+#{set id:customer?.customerKey /}
+#{set mode: mode /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+
+
+#{script 'external/Util.js' /}
+#{if flash.error || errors}
+    <div class="error">
+    	<b>Error when saving data!</b><br/><br/>
+    	#{if flash.error}
+<li>${flash.error}</li>
+		#{/if}
+		#{ifErrors}
+			#{errors}
+<li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}
+<script type="text/javascript">	
+	$(function() {
+		#{include 'RegistrySubscription/Util.js' /}
+		#{include 'Customers/contact.js' /}
+		#{include 'Customers/customer.js' /} 
+	});
+	
+</script>
+
+<style type="text/css">
+  .errorMessage { color:red; }
+</style>
+
+<form id="customerForm" class="form" accept-charset="utf-8" encType="multipart/form-data" method="POST">
+	#{hidden id:'param', name:'param', value:param /}
+	#{hidden id:'status', name:'status', value:status /}
+	#{hidden id:'custAccountKey' /}
+	#{hidden id:'custAccountNo', name:'account.custodyAccountKey', value:account?.custodyAccountKey /}
+	#{hidden id:'custAccountName', name:'account.name', value:account?.name /}
+	#{hidden id:'bankAccountKey' /}
+	#{hidden id:'bankAccountNo', name:'account.settlementAccount.accountNo', value:account?.settlementAccount?.accountNo /}
+	#{hidden id:'bankAccountName', name:'account.settlementAccount.name', value:account?.settlementAccount?.name /}
+	#{hidden name:'customer.organization.organizationId', value:customer?.organization?.organizationId /}
+	#{hidden id:'customerKey', name:'customer.customerKey', value:customer?.customerKey /}
+	#{hidden id:'currentDate', name:'currentDate', value:currentDate, class:'calendar' /}
+	#{hidden id:'dummy' /}
+	<h2>Customer: ${customer?.customerNo}-${customer?.customerName}</h2>
+	<div id="tabs"> 
+		<ul>
+			<li><a href="#tabs-1">Main</a></li>
+			<li><a href="#tabs-2" name="individual">Individual</a></li>
+			<li><a href="#tabs-3" name="corporate">Institutional</a></li>
+			<li><a href="#tabs-4">Contacts</a></li>
+			<li><a href="#tabs-5">Additional</a></li>
+			<li><a href="#tabs-6">Account</a></li>
+			<li><a href="#tabs-7">Charge Invoice</a></li>
+			<li><a href="#tabs-8">User Defined Field</a></li>
+		</ul>
+		<div class="pane" id="tabs-1">
+			<br />
+			#{include 'Customers/tab_primary.html' /}	
+		</div>
+		<div class="pane" id="tabs-2">	
+			#{include 'Customers/tab_individual.html' /}
+		</div>
+		<div class="pane" id="tabs-3">	
+			#{include 'Customers/tab_corporate.html' /}		
+		</div>
+		<div class="pane" id="tabs-4">		
+			#{include 'Customers/tab_contacts.html' /}
+				
+		</div>
+		<div class="pane" id="tabs-5">
+			#{include 'Customers/tab_additional.html' /}		
+		</div>
+		<div class="pane" id="tabs-6">
+			#{include 'Customers/tab_account.html' /}	
+		</div>
+		<div class="pane" id="tabs-7">
+			<div id="listChargeInvoice">
+				#{include 'Customers/tab_charge_invoice.html' /}
+			</div>
+			<div class="buttons">
+				#{button id:'addChargeInvoice',name:'addChargeInvoice', readOnly:readOnly, value:'Add' /} 		
+			</div>
+			<p>
+				#{textBox id:'exchangeRateRefCode', name:'customer.exchangeRateRef.lookupCode', label:'Exchange Rate Ref.', value:customer?.exchangeRateRef?.lookupCode, class:'capitalize', readOnly:readOnly, required:true, width:'50px' /}
+				#{hidden id:'exchangeRateRef', name:'customer.exchangeRateRef.lookupId', value:customer?.exchangeRateRef?.lookupId /}
+				#{button id:'exchangeRateRefHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'exchangeRateRefDesc', name:'customer.customer.lookupDescription', value:customer?.exchangeRateRef?.lookupDescription, readOnly:true, width:'222px' /}
+				<span class="error" id="exchangeRateRefCodeError"></span>
+			</p>
+			<p>
+				#{textBox id:'paymentMethodCode', name:'customer.paymentMethod.lookupCode', label:'Payment Method', value:customer?.paymentMethod?.lookupCode, class:'capitalize', readOnly:readOnly, required:true, width:'50px' /}
+				#{hidden id:'paymentMethod', name:'customer.paymentMethod.lookupId', value:customer?.paymentMethod?.lookupId /}
+				#{button id:'paymentMethodHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'paymentMethodDesc', name:'customer.customer.lookupDescription', value:customer?.paymentMethod?.lookupDescription, readOnly:true, width:'222px' /}
+				<span class="error" id="paymentMethodCodeError"></span>
+			</p>
+		</div>
+		<div class="pane" id="tabs-8">
+			<div id="udfCorporate">
+				#{include 'templates/udf2.html' /}
+			</div>
+			<div id="udfGlobal">
+				#{include 'templates/udf.html' /}
+			</div>
+			<div id="udfIndividual">
+				#{include 'templates/udf1.html' /}
+			</div>
+		</div>
+	</div>
+	
+	<b><span id="customerMessageErrorGlobal" class="req"></span></b>
+	#{if param}
+		<div class="buttons">
+			#{if param == 'register-cust-acct'}
+				<input type="button" id="continueCust" value="Continue" #{if customer?.isActive == false } disabled="disabled"#{/if}/>
+				<!-- <button id="continueCust" #{if customer?.isActive == false } disabled="disabled"#{/if}>Continue</button> -->
+			#{/if}
+			#{if param == 'register-bank-acct'}
+				<input type="button" id="continueBank" value="Continue" #{if customer?.isActive == false } disabled="disabled"#{/if}/>
+				<!-- <button id="continueBank" #{if customer?.isActive == false } disabled="disabled"#{/if}>Continue</button> -->
+			#{/if}
+			<!-- #{if param == 'register-invt-acct'}
+				<button id="continueInvt" #{if customer?.isActive == false } disabled="disabled"#{/if}>Continue</button>
+			#{/if} -->
+			#{if ((param == 'edit') && (mode == 'edit'))}
+				#{if confirming}
+					<input type="button" id="confirm" value="Confirm" />
+					<input type="button" id="back" value="Back" />
+				#{/if}
+				#{else}	
+					<input type="button" id="save" value="Save" />
+					<input type="button" id="mainCancel" value="Cancel" />
+				#{/else}
+			#{/if}
+			#{else}
+				<input type="button" id="backCustBankInvt" value="Close" />
+			#{/else}
+		</div>
+	#{/if}
+	#{if ((param == "") && (mode == 'entry'))}
+		<div class="buttons">
+			#{if confirming}
+				<input type="button" id="confirm" value="Confirm" />
+				<input type="button" id="back" value="Back" />
+			#{/if}
+			#{else}
+				<input type="button" id="save" value="Save" />
+				<input type="button" id="mainCancel" value="Cancel" />
+			#{/else}
+		</div>
+	#{/if}
+    <form></form>
+	<div id="detailContact" title="Detail Address">
+			#{include 'Customers/detail_contact.html' /}
+		<div class="buttons">
+			<input type="button" id="saveCon" value="Save" />
+			<input type="button" id="cancelCon" value="Cancel" />
+			<input type="button" id="closeCon" value="Close" />
+		</div>
+	</div>
+	<div id="detailContactCorp" title="Detail Contact">
+			#{include 'Customers/detail_contact_corp.html' /}
+		<div class="buttons">
+			<input type="button" id="saveConCorp" value="Save" />
+			<input type="button" id="cancelConCorp" value="Cancel" />
+			<input type="button" id="closeConCorp" value="Close" />
+		</div>
+	</div>
+	<div id="detailChargeInvoice" title="Detail Charge Invoice">
+	#{include 'Customers/detail_charge_invoice.html' /}
+	<div class="buttons">
+		
+		#{if (((mode=='view'))||(confirming)) }
+			#{button id:'cancelCharge',name:'cancelCharge', value:'Close' /}				
+		#{/if}
+		#{else}
+			#{button id:'saveCharge',name:'saveCharge', value:'Save'   /} 		
+			#{button id:'cancelCharge',name:'cancelCharge', value:'Cancel' /}
+		#{/else}
+	</div>
+</div>
+</form>
+
+<div id="dialog-message-1" title="Message Confirmation">
+	<p>
+	<span class="ui-icon ui-icon-notice" style="float:left; margin:0 7px 50px 0;"></span>
+	Are you sure to delete data ? </p>
+</div>
+
+<div id="dialog-message-2" title="Message Confirmation">
+	<p>
+	<span class="ui-icon ui-icon-notice" style="float:left; margin:0 7px 50px 0;"></span>
+	Are you sure to inactive data ? </p>
+</div>
+

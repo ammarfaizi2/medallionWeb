@@ -1,0 +1,42 @@
+<p><label>${elementLabel}</label>
+<input class="date calendar" type="text" id="${formId}${elementCode}" name="${elementCode}"/><span id="${formId}${elementCode}Error" class="error"></span></p>
+<script>
+$(document).ready(function(){	
+	
+	$("input.calendar").mask("${appProp?.dateMask}", { placeholder:" " });
+	$("input.calendar").datepicker({dateFormat:'${appProp?.jqueryDateFormat}', yearRange: '1000:9999'});
+	$('input.calendar').change( function(){
+		var el = $(this);
+		var dateVal =  el.val();
+		var id = this.id;
+		var errorId= "#" + id + "Error";
+		el.removeClass("fieldError");
+		$(errorId).html("");
+		try {
+			var formatdate = '${appProp?.jqueryDateFormat}';
+			var formatArr = formatdate.split("/");
+			var valueArr = dateVal.split("/");
+			if (formatArr.length == 3 && valueArr.length == 3) {
+				var yearIdx = -1;
+				for (x in formatArr) { if (formatArr[x] == 'yy') yearIdx = x; }
+				if (yearIdx != -1) {
+					var number = Number(valueArr[yearIdx]);
+					if (number < 1 || number > 9999) { throw true; }
+				}
+			}
+	        if(dateVal.length >0)
+	        	$.datepicker.parseDate('${appProp?.jqueryDateFormat}', dateVal, null);
+	        else
+	        	throw true;
+	    } catch(error) {
+	    	el.addClass("fieldError");
+	    	$(errorId).html("Invalid date format").show();
+	    	el.val('');
+	    }
+	});
+	
+	var paramHtml = $("#${formId}");
+	paramHtml.find("#${formId}${elementCode}").datepicker({dateFormat:'${appProp?.jqueryDateFormat}', yearRange: '1000:9999'});
+	paramHtml.find("#${formId}${elementCode}").datepicker("setDate", new Date(${timeNow}));
+});	
+</script>

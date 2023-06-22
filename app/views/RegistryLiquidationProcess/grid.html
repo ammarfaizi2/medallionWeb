@@ -1,0 +1,86 @@
+<script type="text/javascript">
+$(function(){
+	
+	// This is the hack for IE
+	if ($.browser.msie) {
+	  $('#notInList').click(function() {
+	    this.blur();
+	    this.focus();
+	  });
+	}
+
+//	$('#notInList').change(function() {
+	//	if ($('#notInList').is(':checked')) 
+     //   	$('.buttons #new').show();
+	//	else 
+	//		$('.buttons #new').hide();
+	//});
+	$('.buttons input:button').button();
+	//$('.buttons #new').hide();
+	$('.buttons #new').click(function() {
+		entry();
+	});
+ });
+ 
+
+/*function doEdit(data) {
+	if ((data[7] == "New") || (data[7] == "Updated")) {
+		view(data[0]);
+		return false;
+	} else {
+		return true;
+	}
+}*/
+
+</script>
+
+<h3>Search results</h3>
+
+#{if products}
+<table id="grid1" class="display">
+	<thead>
+		<tr>
+			<th>Product Code</th>
+			<th>Fund Code</th>
+			<th>Name</th>
+			<th>Type</th>
+			<th>Effective Date</th>
+			<th>Liquidation Date</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:products, as:'product'}
+		<tr>
+			<td>
+				${product?.productCode}
+			</td>
+			<td>
+				${product?.productCode}
+			</td>
+			<td>
+				${product?.name}
+			</td>
+			<td>
+				${product?.lookupByType?.lookupCode}
+			</td>
+			<td>
+				${product?.effectiveDate?.format(appProp.dateFormat)}
+			</td>
+			<td>
+				${product?.liquidDate?.format(appProp.dateFormat)}
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>
+
+	<!--	<div class="buttons">
+	 		<label><input type="checkbox" id="notInList"/> Not in the list</label>&nbsp; 
+			<input type="button" id="new" value="New" />	
+		</div>-->	
+
+
+#{/if}
+#{else}
+<div>No record found</div>
+#{/else}

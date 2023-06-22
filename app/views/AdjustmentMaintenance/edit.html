@@ -1,0 +1,148 @@
+#{extends 'templates/main.html' /}
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		$('#save').button();
+		$('#clear').button();
+		$('#confirm').button();
+		$('#back').button();
+		$('#cancel').button();
+
+		var backToList = function() {
+			location = "@{list()}";
+		}
+
+		var closeDialogMessage = function() {
+			$("dialog-message").dialog('close');
+		}
+
+		//Action buttons 
+		$('#save').click(function() {
+			var action = "@{save()}";
+			var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+			var resume = true;
+			var recordCount = 0;
+			$("#gridAdjustmentDetail tbody tr").each(function(){
+				var text = $(this).find('td').text();
+				if(text != 'No data available in table') recordCount++;
+			});
+			
+			clearError();
+			if($("#name").val()==''){
+				resume=false;
+				showError("Name is required");
+			}
+			
+			if(recordCount<1){
+				resume=false;
+				/* messageAlertOk("Invalid detail of adjustment", "ui-icon1 ui-icon-circle-close", "Error Message", function() {
+				}); */
+				showError("Invalid detail of adjustment");
+			}
+			
+			if(resume){
+				loading.dialog({
+					closeOnEscape: false,
+					draggable: false,
+					modal: true,
+					resizable: false,
+					open:function() {
+						$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+					} 
+				});
+				
+				$('#adjustmentMasterForm').attr('action', action);
+				$('#adjustmentMasterForm').submit();
+			}
+		});
+
+		$('#confirm').click(function() {
+			var action = "@{confirm()}";
+			var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+			loading.dialog({
+				closeOnEscape: false,
+				draggable: false,
+				modal: true,
+				resizable: false,
+				open:function() {
+					$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+				} 
+			});
+			$.post(action, $('#adjustmentMasterForm').serialize(), function(data, status, xhr) {
+				checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					//messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Notification", backToList);
+					backToList();
+				} else {
+					//messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+					clearError();
+					showError(data.error);
+				}
+			});
+		});
+		
+		$('#back').click(function() {
+			location.href="@{back()}?id=${adjustmentMaster?.code}&mode=${mode}";
+		});
+		$('#clear').click(function() {
+			if ('${mode}'==='entry') {
+				location.href='@{entry()}';	
+			} else if ('${mode}'==='edit') {
+				location.href='@{edit()}/${adjustmentMaster?.code}';	
+			}
+		});
+		$("#clear").hide();
+		$('#cancel').click(function() {
+			location.href="@{list()}";
+		});
+		
+	});
+	
+	function showError(errorMsg){
+		$("#errMsgDiv").show();
+		var msg = $("#errMsg").html();
+		if(msg!='') msg = msg+"<li>"+errorMsg+"</li>";
+		else msg = "<li>"+errorMsg+"</li>";
+		$("#errMsg").html(msg);
+	}
+	
+	function clearError(){
+		$("#errMsg").html('');
+	}
+</script>
+<h2>Adjustment Maintenance Entry</h2>
+<div id="errMsgDiv" class="error" style="display:none">
+   	Error when saving data!<br/>
+   	<div id="errMsg">
+   	</div>
+</div>
+
+<div id="detail">
+	#{include 'AdjustmentMaintenance/detail.html' /}	
+</div>
+<div id="actions" class="buttons">
+	#{if confirming}
+		<input type="button" id="confirm" value="Confirm" />
+		<input type="button" id="back" value="Back" />
+	#{/if}
+	#{elseif ((mode == 'entry') || (mode == 'edit')) && (!confirming)}
+		<input type="button" id="save" value="Save" />
+		<input type="button" id="clear" value="Clear" />
+		<input type="button" id="cancel" value="Cancel"/>
+	#{/elseif}
+	#{else}
+		<input type="button" id="cancel" value="Close" />
+	#{/else}
+</div>
+
+
+
+
+
+
+
+
+
+
+

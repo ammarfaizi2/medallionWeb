@@ -1,0 +1,107 @@
+<p>
+	#{textBox id:'participantCode', name:'cust.kseiAccount.accountCode', label:'Participant Code', value:cust?.kseiAccount?.accountCode, class:'capitalize', width:'200px',required:true,readOnly:readOnly, maxLength:50 /}
+	#{hidden id:'kseiAccountKey', name:'cust.kseiAccount.custodianAccountKey', value:cust?.kseiAccount?.custodianAccountKey /}
+	#{hidden id:'categoryKsei', name:'cust.kseiAccount.accountCategory.lookupId', value:cust?.kseiAccount?.accountCategory?.lookupId /}
+	<span class="error">#{error 'Participant Code in tab KSEI/C-BEST is' /}</span>		
+</p>
+<br />
+<fieldSet>
+	<legend><b>For Debet Purpose</b></legend>
+	<div style="overflow-y:scroll;height:130px">
+	<table id="gridBankAccountDebetKsei" class="display">
+		<thead>
+			<tr>
+				<th>Account No</th>
+				<th>Bank Name</th>
+				<th>Beneficiary Name</th>
+				<th>Currency</th>
+				<th>Branch</th>
+				<th>Used By</th>
+				<th>Action</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+		</tbody>
+	</table>
+	</div>
+	<div class="buttons">
+		<input type="button" id="newDebetKsei" value="Add" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" #{if readOnly}disabled="disabled"#{/if}/>
+	</div>
+<!-- 	<p> -->
+<!-- 		#{textBox id:'coaCodeDk', name:'cust.kseiAccount.coaDebetKsei.coaCode', label:'Coa Code', value:cust?.kseiAccount?.coaDebetKsei?.coaCode, class:'capitalize', width:'100px',required:false,readOnly:readOnly, maxLength:50 /} -->
+<!-- 	</p> -->
+<!-- 	<p> -->
+<!-- 		#{textBox id:'coaNameDk', name:'cust.kseiAccount.coaDebetKsei.coaName', label:'Coa Name', value:cust?.kseiAccount?.coaDebetKsei?.coaName, class:'capitalize', width:'200px',required:false,readOnly:readOnly, maxLength:50 /} -->
+<!-- 	</p> -->
+<!-- 	<p> -->
+<!-- 		<label>Debet Type</label> -->
+<!-- 		<input type='radio' id='radiodebetTypeDkCash' name='processTypeDebetKsei' value='${cash}' /> -->
+<!-- 		Cash Account -->
+<!-- 		<input type='radio' id='radiodebetTypeDkGl' name='processTypeDebetKsei' value='${gl}' /> -->
+<!-- 		GL Account -->
+		#{hidden id:'debetTypeDk', name:'cust.kseiAccount.coaDebetKsei.processType' , value:cust?.kseiAccount?.coaDebetKsei?.processType /}
+<!-- 	</p> -->
+</fieldSet>
+
+<br />
+
+<fieldSet>
+	<legend><b>For Credit Purpose</b></legend>
+	<div style="overflow-y:scroll;height:130px">
+	<table id="gridBankAccountCreditKsei" class="display">
+		<thead>
+			<tr>
+				<th>Account No</th>
+				<th>Bank Name</th>
+				<th>Beneficiary Name</th>
+				<th>Currency</th>
+				<th>Branch</th>
+				<th>Used By</th>
+				<th>Action</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+		</tbody>
+	</table>
+	</div>
+	<div class="buttons">
+		<input type ="button" id="newCreditKsei" value="Add" #{if readOnly}disabled="disabled"#{/if} class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" #{if readOnly}disabled="disabled"#{/if}/>
+	</div>
+	
+<!-- 	<p> -->
+<!-- 		#{textBox id:'coaCodeCk', name:'cust.kseiAccount.coaCreditKsei.coaCode', label:'Coa Code', value:cust?.kseiAccount?.coaCreditKsei?.coaCode, class:'capitalize', width:'100px',required:false,readOnly:readOnly, maxLength:50 /} -->
+<!-- 	</p> -->
+<!-- 	<p> -->
+<!-- 		#{textBox id:'coaNameCk', name:'cust.kseiAccount.coaCreditKsei.coaName', label:'Coa Name', value:cust?.kseiAccount?.coaCreditKsei?.coaName, class:'capitalize', width:'200px',required:false,readOnly:readOnly, maxLength:50 /} -->
+<!-- 	</p> -->
+	<!-- <p>
+		#{radioButton id:'debetTypeCk', name:'cust.kseiAccount.coaCreditKsei.processType', value:((cust?.kseiAccount?.coaCreditKsei?.processType)?'true':'false'), label:'Debet Type', options:operators, readOnly:readOnly/}
+	</p> -->
+	<p>
+<!-- 		<label>Credit Type</label> -->
+<!-- 		<input type='radio' id='radiodebetTypeCkCash' name='processTypeCreditKsei' value='${cash}' /> -->
+<!-- 		Cash Account -->
+<!-- 		<input type='radio' id='radiodebetTypeCkGl' name='processTypeCreditKsei' value='${gl}' /> -->
+<!-- 		GL Account -->
+		#{hidden id:'debetTypeCk', name:'cust.kseiAccount.coaCreditKsei.processType' , value:cust?.kseiAccount?.coaCreditKsei?.processType /}
+<!-- 	</p> -->
+</fieldSet>
+

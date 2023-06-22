@@ -1,0 +1,28 @@
+<table id="gridPick2" class="display">
+	#{hidden id:'lookupId', name:'param.lookupId', value:param?.lookupId /}
+	#{hidden id:'filter', name:'param.filter', value:param?.filter /}
+	#{hidden id:'key', name:'param.key', value:param?.key /}	
+	#{hidden id:'code', name:'param.code', value:param?.code /}	
+	#{hidden id:'formId', name:'param.formId', value:param?.formId /}	
+	#{if param.reportParams != null}
+		#{list param.reportParams, as:'reportParam'}
+		#{if reportParam != null}
+			#{hidden id:'reportParam_'+(reportParam_index-1), name:'reportParam['+(reportParam_index-1)+'].field', value:reportParam?.field /}				
+		#{/if}
+		#{/list}
+	#{/if}
+	#{else}
+	#{/else}
+	<thead>
+		<tr id="headertr">
+		</tr>
+	</thead>
+	<tbody></tbody>
+</table>
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'Pick/Grid.js' /}
+	$(document).ready(function() {
+		new Grid($("#gridPick2"));
+	});
+</script>

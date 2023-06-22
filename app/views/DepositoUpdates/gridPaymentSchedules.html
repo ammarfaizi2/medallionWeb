@@ -1,0 +1,65 @@
+#{if  security?.isFloatingRate == false }
+#{set readOnlyCoupon: true /}
+#{/if}
+#{else}
+#{set readOnlyCoupon: readOnly /}
+#{/else}
+<script type="text/javascript">
+$(function(){
+	gridCoupons();
+})
+</script>
+
+<style>
+.center { text-align: center }
+</style>
+
+<h4><span id="couponError" class="error"></span></h4>
+<table id="gridCoupon" class="display" >
+	<thead>
+		<tr>
+			<th width="50px">No</th>
+			<th style="text-align:center" width="200px">Start Date</th>
+			<th style="text-align:center" width="200px">End Date</th>
+			<th style="text-align:center" width="100px">Days</th>
+			<th style="text-align:center" width="100px">Gross Interest</th>
+			<th style="text-align:center" width="200px">Payment Date</th>
+			<th style="text-align:center" width="200px">Paid</th>
+		</tr>
+	</thead>
+	<tbody>
+		#{list schedules, as:'schedule'}
+		<tr>
+			
+			<td align="center">
+				${schedule?.id?.paymentNo}
+			</td>
+			<td align="center">
+				#{textBox id:'lastPaymentDate[' + (schedule_index-1) + ']',name:'schedules[' + (schedule_index-1) + '].startDate', value:schedule?.startDate?.format(appProp.dateFormat), class:'calendar center', readOnly:true /}
+			</td>
+			<td align="center">
+				#{textBox id:'nextPaymentDate[' + (schedule_index-1) + ']',name:'schedules[' + (schedule_index-1) + '].endDate', value:schedule?.endDate?.format(appProp.dateFormat), class:'coupon center nextDate',readOnly:(schedule?.paid)?true:readOnly, width:'85px' /}
+			</td>
+			<td>
+				#{textBox id:'days[' + (schedule_index-1) + ']',name:'schedules[' + (schedule_index-1) + ']', value:schedule?.days, width:'85px', readOnly:true , class:'center numeric'/}
+				#{hidden id:'daysHidden[' + (schedule_index-1) + ']',name:'schedules[' + (schedule_index-1) + '].days', value:schedule?.days /}
+			</td>
+			<td>
+				#{textBox id:'grossInterest[' + (schedule_index-1) + ']',name:'schedules[' + (schedule_index-1) + ']',format:'#,##0.####', value:schedule?.grossInterest,  readOnly:true, class:'numeric'/}
+				#{hidden id:'grossInterestHidden[' + (schedule_index-1) + ']',name:'schedules[' + (schedule_index-1) + '].grossInterest', value:schedule?.grossInterest /}
+			</td>
+			<td align="center">
+				#{textBox id:'paymentDate[' + (schedule_index-1) + ']',name:'schedules[' + (schedule_index-1) + '].paymentDate', value:schedule?.paymentDate?.format(appProp.dateFormat), class:'calendar', readOnly: true/}
+				#{hidden id:'paymentDateHidden[' + (schedule_index-1) + ']',name:'schedules[' + (schedule_index-1) + '].paymentDate', value:schedule?.paymentDate?.format(appProp.dateFormat), class:'calendar' /}
+				#{hidden id:'couponNoHidden[' + (schedule_index-1) + ']', name:'schedules[' + (schedule_index-1) + '].id.paymentNo', value:schedule?.id?.paymentNo /}
+				#{hidden id:'depositoKeyHidden[' + (schedule_index-1) + ']',name:'schedules[' + (schedule_index-1) + '].id.depositoKey', value:schedule?.id?.depositoKey /}	
+			</td>
+			<td align="center">
+				#{checkBox id:'paid[' + (schedule_index-1) + ']', name:'schedules[' + (schedule_index-1) + '].paid', value:schedule?.paid, readOnly:true /}
+				#{hidden name:'schedules[' + (schedule_index-1) + '].interestPaid', value:schedule?.interestPaid /}
+				#{hidden name:'schedules[' + (schedule_index-1) + '].taxAmount', value:schedule?.taxAmount /}
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>	

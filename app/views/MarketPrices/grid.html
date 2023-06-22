@@ -1,0 +1,99 @@
+<script type="text/javascript">
+$(function(){
+	
+	// This is the hack for IE
+	if ($.browser.msie) {
+	  $('#notInList').click(function() {
+	    this.blur();
+	    this.focus();
+	  });
+	}
+
+//	$('#notInList').change(function() {
+	//	if ($('#notInList').is(':checked')) 
+     //   	$('.buttons #new').show();
+	//	else 
+	//		$('.buttons #new').hide();
+	//});
+	$('.buttons input:button').button();
+	//$('.buttons #new').hide();
+	$('.buttons #new').click(function() {
+		entry();
+	});
+ });
+ 
+
+function doEdit(data) {
+	if ((data[7] == "New") || (data[7] == "Updated")) {
+		view(data[0]);
+		return false;
+	} else {
+		return true;
+	}
+}
+
+</script>
+
+<h3>Search results</h3>
+
+#{if marketPrices}
+<table id="grid1" class="display">
+	<thead>
+		<tr>
+			<th>Market Price Key</th>
+			<th width="80px">Security Type</th>
+			<th width="80px">Security Code</th>
+			<th width="80px">Group Code</th>
+			<th width="80px">High</th>
+			<th width="80px">Low</th>
+			<th width="80px">Close</th>
+			<th width="75px">Status</th>
+			<th width="75px">Active</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:marketPrices, as:'marketPrice'}
+		<tr>
+			<td>
+				${marketPrice.marketPriceKey}
+			</td>
+			<td>
+				${marketPrice.security.securityType.securityType}
+			</td>
+			<td>
+				${marketPrice.security.securityId}
+			</td>
+			<td>
+				${marketPrice?.securityPriceGroup?.lookupCode}
+			</td>
+			<td>
+				${marketPrice.highestPrice}
+			</td>
+			<td>
+				${marketPrice.lowestPrice}
+			</td>
+			<td>
+				${marketPrice.closingPrice}
+			</td>
+			<td>
+				${marketPrice.recordStatus.decodeStatus()}
+			</td>
+			<td>
+				${marketPrice?.isActive ?  'Yes': 'No'}
+			</td>	
+		
+		</tr>
+	#{/list}
+	</tbody>
+</table>
+
+	<!--	<div class="buttons">
+	 		<label><input type="checkbox" id="notInList"/> Not in the list</label>&nbsp; 
+			<input type="button" id="new" value="New" />	
+		</div>-->	
+
+
+#{/if}
+#{else}
+<div>No record found</div>
+#{/else}

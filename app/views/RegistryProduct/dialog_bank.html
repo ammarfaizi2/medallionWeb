@@ -1,0 +1,40 @@
+<form></form>
+<form id="bankAccountForm" class="form">
+    <span id="errmsgNull" class="errmsg" ></span>
+	#{hidden id:'rowPosition' /}
+	#{hidden id:'oldDefaultRgProductBankAccount' /}
+	#{hidden id:'bankAccountKey', name:'ba.bankAccountKey', value:ba?.bankAccountKey /}
+<!--         #{hidden id:'productCodeBn', name:'ba.rgProduct.productCode', value:ba?.rgProduct?.productCode /} -->
+
+    <p>
+        #{textBox id:'bankAccountNo', width:'100px', name:'ba.bnAccount.accountNo', label:'Account No', value:ba?.bnAccount?.accountNo, required:true, class:'capitalize', readOnly:readOnly /}
+        #{button id:'bankAccountNoHelp', value:'?', class:'small', readOnly:readOnly /}
+        <span id="bankAccountNoError" class="error"></span>
+    </p>
+
+    <p>
+        #{textBox id:'thirdPartyCode', name:'ba.bnAccount.thirdPartyCode', label:'Bank Code', value:ba?.bnAccount?.thirdPartyCode, readOnly:true, width:'60px' /}
+        #{textBox id:'thirdPartyName', name:'ba.bnAccount.thirdPartyName', value:ba?.bnAccount?.thirdPartyName, readOnly:true, width:'170px' /}
+         #{hidden id:'thirdPartyKey', name:'ba.bnAccount.thirdPartyKey', value:ba?.bnAccount?.thirdPartyKey /}
+    </p>
+
+    <p>
+        #{textBox id:'beneficiaryName', name:'ba.bnAccount.customer.customerName', label:'Beneficiary Name', value:ba?.bnAccount?.customer?.customerName, class:'capitalize', readOnly:true, width:'230px' /}
+    </p>
+
+    <p>
+        #{textBox id:'currencyCode', name:'ba.currency.currencyCode', label:'Currency', value:ba?.currency?.currencyCode, class:'capitalize', readOnly:true, width:'100px' /}
+    </p>
+</form>
+
+<script type="text/javascript">
+    $(function(){
+        $("#cancelBankDialog").click(function() {
+        	$("#dialogBankAccount #bankAccountForm #bankAccountNo").removeClass('fieldError');
+        	$("#dialogBankAccount #bankAccountForm #errmsgNull").html("");
+        	$("#dialogBankAccount #bankAccountForm #bankAccountNoError").html("");
+            $("#dialogBankAccount").dialog('close');
+            return false;
+        });
+    });
+</script>

@@ -1,0 +1,30 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle:'Branch Maintenance' /}
+
+#{if flash.error}
+    <p style="color:#c00">
+        ${flash.error}
+    </p>
+#{/if}
+#{script 'forms.js' /}
+<script type="text/javascript">	
+	$(function() {		
+		$('#dialog').form({
+			title:'#{get "dialogTitle"}Detail Information#{/}',
+			height:'#{get "dialogHeight"}500#{/}',
+			width:'#{get "dialogWidth"}800#{/}'
+		});
+	});
+	function entry(param) {
+		$('#dialog').form('entry', {'param':param});
+	}
+	function edit(id, param) {
+		$('#dialog').form('edit', { 'id':id, 'param':param });
+	}
+	function view(id, param) {
+		$('#dialog').form('view', { 'id':id, 'param':param });
+	}
+</script>
+#{doLayout /}
+<div id="dialog">
+</div>

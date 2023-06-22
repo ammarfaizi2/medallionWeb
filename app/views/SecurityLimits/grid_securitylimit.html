@@ -1,0 +1,20 @@
+<table id="gridSecurityLimit" class="display">
+	<thead>
+		<tr>
+			<th>Security Type</th>
+			<th>Security Name</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list cpSecurity?.cpSecurityDetails, as:'securityLimitDetails'}
+		<tr>
+			<td>${securityLimitDetails?.securityType?.securityType}</td>
+			<td>${securityLimitDetails?.securityType?.description}</td>
+			<td>
+				<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} /></center>
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>

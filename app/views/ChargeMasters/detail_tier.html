@@ -1,0 +1,84 @@
+<script type="text/javascript">
+	$(function(){
+		$('#cancelTier').click(function() {
+			$('#errTierValueNull').html('');
+			$("#detailTier").dialog('close');
+			return false;
+		});
+		
+		$('#tierValue').blur(function(){
+			var el = $(this);
+			var tierValue = $('#tierValueStripped').val();
+			el.removeClass('fieldError');
+			$("#errmsgTier").html("");
+			if($('#masterValueType').val()=="CHARGE_VALUE-P"){
+				if (tierValue > 100){
+					el.addClass('fieldError');
+					$("#errmsgTier").html("Maximum 100 %").show();
+				}
+			}
+			
+		});
+		
+		$('#tierForm #taxCode').lookup({
+			list:'@{Pick.taxMasters()}',
+			get:{
+				url:'@{Pick.taxMaster()}',
+				success: function(data) {
+							$('#tierForm #taxCode').removeClass('fieldError');
+							$('#tierForm #taxKey').val(data.code);
+							$('#tierForm input#taxCode').val(data.taxCode);
+							$('#tierForm #taxName').val(data.description);
+							$('#h_taxName').val(data.description);
+						},
+				error: function() {
+						$('#tierForm #taxCode').addClass('fieldError');
+						$('#tierForm #taxKey').val('');
+						$('#tierForm #taxCode').val('');
+						$('#tierForm #taxName').val('NOT FOUND');
+						$('#h_taxName').val('');
+					}
+			},
+			key:$('#tierForm #taxKey'),
+			description:$('#tierForm #taxName'),
+			help:$('#tierForm #taxCodeHelp'),
+			nextControl:$('#tierForm #tierValue')
+		});
+		
+		$('#tierMaximumRange').blur(function(){
+			$('#newMaxRange').val($('#tierMaximumRangeStripped').val());
+		})
+				
+	});
+	
+</script>
+<style type="text/css">
+  #errmsgTier { color:red; }
+  #errmsgTierMax { color:red; }
+</style>
+<form></form>
+<form id="tierForm" class="form">
+		#{hidden id:'rowPosition' /}
+		#{hidden id:'oldMaxRange' /}
+		#{hidden id:'newMaxRange' /}
+		#{hidden id:'rowNumber', name:'tier.id.rowNumber', value:tier?.id?.rowNumber /}
+		#{hidden id:'chargeKey', name:'tier.id.chargeKey', value:tier?.id?.chargeKey /}
+	<p>
+		#{textBox id:'tierMaximumRange', name:'tierMaximumRange', label:'Max Range', value:tier?.tierMaximumRange, format:'#,##0.####', class:'numeric', required:true, readOnly:readOnly, width:'185px' /}
+		#{hidden id:'tierMaximumRangeStripped', name:'tier.tierMaximumRange', value:tier?.tierMaximumRange /}
+		<span style="center" id="errmsgTierMax"></span>
+	</p>
+	<p>			
+		#{textBox id:'taxCode', name:'tier.taxMaster.taxCode', label:'Tax Code', value:tier?.taxMaster?.taxCode, class:'capitalize', required:false, readOnly:true, width:'86px' /}
+		#{hidden id:'taxKey', name:'tier.taxMaster.taxKey', value:tier?.taxMaster?.taxKey  /}
+		#{button id:'taxCodeHelp', value:'?', class:'small', readOnly:true /}
+		#{textBox id:'taxName', name:'tier.taxMaster.description', value:tier?.taxMaster?.description, readOnly:true, width:'150px' /}
+		
+	</p>
+	<p>
+		#{textBox id:'tierValue', name:'tierValue', label:'Value', value:tier?.tierValue, format:'#,##0.####', class:'numeric', required:true, readOnly:readOnly, width:'185px'/}
+		#{hidden id:'tierValueStripped', name:'tier.tierValue', value:tier?.tierValue /}
+		<span id="percentage">%</span>
+		<span style="center" id="errmsgTier"></span>
+	</p>
+</form>

@@ -1,0 +1,67 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Switching' /}
+#{script 'lookups.js', characterset:'utf-8' /}
+#{script 'lookuppaging.js' /}
+
+<div id="root">
+    <h3><a href="#">Search Transaction</a></h3>
+    <form id="searchForm" class="form">
+        #{hidden id:'query', name:'param.query', value:param?.query /}
+
+        <p>
+            #{textBox id:'switchDateFrom', name:'param.switchDateFrom', label:'Transaction Date', width:'85px', value:param?.switchDateFrom ,class:'calendar', required:'true'  /} (${appProp.displayDateFormat})
+            <span id="switchDateFromError" class="error"></span> <strong>To</strong>
+            #{textBox id:'switchDateTo', name:'param.switchDateTo', value:param?.switchDateTo, class:'calendar'  /} (${appProp.displayDateFormat})
+            <span id="switchDateToError" class="error"></span>
+        </p>
+
+        <p>
+	        #{textBox id:'investorNo', name:'param.investorNo', label:'Investor No', value:param?.investorNo, width:'120px', readOnly:false, class:'capitalize', maxLength:50/}
+	        #{hidden id:'investorNoKey', name:'param.investorKey', value:param?.investorKey /}
+	        #{button  id:'investorNoHelp', value:'?', class:'small', readOnly:false/}
+	        #{textBox id:'investorNoDesc', value:param?.investorNo, readOnly:true, width:'340px' /}
+	    </p>
+
+        <p>
+            #{dropDownList id:'switchNoOperator', name:'param.switchNoOperator', label:'Switching No', options:stringOperators, value:param?.switchNoOperator /}
+            #{textBox id:'switchingKey', name:'param.switchingKey', value:param?.switchingKey, class:'numberOnly' /}
+        </p>
+
+        <p>
+            <div class="buttons">
+                <input type="button" id="search" value="Search" />              
+                <input type="button" id="reset" value="Reset" />
+            </div>
+        </p>
+    </form>
+</div>
+
+<p>&nbsp;</p>
+
+<div id="result">
+    <table id="tableSwitching" class="display">
+        <thead>
+            <tr>
+                <th width="80px" field="switchDate|date|date|center|sort">Transaction Date</th>
+                <th width="80px" field="switchingKey|string|none|center|sort">Switching #</th>
+                <th width="100px" field="rgInvestmentaccountByOutAccountNumber.customer.customerNo|string|none|center|sort">Investor No</th>
+                <th width="120px" field="rgInvestmentaccountByOutAccountNumber.customer.customerName|string|none|center|sort">Investor Name</th>
+                <th width="80px" field="switchingType|string|none|center|sort">Type</th>
+                <th width="80px" field="rgInvestmentaccountByOutAccountNumber.rgProduct.productCode|string|none|center|sort">Fund (from)</th>
+                <th width="80px" field="rgInvestmentaccountByInAccountNumber.rgProduct.productCode|string|none|center|sort">Fund (to)</th>
+            </tr>
+        </thead>
+    </table>
+
+    <div class="buttons">
+        <input type="button" id="newData" value="New Data" />
+    </div>
+</div>
+
+<script type="text/javascript">
+    #{include 'RegistrySubscription/Util.js' /}
+    #{include 'RegistrySwitch/registrySwitchList.js' /}
+    $(document).ready(function() {
+    	RegistrySwitch($("#root").add("#result"));
+    });
+</script>

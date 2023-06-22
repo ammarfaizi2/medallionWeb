@@ -1,0 +1,226 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Cancel Corporate Action Announcement' /}
+#{set id:entitlement?.entitlementKey /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{set fixData: true /}
+#{script 'lookups.js' /}
+#{script 'date.format.js' /}
+#{script 'validation/numericOnly.js' /}
+
+#{if flash.error || errors}
+    <div class="error">
+    	<b>Error when saving data!</b><br/><br/>
+    	#{if flash.error}
+<li>${flash.error}</li>
+		#{/if}
+		#{ifErrors}
+			#{errors}
+<li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}
+
+#{script 'external/Util.js' /}
+<script type="text/javascript">
+	$(function() {
+		#{include 'RegistrySubscription/Util.js' /}
+		#{include 'CancelCorporateEntitlements/cancelEntitlement.js' /}	
+		
+		var listTrans;
+		
+		if ('${listTrans}' != null )
+			listTrans = ${listTrans.raw()};
+
+		if ('${listTrans}' == null )
+			listTrans = new Array();
+		
+		typeTrans(listTrans);
+		
+		var backToEntry = function() {
+			loading.dialog('open');
+			location = '@{view()}?id='+$("#corporateAnnouncementKey").val()+'';
+		}
+		
+		var closeDialogMessage = function() {
+			$("dialog-message").dialog('close');
+		}
+		
+		$('#cancel').click(function() {
+			location.href='@{view()}?id='+$("#corporateAnnouncementKey").val()+'';		
+		});
+		
+		$('#confirm').click(function() {
+			
+			if (($('#cancelDate').val() == '')||($('#remarksCancel').val() == '') || ($('#cancelDate').hasClass('fieldError'))){
+				if ($('#cancelDate').val() == '') {
+					$('#cancelDateToError').html('Required');	
+				} else {
+					$('#cancelDateToError').html('');
+				}
+				
+				if ($('#remarksCancel').val() == '') {
+					$('#remarkCancelError').html('Required');	
+				} else {
+					$('#remarkCancelError').html('');
+				}
+				return false;
+			} 
+			
+			var action = "@{confirm()}?mode=${mode}#{if group}&group=${group}#{/}#{if param}&param=${param}#{/}";
+			
+			loading.dialog('open');
+			$.post(action, $('#cancelConfForm').serialize(), function(data, status) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Notification", backToEntry);
+				} else {
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+				}
+			});
+		});
+		
+	});
+	
+	function typeTrans(data) {
+		$('#typeTrans').empty('');
+		var tTable = $("<table>");
+		tTable.appendTo($('#typeTrans'));
+		var tTr = $("<tr>");
+		tTr.appendTo(tTable);
+		for(var i=0; i<data.length;i++){
+			
+			if( i % 2 == 0){
+				tTr = $("<tr>");
+				tTr.appendTo(tTable);
+			}
+			
+			if(data[i].transactionNumber==null){
+				data[i].transactionNumber = "";
+			}
+			if(data[i].description==null){
+				data[i].description = "";
+			}
+			if(data[i].quantity==null){
+				data[i].quantity = 0;
+			}
+			if(data[i].settlementAmount==null){
+				data[i].settlementAmount = 0;
+			}
+			var qty = data[i].quantity;
+			var stl = data[i].settlementAmount;
+			
+			var tTh = $("<th align='left'>");
+			var tFieldSet = $("<fieldset style='width:450px;padding: 0;'>");
+			tTh.appendTo(tTr);
+				tFieldSet.appendTo(tTh);
+					$("<legend>"+data[i].viewClassification+"</legend>").appendTo(tFieldSet);
+					$('<p>').appendTo(tFieldSet);
+					$('<label style="text-align: left; margin-left: 2em;"> Txn # </label> <input type="text" value="'+data[i].transactionNumber+'" style="width:100px" disabled />').appendTo(tFieldSet);
+					$('</p>').appendTo(tFieldSet);
+					$('<p>').appendTo(tFieldSet);
+					$('<label style="text-align: left; margin-left: 2em;">Description </label> <input type="text" value="'+data[i].transactionTemplate.description+'" style="width:250px" disabled />').appendTo(tFieldSet);
+					$('</p>').appendTo(tFieldSet);
+					$('<p>').appendTo(tFieldSet);
+					$('<label style="text-align: left; margin-left: 2em;">Quantity </label>  <input type="text" id="idq'+i+'" style="width:150px" class="numeric" disabled />').appendTo(tFieldSet);
+					$('</p>').appendTo(tFieldSet);
+					$('<p>').appendTo(tFieldSet);
+					$('<label style="text-align: left; margin-left: 2em;">Settlement Amount </label>  <input type="text" id="ids'+i+'" style="width:150px" class="numeric" disabled />').appendTo(tFieldSet);
+					$('</p>').appendTo(tFieldSet);
+			
+			$("#idq"+i+"").valueRnd(qty, true, "2", "ROUND"); 
+			$("#ids"+i+"").valueRnd(stl, true, "2", "ROUND"); 
+		}
+	}
+	
+</script>
+
+<style type="text/css">
+  #errmsg {color:red;}
+  textarea {resize:none; height: 80px;}
+</style>
+
+<form id="cancelConfForm" class="form" method="POST" >
+
+#{hidden id:'entitlementDetailKey', name:'trans.entitlementDetailKey', value:trans?.entitlementDetailKey /}
+#{hidden id:'corporateAnnouncementKey', name:'entitlement.corporateAnnouncement.corporateAnnouncementKey', value:entitlement?.corporateAnnouncement?.corporateAnnouncementKey /}
+<table>
+	<tr>
+		<td>
+			<p>      
+				#{textBox id:'corporateAnnouncementCode', name:'entitlement.corporateAnnouncement.corporateAnnouncementCode', label:'Announcement No', value:entitlement?.corporateAnnouncement?.corporateAnnouncementCode, class:'capitalize master', width:'120px', readOnly:true /} 
+			</p>
+			<p>      
+				#{textBox id:'entitlementKey', name:'entitlement.entitlementKey', label:'Entitlement No', value:entitlement?.entitlementKey, class:'capitalize master', width:'120px', readOnly:true /} 
+			</p>
+			<p>			
+				#{textBox id:'description', name:'entitlement.corporateAnnouncement.description', label:'Subject', width:'345px',value:entitlement?.corporateAnnouncement?.description, class:'capitalize master', readOnly:true /}
+				<span class="error">#{error 'Subject is' /}</span>
+			</p>
+			<p>
+				#{textBox id:'securityType', name:'entitlement.corporateAnnouncement.securityType.securityType', label:'Security Type', dataold:entitlement?.corporateAnnouncement?.securityType?.securityType, class:'capitalize master', value:entitlement?.corporateAnnouncement?.securityType?.securityType, required:true, readOnly:readOnly, width:'85px' /}
+				#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:true  /}
+				#{textBox id:'securityTypeDesc', name:'entitlement.corporateAnnouncement.securityType.description', value:entitlement?.corporateAnnouncement?.securityType?.description, readOnly:true, width:'231px' /}
+				<span class="error">#{error 'Security Type is' /}</span>		
+			</p>
+			<p>
+				#{textBox id:'securityCode', name:'entitlement.corporateAnnouncement.security.securityId', label:'Security Code', class:'capitalize master', value:entitlement?.corporateAnnouncement?.security?.securityId, readOnly:true, width:'85px' /}
+				#{button id:'securityCodeHelp', value:'?', class:'small', readOnly:true /}
+				#{textBox id:'securityCodeDesc', name:'entitlement.corporateAnnouncement.security.description', value:entitlement?.corporateAnnouncement?.security?.description, readOnly:true, width:'231px' /}
+				#{hidden id:'securityKey', name:'entitlement.corporateAnnouncement.security.securityKey', value:entitlement?.corporateAnnouncement?.security?.securityKey /}
+				<span class="error">#{error 'Security Code is' /}</span>
+			</p>
+			<p>
+				#{textBox id:'actionCode', name:'entitlement.corporateAnnouncement.actionTemplate.actionCode', label:'Action Code', class:'capitalize master', value:entitlement?.corporateAnnouncement?.actionTemplate?.actionCode, required:true, readOnly:readOnly, width:'85px' /}
+				#{button id:'actionCodeHelp', value:'?', class:'small', readOnly:true /}
+				#{textBox id:'actionCodeDesc', name:'entitlement.corporateAnnouncement.actionTemplate.description', value:entitlement?.corporateAnnouncement?.actionTemplate?.description, readOnly:true, width:'231px' /}
+				#{hidden id:'actionCodeKey', name:'entitlement.corporateAnnouncement.actionTemplate.actionTemplateKey', value:entitlement?.corporateAnnouncement?.actionTemplate?.actionTemplateKey /}
+				<span class="error">#{error 'Action Code is' /}</span>
+			</p>
+			<p>			
+				#{textBox id:'entitlementDate', name:'entitlement.corporateAnnouncement.announcementDate', label:'Entitlement Date', value:entitlement?.corporateAnnouncement?.announcementDate?.format(appProp.dateFormat),required:true , readOnly:readOnly, class:'calendar master' /} (${appProp.displayDateFormat})
+				<span id="announcementDateError" class="error">#{error 'Entitlement Date is' /}</span>
+			</p>
+		</td>
+		<td>
+			<p>			
+				#{textBox id:'cancelDate', name:'trans.cancelDate', label:'Cancel Date', value:trans?.cancelDate?.format(appProp.dateFormat), required:true, class:'calendar master' /} (${appProp.displayDateFormat})
+			</p>
+			<p>
+				<span id="cancelDateToError" class="error">#{error 'Cancel Date is' /}</span>
+			</p>
+			<p>
+				#{textArea id:'remarksCancel', name:'trans.remarkCancel', value:trans?.remarkCancel, label:'Remarks', required:true, class:'capitalize', width:'200px', maxLength:200  /}
+				<span id="remarkCancelError" class="error">#{error 'Remark Cancel is' /}</span>
+			</p>
+		</td>
+	</tr>
+</table>
+
+<br>
+	<p>      
+		#{textBox id:'accountNo', name:'trans.account.accountNo', label:'Account No', value:trans?.account?.accountNo, class:'capitalize master', width:'150px', readOnly:true /} 
+	</p>
+	<p>      
+		#{textBox id:'accountName', name:'trans.account.name', label:'Account Name', value:trans?.account?.name, class:'capitalize master', width:'350px', readOnly:true /} 
+	</p>
+	<p>      
+		#{textBox id:'classification', name:'trans.classification.lookupDescription', label:'Classification', value:trans?.classification?.lookupDescription, class:'capitalize master', width:'350px', readOnly:true /} 
+	</p>
+	<p>      
+		#{textBox id:'holdingRefs', name:'trans.targetHoldingRefs', label:'Holding Refs', value:trans?.targetHoldingRefs, class:'capitalize master', width:'120px', readOnly:true /} 
+	</p>
+<br>
+<br>
+<div id="typeTrans">
+	
+</div>
+
+</form>
+
+<div class="buttons">
+	<input type="button" id="confirm" value="Confirm" />
+	<input type="button" id="cancel" value="Cancel" />
+</div>
+

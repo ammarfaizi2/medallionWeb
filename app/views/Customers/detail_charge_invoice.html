@@ -1,0 +1,119 @@
+<script type="text/javascript">
+$(function(){
+	$('#cancelCharge').click(function() {
+		$("#errmsgChargeGroup").html('');
+		$("#errmsgMinCharge").html('');
+		$("#detailChargeInvoice #chargeInvoiceForm #chargeGroup").removeClass('fieldError');
+		
+		$('#detailChargeInvoice').dialog('close');
+		return false;
+	});
+	
+	
+	/* $('#chargeInvoiceForm #taxCode').lookup({
+		list:'@{Pick.taxMasters()}',
+		get:{
+			url:'@{Pick.taxMaster()}',
+			success: function(data) {
+						$('#chargeInvoiceForm #taxCode').removeClass('fieldError');
+						$('#chargeInvoiceForm #taxKey').val(data.code);
+						$('#chargeInvoiceForm input#taxCode').val(data.taxCode);
+						$('#chargeInvoiceForm #taxName').val(data.description);
+						$('chargeInvoiceForm #h_taxName').val(data.description);
+						//$('#errmsgTaxCode').html('');
+					},
+			error: function() {
+					$('#chargeInvoiceForm #taxCode').addClass('fieldError');
+					$('#chargeInvoiceForm #taxKey').val('');
+					$('#chargeInvoiceForm #taxCode').val('');
+					$('#chargeInvoiceForm #taxName').val('NOT FOUND');
+					$('chargeInvoiceForm #h_taxName').val('');
+				}
+		},
+		key:$('#chargeInvoiceForm #taxKey'),
+		help:$('#chargeInvoiceForm #taxCodeHelp'),
+		nextControl:$('#chargeInvoiceForm #tierValue')
+	}); */
+	
+	$('#chargeInvoiceForm #maxCharge').blur(function(){
+		var max = parseFloat($("#chargeInvoiceForm #maxChargeStripped").val());
+		var min = parseFloat($("#chargeInvoiceForm #minChargeStripped").val());
+		if (min > max) {
+			$('#chargeInvoiceForm #maxCharge').addClass('fieldError');
+			$('#errmsgMaxCharge').html('Max Value must be greather than Min Value');
+		} else {
+			$('#chargeInvoiceForm #maxCharge').removeClass('fieldError');
+			$('#errmsgMaxCharge').html('');
+		}
+	});
+	
+	$('#chargeInvoiceForm #minCharge').blur(function(){
+		var max = parseFloat($("#chargeInvoiceForm #maxChargeStripped").val());
+		var min = parseFloat($("#chargeInvoiceForm #minChargeStripped").val());
+		if (min > max) {
+			$('#chargeInvoiceForm #maxCharge').addClass('fieldError');
+			$('#errmsgMaxCharge').html('Max Value must be greather than Min Value');
+		} else {
+			$('#chargeInvoiceForm #maxCharge').removeClass('fieldError');
+			$('#errmsgMaxCharge').html('');
+		}
+	});
+	
+	$('#cekBoxMaxCharge').change(function(){
+		if ($(this).is(':checked')){
+			$('#maxCharge').attr('disabled','disabled');
+			$('#maxCharge').val('');
+			$('#maxChargeStripped').val('');
+			$('p[id="pMaxCharge"] label span').html('');
+			$('#errmsgMaxCharge').html('');
+			$('#maxCharge').removeClass('fieldError');
+		} else {
+			$('#maxCharge').attr('disabled',false);
+			$('p[id="pMaxCharge"] label span').html(' *');
+		}
+	});
+	
+	/*$('#chargeInvoiceForm #chargeGroup').change(function(){
+		$('#chargeInvoiceForm #chargeGroup').removeClass('fieldError');
+		$('#errmsgChargeGroup').html('');
+	});
+	*/
+});
+
+
+</script>
+
+<form id="chargeInvoiceForm" class="form">
+	<br>
+	#{hidden id:'customerChargeKey', name:'customerCharge.customerChargeKey' /}
+	#{hidden id:'customerKey', name:'customerCharge.customer?.customerKey' /}
+	#{hidden id:'rowPosition' /}
+	<p>
+		#{dropDownList id:'chargeGroup', name:'customerCharge.invoiceCharge.lookupId', label:'Charge Group', value:customerCharge?.invoiceCharge?.lookupId, options:invoiceCharge, required:true, readOnly:readOnly /}
+		#{hidden id:'chargeGroupDesc', name:'customerCharge.invoiceCharge.lookupDescription', value:customerCharge?.invoiceCharge?.lookupDescription /}
+		<span id="errmsgChargeGroup" class="error"></span>
+	</p>
+	<!-- <p>			
+		#{textBox id:'taxCode', name:'customerCharge.taxMaster.taxCode', label:'Tax Code', value:customerCharge?.taxMaster?.taxCode, class:'capitalize', required:true, readOnly:readOnly, width:'100' /}
+		#{hidden id:'taxKey', name:'customerCharge.taxMaster.taxKey', value:customerCharge?.taxMaster?.taxKey  /}
+		#{button id:'taxCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'taxName', name:'customerCharge.taxMaster.description', value:customerCharge?.taxMaster?.description, readOnly:true, width:'200' /}
+		<span id="errmsgTaxCode" class="error"></span>
+	</p> -->
+	<p>
+		#{textBox id:'minCharge',label:'Min Charge', value:customerCharge?.minimumValue, format:'#,##0.####', class:'numeric', width:'100px', required:true, readOnly:readOnly /}
+		#{hidden id:'minChargeStripped', name:'customerCharge.minimumValue', value:customerCharge?.minimumValue /}
+		<span id="errmsgMinCharge" class="error"></span>
+		
+	</p>
+	<p id="pMaxCharge">
+		#{textBox id:'maxCharge', label:'Max Charge', value:customerCharge?.maximumValue, format:'#,##0.####', class:'numeric', width:'100px', readOnly:readOnly, required:true /}
+		#{hidden id:'maxChargeStripped', name:'customerCharge.maximumValue',  value:customerCharge?.maximumValue /}
+		<span id="errmsgMaxCharge" class="error"></span>
+		#{checkBox id:'cekBoxMaxCharge', name:'cekBoxMaxCharge', value:cekBoxMaxCharge , readOnly:readOnly /} Max
+	</p>
+	
+</form>
+
+
+			

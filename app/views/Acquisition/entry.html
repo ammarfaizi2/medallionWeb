@@ -1,0 +1,113 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Acquisition Maintenance' /}
+#{set fixData: true /}
+#{set mode: mode /}
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+
+<div>
+	<div id='csTransaction' style="display: none;">
+		#{include 'Transactions/entry.html' /}
+	</div>
+	
+	<div id="actions" class="buttons">
+		#{if mode == 'edit'}
+			#{if confirming == true}
+				<input id='btnConfirm' type="button" value="Confirm" />
+				<input id='btnBack' type="button" value="Back" />
+			#{/if}
+			#{else}
+				<input id='btnSave' type="button" value="Save" />
+				<input id='btnCancel' type="button" value="Cancel" />
+			#{/else}
+		#{/if}
+		
+		#{if mode == 'view'}
+			#{if recordStatus == 'N' || recordStatus == 'U'}
+				<input id='btnCancel' type="button" value="Close" />
+			#{/if}
+			#{else}
+				<input id="btnApproveWf" type="button" value="Approve" />
+				<input id="btnRejectWf" type="button" value="Reject" />	
+				<input id="btnCloseWf" type="button" value="Cancel" />
+			#{/else}
+		#{/if}
+	</div>
+	
+	<div id='root'>
+		<div id="acquisitionTab" style="height:430px;width:850px">
+			<ul>
+				<li><a href="#tab1">Detail</a></li>
+				<li><a href="#tab2">Acquisition</a></li>
+			</ul>
+			<div id="tab1">
+			</div>
+			<div id="tab2">
+				<form id='acquisitionForm' action="save" class="form" method="post">
+					#{textBox  id:'mode', label:'mode', name:'mode', value:mode /}</br>
+					#{textBox  id:'acquisitionKey', label:'AcquisitionKey', name:'acquisition.acquisitionKey', value:acquisition?.acquisitionKey /}</br>
+					#{textBox  id:'transactionKey', label:'TransactionKey', name:'acquisition.transaction.transactionKey', value:acquisition?.transaction?.transactionKey /}</br>
+					#{textArea id:'json', label:'Json', name:'acquisition.json', value:acquisition?.json /}</br>
+					#{textBox  id:'priceUnit', label:'PriceUnit', name:'acquisition.priceUnit', value:acquisition?.priceUnit /}</br>
+				</form>
+				<div style='overflow:auto;height: 340px'>
+					<table id='tblAcquisition' class="display">
+						<thead style="width: 100%">
+							<tr style="width: 100%">
+								<td style="width: 100px;text-align: left;">Acquisition&nbsp;Date</td>
+								<td style="width: 250px;text-align: right;">Quantity</td>
+								<td style="width: 250px;text-align: right;">Price</td>
+								<td style="width: 300px;text-align: right;">Nominal</td>
+								<td style="width: 100px;text-align: center;">Action</td>
+							</tr>
+						</thead>
+					</table>
+				</div>
+				</br>
+				<input id='addNewAquisition' type="button" value="Add"/>
+			</div> 
+		</div>
+		
+		<div id="dialogEntry" title="Acquisition">
+			<span id="dlgErr" class="error"></span>
+			</br>
+			<form class="form">
+				#{textBox id:'dlgDummy'/}
+				#{textBox id:'dlgAcquisitionDate', label:'Acquisition Date', width:'100px', required:true, class:'calendar' /}(${appProp.displayDateFormat})
+				<span id="dlgAcquisitionDateErr" class="error"></span>
+				</p>
+				#{textBox id:'dlgQuantity', label:'Quantity', width:'100px', required:true/}
+				<span id="dlgQuantityErr" class="error"></span>
+				</p>
+				#{textBox id:'dlgPrice', label:'Price', width:'100px', required:true/}
+				<span id="dlgPriceErr" class="error"></span>
+				</p>
+				#{textBox id:'dlgNominal', label:'Nominal', width:'100px', required:false, readOnly:true/}
+				<span id="dlgNominalErr" class="error"></span>
+			</form>	
+		</div>	
+		
+		<div id="dialogView" title="Acquisition">
+			<form class="form">
+				#{textBox id:'dlgAcquisitionDate2', label:'Acquisition Date', width:'100px', required:true, readOnly:true, class:'calendar' /}(${appProp.displayDateFormat})
+				</p>
+				#{textBox id:'dlgQuantity2', label:'Quantity', width:'100px', required:true, readOnly:true/}
+				</p>
+				#{textBox id:'dlgPrice2', label:'Price', width:'100px', required:true, readOnly:true/}
+				</p>
+				#{textBox id:'dlgNominal2', label:'Nominal', width:'100px', required:false, readOnly:true/}
+			</form>	
+		</div>	
+		
+		<div id="dialogConfirmSuccess" title="Information">
+			<div>Success Save Aquisition</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'Acquisition/entry.js' /}
+	$(document).ready(function() {
+		entry($("#root"));
+	});
+</script>

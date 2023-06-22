@@ -1,0 +1,32 @@
+#{extends 'templates/main.html' /}
+#{include 'Utility/errors.html' /}
+
+
+<div id="root">
+	<h3>Upload Profile List</h3>
+	<table id="tableProfile" class="display">
+		<thead>
+			<tr>
+				<th width="100px" field="name|string|none|left|sort">Profile ID</th>
+				<th width="200px" field="description|string|none|left|sort">Profile Name</th>
+				<th width="100px" field="template|string|none|left|sort">Template</th>
+				<th width="100px" field="type|number|none|right|sort">Type</th>
+				<th width="100px" field="active|boolean|yesno|right|sort">Active</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+</div>
+<div id="buttonnew">
+	<div class="buttons">
+		<input type="button" id="newdata" value="New Profile" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"/>
+	</div>
+</div>
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include VIEW_DIR+'/UploadPaging.js' /}
+	$(function() {
+		UploadPaging($("#root").add("#buttonnew"));
+	});
+</script>

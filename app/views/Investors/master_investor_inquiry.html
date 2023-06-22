@@ -1,0 +1,518 @@
+#{extends 'templates/main.html' /}
+#{script 'date.format.js' /}
+
+<script type="text/javascript">	
+	$(function() {
+		#{include 'RegistrySubscription/Util.js' /}
+		
+		var INVESTOR_INQUIRY = 'invt-inqy';
+		var INVESTOR_UNIT = 'invt-unit';
+		
+		$('.calendar').datepicker();
+		$("#dialog-historyInvestorInquiry").css("display", "none");
+		$("#dialog-historyInvestorUnit").css("display", "none");
+		
+		// search form investor transaction initialize ==========================================================================
+		$("#dialog-historyInvestorInquiry").dialog({
+			autoOpen:false,
+			heigth:'250px',
+			width:'600px',
+			resizable:false,
+			modal:true			
+		});
+		// ======================================================================================================================
+		
+		// search form investor transaction initialize ==========================================================================
+		$("#dialog-historyInvestorUnit").dialog({
+			autoOpen:false,
+			heigth:'250px',
+			width:'600px',
+			resizable:false,
+			modal:true			
+		});
+		// ======================================================================================================================
+			
+		//$('#param').val('customer-inquiry');
+		
+		$("#backInvInq").click(function(){
+			if('${param}'!=""){
+				location.href='@{view()}/' +'${customer?.customerKey}' + "?param=${param}";
+			} else {
+				location.href='@{view()}/' +'${customer?.customerKey}';
+			}
+			
+			return false;
+		});
+		
+		$(".backSearchTransaction").click(function(){
+			$('#dialog-historyInvestorInquiry').dialog('close');
+			$('#dialog-historyInvestorUnit').dialog('close');
+			return false;
+		});
+		
+		// set digitParameter ===================================================================================================
+		var digitAmount = $("#digitAmount").val();
+		var digitUnit = $("#digitUnit").val();
+		var digitPrice = $("#digitPrice").val();
+		var typeAmount = $("#typeAmount").val();
+		var typeUnit = $("#typeUnit").val();
+		var typePrice = $("#typePrice").val();
+		formatAmount(digitAmount, typeAmount);
+		formatUnit(digitUnit, typeUnit);
+		formatPrice(digitPrice, typePrice);
+		// ======================================================================================================================
+		
+		// for date info ========================================================================================================
+		
+		var current = new Date($('#currentDate').val());
+		var currentDate = new Date($('#currentDate').val());
+		current.setDate(1);
+		var begin = current;
+		
+		if (($('#dateFrom').val() == "") && ($('#dateTo').val() == "")) {
+			console.debug("current = " + current + " currentDate = " + currentDate);
+			$("#beginInqy").html(begin.format("dd-mmm-yyyy"));
+			$("#currentInqy").html(currentDate.format("dd-mmm-yyyy"));
+			$("#beginUnit").html(begin.format("dd-mmm-yyyy"));
+			$("#currentUnit").html(currentDate.format("dd-mmm-yyyy"));
+		}
+		
+		if (($('#dateFrom').val() != "") && ($('#dateTo').val() != "")) { 
+			dateFrom = $('#dateFrom').val();
+			dateTo = $('#dateTo').val();
+			console.debug("1. dateFrom = " + dateFrom + " dateTo = " + dateTo);
+			var from = "${dateFrom?.format('dd-MMM-yyyy')}"
+			var to = "${dateTo?.format('dd-MMM-yyyy')}"
+			
+			if ($('#from').val() == INVESTOR_INQUIRY) {
+				$("#beginInqy").html(from);
+				$("#currentInqy").html(to);
+				//$("#beginUnit").html(begin.format("dd-mmm-yyyy"));
+				//$("#currentUnit").html(currentDate.format("dd-mmm-yyyy"));
+			}
+			if ($('#from').val() == INVESTOR_UNIT) {
+				//$("#beginInqy").html(begin.format("dd-mmm-yyyy"));
+				//$("#currentInqy").html(currentDate.format("dd-mmm-yyyy"));
+
+				$("#beginUnit").html(from);
+				$("#currentUnit").html(to);
+			} 
+		}
+		// ======================================================================================================================
+	});
+	
+	// setting digit parameter and rounding for amount ==========================================================================
+	function formatAmount(digitAmount, typeAmount) {
+		$("td[name=amountCell]", $("#grid-investor-inquiry")).each(function() {
+			console.debug($('#amountRoundValue').val());
+			var amount = $(this).html();
+			$("#formatAmount").valueRnd(amount.toNumber(","), true, digitAmount, typeAmount);
+			$(this).html($("#formatAmount").val());
+		});
+		
+		$("td[name=amountCell]", $("#grid-unit-valuation")).each(function() {
+			console.debug($('#amountRoundValue').val());
+			var amount = $(this).html();
+			$("#formatAmount").valueRnd(amount.toNumber(","), true, digitAmount, typeAmount);
+			$(this).html($("#formatAmount").val());
+		});
+	}
+	// ==========================================================================================================================
+	
+	// setting digit parameter and rounding for unit ============================================================================
+	function formatUnit(digitUnit, typeUnit) {
+		$("td[name=unitCell]", $("#grid-investor-inquiry")).each(function() {
+			var unit = $(this).html();
+			$("#formatUnit").valueRnd(unit.toNumber(","), true, digitUnit, typeUnit);
+			$(this).html($("#formatUnit").val());
+		});
+		
+		$("td[name=unitCell]", $("#grid-unit-valuation")).each(function() {
+			var unit = $(this).html();
+			$("#formatUnit").valueRnd(unit.toNumber(","), true, digitUnit, typeUnit);
+			$(this).html($("#formatUnit").val());
+		});
+	}
+	// ==========================================================================================================================
+	
+	// setting digit parameter and rounding for price ===========================================================================
+	function formatPrice(digitPrice, typePrice) {
+		$("td[name=priceCell]", $("#grid-investor-inquiry")).each(function() {
+			var price = $(this).html();
+			$("#formatPrice").valueRnd(price.toNumber(","), true, digitPrice, typePrice);
+			$(this).html($("#formatPrice").val());
+		});
+		
+		$("td[name=priceCell]", $("#grid-unit-valuation")).each(function() {
+			var price = $(this).html();
+			$("#formatPrice").valueRnd(price.toNumber(","), true, digitPrice, typePrice);
+			$(this).html($("#formatPrice").val());
+		});
+	}
+	// ==========================================================================================================================
+	
+	function investorUnit() {
+		var dateFrom;
+		var dateTo;
+			
+		$('.btn').button();
+		$(".btn").css("width", "100px");
+		
+		$('.tabs').tabs();
+		
+		$("#printUnitValuation").click(function(){
+			//dateFrom = $('#dateFrom').val();
+			//dateTo = $('#dateTo').val();
+			dateFrom = $('#searchDateFromUnit').val();
+			dateTo = $('#searchDateToUnit').val();
+			window.open('@{Customers.printUnitValuation()}?accountNumber=' + '${inv?.accountNumber}' + '&dateFrom=' + dateFrom + '&dateTo=' + dateTo);
+			return false;
+		});
+		
+		$("#searchDateFromUnit").change(function(){
+			var id = this.id;
+			var thisId = "#" + id;
+			var errorId = "#" + id + "Error";
+			var compare1 = thisId;
+			var compare2 = "#searchDateToUnit";
+			var compare3 = "";
+			var compare1Format =  new Date($(compare1).val()).getTime();
+			var compare2Format = new Date($(compare2).val()).getTime();
+			var compare3Format = "";
+			var conditionMessageError = "Invalid date format";
+			var errorMsg = "must be greather than Date From";
+			console.debug("id = " + id + " thisId = " + thisId + " errorId = " + errorId + " compare1 = " + compare1 + " compare2 = " + compare2 + " compare1Format = " + compare1Format + " compare2Format = " + compare2Format + " conditionMessageError = " + conditionMessageError + " errorMsg = " + errorMsg);
+			validateCompare(thisId, errorId, compare1, compare2, compare3, errorMsg, compare1Format, compare2Format, compare3Format, conditionMessageError);
+		});
+		
+		$("#searchDateToUnit").change(function(){
+			var id = this.id;
+			var thisId = "#" + id;
+			var errorId = "#" + id + "Error";
+			var compare1 = "#searchDateFromUnit";
+			var compare2 = thisId;
+			var compare3 = "";
+			var compare1Format = $(compare1).val();
+			var compare2Format = $(compare2).val();
+			var compare3Format = "";
+			var conditionMessageError = "Invalid date format";
+			var errorMsg = "must be greather than Date From";
+			console.debug("id = " + id + " thisId = " + thisId + " errorId = " + errorId + " compare1 = " + compare1 + " compare2 = " + compare2 + " compare1Format = " + compare1Format + " compare2Format = " + compare2Format + " conditionMessageError = " + conditionMessageError + " errorMsg = " + errorMsg);
+			validateCompare(thisId, errorId, compare1, compare2, compare3, errorMsg, compare1Format, compare2Format, compare3Format, conditionMessageError);
+		});
+		
+		
+		$("#historyUnit").click(function(){
+			$('#dialog-historyInvestorUnit').dialog('open');
+			$('#searchDateFromUnit').val("");
+			$('#searchDateToUnit').val("");
+			$('#searchDateFromUnit').removeClass('fieldError');
+			$('#searchDateToUnit').removeClass('fieldError');
+			$('#searchDateFromUnitError').html("");
+			$('#searchDateToUnitError').html("");
+			$('.ui-widget-overlay').css('height',$('body').height());
+			return false;
+		});
+		
+		$("#searchInvestorUnit").click(function(){
+			if (($('#searchDateFromUnit').val() == "") || ($('#searchDateToUnit').val() == "")) {
+				if ($('#searchDateFromUnit').val() == ""){
+					$('#searchDateFromUnit').addClass('fieldError');
+					$('#searchDateFromUnitError').html("Required");
+				} else {
+					$('#searchDateFromUnit').removeClass('fieldError');
+					$('#searchDateFromUnitError').html("");
+				}
+				if ($('#searchDateToUnit').val() == ""){
+					$('#searchDateToUnit').addClass('fieldError');
+					$('#searchDateToUnitError').html("Required");
+				} else {
+					$('#searchDateToUnit').removeClass('fieldError');
+					$('#searchDateToUnitError').html("");
+				}
+				return false;
+			} else {
+				var checkError = $("input").hasClass('fieldError');
+				if (checkError){
+					return false;
+				} else {
+					$('#searchDateFromUnit').removeClass('fieldError');
+					$('#searchDateToUnit').removeClass('fieldError');
+					$('#searchDateFromUnitError').html("");
+					$('#searchDateToUnitError').html("");
+					$('#dialog-historyInvestorUnit').dialog('close');
+					dateFrom = new Date($('#searchDateFromUnit').val());
+					dateTo = new Date($('#searchDateToUnit').val());
+					console.debug("searched >>> dateFrom = " + dateFrom + " dateTo = " + dateTo);
+					
+					$.get('@{Customers.historyInvestorUnit()}', $('#searchTransactionFormInvestorUnit').serialize(), function(data) {
+						checkRedirect(data);
+						tableUnitValuation.fnClearTable();
+						$('#investorUnit').html(data);
+						$('#investorUnit').show();
+						
+						//var from = "${dateFrom?.format('dd-MMM-yyyy')}"
+						//var to = "${dateTo?.format('dd-MMM-yyyy')}"
+						
+						$("#beginUnit").html(dateFrom.format('dd-mmm-yyyy'));
+						$("#currentUnit").html(dateTo.format('dd-mmm-yyyy'));
+						//dateFrom = new Date($('#searchDateFromUnit').val());
+						//dateTo = new Date($('#searchDateToUnit').val());
+						//console.debug("dateFrom = " + dateFrom + "dateTo = " + dateTo);
+						//$("#beginUnit").html(dateFrom.format("dd-mmm-yyyy"));
+						//$("#currentUnit").html(dateTo.format("dd-mmm-yyyy"));
+					});
+					
+					
+					//location.href='@{Customers.historyInvestorUnit()}?accountNumber=' + '${inv?.accountNumber}' + '&id=${customer?.customerKey}' + '&dateFrom=' + dateFrom + '&dateTo=' + dateTo;
+				}
+			}
+		});
+		
+		// investor inquiry table initialize ====================================================================================
+		var tableUnitValuation = 
+			$('#grid-unit-valuation').dataTable({
+				aoColumnDefs: [ {bVisible:false,aTargets:[0]},
+				                {bSortable:false,aTargets:[1,2,3,4,5,6]}
+					          ],
+				bJQueryUI:true,
+				bAutoWidth: false,
+				bSort: false,
+				bFilter: true,
+				bInfo: false,
+				bJQueryUI:true,
+				bPaginate: false,
+				bSearch: false,
+				bLengthChange:false,
+				bScrollCollapse:true,
+				sScrollX:'100%',
+				sScrollY:'200px'
+				//iDisplayLength:10
+			});
+		// ======================================================================================================================
+	}
+	
+	function investorInquiry() {
+		var dateFrom;
+		var dateTo;
+		$('.btn').button();
+		$(".btn").css("width", "100px");
+		
+		$('.tabs').tabs();
+		
+		$("#printInvestorInquiry").click(function(){
+			//dateFrom = $('#dateFrom').val();
+			//dateTo = $('#dateTo').val();
+			dateFrom = $('#searchDateFromInqy').val();
+			dateTo = $('#searchDateToInqy').val();
+			console.debug("printed >>> dateFrom = " + dateFrom + " dateTo = " + dateTo);
+			window.open('@{Customers.printInvestorInquiry()}?accountNumber=' + '${inv?.accountNumber}' + '&dateFrom=' + dateFrom + '&dateTo=' + dateTo);
+			return false;
+		});
+		
+		$("#searchDateFromInqy").change(function(){
+			var id = this.id;
+			var thisId = "#" + id;
+			var errorId = "#" + id + "Error";
+			var compare1 = thisId;
+			var compare2 = "#searchDateToInqy";
+			var compare3 = "";
+			var compare1Format =  new Date($(compare1).val()).getTime();
+			var compare2Format = new Date($(compare2).val()).getTime();
+			var compare3Format = "";
+			var conditionMessageError = "Invalid date format";
+			var errorMsg = "must be greather than Date From";
+			console.debug("id = " + id + " thisId = " + thisId + " errorId = " + errorId + " compare1 = " + compare1 + " compare2 = " + compare2 + " compare1Format = " + compare1Format + " compare2Format = " + compare2Format + " conditionMessageError = " + conditionMessageError + " errorMsg = " + errorMsg);
+			validateCompare(thisId, errorId, compare1, compare2, compare3, errorMsg, compare1Format, compare2Format, compare3Format, conditionMessageError);
+		});
+		
+		$("#searchDateToInqy").change(function(){
+			var id = this.id;
+			var thisId = "#" + id;
+			var errorId = "#" + id + "Error";
+			var compare1 = "#searchDateFromInqy";
+			var compare2 = thisId;
+			var compare3 = "";
+			var compare1Format = $(compare1).val();
+			var compare2Format = $(compare2).val();
+			var compare3Format = "";
+			var conditionMessageError = "Invalid date format";
+			var errorMsg = "must be greather than Date From";
+			console.debug("id = " + id + " thisId = " + thisId + " errorId = " + errorId + " compare1 = " + compare1 + " compare2 = " + compare2 + " compare1Format = " + compare1Format + " compare2Format = " + compare2Format + " conditionMessageError = " + conditionMessageError + " errorMsg = " + errorMsg);
+			validateCompare(thisId, errorId, compare1, compare2, compare3, errorMsg, compare1Format, compare2Format, compare3Format, conditionMessageError);
+		});
+		
+		$("#historyInvestor").click(function(){
+			$('#dialog-historyInvestorInquiry').dialog('open');
+			$('#searchDateFromInqy').val("");
+			$('#searchDateToInqy').val("");
+			$('#searchDateFromInqy').removeClass('fieldError');
+			$('#searchDateToInqy').removeClass('fieldError');
+			$('#searchDateFromInqyError').html("");
+			$('#searchDateToInqyError').html("");
+			$('.ui-widget-overlay').css('height',$('body').height());
+			return false;
+		});
+		
+		$("#searchInvestorInqury").click(function(){
+			if (($('#searchDateFromInqy').val() == "") || ($('#searchDateToInqy').val() == "")) {
+				if ($('#searchDateFromInqy').val() == ""){
+					$('#searchDateFromInqy').addClass('fieldError');
+					$('#searchDateFromInqyError').html("Required");
+				} else {
+					$('#searchDateFromInqy').removeClass('fieldError');
+					$('#searchDateFromInqyError').html("");
+				}
+				if ($('#searchDateToInqy').val() == ""){
+					$('#searchDateToInqy').addClass('fieldError');
+					$('#searchDateToInqyError').html("Required");
+				} else {
+					$('#searchDateToInqy').removeClass('fieldError');
+					$('#searchDateToInqyError').html("");
+				}
+				return false;
+			} else {
+				var checkError = $("input").hasClass('fieldError');
+				if (checkError){
+					return false;
+				} else {
+					$('#searchDateFromInqy').removeClass('fieldError');
+					$('#searchDateToInqy').removeClass('fieldError');
+					$('#searchDateFromInqyError').html("");
+					$('#searchDateToInqyError').html("");
+					$('#dialog-historyInvestorInquiry').dialog('close');
+					dateFrom = new Date($('#searchDateFromInqy').val());
+					dateTo = new Date($('#searchDateToInqy').val());
+					//tableInvestorInquiry.fnClearTable();
+					$.get('@{Customers.historyInvestorInquiry()}', $('#searchTransactionFormInvestorInquiry').serialize(), function(data) {
+						checkRedirect(data);
+						tableInvestorInquiry.fnClearTable();
+						$('#investorInquiry').html(data);
+						$('#investorInquiry').show();
+						
+						$("#beginInqy").html(dateFrom.format('dd-mmm-yyyy'));
+						$("#currentInqy").html(dateTo.format('dd-mmm-yyyy'));
+					});
+					//location.href='@{Customers.historyInvestorInquiry()}?accountNumber=' + '${inv?.accountNumber}' + '&id=${customer?.customerKey}' + '&dateFrom=' + dateFrom + '&dateTo=' + dateTo;
+				}
+			}
+		});
+		
+		// investor inquiry table initialize ====================================================================================
+		var tableInvestorInquiry = 
+			$('#grid-investor-inquiry').dataTable({
+				aoColumnDefs: [ {bVisible:false,aTargets:[0]},
+				                {bSortable:false,aTargets:[1,2,3,4,5,6,7,8,9]}
+					          ],
+				bJQueryUI:true,
+				bAutoWidth: false,
+				bSort: false,
+				bFilter: true,
+				bInfo: false,
+				bJQueryUI:true,
+				bPaginate: false,
+				bSearch: false,
+				bLengthChange:false,
+				bScrollCollapse:true,
+				sScrollX:'100%',
+				sScrollY:'200px'
+				//iDisplayLength:10
+			});
+		// ======================================================================================================================
+		
+	}
+</script>
+
+<style>
+ 	/*div#grid-investor-inquiry_wrapper {
+    	width: 1100px;
+	}*/
+	
+	.infoHolder {
+		margin-top: -5px;	
+	}
+</style>
+
+
+<div id="master">
+<h2>Customer: ${customer?.customerNo}-${customer?.customerName}</h2>
+	#{hidden id:'param', name:'param', value:param /}
+	#{hidden id:'from', name:'from', value:from /}
+	#{hidden id:'formatAmount'/}
+	#{hidden id:'formatPrice'/}
+	#{hidden id:'formatUnit'/}
+	#{hidden id:'digitAmount', name:'inv.rgProduct.amountRoundValue', value:inv?.rgProduct?.amountRoundValue /}
+	#{hidden id:'digitUnit', name:'inv.rgProduct.unitRoundValue', value:inv?.rgProduct?.unitRoundValue /}
+	#{hidden id:'digitPrice', name:'inv.rgProduct.priceRoundValue', value:inv?.rgProduct?.priceRoundValue /}
+	#{hidden id:'typeAmount', name:'inv.rgProduct.amountRoundType', value:inv?.rgProduct?.amountRoundType /}
+	#{hidden id:'typeUnit', name:'inv.rgProduct.unitRoundType', value:inv?.rgProduct?.unitRoundType /}
+	#{hidden id:'typePrice', name:'inv.rgProduct.priceRoundType', value:inv?.rgProduct?.priceRoundType /}
+	#{hidden id:'currentDate', name:'currentDate', value:currentDate /}
+	#{hidden id:'dateFrom', name:'dateFrom', value:dateFrom?.format('MM/dd/yyyy') /}
+	#{hidden id:'dateTo', name:'dateTo', value:dateTo?.format('MM/dd/yyyy') /}
+	<div id="investorInquiry">
+		#{include 'Customers/grid_investor_inquiry.html' /}
+	</div>
+	<br />
+	<div id="investorUnit">
+		#{include 'Customers/grid_investor_unit.html' /}
+	</div>
+	<br />		
+	<button id="backInvInq" class="btn">Back</button>
+</div>
+
+<div id="dialog-historyInvestorInquiry" title="Investor Inquiry">
+	<fieldset>
+		<legend><b>Search Transaction</b></legend>
+		<form id="searchTransactionFormInvestorInquiry" class="form">
+			<p>			
+				#{textBox id:'searchFundCodeInqy', name:'params.searchFundCode', label:'Fund Code', value:inv?.rgProduct?.productCode, width:'150px', readOnly:readOnly, class:'capitalize', readOnly:true /}
+				#{button  id:'searchFundCodeHelpInqy', value:'?', class:'small', readOnly:true /}
+			</p>
+			<p>		
+				#{textBox id:'searchInvtAcctInqy', name:'params.searchInvtAcct', label:'Investment Acct', value:inv?.accountNumber, width:'150px', class:'capitalize', readOnly:true /}
+				#{button  id:'searchInvtAcctHelpInqy', value:'?', class:'small', readOnly:true /}
+			</p>
+			<p>			
+				#{textBox id:'searchDateFromInqy', name:'params.searchDateFrom', label:'Date From', value:params?.searchDateFrom?.format('MM/dd/yyyy'), class:'calendar', readOnly:readOnly, required:true /} (MM/DD/YYYY)
+				<span id="searchDateFromInqyError" class="error"></span>
+			</p>
+			<p>			
+				#{textBox id:'searchDateToInqy', name:'params.searchDateTo', label:'Date To', value:params?.searchDateTo?.format('MM/dd/yyyy'), class:'calendar', readOnly:readOnly, required:true /} (MM/DD/YYYY)
+				<span id="searchDateToInqyError" class="error"></span>
+			</p>
+		</form>
+	</fieldset>
+	<div class="buttons">
+		<button id="searchInvestorInqury" class="btn">Search</button>
+		<button class="btn backSearchTransaction">Back</button>
+	</div>
+</div>
+
+<div id="dialog-historyInvestorUnit" title="Investor Inquiry">
+	<fieldset>
+		<legend><b>Search Transaction</b></legend>
+		<form id="searchTransactionFormInvestorUnit" class="form">
+			<p>			
+				#{textBox id:'searchFundCodeUnit', name:'params.searchFundCode', label:'Fund Code', value:inv?.rgProduct?.productCode, width:'150px', readOnly:readOnly, class:'capitalize', readOnly:true /}
+				#{button  id:'searchFundCodeHelpUnit', value:'?', class:'small', readOnly:true /}
+			</p>
+			<p>		
+				#{textBox id:'searchInvtAcctUnit', name:'params.searchInvtAcct', label:'Investment Acct', value:inv?.accountNumber, width:'150px', class:'capitalize', readOnly:true /}
+				#{button  id:'searchInvtAcctHelpUnit', value:'?', class:'small', readOnly:true /}
+			</p>
+			<p>			
+				#{textBox id:'searchDateFromUnit', name:'params.searchDateFrom', label:'Date From', value:params?.searchDateFrom?.format('MM/dd/yyyy'), class:'calendar', readOnly:readOnly, required:true /} (MM/DD/YYYY)
+				<span id="searchDateFromUnitError" class="error"></span>
+			</p>
+			<p>			
+				#{textBox id:'searchDateToUnit', name:'params.searchDateTo', label:'Date To', value:params?.searchDateTo?.format('MM/dd/yyyy'), class:'calendar', readOnly:readOnly, required:true /} (MM/DD/YYYY)
+				<span id="searchDateToUnitError" class="error"></span>
+			</p>
+		</form>
+	</fieldset>
+	<div class="buttons">
+		<button id="searchInvestorUnit" class="btn">Search</button>
+		<button class="btn backSearchTransaction">Back</button>
+	</div>
+</div>

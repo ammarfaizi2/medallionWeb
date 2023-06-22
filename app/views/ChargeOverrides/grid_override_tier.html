@@ -1,0 +1,52 @@
+#{hidden id:'rowNumber' /}
+<table id="gridChargeOverrideTier" class="display">
+	<thead>
+		<tr>
+			<th>Tier Maximum Range</th>
+			<th>Tier Key</th>
+			<th>Tier Maximum Range (value is less than or equal &lt= )</th>
+			<th width="125px">Tax Code</th>
+			<th width="150px">Tier value</th>
+			<th width="150px">Action</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list chargeOverride?.chargeOverrideTiers, as:'tier'}
+		<tr>
+			<td>
+				${tier?.tierMaximumRange}
+			</td>		
+			<td>
+				${tier?.id?.rowNumber}
+			</td>
+			<td>
+				#{if tier?.tierMaximumRange}
+					${tier?.tierMaximumRange}
+				#{/if}
+				#{else}
+					MAX
+				#{/else}
+			</td>
+			<td>
+				${tier?.taxMaster?.taxCode}
+			</td>
+			<td class="alignright" >
+				${tier?.tierValue}
+			</td>	
+			<td>
+				#{hidden id:'tierMaximumRange', name:'tiers[' + (tier_index-1) + '].tierMaximumRange', value:tier?.tierMaximumRange /}
+				#{hidden id:'rowNumber', name:'tiers[' + (tier_index-1) + '].id.rowNumber', value:tier?.id?.rowNumber /}
+				#{hidden id:'chargeKey', name:'tiers[' + (tier_index-1) + '].id.chargeOverrideKey', value:tier?.id?.chargeOverrideKey /}
+				#{hidden id:'taxCode', name:'tiers[' + (tier_index-1) + '].taxMaster.taxCode', value:tier?.taxMaster?.taxCode /}
+				#{hidden id:'tierValue', name:'tiers[' + (tier_index-1) + '].tierValue', value:tier?.tierValue /}
+				#{hidden id:'taxKey', name:'tiers[' + (tier_index-1) + '].taxMaster.taxKey', value:tier?.taxMaster?.taxKey /}
+				#{hidden id:'taxName', name:'tiers[' + (tier_index-1) + '].taxMaster.description', value:tier?.taxMaster?.description /}
+				
+				#{if tier?.tierMaximumRange}
+				<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} /></center>
+				#{/if}
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>

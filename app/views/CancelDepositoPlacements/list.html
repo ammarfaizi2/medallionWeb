@@ -1,0 +1,78 @@
+#{extends 'templates/main.html' /}
+#{script 'lookuppaging.js' /}
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+<div id="root">
+	<h3><a href="#">Search Cancel Deposito Placement</a></h3>
+	<form id="searchForm" class="form">
+		<input id="param" name="params.param" type="hidden" value="${param}"/>
+		<p>
+			#{textBox id:'placementDateFrom', name:'params.dateFrom', label:'Placement Date', value:params?.dateFrom?.format(appProp.dateFormat), width:'100px', required:true, class:'calendar' /}
+			(${appProp.displayDateFormat})
+			<span id="placementDateFromError" class="error"></span> 
+			<b>To</b>
+			#{textBox id:'placementDateTo', name:'params.dateTo', value:params?.dateTo?.format(appProp.dateFormat), width:'100px', required:true, class:'calendar' /}
+			(${appProp.displayDateFormat})
+			<span id="placementDateToError" class="error"></span>
+		</p>
+		<p>
+			#{textBox id:'customerCode',width:'100px', name:'', label:'Customer Code', value:'', required:false, class:'capitalize' /}
+			#{hidden id:'customerCodeKey', name:'params.customerCode', value:params.customerCode /}
+			#{button id:'customerCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'customerCodeDesc', name:'', value:customer?.customerName, readOnly:true, width:'200px' /}
+			<span id="actionCodeError" class="error"></span>
+		</p>
+		<p>
+			#{textBox id:'securityType',width:'100px', name:'', label:'Security Type', value:'',required:false, class:'capitalize' /}
+			#{hidden id:'securityTypeId', name:'params.securityType', value:params?.securityType /}
+			#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'securityTypeName', name:'transaction.transactionTemplate.securityType.description', value:transaction?.transactionTemplate?.securityType?.description, readOnly:true, width:'200px' /}
+			<span id="securityTypeError" class="error"></span>
+		</p>
+		<p>
+			#{textBox id:'securityCode',width:'100px', name:'', label:'Security Code', value:'',required:false, class:'capitalize' /}
+			#{hidden id:'securityCodeId', name:'params.securityCode', value:params?.securityCode /}
+			#{button id:'securityCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'securityCodeName', name:'transaction.security.description', value:transaction?.security?.description, readOnly:true, width:'200px' /}
+			<span id="securityCodeError" class="error"></span>
+		</p>
+		
+		<p>
+			#{dropDownList id:'depositoNoOperator', name:'params.depositoNoOperator', label:'Deposito No', options:stringOperators, value:params.depositoNoOperator /}
+			#{textBox id:'depositoSearchNo', name:'params.depositoNo', value:params.depositoNo, class:'capitalize', width:'227px' /}
+		</p>
+		<div class="buttons">
+				<input type="button" id="search" value="Search" />				
+				<input type="button" id="reset" value="Reset" />					
+			</div>
+		
+	</form>
+</div>
+<br />
+<div id="result" style="display:none">
+	<table id="tabledeposito" class="display">
+		<thead>
+			<tr>
+				<th width="100px" field="deposito.placementDate|date|date|center|sort">Placement Date</th>
+				<th width="80px" field="deposito.depositoNo|string|none|left|sort">Deposito #</th>
+				<th width="120px" field="deposito.account.accountNo|string|none|left|sort">Account No</th>
+				<th width="250px" field="deposito.account.name|string|none|left|sort">Account Name</th>
+				<th width="80px" field="security.securityId|string|none|left|sort">Security Code</th>
+				<th width="100px" field="amount|number|decimal4|right|sort">Nominal</th>
+				<th width="80px" field="interestRate|number|decimal4|right|sort">Int. Rate(%)</th>
+				<th width="100px" field="maturityDate|date|date|center|sort">Maturity Date</th>
+								
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+</div>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'CancelDepositoPlacements/CancelPlacementList.js' /}
+	$(document).ready(function() {
+		Paging($("#root").add("#result"));
+	});
+</script>

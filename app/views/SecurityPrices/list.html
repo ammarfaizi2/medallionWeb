@@ -1,0 +1,93 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Security Price Entry' /}
+#{set fixData: true /}
+#{script 'lookups.js', characterset:'utf-8' /}
+
+<script type="text/javascript">
+
+	$(function() {
+		
+		//$('#customerNoOperator').lookup({
+		//	list:'@{Pick.accounts()}',
+		//	get:'@{Pick.account()}',
+		//	description:$('#customerSearchNo'),
+		//	help:$('#securityIdSourceHelp')
+		//});
+		
+			// Search section
+			
+		$('#accordion').accordion({
+			collapsible: true
+		});
+		$('#marketDate').datepicker();
+		$('.calendar').datepicker();
+		$('.buttons button:first').button({
+			icons: {
+			primary: 'ui-icon-search'
+		}
+		}).next().button();	
+		$('#search').click(function() {
+			search();
+			return false;
+		});
+		// end of Search
+		
+		$('.buttons input:button').button();
+		
+	});
+	var search = function() {
+		$('#result .loading').show();
+		$('#result .response').hide();
+		$('#result').show();
+		$.console("debug", ">>>> Serialize: " + $('#searchForm').serialize());
+		
+		$.get('@{search()}', $('#searchForm').serialize(), function(data) {
+			checkRedirect(data);
+			$.console("debug", ">>>> 1.Serialize: " + $('#searchForm').serialize());
+			$('#result .response').html(data);
+			$('#result .loading').hide();
+			$('#result .response').show();
+			setupTable();
+		});
+		$.console("debug", ">>>> 2,Serialize: " + $('#searchForm').serialize());
+		
+	};
+</script>
+	
+</script>
+<div id="accordion">
+	<h3><a href="#">Search Security Price</a></h3>
+		<form id="searchForm" class="form">
+
+				<input id="param" name="params.param" type="hidden" value="${param}"/> 
+			<p>
+				#{textBox id:'marketDate', name:'params.marketPriceSearchMarketDate', label:'Price Date', value:params.marketPriceSearchMarketDate?.format(appProp.dateFormat), required:true,width:'85px', class:'calendar' /}(${appProp.displayDateFormat})
+			</p>
+			
+			<p>
+				#{textBox id:'customerNoOperator', name:'params.marketPriceSearchCustomerKey', label:'Customer No', options:stringOperators, value:params.marketPriceSearchCustomerKey,required:true /}
+			<!-- 	#{button id:'securityIdSourceHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'customerSearchNo', name:'params.marketPriceSearchCustomer', value:params.marketPriceSearchCustomer, class:'capitalize' /}
+				 -->			
+			</p>	
+			
+			<p>
+				<div class="buttons">
+					<!-- <input type="button" id="search" value="Search" />
+					<input type="button" id="reset" value="Reset" /> -->
+					<button id="search">Search</button>
+					<button id="reset">Reset</button>
+				</div>
+			</p>
+	</form>
+</div>
+<div id="result" style="display:none">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<div class="response"></div>
+</div>
+
+
+
+
+
+

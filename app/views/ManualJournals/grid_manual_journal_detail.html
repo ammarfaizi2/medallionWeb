@@ -1,0 +1,50 @@
+#{hidden id:'rowNumber' /}
+<table id="gridManualJournalDetail" class="display">
+	<thead>
+		<tr>
+			<th>COA No</th>
+			<th>Account Name</th>
+			<th>Subledger</th>
+			<th>Dr/Cr</th>
+			<th width="150px">Amount Debet</th>
+			<th width="150px">Amount Credit</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list faTransaction?.faTransactionDetails, as:'faTransactionDetail'}
+		<tr>
+			<td>
+				${faTransactionDetail?.faCoaMaster?.coaCode}
+			</td>
+			<td>
+				${faTransactionDetail?.faCoaMaster?.description}
+			</td>
+			<td>
+				${faTransactionDetail?.subLedger}
+			</td>
+			<td>
+				${faTransactionDetail?.dorc}
+			</td>
+			<td>
+				${faTransactionDetail?.amount}
+			</td>
+			<td>
+				${faTransactionDetail?.amount}
+			</td>
+			<td>
+				#{hidden id:'detailKey', name:'faTransactionDetails[' + (faTransactionDetail_index-1) + '].detailKey', value:faTransactionDetail?.detailKey /}
+				#{hidden id:'coaCode', name:'faTransactionDetails[' + (faTransactionDetail_index-1) + '].faCoaMaster?.coaCode', value:faTransactionDetail?.faCoaMaster?.coaCode /}
+				#{hidden id:'coaDescription', name:'faTransactionDetails[' + (faTransactionDetail_index-1) + '].faCoaMaster?.description', value:faTransactionDetail?.faCoaMaster?.description /}
+				#{hidden id:'subLedger', name:'faTransactionDetails[' + (faTransactionDetail_index-1) + '].subLedger', value:faTransactionDetail?.subLedger /}
+				#{hidden id:'coaMasterKey', name:'faTransactionDetails[' + (faTransactionDetail_index-1) + '].faCoaMaster?.coaMasterKey', value:faTransactionDetail?.faCoaMaster?.coaMasterKey /}
+				#{hidden id:'transactionKey', name:'faTransactionDetails[' + (faTransactionDetail_index-1) + '].faTransaction.transactionKey', value:faTransactionDetail?.faTransaction?.transactionKey /}
+				#{hidden id:'position', name:'faTransactionDetails[' + (faTransactionDetail_index-1) + '].dorc', value:faTransactionDetail?.dorc /}
+				#{hidden id:'amount', name:'faTransactionDetails[' + (faTransactionDetail_index-1) + '].amount', value:faTransactionDetail?.amount /}
+				
+				<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} /></center>
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>

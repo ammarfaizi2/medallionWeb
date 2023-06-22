@@ -1,0 +1,78 @@
+<!-- #{extends 'templates/list1.html' /} -->
+<!-- #{script 'lookups.js' /} -->
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Third Party Issuer Maintenance' /}
+#{set fixData: true /}
+
+<!-- <script type="text/javascript"> -->
+<!-- // 	function doEdit(data) { -->
+<!-- // 		if ((data[3] == "New") || (data[3] == "Updated")) { -->
+<!-- // 			view(data[0]); -->
+<!-- // 			return false; -->
+<!-- // 		} else { -->
+<!-- // 			return true; -->
+<!-- // 		} -->
+<!-- // 	} -->
+<!-- </script> -->
+<!-- <table class="display"> -->
+<!-- 	<thead> -->
+<!-- 		<tr> -->
+<!-- 			<th>Key</th> -->
+<!-- 			<th width="150px">Code</th> -->
+<!-- 			<th width="300px">Name</th> -->
+<!-- 			<th width="50px">Status</th> -->
+<!-- 			<th width="50px">Active</th> -->
+<!-- 		</tr> -->
+<!-- 	</thead> -->
+<!-- 	<tbody> -->
+<!-- 	#{list items:thirdParties, as:'thirdParty'} -->
+<!-- 		<tr> -->
+<!-- 			<td> -->
+<!-- 				${thirdParty?.thirdPartyKey}  -->
+<!-- 			</td> -->
+<!-- 			<td> -->
+<!-- 				${thirdParty?.thirdPartyCode}  -->
+<!-- 			</td> -->
+<!-- 			<td> -->
+<!-- 				${thirdParty?.thirdPartyName} -->
+<!-- 			</td> -->
+<!-- 			<td> -->
+<!-- 				${thirdParty?.recordStatus?.decodeStatus() } -->
+<!-- 			</td> -->
+<!-- 			<td> -->
+<!-- 			 	${thirdParty?.isActive ? 'Yes':'No'} -->
+<!-- 			</td> -->
+<!-- 		</tr> -->
+<!-- 	#{/list} -->
+<!-- 	</tbody> -->
+<!-- </table> -->
+
+<script type="text/javascript">
+#{include 'RegistrySubscription/Util.js' /}
+#{include 'ThirdPartyIssuers/thirdPartyIssuersPaging.js' /}
+$(document).ready(function() {
+	Paging($("#main"));
+});
+</script>
+
+<div id="root">
+	<h3>Third Party Issuer Maintenance</h3>
+</div>
+<div id="result" style="display:block">
+    <table id="tableThirdPartyIssuers" class="display">
+        <thead>
+            <tr>
+                <th width="80px" field="thirdPartyCode|string|none|left|sort">Code</th>
+                <th width="50px" field="thirdPartyName|string|none|left|sort">Name</th>
+                <th width="80px" field="recordStatus|string|decode|left|sort">Status</th>
+				<th width="50px" field="isActive|boolean|yesno|center|sort">Active</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<div id="btn" class="buttons">
+	<input type="button" id="newData" value="New Data" />	
+</div>

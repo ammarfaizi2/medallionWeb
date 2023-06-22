@@ -1,0 +1,35 @@
+<p id="p_">	
+	#{hidden id:elementCode+"Id", name:elementCode+"Id", value:id /}
+	#{if !readOnly}
+		#{textBox id:elementCode, name:elementCode, label:elementLabel, value:"${defaultValue}", width:'120px', readOnly:false, class:'reportinput capitalize' /}
+	#{/if}
+	#{else}
+		#{textBox id:elementCode, name:elementCode, label:elementLabel, value:"", width:'120px', readOnly:true, class:'reportinput' /}
+	#{/else}
+	#{button  id:elementCode+"Help", value:'?', class:'small', readOnly:false/}
+	#{textBox id:elementCode+"Desc", name:'name', value:"", readOnly:true, width:'340px' /}
+	#{hidden id:elementCode+"Type", name:'elementType', value:elementType /}
+	<span id="errmsg${elementCode}Code" class="error"></span>
+</p>
+<script>
+$(document).ready(function(){	
+	var paramHtml = $("#${formId}");
+	paramHtml.find("#${elementCode}").reportdynapopup("${elementPicker}", '', 'securityType', function(data){
+		var rawRefBy = "${refBy}";
+		var splitRefBy = rawRefBy.split(",");
+		for( idx in splitRefBy ){
+		    if( splitRefBy[idx] == "" ) continue;
+			paramHtml.find("#"+splitRefBy[idx]).val(" All");
+			paramHtml.find("#"+splitRefBy[idx]).blur();
+		}
+	}, function(){
+		console.log("there is a failure");
+	}, "#${formId}");
+	if( paramHtml.find("#${elementCode}").val() != "" ){
+
+		paramHtml.find("#${elementCode}").blur();
+
+	}
+
+});	
+</script>

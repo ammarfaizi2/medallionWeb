@@ -1,0 +1,107 @@
+#{extends 'templates/main.html' /}
+#{script 'jquery.form.js', characterset:'utf-8' /}
+#{script 'jquery.validate.js', characterset:'utf-8' /}
+#{script 'pdiloader.js', characterset:'utf-8' /}
+
+<div id="accordion_container">
+	<div class="accordion">
+		#{list mapReport.keySet(), as:'reportGroup'}
+			<h3><a>${reportGroup}</a></h3>
+			<div id="rgroup${reportGroup}" class="form">
+				<div class="accordion_inner">
+				#{list mapReport.get(reportGroup), as:'reports'}
+					#{list reports, as:'report'}
+						<h4><a>${report.reportPdi.reportName}</a></h4>
+						<div id="report${report.reportPdi.reportName}" class="form">
+							<form method="POST" id="form${report.reportPdi.reportKey}" class="formloader" enctype="multipart/form-data">
+							<p>
+								#{textBox id:'reportFile', name:'reportFile', label:'Transformation File', value:report.reportPdi.reportFile, readOnly:true, width:'200px' /}
+								#{hidden id:'reportKey', name:'reportKey', value:report?.reportPdi.reportKey /}
+							</p>
+							#{if report.reportPdi.gnReportPdiParams?.size() > 0}
+							<p>
+								<label>Parameter Table</label>
+								<table id="inputtable">
+									<thead>
+										<tr>
+											<th>Name</th>
+											<th>Value</th>
+										</tr>
+									</thead>
+									<tbody>
+										#{list report.reportPdi.gnReportPdiParams, as:'param'}
+										<tr>
+											#{if param.dataType?.lookupId.equals("DATA_TYPE-FILE")}
+												<td>
+													#{textBox id:'paramListNameUpload_'+param.paramKey, name:'paramListNameUpload[]', value:param.paramName, readOnly:true, width:'200px' /}
+												</td>
+											#{/if}
+											#{else}
+												<td>
+													#{textBox id:'paramListName_'+param.paramKey, name:'paramListName[]', value:param.paramName, readOnly:true, width:'200px' /}
+												</td>							
+											#{/else}
+											
+											#{if param.displayType?.lookupId.equals("DISPLAY_TYPE-2")}  <!-- Drop down -->
+												<td>
+													#{dropDownList id:'paramListValue_'+param.gnLookupGroup?.lookupGroup, name:'paramListValue[]', label:'', options:lookupItems, value:'', readOnly:false, width:'120px', class:'required forLookupGroup'/}
+												</td>
+											#{/if}
+											#{elseif param.displayType?.lookupId.equals("DISPLAY_TYPE-3")}  <!-- Date -->
+												<td>
+													#{textBox id:'paramListValue_'+param.paramKey, name:'paramListValue[]', value:param.defaultValue, readOnly:readOnly, width:'200px', maxLength:param.length ,class: 'calendar required',required:true /}													
+												</td>
+											#{/elseif}
+											#{elseif param.displayType?.lookupId.equals("DISPLAY_TYPE-4")}  <!-- Predefined -->
+												<td>
+													#{textBox id:'paramListValue_'+param.paramKey, name:'paramListValue[]', value:param.defaultValue, readOnly:true, width:'200px', maxLength:param.length ,class: 'required' /}
+												</td>
+											#{/elseif}										
+											#{else}
+												#{if param.dataType?.lookupId.equals("DATA_TYPE-FILE")}
+													<td>
+														#{fileUpload id:'paramListValueUpload_'+param.paramKey, name:'paramListValueUpload[]', class:'required'  /}
+													</td>
+												#{/if}
+												#{elseif param.dataType?.lookupId.equals("DATA_TYPE-NUM")}  <!-- Predefined -->
+													<td>
+														#{textBox id:'paramListValue_'+param.paramKey, name:'paramListValue[]', value:param.defaultValue, readOnly:readOnly, maxLength:param.length, width:'200px', class:'numericnosep required' /}
+													</td>
+												#{/elseif}												
+												#{else}
+													<td>
+														#{textBox id:'paramListValue_'+param.paramKey, name:'paramListValue[]', value:param.defaultValue, readOnly:readOnly, maxLength:param.length, width:'200px', class:'required' /}
+													</td>
+												#{/else}
+											#{/else}
+										</tr>
+										#{/list}
+									</tbody>
+								</table>
+							</p>
+							#{/if}
+				
+							<p>
+								<input type="submit" name="execute" value="Execute" formid="form${report.reportPdi.reportKey}" contentid="content${report.reportPdi.reportKey}" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" />
+							</p>
+							</form>
+							<div id="content${report.reportPdi.reportKey}" style="display:none;width:400px" class="ui-corner-all">
+							</div>
+						</div>
+					#{/list}
+				#{/list}		
+				</div>
+			</div>
+		#{/list}
+	</div>
+	<div id="resulttmp" style="display:none">
+		<span class="loading"><img src="@@{'/public/images/loading2.gif'}" style="width:10px;height:10px" /></div>
+	</div>
+</div>
+<script type="text/javascript">
+	$(document).ready(function(){
+		$( "#accordion_container" ).pdiloader({
+			urlOutput : "@{loadoutput()}"
+		});
+	});
+</script>

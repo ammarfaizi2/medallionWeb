@@ -1,0 +1,51 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle:'Corporate Action Template Maintenance' /}
+
+<script type="text/javascript">
+
+		function doEdit(data) {
+			if ((data[3] == "New") || (data[3] == "Updated")) {
+				view(data[0]);
+				return false;
+			} else {
+				return true;
+			}
+		}
+
+</script>
+
+<table class="display">
+	<thead>
+		<tr>
+			<th width="100px">Key</th>
+			<th width="200px">Action Code</th>
+			<th width="450px">Description</th>
+			<th>Status</th>
+			<th>Active</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:actionTemplates, as:'actionTemplate'}
+		<tr>
+			<td>
+				${actionTemplate?.actionTemplateKey}
+			</td>
+			<td>
+				${actionTemplate?.actionCode}
+			</td>
+			<td>
+				${actionTemplate?.description}
+			</td>
+			<td>
+				${actionTemplate?.recordStatus?.decodeStatus()}
+			</td>
+			<td>
+				 ${actionTemplate?.isActive ? 'Yes':'No'}
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>
+	
+
+

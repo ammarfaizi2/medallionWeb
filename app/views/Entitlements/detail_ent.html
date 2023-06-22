@@ -1,0 +1,192 @@
+#{set pageTitle: 'Corporate Action Entitlement Entry' /}
+#{script 'lookups.js' /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{set mode: mode /}
+
+
+
+<script type="text/javascript">
+$(function() {
+	
+	$('#dialogX').dialog("open");
+	
+	$('#tabs').tabs({
+		select: function(event, ui) {
+			//alert($(ui.panel).attr('id'));
+			activeTab = $(ui.panel).attr('id');
+			activeTabCapital = activeTab.toString().slice(0,1).toUpperCase() + activeTab.slice(1);
+			$("#ui-dialog-title-dialog").html("Charge " + activeTabCapital + " Maintenance");
+		}
+	});
+	$('#tabs').css('height','350' );
+	
+	// TODO ENTITLEMENTDETAIL GRID
+	entitlementDetailGrid();
+	
+	$( "#detailEntitlementAction" ).dialog({
+			autoOpen:false,
+			modal:true,
+			heigth:'800px',
+			width:'350px',
+			resizable:false
+		});
+	
+	//show detail from listEntitlement at tab_grid_entitlement
+	
+	
+	//end of detail
+	
+	
+	// function process
+	$('#process').click(function() {
+		$('#entDet #grid').dataTable().fnDraw();
+			//$.post('@{Entitlements.populateEntitlement()}', {'announcementKey':$('#corporateAnnouncementKey').val()}, function(data) {
+			$.post('@{Entitlements.populateEntitlement()}/'+ $('#corporateAnnouncementKey').val(), $('#form').serialize(), function(data) {
+	    		checkRedirect(data);
+				$('#listEntitlement').html(data);
+				$('#tabs').tabs("select", "entDet");
+			
+			//alert(data[0].code);
+			//	tableProfile.fnClearTable();
+			/*	for (idx in data){
+					//alert(data[idx].code);
+					tableProfile.fnAddData(["<center><input type='button' id='actionButton"+idx+"' value='' ></center>",
+					    					"<center><input type='checkBox' id='isChecked' name=entitlementDetails["+idx+"].isChecked value='" + data[idx].isChecked +"'></center>" + "<input  type='hidden' id='announcement' name=entitlementDetails["+idx+"].announcementDetail.announcementDetailKey value='" + data[idx].AnnouncementDetail +"'>" , 
+					    					data[idx].code + "<input  type='hidden' id='announcement' name=entitlementDetails["+idx+"].announcementDetail.announcementDetailKey value='" + data[idx].code +"'>" ,
+					                     	//data[idx].announcementDetail,
+					                     	data[idx].securitySource + "<input  type='hidden' id='securitySource' name=entitlementDetails["+idx+"].announcementDetail.securityBySecuritySource.securityId value='" + data[idx].securitySource +"'>",
+					                     	data[idx].securityTarget + "<input  type='hidden' id='securityTarget' name=entitlementDetails["+idx+"].announcementDetail.securityBySecurityTarget.securityId value='" + data[idx].securityTarget +"'>",
+					    					data[idx].account + "<input  type='hidden' id='account' name=entitlementDetails["+idx+"].account.accountNo value='" + data[idx].account +"'>",
+					    					data[idx].currency+ "<center><input  type='hidden' id='currency' name=entitlementDetails["+idx+"].currency value='" + data[idx].currency +"'></center>",
+					    					data[idx].sourceQuantity + "<input  type='hidden' id='sourceQuantity' name=entitlementDetails["+idx+"].sourceQuantity value='" + data[idx].sourceQuantity +"'>",
+					    					data[idx].targetQuantity + "<input  type='hidden' id='targetQuantity' name=entitlementDetails["+idx+"].targetQuantity value='" + data[idx].targetQuantity +"'>",
+					    					data[idx].price + "<input  type='hidden' id='price' name=entitlementDetails["+idx+"].price value='" + data[idx].price +"'>",
+					    					data[idx].amount + "<input  type='hidden' id='amount' name=entitlementDetails["+idx+"].amount value='" + data[idx].amount +"'>",
+					    					data[idx].taxRate + "<input  type='hidden' id='taxRate' name=entitlementDetails["+idx+"].taxRate value='" + data[idx].taxRate +"'>",
+					    					data[idx].taxAmount + "<input  type='hidden' id='taxAmount' name=entitlementDetails["+idx+"].taxAmount value='" + data[idx].taxAmount +"'>",
+					    					data[idx].netAmount + "<input  type='hidden' id='netAmount' name=entitlementDetails["+idx+"].netAmount value='" + data[idx].netAmount +"'>",
+					    					data[idx].status + "<input type='hidden' id='status' name=entitlementDetails["+idx+"].status value='" + data[idx].status +"'>",
+					 
+					    				]); 
+					//idx.find('#entitlementDetailKey').attr('name', 'entitlementDetails[' + index + '].entitlementDetailKey');
+					$("#actionButton"+idx+"").click(function() {
+						//alert("")
+						//$('#listEntitlement #grid tbody tr').die('click');
+						$('#listEntitlement #grid tbody tr').live('click', function() {
+							editEntitlementAction(this);
+							$("#detailEntitlementAction").dialog('open');
+							$('#listEntitlement #grid tbody tr').die('click');
+								
+						});
+					});
+					} */
+			})
+			
+			$('#process').button("disable");	
+			$('#accounNoHeader').click();
+			return false;
+	});
+	// end of function
+	
+/*
+	// function editEntitlementAction
+	var selectedRow;
+	function editEntitlementAction(actionDetail) {
+			selectedRow = actionDetail;
+			//alert(selectedRow);
+			
+			$('#entitlementActionForm #securitySource').val($(selectedRow).find('#securitySource').val());
+			$('#entitlementActionForm #securityTarget').val($(selectedRow).find('#securityTarget').val());
+			$('#entitlementActionForm #account').val($(selectedRow).find('#account').val());
+			$('#entitlementActionForm #currency').val($(selectedRow).find('#currency').val());
+			$('#entitlementActionForm #sourceQuantity').val($(selectedRow).find('#sourceQuantity').val());
+			$('#entitlementActionForm #targetQuantity').val($(selectedRow).find('#targetQuantity').val());
+			$('#entitlementActionForm #price').val($(selectedRow).find('#price').val());
+			$('#entitlementActionForm #amount').val($(selectedRow).find('#amount').val());
+			$('#entitlementActionForm #taxRate').val($(selectedRow).find('#taxRate').val());
+			$('#entitlementActionForm #taxAmount').val($(selectedRow).find('#taxAmount').val());
+			$('#entitlementActionForm #netAmount').val($(selectedRow).find('#netAmount').val());
+			$('#entitlementActionForm #status').val($(selectedRow).find('#status').val());
+			//alert($(selectedRow).find('#accountX').val());
+			//alert($('#entitlementActionForm #account').val());
+	}
+*/	
+	// to avoid dataTables bug when hiding columns
+	//$('#profilMaster #grid').css('width','');
+	$('#entDet" #grid').css('width','');
+	if ($('#announcementDetailKey').val() == null) {
+		$('.dataTables_scrollBody').css('height', '');
+	}
+	
+});
+	
+//DataTables profile section
+function entitlementDetailGrid() {
+	var tableProfile = 
+		$('#entDet #grid').dataTable({
+			aaSorting:[[1,'asc']],
+			aoColumnDefs: [
+				{bVisible:false, aTargets:[0]},
+				{bSortable:false,aTargets:[2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]}
+			],					
+			bAutoWidth:false,
+			bFilter:false,
+			bInfo:false,
+			bJQueryUI:true,
+			bSearch:true,
+			bFilter:true,
+			bLengthChange:false,
+			bPaginate:false,
+			bScrollCollapse:true,
+			sScrollX:'100%',
+			sScrollY:'180px'
+			
+		});
+	$('#entDet #grid tbody tr').die('click');
+}
+// end of DataTables
+
+</script>
+
+<style>
+	/* #grid {
+		table-layout: fixed;
+	} 
+	
+	div.dataTables_wrapper .ui-widget-header {
+    	width: 2196px;
+	}
+	
+	div#grid_wrapper.dataTables_wrapper table#grid.display {
+		width: 2208px;
+	}
+	
+	*/
+</style>
+
+<form id="entitlementForm" class="form" method="POST">	
+#{hidden id:'taskId', name:'taskId', value:taskId /}
+#{hidden id:'keyId', name:'keyId', value:keyId /}	
+#{hidden id:'from', name:'from', value:from /}
+	<div id="tabs">
+		<ul>
+			<li><a href="#profilMaster">Master</a></li>
+			<li><a href="#entDet">Entitlement Detail</a></li>
+		</ul>	
+		<div class="pane" id="profilMaster">	
+			#{include 'Entitlements/tab_master.html' /}
+		</div>		
+		<div class="pane" id="entDet">
+			<div id="listEntitlement">
+				#{include 'Entitlements/tab_grid_entitlement_detail.html' /}
+			</div>
+		</div>		
+	</div>
+</form>
+	
+<div id="detailEntitlementAction" title="Review Entitlement Detail">
+	#{include 'Entitlements/detail.html' /}
+</div>
+
+
+

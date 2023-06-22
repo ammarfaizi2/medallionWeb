@@ -1,0 +1,38 @@
+<form id="currencyExchangeForm" class="form">
+	#{hidden id:'rowPosition'/}
+	#{hidden id:'currencyExchangeKey', name:'securityLimitDetail.currencyExchangeKey', value:securityLimitDetail?.currencyExchangeKey /}
+		<br>
+		<b><span id="errDetailCurrExchgGlobal" class="error"></span></b>
+		<div id="divEntityCurrencyExchange">
+			<div id="divCurrencyExchangeOtherToBase" class="frmOtherToBase">
+				#{hidden id:'oldSourceCurrency' /}
+				#{hidden id:'newSourceCurrency' /}
+				<p>
+					#{textBox id:'sourceCurrency', name:'currencyExchangeDetail.sourceCurrency.currencyCode', label:'Other Currency', value:currencyExchangeDetail?.sourceCurrency?.currencyCode, class:'capitalize', required:true, readOnly:readOnly, width:'50px', maxLength:'10' /}
+					#{button id:'sourceCurrencyHelp', value:'?', class:'small', readOnly:readOnly /}
+					#{textBox id:'sourceCurrencyDesc', name:'currencyExchangeDetail.sourceCurrency.description', value:currencyExchangeDetail?.sourceCurrency?.description, readOnly:true, width:'222px' /}		
+					<span id="sourceCurrencyError" class="error">#{error 'Source Currency' /}</span>
+				</p>
+			</div>
+			<div id="divCurrencyExchangeBaseToOther" class="frmBaseToOther">
+				#{hidden id:'oldTargetCurrency' /}
+				#{hidden id:'newTargetCurrency' /}
+				<p>
+					#{textBox id:'targetCurrency', name:'currencyExchangeDetail.targetCurrency.currencyCode', label:'Other Currency', value:currencyExchangeDetail?.targetCurrency?.currencyCode, class:'capitalize', required:true, readOnly:readOnly, width:'50px', maxLength:'10' /}
+					#{button id:'targetCurrencyHelp', value:'?', class:'small', readOnly:readOnly /}
+					#{textBox id:'targetCurrencyDesc', name:'currencyExchangeDetail.targetCurrency.description', value:currencyExchangeDetail?.targetCurrency?.description, readOnly:true, width:'222px' /}		
+					<span id="targetCurrencyError" class="error">#{error 'Target Currency' /}</span>
+				</p>
+			</div>
+			<p id="pUnitCurrency">
+				#{textBox id:'unitCurrency', name:'unitCurrency', label:'Unit Currency', value:currencyExchangeDetail?.unitCurrency, format:'#,##0.####', class:'numeric', required:true, readOnly:readOnly, width:'180px' /}
+				#{hidden id:'unitCurrencyStripped', name:'currencyExchangeDetail.unitCurrency', value:currencyExchangeDetail?.unitCurrency /}		
+				<span id="unitCurrencyError" class="error">#{error 'Unit Currency' /}</span>
+			</p>
+			<p>
+				#{textBox id:'exchangeRate', name:'exchangeRate', label:'Exchange Rate', value:currencyExchangeDetail?.exchangeRate, format:'#,##0.####', class:'numeric', required:true, readOnly:readOnly, width:'180px' /}
+				#{hidden id:'exchangeRateStripped', name:'currencyExchangeDetail.exchangeRate', value:currencyExchangeDetail?.exchangeRate /}		
+				<span id="exchangeRateError" class="error">#{error 'Exchange Rate' /}</span>
+			</p>
+		</div>
+</form>

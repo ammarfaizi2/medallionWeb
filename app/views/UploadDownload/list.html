@@ -1,0 +1,98 @@
+#{extends 'templates/list1.html' /}
+#{if action =='Download'}
+	#{set pageTitle: 'Profile Download List ' /}
+#{/if}
+#{if action =='Upload'}
+	#{set pageTitle: 'Profile Upload List ' /}
+#{/if}
+#{set fixData: true /}
+#{set mode: mode /}
+#{script 'lookups.js' /}
+
+<script type="text/javascript">
+	function doEdit(data) {
+		var isSystem = data[data.length-1];
+		if (isSystem == 'YES') {
+			alert('Can not edit system templete');
+		}
+		return (isSystem == 'NO');
+	}
+</script>
+<div id="accordion">
+	<!-- <h3><a href="#">Profile List</a></h3> -->
+	<form id="uploadDownloadForm">
+		<table class="display">
+			<thead>
+				<tr>
+					<th>Profile Key</th>
+					<th align="left">Profile ID</th>
+					<th align="left">Profile Name</th>
+					<th align="center">Status</th>
+					<th align="left">Action</th>
+					<th align="left">Template</th>
+					<th align="center">System</th>
+				</tr>
+			</thead>
+			<tbody>
+			#{list profiles, as:'profile'}
+				<tr>
+					<td>${profile[0]}</td>
+					<td align="left">${profile[1]}</td>
+					<td align="left">${profile[2]}</td>
+					<td align="center">${profile[3] ? 'YES' : 'NO'}</td>
+					<td align="left">${profile[4]}</td>
+					<td align="left">${profile[5]}</td>
+					<td align="center">${profile[6] ? 'YES' : 'NO'}</td>
+				</tr>
+			#{/list}
+			</tbody>
+		</table>
+		<p>
+			<div class="buttons">
+				#{if action =='Download'}
+				<input id='btnNewDownload' type="button" value="New Profile" ></input>
+				#{/if}
+				#{if action =='Upload'}
+				<input id='btnNewUpload' type="button" value="New Profile" ></input>
+				#{/if}
+			</div>
+			<!-- <div class="buttons">
+				<input id='btnNewUpload' type="button" value="New Upload" ></input>
+				<input id='btnUploadData' type="button" value="Upload" ></input>
+				<input id='btnExecuteUpload' type="button" value="Exec Upload" ></input>
+			</div> -->
+		</p>
+	</form>
+</div>	
+
+<div id="result" style="display:none">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<div class="response"></div>
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('.buttons input:button').button();
+		
+		$('#btnNewDownload').click(function(){
+			$('#uploadDownloadForm').attr('action', 'downloadentry').submit();
+		});
+		$('#btnNewUpload').click(function(){
+			$('#uploadDownloadForm').attr('action', 'uploadentry').submit();
+		});
+		/* $('#btnDownloadData').click(function(){
+			$('#uploadDownloadForm').attr('action', 'downloaddata').submit();
+		});
+		$('#btnUploadData').click(function(){
+			$('#uploadDownloadForm').attr('action', 'uploaddata').submit();
+		});
+		$('#btnExecuteUpload').click(function(){
+			$('#uploadDownloadForm').attr('action', 'executeupload').submit();
+		}); */
+	});
+</script>
+
+
+
+	
+

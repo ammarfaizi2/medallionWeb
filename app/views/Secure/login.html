@@ -1,0 +1,147 @@
+#{extends 'templates/main.html' /}
+
+#{script 'jquery.rc4.js' /}
+#{if session.username}
+	<script type="text/javascript">
+		$(function() {
+			var returnData;
+	    	$.ajaxSetup({ async : false });
+			$.get("@{Secure.logout(session.auditTrailKey)}", function(data) {
+				returnData = data;
+			});
+		});
+	</script>
+#{/if}
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		
+		function generateUUID() {
+		    var d = new Date().getTime();
+		    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+		        var r = (d + Math.random()*16)%16 | 0;
+		        d = Math.floor(d/16);
+		        return (c=='x' ? r : (r&0x7|0x8)).toString(16);
+		    });
+		    return uuid;
+		};
+		
+		function encrypt() {
+			var id = generateUUID();
+			$("#uuid").val(id);
+			//redmine #3427
+			$('#password').val($('#ipassword').val());
+			for (i = 0; i < id.length; i++) {
+				if (!isNaN(id.substring(i, i+1))) {
+					var start = Number(id.substring(i, i+1));
+					if ($('#password').val() != '') {
+						$('#password').rc4({ key: id.substring(start, start + 8) });
+					}
+					break;
+				}
+			}		
+		}
+		
+		var cDialog = $("#dialogConfirm" ).dialog({
+			autoOpen: false,
+			resizable: false,
+		    height: "auto",
+		    width: 400,
+		    modal: true,
+		    buttons: {
+		    	"Yes": function() {
+		    		$(this).dialog("close");
+		    		$("#signin").click();
+		        },
+				"No": function() {
+		          $(this).dialog("close");
+		          var sPassword = $('#password');
+		          sPassword.val(passwordBeforeEncy);
+		        }
+		      }
+		});
+		
+		$('#prelogin').add('#signin').button();
+		$('#loginForm').submit(function() {
+			encrypt();
+			return true;
+		});
+		
+		var passwordBeforeEncy;
+		$('#prelogin').click(function(){
+			//redmine #3427
+			var nePassword = $('#ipassword');
+			passwordBeforeEncy = nePassword.val(); 
+			
+			
+			encrypt();
+			var pUsername = $('#username');
+			var sPassword = $('#password');
+			var uUUID = $('#uuid');
+			
+			var data = $.ajax({
+				type : "GET", 
+				url : "@{Secure.preAuthenticate()}?username="+pUsername.val()+"&password="+sPassword.val()+"&uuid="+uUUID.val(), 
+				async : false,
+			    contentType : 'application/json; charset=utf-8'
+			});
+			
+			var sts = data.responseText;
+			if (sts == "LOGINFAIL") {
+				$("#signin").click();
+			}else if (sts == "LOGINSUCCESS") {
+				$("#signin").click();
+			}else{
+				$("#confirmMsg").html(sts);
+				cDialog.dialog('open');
+			}			
+		});
+		
+		
+	});
+</script>
+
+<div id="news"></div>
+
+<div id="login">
+	
+	<h2>&{'secure.title'}</h2>
+		
+	<form id="loginForm" action="@{Secure.authenticate()}" method="POST" class="form">
+		#{if flash.success}
+			<div class="success">
+				&{flash.success}
+			</div>
+		#{/if}
+		#{ifErrors}			
+			<p class="error">
+			#{errors}
+				${error}
+			#{/errors}
+			</p>
+		#{/ifErrors}
+		
+		<div style="padding-left:15px">	
+			<p id="username-field">
+				<label for="username">&{'secure.username'}</label>
+				<input type="text" name="username" id="username" value="${flash.username}" />
+			</p>
+			<p id="password-field">
+				<label for="password">&{'secure.password'}</label>
+				<input type="password" name="ipassword" id="ipassword" value="" />
+			</p>
+			<p id="signin-field">
+				<input type="submit" id="signin" value="&{'secure.signin'}"  style="display: none;"/>
+				<input type="button" id="prelogin" value="&{'secure.signin'}" />
+			</p>
+			<input id="uuid" name="uuid" type="hidden" >
+			<!-- redmine #3427 -->
+			<input type="hidden" name="password" id="password"/>
+		</div>
+	</form>
+	
+	<div id="dialogConfirm" title="Confirmation">
+  		<p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span><span id='confirmMsg'></span></p>
+	</div>
+ 
+</div>

@@ -1,0 +1,305 @@
+#{extends 'templates/list2.html' /}
+#{set pageTitle: 'Fund Transfer Approval' /}
+#{script 'lookuppaging.js' /}
+#{script 'lookups.js' /}
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	$(function() {
+		// DECLARE CLASS BTN
+		$(".btn").button();
+		$(".btn").css("width", "100px");
+		//===============
+		$('#approve').button();
+		$('#reject').button();
+		
+		
+		var backToWorkList = function() {
+			loading.dialog('open');
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			};
+		}
+		
+		var closeDialog = function(){
+			$("#dialog-message").dialog("close");
+		};
+		
+		$('#approve').click(function() {
+			var action = "@{approve()}?taskId=${taskId}&maintenanceLogKey=${maintenanceLogKey}&operation=${operation}";
+			loading.dialog('open');
+			$.post(action, function(data, status, xhr) {
+				loading.dialog('close');
+				if (data.status == 'success') {
+					messageAlertOk("Fund Transfer with no ${fundTransfer.batchKey} is Approved", "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+				} else {
+					messageAlertOk(data.message, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialog);
+				}
+			});			
+		});
+		
+		$('#reject').click(function() {
+			var action = "@{reject()}?taskId=${taskId}&maintenanceLogKey=${maintenanceLogKey}&operation=${operation}";
+			loading.dialog('open');
+			$.post(action, function(data, status, xhr) {
+				loading.dialog('close');
+				if (status == 'success') {
+					messageAlertOk("Fund Transfer with no ${fundTransfer.batchKey} is Rejected", "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+				} else {
+					messageAlertOk(data.message, "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+				}
+			});
+		});
+		
+		$('#closeWorkflow').click(function() {
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			}
+		});
+		
+		$("#accountNoKsei").dynapopup('PICK_CS_ACCOUNT_FUND_TRANSFER', '', 'btnPopulateKsei');
+		
+		$('#securityType').lookup({
+			list:'@{Pick.securityTypes()}',
+			get:{
+				url:'@{Pick.securityType()}',
+				success: function(data){
+					$('#securityType').removeClass('fieldError');
+					$('#securityTypeId').val(data.code);
+					$('#securityTypeName').val(data.description);
+					$('#h_securityTypeName').val(data.description);
+					$('#securityCode').val('');
+					$('#securityCodeId').val('');
+					$('#securityCodeName').val('');
+					$('#securityType').change();
+ 				},
+				error: function(data){
+					$('#securityType').addClass('fieldError');
+					$('#securityType').val('');
+					$('#securityTypeId').val('');
+					$('#securityTypeName').val('NOT FOUND');
+					$('#h_securityTypeName').val('');
+					$('#securityType').change();
+				}
+			},
+			description:$('#securityTypeName'),
+			help:$('#securityTypeHelp'),
+			nextControl:$('#securityCode')
+		});
+		
+		$('#currency').lookup({
+			list:'@{Pick.currencies()}',
+			get:{
+				url:'@{Pick.currency()}',
+				success: function(data) {
+					if (data) {
+						$('#currency').removeClass('fieldError');
+						$('#currency').val(data.code);
+						$('#currencyDesc').val(data.description);
+						$('#h_currencyDesc').val(data.description);
+					}
+				},
+				error : function(data) {
+					$('#currency').addClass('fieldError');
+					$('#currencyDesc').val('NOT FOUND');
+					$('#currency').val('');
+					$('#h_currencyDesc').val('');
+				}
+			},
+			key:$('#currency'),
+			description:$('#currencyDesc'),
+			help:$('#currencyHelp')
+		});
+		
+		$(".buttons").css("display","none");
+		$("#approval-actions").css("display","block");
+		if("${fundTransfer.endSettleDate}" == ""){
+			$("#kseiDateFrom").val("");
+			$("#checkAsOfKseiDate").attr('checked',true);
+			$("#checkKseiFromTo").attr('checked',false);
+
+			$("#asOfDateKsei").val("${fundTransfer.startSettleDate.format(appProp.dateFormat)}");
+			$("#kseiDateFrom").val("");
+			$("#kseiDateTo").val("");
+		}else{
+			$("#kseiDateFrom").val("${fundTransfer.startSettleDate.format(appProp.dateFormat)}");
+			$("#kseiDateTo").val("${fundTransfer.startSettleDate.format(appProp.dateFormat)}");
+			$("#checkAsOfKseiDate").attr('checked',false);
+			$("#checkKseiFromTo").attr('checked',true);
+		}
+		
+		if("${fundTransfer.accountNo}" != ""){
+			$('#accountNoKsei').removeAttr('disabled');
+			$('#accountNoKsei').val("${fundTransfer.accountNo}");
+			$('#accountNoKsei').blur();
+			$('#accountNoKsei').attr('disabled', 'disabled');
+		}
+		
+		if("${fundTransfer.transactionType}" != ""){
+			$('#transType').removeAttr('disabled');
+			$('#transType').val("${fundTransfer.transactionType}");
+			$('#transType').attr('disabled', 'disabled');
+		}
+		
+		if("${fundTransfer.securityType}" != ""){
+			$('#securityType').removeAttr('disabled');
+			$('#securityType').val("${fundTransfer.securityType}");
+			$('#securityType').blur();
+			$('#securityType').attr('disabled', 'disabled');
+		}
+		
+		if("${fundTransfer.transferType}" != ""){
+			$('#transferType').removeAttr('disabled');
+			$('#transferType').val("${fundTransfer.transferType}");
+		}
+		
+		if("${fundTransfer.currency}" != ""){
+			$('#currency').removeAttr('disabled');
+			$('#currency').val("${fundTransfer.currency}");
+			$('#currency').blur();
+		}
+		if(${fundTransfer.processMode}){
+			$('#checkDefaultKsei').removeAttr('disabled');
+			$('#checkDefaultKsei').attr('checked',true);
+		}else{
+			$('#checkTransactionKsei').removeAttr('disabled');
+			$('#checkTransactionKsei').attr('checked',true);
+		}
+
+		$('#transferType').attr('disabled', 'disabled');
+		$('#currency').attr('disabled', 'disabled');
+		$('#checkDefaultKsei').attr('disabled', 'disabled');
+		$('#checkTransactionKsei').attr('disabled', 'disabled');
+		
+		$('#securityType').attr('disabled', 'disabled');
+	});
+
+</script>
+
+<div id="detail">
+	<form id="form" class="form">
+		<p>
+			#{textBox id:'fundBatchNoKsei', label:'Fund Batch No', value:fundTransfer?.batchKey, width:'120px', readOnly:true, class:'capitalize', required:false /}
+		</p>
+		<p> 
+			<label>Settlement Date</label>
+			<input id='checkAsOfKseiDate' type='radio' name='checkSettlementDate' checked="checked" disabled="disabled"/>
+			<b>As Of&nbsp;</b>
+			#{textBox id:'asOfDateKsei', label:'', width:'80px', readOnly:true, class:'calendar', required:false /}
+		</p>
+		<p>
+			<label>&nbsp;</label>
+			<input id='checkKseiFromTo' type='radio' name='checkSettlementDate'  disabled='disabled'/>
+			<b>From&nbsp;</b>
+			#{textBox id:'kseiDateFrom', label:'', width:'80px', readOnly:true, class:'calendar', required:false /}
+			<b>&nbsp;To&nbsp;</b>
+			#{textBox id:'kseiDateTo', label:'', width:'80px', readOnly:true, class:'calendar', required:false /}
+		</p>
+		<p>
+			#{textBox id:'accountNoKsei', label:'Account No', width:'120px', readOnly:true, class:'capitalize', required:false /}
+			#{hidden  id:'accountNoKseiKey' /}
+			#{button  id:'accountNoKseiHelp', value:'?', class:'small', readOnly:true/}
+			#{textBox id:'accountNoKseiDesc', readOnly:true, width:'245px' /}
+		</p>
+		<p>
+			#{dropDownList id:'transType', label:'Transaction Type', options:transactionType, readOnly:readOnly,width:'120px', required:true /}
+			<span id="transTypeError" class="error"></span>
+		</p>
+		<p>
+			#{textBox id:'securityType',width:'120px', name:'', label:'Security Type', value:'', class:'capitalize' /}
+			#{hidden id:'securityTypeId', name:'params.securityTypeSearchId', value:params?.securityTypeSearchId /}
+			#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:true /}
+			#{textBox id:'securityTypeName', name:'transaction.transactionTemplate.securityType.description', value:transaction?.transactionTemplate?.securityType?.description, readOnly:true, width:'245px' /}
+			<span id="securityTypeError" class="error"></span>
+		</p>
+		<p>
+			#{dropDownList id:'transferType', label:'Transfer Type', options:transferType, readOnly:readOnly,width:'120px', required:true /}
+			<span id="transferTypeError" class="error"></span>
+		</p>
+		<p>
+			#{textBox id:'currency', name:'', label:'Currency', class:'capitalize', required:true, readOnly:readOnly, width:'120px', maxLength:'10' /}
+			#{button id:'currencyHelp', value:'?', class:'small', readOnly:true /}
+			#{textBox id:'currencyDesc', name:'', readOnly:true, width:'245px' /}	
+			<span id="currencyError" class="error"></span>	
+		</p>
+		<p>
+			<label>Process Mode</label>
+			<input id='checkDefaultKsei' type='radio' name='checkProcessMode' checked="checked"/><b>&nbsp;Group</b>
+			<input id='checkTransactionKsei' type='radio' name='checkProcessMode'/><b>&nbsp;Transaction</b>
+		</p>
+		<p>&nbsp;</p>
+		<table id="grid" class="display">
+			<thead>
+				<tr>
+					<th>code</th>
+					<td>No</td>
+					<td>Date</td>
+					<td>Account&nbsp;No</td>
+					<td>Security</td>
+					<td>Currency</td>
+					<td>Transaction&nbsp;No</td>
+					<td>Payment&nbsp;Amount</td>
+					<td>DR/CR</td>
+					<td>Status</td>
+					<td>Sender&nbsp;Branch&nbsp;Code</td>		
+					<td>Sender&nbsp;Bank&nbsp;Code</td>				
+					<td>Sender&nbsp;A/C&nbsp;No</td>
+					<td>Sender&nbsp;A/C&nbsp;Name</td>
+					<td>Sender&nbsp;Currency</td>
+					<td>Benef&nbsp;Bank&nbsp;Code</td>
+					<td>Benef&nbsp;Bank&nbsp;Name</td>					
+					<td>Benef&nbsp;A/C&nbsp;No</td>
+					<td>Benef&nbsp;A/C&nbsp;Name</td>
+					<td>Benef&nbsp;Currency</td>
+					<td>Charge&nbsp;Amount</td>
+					<td>Net&nbsp;Payment&nbsp;Amount</td>
+					<td>Payment&nbsp;Type&nbsp;Code</td>
+				</tr>
+			</thead>
+			<tbody>
+			#{list items:details, as:'detail'}
+				<tr>
+					<td class="capitalize">${detail.noSeq}</td>
+					<td class="capitalize">${detail.noSeq}</td>
+					<td class="capitalize">${detail.valueDate.format(appProp.dateFormat)}</td>
+					<td class="capitalize">${detail.acctNo}</td>
+					<td class="capitalize">${detail.security}</td>
+					<td class="capitalize">${detail.currency}</td>
+					<td class="capitalize">${detail.transactionNo}</td>
+					<td class="capitalize" align="right">${detail.amountStr}</td>
+					<td class="capitalize">${detail.transType}</td>
+					<td class="capitalize">${detail.status}</td>
+					<td class="capitalize">${detail.senderBranchCode}</td>	
+					<td class="capitalize">${detail.senderBankCode}</td>					
+					<td class="capitalize">${detail.senderAcctNo}</td>
+					<td class="capitalize">${detail.senderAcctName}</td>
+					<td class="capitalize">${detail.currency}</td>
+					<td class="capitalize">${detail.benefBankCode}</td>
+					<td class="capitalize">${detail.benefBankName}</td>					
+					<td class="capitalize">${detail.benefAccNo}</td>
+					<td class="capitalize">${detail.benefAccName}</td>
+					<td class="capitalize">${detail.currency}</td>
+					<td class="capitalize" align="right">${detail.chargeAmountStr}</td>
+					<td class="capitalize" align="right">${detail.netAmountStr}</td>
+					<td class="capitalize">${detail.paymentTypeCode}</td>					
+				</tr>
+			#{/list}
+			</tbody>
+		</table>
+	</form>
+</div>	
+
+<input type="button" id="approve" value="Approve" class="btn" />
+<input type="button" id="reject" value="Reject" style="margin:5px;" class="btn" />		
+<input type="button" id="closeWorkflow" value="Cancel" class="btn" />
+	
+<span id="approval-actions">
+	#{hidden id:'taskId', name:'taskId', value:taskId /}
+	#{hidden id:'maintenanceLogKey', name:'maintenanceLogKey', value:maintenanceLogKey /}
+	#{hidden id:'operation', name:'operation', value:operation /}
+	#{hidden id:'from', name:'from', value:from /}
+</span>

@@ -1,0 +1,93 @@
+#{extends 'templates/main.html' /}
+#{set readOnly:((mode !='edit' && mode !='entry') || confirming) /}
+<script type="text/javascript">
+	$(function() {
+		$('.buttons input:button').button();
+		
+		var backToEntry = function() {
+			loading.dialog('open');
+			location = "@{entry()}";
+		}
+		
+		var closeDialogMessage = function() {
+			$("dialog-message").dialog('close');
+		}
+
+		// Action buttons
+		$('#save').click(function(){
+			var action = "@{save()}?mode=${mode}";
+			/* var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+			loading.dialog({
+				closeOnEscape: false,
+				draggable: false,
+				modal: true,
+				resizable: false,
+				open:function() {
+					$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+				} 
+			}); */
+			loading.dialog('open');
+			$('#timeDepositBreakForm').attr('action', action);
+			$('#timeDepositBreakForm').submit();
+		});
+
+		$('#confirm').click(function() {
+			var action = "@{confirm()}?mode=${mode}";
+			loading.dialog('open');
+			/* var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+			loading.dialog({
+				closeOnEscape: false,
+				draggable: false,
+				modal: true,
+				resizable: false,
+				open:function() {
+					$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+				} 
+			}); */
+			$.post(action, $('#timeDepositBreakForm').serialize(), function(data, status) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (status == 'success') {
+					//alert("Your transaction no is " + data);
+					//location = "@{entry()}";
+					messageAlertOk("Your Transaction No is #" + data, "ui-icon ui-icon-circle-check", "Notification", backToEntry);
+				} else {
+					//alert("Failed saving data!");
+					messageAlertOk("Failed saving data!", "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+				}
+			});
+		});
+	
+		$('#back').click(function() {
+			location.href = '@{back()}?mode=${mode}';		
+		});
+
+		$('#clear').click(function() {
+			var action = "@{clear()}?mode=${mode}#{if id}&id=${id}#{/if}";
+			$.post(action, $('#timeDepositBreakForm').serialize(), function(data, status, xhr) {
+	    		checkRedirect(data);
+				if (status == 'success') {
+					$('#detail').html(data);
+				//	$("#actions #confirming").css('display', 'none');
+				//	$('#actions #editing').css('display', '');
+				}
+			});	
+			
+		});
+	});
+</script>
+<h2>Time Deposit Break</h2>
+<div id="detail">
+	#{include 'TimeDepositBreaks/detail.html' /}	
+</div>
+<div id="actions" class="buttons">
+	#{if confirming}
+		<input type="button" id="confirm" value="Confirm" />
+		<input type="button" id="back" value="Back" />
+	#{/if}
+	#{else}
+		<input type="button" id="save" value="Save" />
+		<input type="button" id="clear" value="Clear" />
+	#{/else}
+</div>
+	

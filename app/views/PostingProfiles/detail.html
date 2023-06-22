@@ -1,0 +1,55 @@
+#{extends 'templates/detail1.html' /}
+#{set pageTitle: 'Posting Profile' /}
+#{set faPostingProfile?.postingProfileKey /}
+#{set mode: mode /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{set id:faPostingProfile?.postingProfileKey /}
+#{script 'date.format.js' /}
+#{script 'lookups.js' /}
+
+<script type="text/javascript">
+	$(function() {
+		
+		$('.buttons button').button();
+		
+		$('.buttons #newRules').click(function() {
+			location.href='@{PostingRules.list(faPostingProfile?.postingProfileKey)}';
+			return false;
+		});
+
+		if (('${mode}'=='entry') || (('${mode}'=='edit') && (('${faPostingProfile?.recordStatus?.decodeStatus()}' == 'Reject')|| ($("#status").val() == 'R' )))) {
+			$('input[name=isActive]').attr("disabled", "disabled");
+			$('.buttons #newRules').button("option","disabled",true);
+		}
+		
+		if (($('#isActive2').is(":checked"))||('${mode}'=='view')) $('.buttons #newRules').button("option","disabled",true);
+		
+		$('input[name=isActive]').change(function(){
+			$("input[name='faPostingProfile.isActive']").val($("input[name='isActive']:checked").val());
+		});
+		
+		if ('${confirming}'=='true'){
+			$('.buttons #newRules').button("option","disabled",true);
+		}
+	});
+</script>
+
+
+#{hidden id:'profileKey', name:'faPostingProfile.postingProfileKey', value:faPostingProfile?.postingProfileKey /}
+#{hidden id:'status', name:'status', value:status /}
+<p>
+	#{textBox id:'profileCode', name:'faPostingProfile.profileCode', label:'Code', value:faPostingProfile?.profileCode, class:'capitalize', required:true, readOnly:readOnly, maxLength:50 /}
+	<span class="error">#{error 'Code is' /}</span>
+</p>
+<p>
+	#{textBox id:'profileName', name:'faPostingProfile.profileName', label:'Name', value:faPostingProfile?.profileName,  class:'capitalize',required:true, readOnly:readOnly, width:'300px', maxLength:100 /}
+	<span class="error">#{error 'Name is' /}</span>
+</p>	
+<p>
+	#{radioButton id:'isActive', name:'isActive', value:((faPostingProfile?.isActive)?'true':'false'), label:'Active', options:operators, readOnly:readOnly /}
+	#{hidden id:'isActiveHidden', name:'faPostingProfile.isActive', value:((faPostingProfile?.isActive)?'true':'false') /}
+</p>
+
+<div class="buttons">
+	<button id="newRules">Rules</button>
+</div> 

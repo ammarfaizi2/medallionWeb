@@ -1,0 +1,40 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Password Management' /}
+
+<script type="text/javascript">
+	/* function doEdit(data) {
+		if ((data[3] == "New") || (data[3] == "Updated")) {
+			view(data[0]);
+			return false;
+		} else {
+			return true;
+		}
+	} */
+</script>
+<table class="display">
+	<thead>
+		<tr>
+			<th width="0">ParamId</th>
+			<th>Min Length</th>
+			<th>Max Length</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:passParams, as:'pass'}
+		<tr>
+			<td>
+				${pass?.paramId} 
+			</td>
+			<td>
+				${pass?.minLength}
+			</td>
+			<td>
+				${pass?.maxLength}
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>
+	
+
+

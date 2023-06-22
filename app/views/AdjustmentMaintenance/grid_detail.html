@@ -1,0 +1,30 @@
+#{hidden id:'rowNumber' /}
+<table id="gridAdjustmentDetail" class="display">
+	<thead>
+		<tr>
+			<th>Currency</th>
+			<th>Operator</th>
+			<th>Adjustment Value</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list adjustmentMaster?.gnAdjustmentDetails, as:'gnAdjustmentDetail'}
+		<tr>
+			<td>
+				${gnAdjustmentDetail?.currency?.currencyCode}
+			</td>
+			<td>
+				${gnAdjustmentDetail?.operator?.lookupCode}
+			</td>
+			<td>
+				${gnAdjustmentDetail?.value}
+			</td>
+			<td>
+				#{hidden id:'adjustmentDetailKey', name:'gnAdjustmentDetails[' + (gnAdjustmentDetail_index-1) + '].adjustmentDetailKey', value:gnAdjustmentDetail?.adjustmentDetailKey /}
+				<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} /></center>
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>

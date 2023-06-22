@@ -1,0 +1,1870 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: ' ' /}
+#{set id:customer?.customerKey /}
+#{set mode: mode /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+#{script 'date.format.js' /}
+#{script 'external/Util.js' /}
+
+#{if flash.error || errors}
+    <div class="error">
+    	<b>Error when saving data!</b><br/><br/>
+    	#{if flash.error}
+<li>${flash.error}</li>
+		#{/if}
+		#{ifErrors}
+			#{errors}
+<li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}
+
+<script type="text/javascript">	
+	$(function() {
+		#{include 'RegistrySubscription/Util.js' /}
+		#{include 'Investors/contact.js' /}
+		#{include 'Investors/bankAccount.js' /}
+		
+		$('.buttons input:button').button();
+		
+		var addressTypeDescription;
+		var sameAsDescription;
+		var currentDate = $('#currentDate').datepicker('getDate');
+		var closeDialog = function() {
+			$("#dialog-message").dialog('close');	
+		}
+		
+		var backToList = function() {
+			loading.dialog('open');
+			location = "@{dedupe()}";
+		}
+		
+		var backToListEdit = function() {
+			loading.dialog('open');
+			location.href='@{list()}?mode=edit&param=edit' ;
+		};
+		
+		if ('${mode}'=='entry' && '${status}'=='N'){
+			messageAlertOk("Your Investor No : '${customer?.customerNo}'", "ui-icon ui-icon-circle-check", "Notification", backToList);
+		}
+		
+		if ('${mode}'=='edit' && ('${status}'=='U' || '${status}'=='N')){
+			messageAlertOk("Investor No : '${customer?.customerNo}' Successfully Updated", "ui-icon ui-icon-circle-check", "Notification", backToListEdit);
+		}
+		
+		CUSTOMER_TYPE_I = '${typeIndi}';
+		CUSTOMER_TYPE_C = '${typeCorp}';
+
+		$("#dialog-message-1").css("display","none");
+		$("#dialog-message-2").css("display", "none");
+		$('#tabs').tabs();
+		$('#tabs').css('height','auto' );
+		
+		$('#detailContactCorp').css("display","none");
+		$('#detailBankAccount').css("display","none");
+		
+		if ('${mode}' == 'view'){
+			$('#customerType').change(adjustCustomerType);
+			adjustCustomerType();
+		
+			if ($('#param').val() == 'customer-inquiry') {
+				$("#tabs").tabs("select", "#tabs-6");
+			}
+		}
+		
+		if ('${mode}' == 'edit'){
+			$('#customerType').change(adjustCustomerType);
+			adjustCustomerType();
+			
+		}
+
+		if ('${mode}' == 'entry'){
+			adjustCustomerType();
+		}
+		
+		if (('${mode}'=='entry') || (('${mode}'=='edit') && (('${customer?.recordStatus?.decodeStatus()}' == 'Reject') || ($("#status").val() == 'R' )))) {
+			$('input[name=isActive]').attr("disabled", "disabled");
+		}
+		
+		$('input[name=isActive]').change(function(){
+			var isActiveTrue = function() {
+				$("#isActive1").attr("checked", true);
+				$("input[name='customer.isActive']").val($("input[name='isActive']:checked").val());
+				$("#dialog-message").dialog("close");
+			}  
+			
+			$("input[name='customer.isActive']").val($("input[name='isActive']:checked").val());
+			if ($("input[name='customer.isActive']").val()=='false'||$("input[name='customer.isActive']").val()==false){
+				messageAlertYesNo("Are you sure to inactive data ?", "ui-icon ui-icon-notice", "Confirmation Message", closeDialog, isActiveTrue);
+			}
+		});
+		
+		#{if mode == 'view' || confirming || taskId != null}
+			$('#saveCon').css("display","none");
+			$('#cancelCon').css("display","none");
+			
+			$('#saveBnAccount').css("display","none");
+			$('#cancelBnAccount').css("display","none");
+			
+		#{/if}
+		#{else}
+			$('#closeCon').css("display","none");
+			$('#closeBnAccount').css("display","none");
+		#{/else}
+		
+		$('#continueInvt').click(function() {			
+			location.href='@{RegistryInvestment.entry()}?customerKey=${customer?.customerKey}&param=register-invt-acct';
+			return false;		
+		});
+		
+		// event button new data contact ========================================================================================
+		$('.buttons #newContact').click(function() {
+			newContact();	
+			return false;
+		});
+		// ======================================================================================================================
+		
+		$('.buttons #newAccount').click(function() {
+			$('#detailBankAccount').dialog('open');
+			$('.errorMessage').html("");
+			$("#bankAccountDetailForm input:text").val(""); 
+			$("#bankAccountDetailForm input:hidden").val("");
+			$('#bankAccountDetailForm #description').val("");
+			$("#bankAccountDetailForm .error").html("");
+			$('.ui-widget-overlay').css('height',$('body').height());
+			return false;
+		});	
+		
+		$('#backCustBankInvt').click(function() {	
+			//history.back();
+			if ('${param}' != "") {
+				if ('${param}' == 'dedupe') {
+					location.href='@{dedupe()}';
+				} else if('${param}'=='edit') {
+					location.href='@{list()}?mode=edit&param=edit';
+				} else {
+					location.href='@{list()}#{if mode}?mode=${mode}&param=${param}#{/}';
+				}
+			} else {
+				location.href='@{list()}?mode=view';
+			}
+			
+			return false;
+		});
+
+		$('#cancelCon').click(function(){
+			$('#detailContactCorp').dialog('close');
+			return false;
+		});
+		
+		$('#closeCon').click(function(){
+			$('#detailContactCorp').dialog('close');
+			return false;
+		});
+		
+		$('#cancelBnAccount').click(function(){
+			$('#detailBankAccount').dialog('close');
+			return false;
+		});
+		
+		$('#closeBnAccount').click(function(){
+			$('#detailBankAccount').dialog('close');
+			return false;
+		});
+		
+		$('#closeConApp').click(function(){
+			$('#detailContactCorp').dialog('close');
+			return false;
+		});
+		
+		$('#mainCancel').click(function(){
+			if ('${mode}' == 'entry') {
+				location.href='@{dedupe()}';
+				return false;
+			}
+			location.href='@{list()}?mode=edit' + '&param=edit' ;
+			return false;
+		});
+
+		function validateForm(){
+			var checkError = false;
+			$('input.fieldError').each(function(idx, obj){
+				var curObj = $(obj);
+				var reqClass = curObj.parent().find("label span.req");
+				/*if( reqClass[0] == undefined ){// not required
+					reqClass = curObj.parent().parent().find("label span.req");
+				}*/
+				if( reqClass[0] == undefined ) {
+					// not required
+					if( curObj.val() !='' && curObj.hasClass("fieldAppDateError") ){//date harus dikosongin
+						//console.log(curObj.attr("id")+" has fieldError1");
+						checkError = true;
+					}
+
+				}else{ 
+					// required
+					if( curObj.hasClass('fieldError') ){
+//						console.log(curObj.attr("id")+" has fieldError2");
+						checkError = true;
+					}
+				}
+			});
+			
+			var checkSelectError = false;
+			$('select.fieldError').each(function(idx, obj){
+				var curObj = $(obj);
+				var reqClass = curObj.parent().find("label span.req");
+				/*if( reqClass[0] == undefined ){// not required
+					reqClass = curObj.parent().parent().find("label span.req");
+				}*/
+				
+				if( reqClass[0] == undefined ) {
+					// not required
+					if( curObj.hasClass("fieldAppDateError") ){
+						checkSelectError = true;
+					}
+				}else{ 
+					// required
+					if( curObj.hasClass('fieldError') ){
+						console.log(curObj.attr("id")+" has fieldError");
+						checkSelectError = true;
+					}
+				}
+			});
+			
+		}
+		
+		$('#save').click(function(){
+			var select_customer;
+			//var checkError = $('input').hasClass('fieldError');
+			var checkError = validateForm();
+			var checkClassForIndividu = $('.individual').hasClass('fieldError');
+			var checkClassForDropDown = $(".dropdown").hasClass('fieldError');
+			var checkClassForIndi = $(".forIndi").hasClass('fieldError');
+			var checkClassForCorp = $(".forCorp").hasClass('fieldError');
+			checkIden();
+			checkDoc();
+			select_customer = $('#customerType').val();
+			var lengthTableBnAccount = $('#gBank #grid-bank').dataTable().fnGetNodes().length;
+			console.log("aaaa "+lengthTableBnAccount+": "+checkError+" : "+checkClassForIndividu
+					+": "+checkClassForDropDown+" : "+checkClassForIndi+": "+checkClassForCorp);
+			if (lengthTableBnAccount == 0){
+				$("#tabs").tabs("select", "#tabs-5");
+				$('#errGlobalBankAccount').html('Must have at least One Data!');
+				#{if mode == 'entry'}
+					return false;
+				#{/if}
+				#{else}		
+					return true;
+				#{/else}
+				
+			} else if (checkError || checkClassForDropDown || checkClassForIndividu || checkClassForIndi || checkClassForCorp ) {
+				return false;
+	    	} else {
+	    		$('#errGlobalBankAccount').html('');
+	    		if (select_customer=='${typeIndi}'){
+	    			$(".corporate_only").remove();
+					$(".forCorp").val("");
+					$(".forCorp").remove(); 
+			    	$(".default").remove();
+			    	
+			    	
+				} else {
+					$(".individual_only").remove();
+					$(".forIndi").val("");
+					$(".forIndi").remove(); 
+			    	$(".default").remove();
+			    	
+			    	
+			    }
+	    		var action ='@{save()}?mode=${mode}#{if group}&group=${group}#{/}#{if isPartial}&isPartial=${isPartial}#{/}';
+				loading.dialog('open');
+				$('#customerForm').attr('action', action);
+				$('#customerForm').submit();
+	    	}
+		});
+		
+		$('#confirm').click(function(){		
+			var select_customer; 
+			select_customer = $('#customerType').val();
+	    	if (select_customer == '${typeIndi}'){
+				$(".corporate_only").remove(); 
+		    	$(".default").remove();
+		    	
+			} else {
+		    	$(".individual_only").remove();
+		    	$(".default").remove();
+		    	
+		    } 
+	    	var action ='@{confirm()}?mode=${mode}#{if group}&group=${group}#{/}#{if param}&param=${param}#{/}#{if isPartial}&isPartial=${isPartial}#{/}';
+			loading.dialog('open');
+			$('#customerForm').attr('action', action);
+			$('#customerForm').submit();
+		});
+		
+		$('#back').click(function(){
+			location.href='@{back(id)}?mode=${mode}#{if status}&status=${status}#{/}#{if group}&group=${group}#{/}#{if param}&param=${param}#{/}#{if from}&from=${from}#{/}#{if isPartial}&isPartial=${isPartial}#{/}';
+			return false;
+		});
+		
+		$('#addresses').tabs();
+		$('#accounts').tabs();
+
+		$('#corporate_only').tabs();
+		
+		$('.calendar').datepicker();
+		
+		// contact detail initialize ============================================================================================
+		$("#detailContactCorp").dialog({
+			autoOpen:false,
+			heigth:'700px',
+			width:'900px',
+			resizable:false,
+			modal:true			
+		});
+		// ======================================================================================================================
+		
+		// Bank Account detail initialize ============================================================================================
+		$("#detailBankAccount").dialog({
+			autoOpen:false,
+			heigth:'800px',
+			width:'600px',
+			resizable:false,
+			modal:true			
+		});
+		// ======================================================================================================================
+		
+		// branch lookup ========================================================================================================
+		$('#branchNo').lookup({
+			list:'@{Pick.branches()}',
+			get:{
+				url:'@{Pick.branch()}',
+				success: function(data) {
+					if (data) {
+						$('#branchNo').removeClass('fieldError');
+						$('#branchKey').val(data.code);
+						$('#branchName').val(data.description);
+						$('#h_branchName').val(data.description);
+					}
+				},
+				error : function(data) {
+					$('#branchNo').addClass('fieldError');
+					$('#branchName').val('NOT FOUND');
+					$('#branchNo').val('');
+					$('#branchKey').val('');
+					$('#h_branchName').val('');
+				}
+			},
+			key:$('#branchKey'),
+			description:$('#branchName'),
+			help:$('#branchHelp'),
+			nextControl:$('#firstName')
+		});
+		// ======================================================================================================================
+		
+		// branch action change =================================================================================================
+		$('#branchNo').change(function(){
+			if ($('#branchNo').val() == "") {
+				$('#branchNo').val("");
+				$('#branchKey').val("");
+				$('#branchName').val("");
+				$('#h_branchName').val("");
+			}
+		});
+		// ======================================================================================================================
+		
+		// birthdate validation can not be greather than current date ===========================================================
+		$('#birthDate').change(function(){
+			var el = $(this);
+			//var currentDate = new Date();
+			var birthDate = new Date($('#birthDate').datepicker('getDate'));
+			
+			if ($("#birthDateError").html() != "Invalid date format") {
+				if (birthDate.getTime() > new Date(currentDate).getTime()) {
+					el.addClass('fieldError');
+					$("#birthDateError").html("can not be greather than Application Date");
+				} else {
+					if (getAge($('#birthDate').datepicker('getDate')) < 17){
+						el.addClass('fieldError');
+						$("#birthDateError").html("Must have 17 years old or older!");
+						return false;
+					} else {
+						el.removeClass('fieldError');
+						$("#birthDateError").html("");	
+					}
+				}
+			}
+		});
+		// ======================================================================================================================
+			
+		// expDate 1 validation must be greather than expDate ===================================================================
+		$('#identification1ExpiryCon').change(function(){
+			
+			var id = this.id;
+			var thisId = "#" + id;
+			var value = $(this).datepicker("getDate");
+			if($(thisId).val()==""){
+				$(thisId).removeClass('fieldError');
+				$(thisId+"Error").html("");
+			}else{
+				if (!$(this).hasClass('fieldError')){
+					compareDateMustAfterApplicationDate(thisId, value);
+				}
+			}
+		});
+		
+		$('#contactNpwpRegDate').change(function(){
+			var id = this.id;
+			var thisId = "#" + id;
+			var value = $(this).datepicker("getDate");
+			if($(thisId).val()==""){
+				$(thisId).removeClass('fieldError');
+				$(thisId+"Error").html("");
+			}else{
+				if (!$(this).hasClass('fieldError')){
+					compareDateMustBeforeApplicationDate(thisId, value);
+				}
+			}
+		});
+		
+		$('#expDateBusinesRegCert').change(function(){
+			var id = this.id;
+			var thisId = "#" + id;
+			var value = $(this).datepicker("getDate");
+			if($(thisId).val()==""){
+				$(thisId).removeClass('fieldError');
+				$(thisId+"Error").html("");
+			}else{
+				if (!$(this).hasClass('fieldError')){
+					compareDateMustAfterApplicationDate(thisId, value);
+				}
+			}
+		});
+		// ======================================================================================================================
+		
+		// expDate 2 validation must be greather than expDate ===================================================================
+		$('#identification2ExpiryCon').change(function(){
+			
+			var id = this.id;
+			var thisId = "#" + id;
+			var value = $(this).datepicker("getDate");
+			if($(thisId).val()==""){
+				$(thisId).removeClass('fieldError');
+				$(thisId+"Error").html("");
+			}else{
+				if (!$(this).hasClass('fieldError')){
+					compareDateMustAfterApplicationDate(thisId, value);
+				}
+			}
+		});
+		// ======================================================================================================================
+		
+		// expDate 3 validation must be greather than expDate ===================================================================
+		$('#identification3ExpiryCon').change(function(){
+			
+			var id = this.id;
+			var thisId = "#" + id;
+			var value = $(this).datepicker("getDate");
+			if($(thisId).val()==""){
+				$(thisId).removeClass('fieldError');
+				$(thisId+"Error").html("");
+			}else{
+				if (!$(this).hasClass('fieldError')){
+					compareDateMustAfterApplicationDate(thisId, value);
+				}
+			}
+			
+		});
+		// ======================================================================================================================
+			
+		// expDate 4 validation must be greather than expDate ===================================================================
+		$('#identification4ExpiryCon').change(function(){
+			var id = this.id;
+			var thisId = "#" + id;
+			var value = $(this).datepicker("getDate");
+			if($(thisId).val()==""){
+				$(thisId).removeClass('fieldError');
+				$(thisId+"Error").html("");
+			}else{
+				if (!$(this).hasClass('fieldError')){
+					compareDateMustAfterApplicationDate(thisId, value);
+				}
+			}
+		});
+		// ======================================================================================================================
+		
+			// expDate 1 validation must be greather than expDate ===================================================================
+		$('#identification1ExpiryConTab').change(function(){
+			
+			var id = this.id;
+			var thisId = "#" + id;
+			var value = $(this).datepicker("getDate");
+			if($(thisId).val()==""){
+				$(thisId).removeClass('fieldError');
+				$(thisId+"Error").html("");
+			}else{
+				if (!$(this).hasClass('fieldError')){
+					compareDateMustAfterApplicationDate(thisId, value);
+				}
+			}
+			
+		});
+		// ======================================================================================================================
+		
+		// expDate 2 validation must be greather than expDate ===================================================================
+		$('#identification2ExpiryConTab').change(function(){
+			
+			var id = this.id;
+			var thisId = "#" + id;
+			var value = $(this).datepicker("getDate");
+			if($(thisId).val()==""){
+				$(thisId).removeClass('fieldError');
+				$(thisId+"Error").html("");
+			}else{
+				if (!$(this).hasClass('fieldError')){
+					compareDateMustAfterApplicationDate(thisId, value);
+				}
+			}
+		});
+		// ======================================================================================================================
+		
+		// expDate 3 validation must be greather than expDate ===================================================================
+		$('#identification3ExpiryConTab').change(function(){
+			
+			var id = this.id;
+			var thisId = "#" + id;
+			var value = $(this).datepicker("getDate");
+			if($(thisId).val()==""){
+				$(thisId).removeClass('fieldError');
+				$(thisId+"Error").html("");
+			}else{
+				if (!$(this).hasClass('fieldError')){
+					compareDateMustAfterApplicationDate(thisId, value);
+				}
+			}
+		});
+		// ======================================================================================================================
+			
+		// expDate 4 validation must be greather than expDate ===================================================================
+		$('#identification4ExpiryConTab').change(function(){
+			var id = this.id;
+			var thisId = "#" + id;
+			var value = $(this).datepicker("getDate");
+			if($(thisId).val()==""){
+				$(thisId).removeClass('fieldError');
+				$(thisId+"Error").html("");
+			}else{
+				if (!$(this).hasClass('fieldError')){
+					compareDateMustAfterApplicationDate(thisId, value);
+				}
+			}
+			
+		});
+		
+		$('#document1ExpiryConTab').change(function(){
+			var id = this.id;
+			var thisId = "#" + id;
+			var value = $(this).datepicker("getDate");
+			if($(thisId).val()==""){
+				$(thisId).removeClass('fieldError');
+				$(thisId+"Error").html("");
+			}else{
+				if (!$(this).hasClass('fieldError')){
+					compareDateMustAfterApplicationDate(thisId, value);
+				}
+			}
+		});
+		
+		$('#document2ExpiryConTab').change(function(){
+			var id = this.id;
+			var thisId = "#" + id;
+			var value = $(this).datepicker("getDate");
+			if($(thisId).val()==""){
+				$(thisId).removeClass('fieldError');
+				$(thisId+"Error").html("");
+			}else{
+				if (!$(this).hasClass('fieldError')){
+					compareDateMustAfterApplicationDate(thisId, value);
+				}
+			}
+		});
+		
+		$('#document3ExpiryConTab').change(function(){
+			var id = this.id;
+			var thisId = "#" + id;
+			var value = $(this).datepicker("getDate");
+			if($(thisId).val()==""){
+				$(thisId).removeClass('fieldError');
+				$(thisId+"Error").html("");
+			}else{
+				if (!$(this).hasClass('fieldError')){
+					compareDateMustAfterApplicationDate(thisId, value);
+				}
+			}
+		});
+		
+		$('#document4ExpiryConTab').change(function(){
+			var id = this.id;
+			var thisId = "#" + id;
+			var value = $(this).datepicker("getDate");
+			if($(thisId).val()==""){
+				$(thisId).removeClass('fieldError');
+				$(thisId+"Error").html("");
+			}else{
+				if (!$(this).hasClass('fieldError')){
+					compareDateMustAfterApplicationDate(thisId, value);
+				}
+			}
+		});
+		
+		// ======================================================================================================================
+		
+			
+		// npwp validation ======================================================================================================
+		$('#npwpDate').change(function(){
+			var el = $('#npwpDate');
+			//var currentDate = new Date();
+			var npwpDate = new Date($('#npwpDate').datepicker('getDate'));
+			
+			if ($('#npwpDateError').html() != "Invalid date format") {
+				if (npwpDate.getTime() > new Date(currentDate).getTime()) {
+					el.addClass('fieldError');
+					$("#npwpDateError").html("can not be greather than Application Date");
+				} else {
+					el.removeClass('fieldError');
+					$("#npwpDateError").html("");
+				}
+			}
+		});
+		// ======================================================================================================================
+			
+		// date of company estb validation can not be greather than current date ================================================
+		$('#dateCompEstb').change(function(){
+			var el = $('#dateCompEstb');
+			//var currentDate = new Date();
+			var dateCompEstb = new Date($('#dateCompEstb').datepicker('getDate'));
+			
+			if ($('#dateCompEstbError').html() != "Invalid date format") {
+				if (dateCompEstb.getTime() > new Date(currentDate).getTime()) {
+					el.addClass('fieldError');
+					$("#dateCompEstbError").html("can not be greather than Application Date");
+				} else {
+					el.removeClass('fieldError');
+					$("#dateCompEstbError").html("");
+				}
+			}
+		});
+		// ======================================================================================================================
+			
+		// skd expiry date validation can not be greather than current date =====================================================
+		$('#skdDate').change(function(){
+			var id = this.id;
+			var thisId = "#" + id;
+			var value = $(this).datepicker("getDate");
+			if($(thisId).val()==""){
+				$(thisId).removeClass('fieldError');
+				$(thisId+"Error").html("");
+			}else{
+				if (!$(this).hasClass('fieldError')){
+					compareDateMustAfterApplicationDate(thisId, value);
+				}
+			}
+		});
+		// ======================================================================================================================
+		
+		// address 1 country action blur ======================================================================================			
+		$('#address1CountryCode').change(function(){
+			if (($('#address1CountryCode').val() == "") || ($('#address1CountryCode').isChange())) {
+				$('#address1Country').val("");
+				$('#h_address1CountryDesc').val("");
+				$('#address1CountryCode').removeClass('fieldError');
+				
+				$('#address1StateCode').val("");
+				$('#address1State').val("");
+				$('#address1StateDesc').val("");
+				$('#address1StateCode').removeClass('fieldError');
+				
+				$('#address1AreaCode').val("");
+				$('#address1Area').val("");
+				$('#address1AreaDesc').val("");
+				$('#address1AreaCode').removeClass('fieldError');
+				
+				state("");
+				area("");
+			}
+			
+		});
+		// ======================================================================================================================
+		
+		// address 1 state action blur ========================================================================================
+		$('#address1StateCode').change(function(){
+			if (($('#address1StateCode').val() == "") || ($('#address1StateCode').isChange())) {
+				//$('#contactForm #address1StateCode').val("");
+				$('#address1State').val("");
+				$('#address1StateDesc').val("");
+				$('#h_address1StateDesc').val("");
+				$('#address1StateCode').removeClass('fieldError');
+				
+				$('#address1AreaCode').val("");
+				$('#address1Area').val("");
+				$('#address1AreaDesc').val("");
+				$('#address1AreaCode').removeClass('fieldError');
+				
+				area("");
+			}
+		});
+		// ======================================================================================================================
+		
+		// address 1 area action change =========================================================================================
+		$('#address1AreaCode').change(function(){
+			if ($('#address1AreaCode').val() == "") {
+				$('#address1AreaCode').val("");
+				$('#address1Area').val("");
+				$('#address1AreaDesc').val("");
+				$('#h_address1AreaDesc').val("");
+				$('#address1AreaCode').removeClass('fieldError');
+			}
+		});
+		// ======================================================================================================================
+			
+		var stateFilter ="";
+		if($('#address1CountryCode').val() != ""){
+			stateFilter = "STATE";
+		}
+		state(stateFilter);
+		
+		var areaFilter ="";
+		if($('#address1StateCode').val() != ""){
+			areaFilter = "AREA";
+		}
+		area(areaFilter);
+			
+		// address 1 country lookup at tab contacts =============================================================================
+		/* $('#address1CountryCode').lookup({
+			list:'@{Pick.lookups()}?group=COUNTRY',
+			get:{
+				url:'@{Pick.lookup()}?group=COUNTRY',
+				success: function(data) {
+					if (data) {
+						$('#address1CountryCode').removeClass('fieldError');
+						$('#address1Country').val(data.code);
+						$('#address1CountryDesc').val(data.description);
+						$('#h_address1CountryDesc').val(data.description);
+						state("STATE");
+					}
+				},
+				error : function(data) {
+					$('#address1CountryCode').addClass('fieldError');
+					$('#address1CountryDesc').val('NOT FOUND');
+					$('#address1CountryCode').val('');
+					$('#address1Country').val('');
+					$('#h_address1CountryDesc').val('');
+				}
+			},
+			key:$('#address1Country'),
+			description:$('#address1CountryDesc'),
+			help:$('#address1CountryHelp'),
+			nextControl:$('#address1StateCode')
+		}); */
+		
+		$('#address1CountryCode').dynapopup2({key:'address1Country', help:'address1CountryHelp', desc:'address1CountryDesc'},'PICK_GN_LOOKUP', "COUNTRY", "address1StateCode", 
+				function(data){
+					if (data) {
+						$('#address1CountryCode').removeClass('fieldError');
+						$('#address1Country').val(data.code);
+						$('#address1CountryDesc').val(data.description);
+						$('#h_address1CountryDesc').val(data.description);
+						state("STATE");
+						area("");
+					}
+				},
+				function(data){
+					$('#address1CountryCode').addClass('fieldError');
+					$('#address1CountryDesc').val('NOT FOUND');
+					$('#address1CountryCode').val('');
+					$('#address1Country').val('');
+					$('#h_address1CountryDesc').val('');
+				}
+		);
+		
+		// ======================================================================================================================
+		
+		// customer type action change ==========================================================================================
+		$('#customerType').change(function() {
+			
+			var select_customer;
+			
+	        select_customer = $('#customerType').val();
+	        
+      		if (select_customer == CUSTOMER_TYPE_C) {
+      			$(".corporate").val("");
+      			$('.corporate').attr('checked', false);
+      			adjustCountryCorp();
+      			adjustSupplementDocReq();
+	    		adjustOtherCorp();
+			} else if (select_customer == CUSTOMER_TYPE_I) {
+				$(".individual").val("");
+				$('.individual').attr('checked', false);
+				adjustCountry();
+				adjustOtherIndividual();
+			}
+      		
+      		$(".all").val("");
+			$(".empty").val("");
+			$('input[name="sourceOfFunds"]').attr('checked', false);
+			$('input[name="investObjs"]').attr('checked', false);
+	    	$('#contact #grid-contact').dataTable().fnClearTable();
+	    	$('#jointDate').val('${currentDate}');
+	    	$('.all').attr('checked', false);
+			adjustCustomerType();
+			
+			// for check field error in all input type ==========================================================================
+			var checkError = $("input").hasClass('fieldError'); {
+				if (checkError){
+					$('input').removeClass('fieldError');
+				}
+			}
+			// ==================================================================================================================
+			
+		});
+		// ======================================================================================================================
+		
+		// is customer action change at tab contacts ============================================================================
+		$("input[name='contact.isCustomer']").change(function() {
+			clearAttrForIsCustomer();
+			isCustomer();
+		});
+		// ======================================================================================================================
+		
+		// same as corporate action change at tab contacts ======================================================================
+		$("#contactForm #sameAsCorp").change(function() {
+			var datas = new Object();
+			clearAttrForSameAs();
+			sameAs();
+			//checkValueSameAsWithAddressType();
+			if (($('#sameAsCorp').val() != "") || ($('#addressTypeCorp').val() != "")) {
+				if ($("#contactForm #sameAsCorp").val() == $("#contactForm #addressTypeCorp").val()) {
+					$('#contactForm #sameAsCorp').addClass('fieldError');
+					$('#sameAsCorpError').html("can not same with address type");	
+				} else {
+					//$('#sameAs').removeClass('fieldError');
+					//$('#sameAsError').html("");
+					copyValue();
+				}
+			}
+			getSameAsLookupDescription();
+			
+			if($('#contactForm #sameAsCorp').val()==""){
+				$('#contactForm #sameAsCorp').val("");
+				$("#sameAsCorp").removeClass('fieldError');
+				$("#sameAsCorpError").html("");
+			}
+		});
+		// ======================================================================================================================
+			
+		// same as individual action change at tab contacts =====================================================================
+		$("#contactForm #sameAsInd").change(function() {
+			var datas = new Object();
+			clearAttrForSameAs();
+			sameAs();
+			//checkValueSameAsWithAddressType();
+			if (($('#sameAsInd').val() != "") || ($('#addressTypeInd').val() != "")) {
+				if ($("#contactForm #sameAsInd").val() == $("#contactForm #addressTypeInd").val()) {
+					$('#contactForm #sameAsInd').addClass('fieldError');
+					$('#sameAsIndError').html("can not same with address type");	
+				} else {
+					//$('#sameAs').removeClass('fieldError');
+					//$('#sameAsError').html("");
+					copyValue();
+				}
+			}
+			getSameAsLookupDescription();
+			
+			if($('#contactForm #sameAsInd').val()==""){
+				$('#contactForm #sameAsInd').val("");
+				$("#sameAsInd").removeClass('fieldError');
+				$("#sameAsIndError").html("");
+			}
+		});
+		// ======================================================================================================================
+		
+		// contact addressType corporate event ==================================================================================
+		$("#contactForm #addressTypeCorp").change(function() {
+			$('#contactForm #addressTypeCorp').removeClass('fieldError');
+			$('#duplicateErrorMessageCorp').html("");
+			checkValueSameAsWithAddressType();
+			getAddressTypeLookupDescription();
+			if ($("#contactForm #sameAsCorp").val() != $("#contactForm #addressTypeCorp").val()) {
+				$("#sameAsCorp").removeClass('fieldError');
+				$("#sameAsErrorCorp").html("");
+			}
+		});
+		// ======================================================================================================================
+			
+		// contact addressType individual event =================================================================================
+		$("#contactForm #addressTypeInd").change(function() {
+			$('#contactForm #addressTypeInd').removeClass('fieldError');
+			$('#duplicateErrorMessageInd').html("");
+			checkValueSameAsWithAddressType();
+			getAddressTypeLookupDescription();
+			if ($("#contactForm #sameAsInd").val() != $("#contactForm #addressTypeInd").val()) {
+				$("#sameAsInd").removeClass('fieldError');
+				$("#sameAsErrorInd").html("");
+			}
+		});
+		// ======================================================================================================================
+		
+		// legal domicile change action =========================================================================================
+		$("li[id=skdNoLi] label span").html("");
+		$("li[id=skdDateLi] label span").html("");
+		if ($('#legalDomicile').val() == 'LEGAL_DOMICILE-2') {
+			$("li[id=skdNoLi] label span").html("*");
+			$("li[id=skdDateLi] label span").html("*");
+		}
+		
+		$('#legalDomicile').change(function(){
+			//alert("1. " + $('#legalDomicile').val());
+			if ($('#legalDomicile').val() == 'LEGAL_DOMICILE-2') {
+				//alert("2. " + $('#legalDomicile').val());
+				$("li[id=skdNoLi] label span").html("*");
+				$("li[id=skdDateLi] label span").html("*");
+			} else {
+				$("li[id=skdNoLi] label span").html("");
+				$("li[id=skdDateLi] label span").html("");
+			}
+			
+			$('#originCountry').removeClass('fieldError');
+			$('#originCountry').val("");
+			$('#originCountryId').val("");
+			$('#originCountryDesc').val("");
+			$('#h_originCountryDesc').val("");
+		});
+		// ======================================================================================================================
+		
+		// for check identification type 1 in tab contacts ======================================================================
+		$('#contactForm #identificationType1').change(function() {
+			checkIdenContact();
+			$('#contactForm #identification1No').val('');
+			$('#contactForm #identification1ExpiryCon').val('');
+			$('#contactForm #identification1ExpiryCon').removeClass('fieldError');
+			$('#contactForm #identification1ExpiryConError').html('');
+		});
+		// ======================================================================================================================
+		
+		// for check identification type 2 in tab contacts ======================================================================
+		$('#contactForm #identificationType2').change(function() {
+			checkIdenContact();
+			$('#contactForm #identification2No').val('');
+			$('#contactForm #identification2ExpiryCon').val('');
+			$('#contactForm #identification2ExpiryCon').removeClass('fieldError');
+			$('#contactForm #identification2ExpiryConError').html('');
+		});
+		// ======================================================================================================================
+		
+		// for check identification type 3 in tab contacts ======================================================================
+		$('#contactForm #identificationType3').change(function() {
+			checkIdenContact();
+			$('#contactForm #identification3No').val('');
+			$('#contactForm #identification3ExpiryCon').val('');
+			$('#contactForm #identification3ExpiryCon').removeClass('fieldError');
+			$('#contactForm #identification3ExpiryConError').html('');
+		});
+		// ======================================================================================================================
+			
+		// for check identification type 4 in tab contacts ======================================================================
+		$('#contactForm #identificationType4').change(function() {
+			checkIdenContact();
+			$('#contactForm #identification4No').val('');
+			$('#contactForm #identification4ExpiryCon').val('');
+			$('#contactForm #identification4ExpiryCon').removeClass('fieldError');
+			$('#contactForm #identification4ExpiryConError').html('');
+		});
+		// ======================================================================================================================
+			
+	});	
+	
+	function getAge(birthDate){
+		 var currentDate = $('#currentDate').datepicker('getDate');
+		 var newCurDate = new Date(currentDate);
+		 var birthDate = new Date(birthDate);
+		 var age = newCurDate.getFullYear() - birthDate.getFullYear();
+		 var m = newCurDate.getMonth() - birthDate.getMonth();
+		 
+		 if (m < 0 || (m == 0 && newCurDate.getDate() < birthDate.getDate())){
+			 age--;
+		 }
+		 return age;
+	 }
+	
+	function checkIdenContact(){
+		var checkCombo = true;
+		if (($("#contactForm #identificationType1").val() == $("#contactForm #identificationType2").val()) || ($("#contactForm #identificationType2").val() == $("#contactForm #identificationType1").val())) {
+			if(checkCombo){
+				$('#contactForm #identificationType3').removeClass('fieldError');
+				$('#contactForm #errmsgIDType3').html("");
+				$('#contactForm #identificationType4').removeClass('fieldError');
+				$('#contactForm #errmsgIDType4').html("");
+				if (($("#contactForm #identificationType1").val() !="") && ($("#contactForm #identificationType2").val() !="")) {
+					$('#contactForm #identificationType2').addClass('fieldError');
+					$('#contactForm #errmsgIDType2').html("can not same with Identification 1");
+					checkCombo = false;
+				}
+			}
+		} 
+		if (($("#contactForm #identificationType1").val() == $("#contactForm #identificationType3").val()) || ($("#contactForm #identificationType3").val() == $("#contactForm #identificationType1").val())) {
+			if(checkCombo){
+				$('#contactForm #identificationType2').removeClass('fieldError');
+				$('#contactForm #errmsgIDType2').html("");
+				$('#contactForm #identificationType4').removeClass('fieldError');
+				$('#contactForm #errmsgIDType4').html("");
+				if (($("#contactForm #identificationType1").val() !="") && ($("#contactForm #identificationType3").val() !="")) {
+					$('#contactForm #identificationType3').addClass('fieldError');
+					$('#contactForm #errmsgIDType3').html("can not same with Identification 1");
+					checkCombo = false;
+				}
+			}
+		} 
+		if (($("#contactForm #identificationType1").val() == $("#contactForm #identificationType4").val()) || ($("#contactForm #identificationType4").val() == $("#contactForm #identificationType1").val())) {
+			if(checkCombo){
+				$('#contactForm #identificationType2').removeClass('fieldError');
+				$('#contactForm #errmsgIDType2').html("");
+				$('#contactForm #identificationType3').removeClass('fieldError');
+				$('#contactForm #errmsgIDType3').html("");
+				if (($("#contactForm #identificationType1").val() != "") && ($("#contactForm #identificationType4").val() != "")) {
+					$('#contactForm #identificationType4').addClass('fieldError');
+					$('#contactForm #errmsgIDType4').html("can not same with Identification 1");
+					checkCombo = false;
+				}
+			}
+		} 
+		if (($("#contactForm #identificationType2").val() == $("#contactForm #identificationType3").val()) || ($("#contactForm #identificationType3").val() == $("#contactForm #identificationType2").val())) {
+			if(checkCombo){
+				$('#contactForm #identificationType2').removeClass('fieldError');
+				$('#contactForm #errmsgIDType2').html("");
+				$('#contactForm #identificationType4').removeClass('fieldError');
+				$('#contactForm #errmsgIDType4').html("");
+				if (($("#contactForm #identificationType2").val() !="") && ($("#contactForm #identificationType3").val() !="")) {
+					$('#contactForm #identificationType3').addClass('fieldError');
+					$('#contactForm #errmsgIDType3').html("can not same with Identification 2");
+					checkCombo = false;
+				} else {
+					$('#contactForm #identificationType3').removeClass('fieldError');
+					$('#contactForm #errmsgIDType3').html("");
+				}
+			}
+		} 
+		if (($("#contactForm #identificationType2").val() == $("#contactForm #identificationType4").val()) || ($("#contactForm #identificationType4").val() == $("#contactForm #identificationType2").val())) {
+			if(checkCombo){
+				$('#contactForm #identificationType2').removeClass('fieldError');
+				$('#contactForm #errmsgIDType2').html("");
+				$('#contactForm #identificationType3').removeClass('fieldError');
+				$('#contactForm #errmsgIDType3').html("");
+				if (($("#contactForm #identificationType2").val() != "") && ($("#contactForm #identificationType4").val() != "")) {
+					$('#contactForm #identificationType4').addClass('fieldError');
+					$('#contactForm #errmsgIDType4').html("can not same with Identification 2");
+					checkCombo = false;
+				} else {
+					$('#contactForm #identificationType4').removeClass('fieldError');
+					$('#contactForm #errmsgIDType4').html("");
+				}
+			}
+		} 
+		if (($("#contactForm #identificationType3").val() == $("#contactForm #identificationType4").val()) || ($("#contactForm #identificationType4").val() == $("#contactForm #identificationType3").val())) {
+			if(checkCombo){
+				$('#contactForm #identificationType2').removeClass('fieldError');
+				$('#contactForm #errmsgIDType2').html("");
+				$('#contactForm #identificationType3').removeClass('fieldError');
+				$('#contactForm #errmsgIDType3').html("");
+				if (($("#contactForm #identificationType3").val() != "") && ($("#contactForm #identificationType4").val() != "")) {
+					$('#contactForm #identificationType4').addClass('fieldError');
+					$('#contactForm #errmsgIDType4').html("can not same with Identification 3");
+					checkCombo = false;
+				} else {
+					$('#contactForm #identificationType4').removeClass('fieldError');
+					$('#contactForm #errmsgIDType4').html("");
+				}
+			}
+		} 
+		if(checkCombo){
+			$('#contactForm #identificationType2').removeClass('fieldError');
+			$('#contactForm #errmsgIDType2').html("");
+			$('#contactForm #identificationType3').removeClass('fieldError');
+			$('#contactForm #errmsgIDType3').html("");
+			$('#contactForm #identificationType4').removeClass('fieldError');
+			$('#contactForm #errmsgIDType4').html("");
+		}
+	}
+	
+		
+	// function customer type ===================================================================================================
+	function adjustCustomerType() {
+		var select_customer; 
+        select_customer = $('#customerType').val(); 	
+            		       
+			if (select_customer == CUSTOMER_TYPE_C){
+	        	
+	        	$("label:contains('Birth Date *')").html("Founded Date <span class='req'>*</span>");
+	        	$("#tabs").tabs("disable",1);
+	        	$("#tabs").tabs("enable",2);
+	        	$(".default").css("display", "none");
+	        	$("div.individual_only").css("display", "none");
+	        	$("div.corporate_only").css("display", "block");
+	        	$("li.corporate_only").css("display", "");
+	        	$("p.corporate_only").css("display", "");
+	        	$(".forIndi").val("");
+	        	$('.forIndi').removeClass('fieldError');
+	        	
+	        } else if (select_customer == CUSTOMER_TYPE_I){
+	        	$("label:contains('Founded Date *')").html("Birth Date <span class='req'>*</span>");
+	        	$("label:contains('Identification 1')").html("Identification 1 <span class='req'>*</span>");
+	        	$("#tabs").tabs("disable",2);
+	        	$("#tabs").tabs("enable",1);
+	        	$(".default").css("display", "none");
+	        	$("div.individual_only").css("display", "block");
+	        	$("div.corporate_only").css("display", "none");
+	        	$("li.individual_only").css("display", "");
+	        	$("p.individual_only").css("display", "");
+	        	$(".forCorp").val("");
+	        	$('.forCorp').removeClass('fieldError');
+	        	//$('#contact #grid-contact').dataTable().fnClearTable();
+	        } else {
+	        	$("#tabs").tabs("disable",1);
+	        	$("#tabs").tabs("disable",2);
+	        	$(".individual").val("");
+	        	$("div.individual_only").css("display", "none");
+	        	$("div.corporate_only").css("display", "none");
+	        	$("li.individual_only").css("display", "none");
+	        	$("li.corporate_only").css("display", "none");
+	        	$("p.individual_only").css("display", "none");
+	        	$("p.corporate_only").css("display", "none");
+	        	$(".forIndi").val("");
+	        	$(".default").css("display", "");
+	        	$(".forCorp").val("");
+	        	$('.forIndi').removeClass('fieldError');
+	        	$('.forCorp').removeClass('fieldError');
+	        	//$('#contact #grid-contact').dataTable().fnClearTable();
+	        }
+			
+			if (('${sofData}'!='')&&('${invData}'!='')||
+				('${sofData}'!=null)&&('${invData}'!=null)) {
+				var dataSof = '${sofData}';
+				var dataInv = '${invData}';
+				var arrDataSof = dataSof.split("|");
+				
+				for (var i=0; i < arrDataSof.length; i++) {
+					$('#sof'+arrDataSof[i]).attr('checked', true);
+					$('#hiddenSof'+arrDataSof[i]+'').val(arrDataSof[i]);
+				}
+				
+				var arrDataInv = dataInv.split("|");
+				for (var i=0; i < arrDataInv.length; i++) {
+					$('#inv'+arrDataInv[i]+'').attr('checked', true);
+					$('#hiddenInv'+arrDataInv[i]+'').val(arrDataInv[i]);
+				}
+			}
+			
+			adjustOther();
+	};	
+	// ==========================================================================================================================
+	
+	// function clear value for contact =========================================================================================
+	function clearAttrForContact() {
+		$(".isCustomer").val("");
+		if ($('#customerType').val() == CUSTOMER_TYPE_C) {
+			$("#contactForm #sameAsCorp").val("");
+		} else {
+			$("#contactForm #sameAsInd").val("");
+		}
+		$(".sameAs").val("");	
+		$("#contactForm #remarks").val("");
+	}
+	// ==========================================================================================================================
+
+	// function clear value for is customer class ===============================================================================
+	function clearAttrForIsCustomer() {
+		$(".isCustomer").val("");	
+		$('.partOfName').val("");
+	};
+	// ==========================================================================================================================
+	
+	// function clear value for same as class ===================================================================================
+	function clearAttrForSameAs() {
+		$(".sameAs").val("");
+		$("#address1CountryDesc").val("");
+		$("#address1StateDesc").val("");
+		$("#address1AreaDesc").val("");
+	};
+	// ==========================================================================================================================
+	
+	// disable properties using sameAs class ====================================================================================
+	function disableForSameAs() {
+		$(".sameAs").attr('disabled', 'disable');
+		$(".small").attr('disabled', 'disable');
+	}
+	// ==========================================================================================================================
+	
+	// enable properties using sameAs class ===================================================================================== 
+	function enableForSameAs() {
+		$(".sameAs").attr('disabled', false);
+		$(".small").attr('disabled', false);
+	}
+	// ==========================================================================================================================
+	
+	// for sameAs dropdown ======================================================================================================
+	function sameAs() {
+		if ('${confirming}' != 'true') {
+			var select_sameAs; 
+			//--for sameAs
+	        if ($('#customerType').val() == CUSTOMER_TYPE_C) {
+				select_sameAs = $('#contactForm #sameAsCorp').val();
+	     		
+				if ($("#contactForm #sameAsCorp").val() == "") {
+					enableForSameAs();
+				} else {
+					disableForSameAs();
+				}
+	        } else {
+	        	select_sameAs = $('#contactForm #sameAsInd').val();
+				if ($("#contactForm #sameAsInd").val() == "") {
+					enableForSameAs();
+				} else {
+					disableForSameAs();
+				}
+	        }
+		}
+	};
+	// ==========================================================================================================================
+
+	// for radio button is customer at tab contact ==============================================================================
+	function isCustomer() {
+		if ('${confirming}' != 'true') {
+			var select_isCustomer; 
+	        select_isCustomer = $('#isCustomer').val();
+			
+			if($("#isCustomer1").is(":checked")){
+				$("input[name='contact.isCustomer']").val('true');
+			} else {
+				$("input[name='contact.isCustomer']").val('false');
+			}
+			if (($("input[name='contact.isCustomer']:checked").val() == "true") || ($("input[name='contact.isCustomer']").val() == "true")) {
+				$(".isCustomer").attr('disabled', true);
+				$("p[id=contactNameP] label span").html("");
+				$("td[id=identificationType1Li] label span").html("");
+			
+			} else {
+				console.debug("unchecked = " + $("input[name='contact.isCustomer']:checked").val());
+				$(".isCustomer").attr('disabled', false);
+				$("p[id=contactNameP] label span").html("*");
+				$("td[id=identificationType1Li] label span").html("*");
+
+			}
+		}			
+	};
+	// ==========================================================================================================================
+	
+	// function same as which is copy value from another contact ================================================================
+	function copyValue() {
+		var table = $('#contact #grid-contact').dataTable();
+		var rows = table.fnGetNodes().length;
+		var found = false;	
+		if ($('#customerType').val() == CUSTOMER_TYPE_C) {
+			if (rows == 0) {
+				
+				if ($('#sameAsCorp').val() != "") {
+					$("#sameAsCorp").addClass('fieldError');
+					$("#sameAsCorpError").html("Not Available");
+					return false;
+				}
+			
+			}
+			
+			for (i = 0; i < rows; i++) {
+				var cell = tableContact.fnGetData(i);
+				
+				if ($('#sameAsCorp').val() != "") {
+					if (($("#sameAsCorp").val() != $(cell[0]).val())) {	
+						$("#sameAsCorp").addClass('fieldError');
+						$("#sameAsCorpError").html("Not Available");
+						
+					}
+				}
+				
+				if ($('#sameAsCorp').val() == $(cell[0]).val()) {	
+					$('#sameAsCorp').removeClass('fieldError');
+					$('#sameAsCorpError').html("");
+					var datas = table.fnGetData(i);
+					if ((datas.address1 == '') && (datas.address1City == '') && (datas.address1Country.lookupCode == '') &&
+						(datas.address1State.lookupCode == '') && (datas.address1Area.lookupCode == '') && (datas.address1ZipCode == '') &&
+						(datas.address1Phone1 == '') && (datas.address1Phone2 == '') && (datas.address1Phone3 == '')) {
+						$("#sameAsCorp").addClass('fieldError');
+						$("#sameAsCorpError").html("Not allowed, data contact is empty");
+					} else {
+						assignmentValueForSameAs(datas);
+						found = true;
+						break;
+					}
+				}
+			}
+		} else {
+			if (rows == 0) {
+				if ($('#sameAsInd').val() != "") {
+					$("#sameAsInd").addClass('fieldError');
+					$("#sameAsIndError").html("Not Available");
+					return false;
+				}
+			}
+			
+			for (i = 0; i < rows; i++) {
+				var cell = tableContact.fnGetData(i);
+				
+				if ($('#sameAsInd').val() != "") {
+					if (($("#sameAsInd").val() != $(cell[0]).val())) {	
+						$("#sameAsInd").addClass('fieldError');
+						$("#sameAsIndError").html("Not Available");
+					}
+				}
+				
+				if ($('#sameAsInd').val() == $(cell[0]).val()) {	
+					$('#sameAsInd').removeClass('fieldError');
+					$('#sameAsIndError').html("");
+					var datas = table.fnGetData(i);
+					if ((datas.address1 == '') && (datas.address1City == '') && (datas.address1Country.lookupCode == '') &&
+						(datas.address1State.lookupCode == '') && (datas.address1Area.lookupCode == '') && (datas.address1ZipCode == '') &&
+						(datas.address1Phone1 == '') && (datas.address1Phone2 == '') && (datas.address1Phone3 == '')) {
+						$("#sameAsInd").addClass('fieldError');
+						$("#sameAsIndError").html("Not allowed, data contact is empty");
+					} else {
+						assignmentValueForSameAs(datas);
+						found = true;
+						break;
+					}
+				}
+			}
+		}
+	}
+	// ==========================================================================================================================
+		
+	// function contact registration date 1 validation ==========================================================================
+	function conRegDate1validation() {
+		var el = $('#contactForm #identification1RegDateCon');
+		var expiryDate3 = new Date($('#contactForm #identification1ExpiryCon').val());
+		var regDate3 = new Date($('#contactForm #identification1RegDateCon').val());
+		
+		el.removeClass('fieldError');
+		$("#errConReg1Msg").html("");
+		
+		if (expiryDate3.getTime() < regDate3.getTime()) {
+			el.addClass('fieldError');
+			$("#errConReg1Msg").html("Registration Date must be less than Expiry Date");
+		} else {
+			el.removeClass('fieldError');
+			$("#errConReg1Msg").html("");
+		}
+	};
+	// ==========================================================================================================================
+	
+	// for compare date with application date ============================================================================
+	function compareDateMustAfterApplicationDate(thisId, value) {
+		var dateValue = new Date(value);
+		var currentDate = $('#currentDate').datepicker('getDate');
+		if (dateValue.getTime() < currentDate.getTime()) {
+			$(thisId).addClass('fieldError');
+			$(thisId+"Error").html("can not less than Application Date");
+			return false;
+		} else {
+			$(thisId).removeClass('fieldError');
+			$(thisId+"Error").html("");
+			return true;
+		}
+	}
+	
+	function compareDateMustBeforeApplicationDate(thisId, value) {
+		var dateValue = new Date(value);
+		var currentDate = $('#currentDate').datepicker('getDate');
+		if (dateValue.getTime() > currentDate.getTime()) {
+			$(thisId).addClass('fieldError');
+			$(thisId+"Error").html("can not greather than Application Date");
+			return false;
+		} else {
+			$(thisId).removeClass('fieldError');
+			$(thisId+"Error").html("");
+			return true;
+		}
+	}
+	// ==========================================================================================================================
+	
+	// for get lookupDescription from dropdown addressType ======================================================================
+	function getAddressTypeLookupDescription() {
+		if ($('#customerType').val() == CUSTOMER_TYPE_C) {		
+			// SUBSTRING WHEN LOOKUPDESCRIPTION/OPTION FROM DROPDOWN SHOW ON DATATABLES SCREEN
+			var selected = $('#contactForm #addressTypeCorp').val();
+			var selectedText = $("#contactForm #addressTypeCorp option[value=" + selected + "]").text();
+			if (selectedText != '') {
+					//console.debug(selectedText);
+					
+					selectedText = jQuery.trim(selectedText);
+					
+					//console.debug(selectedText);
+					//console.debug('index:' + jQuery.trim(selectedText).indexOf('-'));
+					selectedText = selectedText.substring(jQuery.trim(selectedText).indexOf('-') + 1);
+			}
+			$("#contactForm #addressTypeDescCorp").val(selectedText);
+			// END OF SUBSTRING
+			addressTypeDescription = selectedText;
+			$("#contactForm #addressTypeDescCorp").val(addressTypeDescription);
+			$('#newAddressType').val($("#addressTypeCorp").val());
+		} else {
+			// SUBSTRING WHEN LOOKUPDESCRIPTION/OPTION FROM DROPDOWN SHOW ON DATATABLES SCREEN
+			var selected = $('#contactForm #addressTypeInd').val();
+			var selectedText = $("#contactForm #addressTypeInd option[value=" + selected + "]").text();
+			if (selectedText != '') {
+					
+					selectedText = jQuery.trim(selectedText);
+					selectedText = selectedText.substring(jQuery.trim(selectedText).indexOf('-') + 1);
+			}
+			$("#contactForm #addressTypeDescInd").val(selectedText);
+			// END OF SUBSTRING
+			addressTypeDescription = selectedText;
+			$("#contactForm #addressTypeDescInd").val(addressTypeDescription);
+			$('#newAddressType').val($("#addressTypeInd").val());
+		}
+	}
+	// ==========================================================================================================================
+	
+	// for get lookupDescription from dropdown sameAs ==========================================================================
+	function getSameAsLookupDescription() {
+		if ($('#customerType').val() == CUSTOMER_TYPE_C) {		
+			// SUBSTRING WHEN LOOKUPDESCRIPTION/OPTION FROM DROPDOWN SHOW ON DATATABLES SCREEN
+			var selected = $('#contactForm #sameAsCorp').val();
+			var selectedText = $("#contactForm #sameAsCorp option[value=" + selected + "]").text();
+			if (selectedText != '') {
+				selectedText = jQuery.trim(selectedText);
+				selectedText = selectedText.substring(jQuery.trim(selectedText).indexOf('-') + 1);
+			}
+			$("#contactForm #sameAsDescCorp").val(selectedText);
+			// END OF SUBSTRING
+			sameAsDescription = selectedText;
+			$("#contactForm #sameAsDescCorp").val(sameAsDescription);
+		} else {
+			// SUBSTRING WHEN LOOKUPDESCRIPTION/OPTION FROM DROPDOWN SHOW ON DATATABLES SCREEN
+			var selected = $('#contactForm #sameAsInd').val();
+			var selectedText = $("#contactForm #sameAsInd option[value=" + selected + "]").text();
+			if (selectedText != '') {
+				selectedText = jQuery.trim(selectedText);
+				selectedText = selectedText.substring(jQuery.trim(selectedText).indexOf('-') + 1);
+			}
+			$("#contactForm #sameAsDescInd").val(selectedText);
+			// END OF SUBSTRING
+			sameAsDescription = selectedText;
+			$("#contactForm #sameAsDescInd").val(sameAsDescription);
+		}
+	}
+	// ==========================================================================================================================
+	
+	// function new contact when data already exist =============================================================================
+	function newContact() {
+		selectedRow = null;
+		$('#detailContactCorp').dialog('open');
+		$('.ui-widget-overlay').css('height',$('body').height());
+		selectedRow = null;
+		clearAttrForContact();
+		$('#emailContactError').html('');
+		if ($('#customerType').val() == CUSTOMER_TYPE_C) {
+			$('#addressTypeCorp').attr("disabled",false);
+			$("#sameAsCorp").attr('disabled', false);
+			$('#contactForm #addressTypeCorp').removeClass('fieldError');
+			$("#contactForm #sameAsCorp").removeClass('fieldError');
+			$("#contactForm #addressTypeCorp option:nth-child(1)").attr('selected', true);
+			$("#contactForm #sameAsCorp option:nth-child(1)").attr('selected', true);
+		} else {
+			$('#addressTypeInd').attr("disabled",false);
+			$("#sameAsInd").attr('disabled', false);
+			$('#contactForm #addressTypeInd').removeClass('fieldError');
+			$("#contactForm #sameAsInd").removeClass('fieldError');
+			$("#contactForm #addressTypeInd option:nth-child(1)").attr('selected', true);
+			$("#contactForm #sameAsInd option:nth-child(1)").attr('selected', true);
+		}
+		enableForSameAs();
+		$('#contactForm #contacTypeCorp').val("");
+		$('#contactForm #contactTypeDescCorp').val("");
+		$('#contactForm #contacTypeCorp').removeClass('fieldError');
+		$('.errorMessage').html("");
+		$("#contactForm input:text").val(""); 
+		$("#contactForm input:hidden").val("");
+		$("#contactForm").find("input[class*='fieldError']").removeClass('fieldError');
+		$('#contactForm #identificationType1').removeClass('fieldError');
+		$('#contactForm #identificationType2').removeClass('fieldError');
+		$('#contactForm #identificationType3').removeClass('fieldError');
+		$("input[name='contact.isCustomer']").val('false');
+	}
+	// ==========================================================================================================================
+	
+	// for check value sameAs with addressType ==================================================================================
+	function checkValueSameAsWithAddressType() {
+		//$('#contactForm #sameAs').removeClass('fieldError');
+		//$('#sameAsError').html("");
+		if ($('#customerType').val() == CUSTOMER_TYPE_C) {
+			if (($('#sameAsCorp').val() != "") || ($('#addressTypeCorp').val() != "")) {
+				if ($("#contactForm #sameAsCorp").val() == $("#contactForm #addressTypeCorp").val()) {
+					$('#contactForm #sameAsCorp').addClass('fieldError');
+					$('#sameAsErrorCorp').html("can not same with address type");	
+				}
+			}
+		} else {
+			if (($('#sameAsInd').val() != "") || ($('#addressTypeInd').val() != "")) {
+				if ($("#contactForm #sameAsInd").val() == $("#contactForm #addressTypeInd").val()) {
+					$('#contactForm #sameAsInd').addClass('fieldError');
+					$('#sameAsErrorInd').html("can not same with address type");	
+				}
+			}
+		}
+	}
+	// ==========================================================================================================================
+	
+	// for compare expiry date with application date ============================================================================
+	function compareExpiryDateWithApplicationDate(thisId, currentDate, errorMsg2) {
+		//if ($("#identification1ExpiryError").html()!= "* Invalid date format") {
+			if (new Date($(thisId).val()).getTime() < new Date(currentDate).getTime()) {
+				$(thisId).addClass('fieldError');
+				$(thisId+"Error").html(errorMsg2);
+			} else {
+				$(thisId).removeClass('fieldError');
+				$(thisId+"Error").html("");
+			}
+		//}
+	}
+	// ==========================================================================================================================
+	
+	// ==========================================================================================================================
+	
+	// setting digit parameter and rounding for amount ==========================================================================
+	function formatAmount(digitAmount, typeAmount) {
+		$("td[name=amountCell]", $("#grid-investor-inquiry")).each(function() {
+			var amount = $(this).html();
+			$("#formatAmount").valueRnd(amount.toNumber(","), true, digitAmount, typeAmount);
+			$(this).html($("#formatAmount").val());
+		});
+	}
+	// ==========================================================================================================================
+	
+	// setting digit parameter and rounding for unit ============================================================================
+	function formatUnit(digitUnit, typeUnit) {
+		$("td[name=unitCell]", $("#grid-investor-inquiry")).each(function() {
+			var unit = $(this).html();
+			$("#formatUnit").valueRnd(unit.toNumber(","), true, digitUnit, typeUnit);
+			$(this).html($("#formatUnit").val());
+		});
+	}
+	// ==========================================================================================================================
+	
+	// setting digit parameter and rounding for price ===========================================================================
+	function formatPrice(digitPrice, typePrice) {
+		$("td[name=priceCell]", $("#grid-investor-inquiry")).each(function() {
+			var price = $(this).html();
+			$("#formatPrice").valueRnd(price.toNumber(","), true, digitPrice, typePrice);
+			$(this).html($("#formatPrice").val());
+		});
+	}
+	// ==========================================================================================================================
+	
+	function assignmentValueForSameAs(datas) {
+		$('#address1').val(datas.address1);
+		$('#address1City').val(datas.address1City);
+		if (datas.address1Country == null || datas.address1Country == '') {
+			$('#address1CountryCode').val('');
+			$('#address1Country').val('');
+			$('#address1CountryDesc').val('');
+		} else {
+			$('#address1CountryCode').val(datas.address1Country.lookupCode);
+			$('#address1Country').val(datas.address1Country.lookupId);
+			$('#address1CountryDesc').val(datas.address1Country.lookupDescription);	
+		}
+		
+		if (datas.address1State == null || datas.address1State == '') {
+			$('#address1StateCode').val('');
+			$('#address1State').val('');
+			$('#address1StateDesc').val('');
+		} else {
+			$('#address1StateCode').val(datas.address1State.lookupCode);
+			$('#address1State').val(datas.address1State.lookupId);
+			$('#address1StateDesc').val(datas.address1State.lookupDescription);
+		}
+		
+		if (datas.address1Area == null || datas.address1Area == '') {
+			$('#address1AreaCode').val('');
+			$('#address1Area').val('');
+			$('#address1AreaDesc').val('');
+		} else {
+			$('#address1AreaCode').val(datas.address1Area.lookupCode);
+			$('#address1Area').val(datas.address1Area.lookupId);
+			$('#address1AreaDesc').val(datas.address1Area.lookupDescription);
+		}
+		
+		$('#address1ZipCode').val(datas.address1ZipCode);
+		$('#address1Phone1').val(datas.address1Phone1);
+		$('#address1Phone2').val(datas.address1Phone2);
+		$('#address1Phone3').val(datas.address1Phone3);
+	}
+		
+	function state(data) {
+		// address 1 state lookup at tab contacts ===============================================================================
+		$('#address1StateCode').lookup({
+			list:'@{Pick.lookups()}?group='+data,
+			get:{
+				url:'@{Pick.lookup()}?group='+data,
+				success: function(data) {
+					if (data) {
+						if ($('#address1CountryCode').val() == "" || $('#address1CountryCode').val() == null) {
+							$('#address1StateCode').addClass('fieldError');
+							$('#address1StateDesc').val('NOT FOUND');
+							$('#address1StateCode').val('');
+							$('#address1State').val('');
+							$('#h_address1StateDesc').val('');
+							return false;
+						}
+						$('#address1StateCode').removeClass('fieldError');
+						$('#address1State').val(data.code);
+						$('#address1StateDesc').val(data.description);
+						$('#h_address1StateDesc').val(data.description);
+						area("AREA");
+					}
+				},
+				error : function(data) {
+					$('#address1StateCode').addClass('fieldError');
+					$('#address1StateDesc').val('NOT FOUND');
+					$('#address1StateCode').val('');
+					$('#address1State').val('');
+					$('#h_address1StateDesc').val('');
+				}
+			},
+			filter: {'key':'1','value':$('#address1Country')},
+			key:$('#address1State'),
+			description:$('#address1StateDesc'),
+			help:$('#address1StateHelp'),
+			nextControl:$('#address1AreaCode')
+		});
+		// ======================================================================================================================
+	}
+	
+	function area(data) {
+		// address 1 area lookup at tab contacts ================================================================================
+		$('#address1AreaCode').lookup({
+			list:'@{Pick.lookups()}?group='+data,
+			get:{
+				url:'@{Pick.lookup()}?group='+data,
+				success: function(data) {
+					if (data) {
+						if ($('#address1StateCode').val() == "" || $('#address1StateCode').val() == null) {
+							$('#address1AreaCode').addClass('fieldError');
+							$('#address1AreaDesc').val('NOT FOUND');
+							$('#address1AreaCode').val('');
+							$('#address1Area').val('');
+							$('#h_address1AreaDesc').val('');
+							return false;
+						}
+						$('#address1AreaCode').removeClass('fieldError');
+						$('#address1Area').val(data.code);
+						$('#address1AreaDesc').val(data.description);
+						$('#h_address1AreaDesc').val(data.description);
+					}
+				},
+				error : function(data) {
+					$('#address1AreaCode').addClass('fieldError');
+					$('#address1AreaDesc').val('NOT FOUND');
+					$('#address1AreaCode').val('');
+					$('#address1Area').val('');
+					$('#h_address1AreaDesc').val('');
+				}
+			},
+			filter:{'key':'2','value':$('#address1State')},
+			key:$('#address1Area'),
+			description:$('#address1AreaDesc'),
+			help:$('#address1AreaHelp'),
+			nextControl:$('#address1ZipCode')
+		});
+		// ======================================================================================================================
+	}
+	
+	
+
+	function doCancel() {
+		#{if mode == 'edit'}
+			location.href='@{list()}#{if mode}?mode=${mode}#{/}';
+		#{/if}
+		#{elseif mode == 'entry'}		
+			location.href='@{dedupe()}';
+		#{/elseif}
+		#{else}		
+			history.back();
+		#{/else}
+	};
+	
+	function doClose() {
+		location.href='@{list()}#{if mode}?mode=${mode}#{/}';
+		if (param) {
+			if (param == 'register-bank-acct') {
+				location.href='@{Investors.list()}?mode=view'+ '&param=register-bank-acct';
+			} else if (param == 'register-cust-acct') {
+				location.href='@{Investors.list()}?mode=view'+ '&param=register-bank-acct';
+			} 
+		} else {
+			location.href='@{Investors.dedupe()}';
+		}
+		
+	};
+	
+</script>
+
+<style type="text/css">
+  .errorMessage { color:red; }
+</style>
+
+<form id="customerForm" class="form" method="POST">
+	#{hidden id:'param', name:'param', value:param /}
+	#{hidden id:'status', name:'status', value:status /}
+	#{hidden id:'custAccountKey' /}
+	#{hidden id:'custAccountNo', name:'account.custodyAccountKey', value:account?.custodyAccountKey /}
+	#{hidden id:'custAccountName', name:'account.name', value:account?.name /}
+	#{hidden id:'bankAccountKey' /}
+	#{hidden id:'bankAccountNo', name:'account.settlementAccount.accountNo', value:account?.settlementAccount?.accountNo /}
+	#{hidden id:'bankAccountName', name:'account.settlementAccount.name', value:account?.settlementAccount?.name /}
+	#{hidden name:'customer.organization.organizationId', value:customer?.organization?.organizationId /}
+	#{hidden id:'customerKey', name:'customer.customerKey', value:customer?.customerKey /}
+	#{hidden id:'currentDate', name:'currentDate', value:currentDate, class:'calendar' /}
+	#{hidden id:'contactKey1', name:'customer.cfContact.contactKey', value:customer?.cfContact?.contactKey /}
+	#{hidden id:'addressType1', name:'customer.cfContact.addressType.lookupId', value:customer?.cfContact?.addressType?.lookupId /}
+	#{hidden id:'contactKey2', name:'customer.cfContact2.contactKey', value:customer?.cfContact2?.contactKey /}
+	#{hidden id:'addressType2', name:'customer.cfContact2.addressType.lookupId', value:customer?.cfContact2?.addressType?.lookupId /}
+	#{hidden id:'dummy' /}
+	<h2>Investor: ${customer?.customerNo}-${customer?.customerName}</h2>
+	<div id="tabs"> 
+		<ul>
+			<li><a href="#tabs-1">Primary</a></li>
+			<li><a href="#tabs-2" name="individual">Individual</a></li>
+			<li><a href="#tabs-3" name="corporate">Institutional</a></li>
+			<li><a href="#tabs-4">ID Info</a></li>
+			<li><a href="#tabs-5">Bank Account</a></li>
+			<li><a href="#tabs-6">Additional</a></li>
+			#{if fromInquiry == 'fromInquiry'}
+				<li><a href="#tabs-7">Product Account</a></li>
+			#{/if}
+		</ul>
+		<div class="pane" id="tabs-1">
+			#{include 'Investors/tab_primary.html' /}	
+		</div>
+		<div class="pane" id="tabs-2">	
+			#{include 'Investors/tab_individual.html' /}
+		</div>
+		<div class="pane" id="tabs-3">	
+			#{include 'Investors/tab_corporate.html' /}		
+		</div>
+		<div class="pane" id="tabs-4">		
+			#{include 'Investors/tab_contacts.html' /}
+					
+		</div>
+		<div class="pane" id="tabs-5">
+			#{include 'Investors/tab_account.html' /}
+			<div class="buttons">
+					<input type="button" id="newAccount"  #{if readOnly}disabled="disabled"#{/if} value="Add" />
+					<span id="deleteErrorMessage" class="errorMessage"></span>
+			</div>	
+		</div>
+		<div class="pane" id="tabs-6">
+			#{include 'Investors/tab_additional.html' /}		
+		</div>
+		#{if fromInquiry == 'fromInquiry'}
+			<div class="pane" id="tabs-7">
+				#{include 'Investors/tab_product_account.html' /}		
+			</div>
+		#{/if}
+	</div>
+	
+	#{if param}
+		<div class="buttons">
+			#{if param == 'register-cust-acct'}
+				<input type="button" id="continueCust" value="Continue" #{if customer?.isActive == false } disabled="disabled"#{/if}/>
+				<!-- <button id="continueCust" #{if customer?.isActive == false } disabled="disabled"#{/if}>Continue</button> -->
+			#{/if}
+			#{if param == 'register-bank-acct'}
+				<input type="button" id="continueBank" value="Continue" #{if customer?.isActive == false } disabled="disabled"#{/if}/>
+				<!-- <button id="continueBank" #{if customer?.isActive == false } disabled="disabled"#{/if}>Continue</button> -->
+			#{/if}
+			#{if param == 'register-invt-acct'}
+				<input type="button" id="continueInvt" value="Continue" #{if customer?.isActive == false } disabled="disabled"#{/if}/>
+				<!-- <button id="continueInvt" #{if customer?.isActive == false } disabled="disabled"#{/if}>Continue</button> -->
+			#{/if}
+			#{if ((param == 'edit') && (mode == 'edit'))}
+				#{if confirming}
+					<!-- <button id="confirm">Confirm</button>
+					<button id="back">Back</button> -->
+					<input type="button" id="confirm" value="Confirm" />
+					<input type="button" id="back" value="Back" />
+				#{/if}
+				#{else}	
+					<input type="button" id="save" value="Save" />
+					<input type="button" id="mainCancel" value="Cancel" />
+					<!-- <button id="save">Save</button>
+					<button id="mainCancel">Cancel</button> -->
+				#{/else}
+			#{/if}
+			#{else}
+				<input type="button" id="backCustBankInvt" value="Close" />
+				<!-- <button id="backCustBankInvt">Close</button> -->
+			#{/else}
+		</div>
+	#{/if}
+	#{if ((param == "") && (mode == 'entry'))}
+		<div class="buttons">
+			#{if confirming}
+				<!-- <button id="confirm">Confirm</button>
+				<button id="back">Back</button> -->
+				<input type="button" id="confirm" value="Confirm" />
+				<input type="button" id="back" value="Back" />
+			#{/if}
+			#{else}	
+				<!-- <button id="save">Save</button>
+				<button id="mainCancel">Cancel</button> -->
+				<input type="button" id="save" value="Save" />
+				<input type="button" id="mainCancel" value="Cancel" />
+			#{/else}
+		</div>
+	#{/if}
+	
+    <form></form>
+	<div id="detailContactCorp" title="Investor">
+			#{include 'Investors/detail_contact.html' /}	
+		<div class="buttons">
+			<!-- <button id="saveCon">Save</button>
+			<button id="cancelCon">Cancel</button>
+			<button id="closeCon">Close</button> -->
+			<input type="button" id="saveCon" value="Save" />
+			<input type="button" id="cancelCon" value="Cancel" />
+			<input type="button" id="closeCon" value="Close" />
+		</div>
+	</div>
+	
+	<div id="detailBankAccount" title="Investor">
+			#{include 'Investors/detail_investor_account.html' /}	
+		<div class="buttons">
+			<input type="button"  id="saveBnAccount" value="Save"/>
+			<input type="button"  id="cancelBnAccount" value="Cancel"/>
+			<input type="button"  id="closeBnAccount" value="Close"/>
+		</div>
+	</div>
+</form>
+
+<div id="dialog-message-1" title="Message Confirmation">
+	<p>
+	<span class="ui-icon ui-icon-notice" style="float:left; margin:0 7px 50px 0;"></span>
+	Are you sure to delete data ? </p>
+</div>
+
+<div id="dialog-message-2" title="Message Confirmation">
+	<p>
+	<span class="ui-icon ui-icon-notice" style="float:left; margin:0 7px 50px 0;"></span>
+	Are you sure to inactive data ? </p>
+</div>
+

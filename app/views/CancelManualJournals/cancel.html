@@ -1,0 +1,65 @@
+#{extends 'templates/main.html' /}
+
+<script type="text/javascript">
+	$(function() {
+		$('#cancel').button();
+		$('#cancelManualJournal').button();
+		
+		var backToList = function() {
+			location = "@{list()}";
+		}
+		
+		var closeDialogMessage = function() {
+			$("dialog-message").dialog('close');
+		}
+		var onProgress = 0;
+		$('#cancelManualJournal').click(function() {
+			if(onProgress ==1)
+				return;
+			
+			onProgress=1;					
+			
+			var action = "@{cancel()}?key=${faTransaction?.transactionKey}";
+			var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+			loading.dialog({
+				closeOnEscape: false,
+				draggable: false,
+				modal: true,
+				resizable: false,
+				open:function() {
+					$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+				} 
+			});
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					if(data.transactionStatus == 'A') {
+						//alert("Cancel Successfully for transaction No #" + data.transactionNo);
+						messageAlertOk("Cancel Successfully for Transaction No #" + data.transactionNo, "ui-icon ui-icon-circle-check", "Notification", backToList);
+					} else {
+						messageAlertOk("Please re-posting Transaction No #" + data.transactionNo + " from " + data.transactionDate, "ui-icon1 ui-icon-alert", "Warning Message", backToList);
+					}
+				} else {
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", backToList); 
+				}
+			});
+		});
+		
+		$('#cancel').click(function() {
+			location.href="@{list()}";			
+		});
+		
+		$('#dvNeedCorrection').css("display","none");
+	});	
+</script>
+<h2>Cancel Journal</h2>
+<div id="detail">
+	#{include 'ManualJournals/detail.html' /}	
+</div>
+<div id="actions" class="buttons">
+		<input type="button" id="cancelManualJournal" value="Save" />
+		<input type="button" id="cancel" value="Cancel" />
+</div>
+
+#{hidden id:'key', name:'faTransaction.transactionKey', value:faTransaction?.transactionKey /}

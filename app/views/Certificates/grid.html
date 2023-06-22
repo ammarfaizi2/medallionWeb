@@ -1,0 +1,72 @@
+<script type="text/javascript">
+$(document).ready(function(){
+	
+	// This is the hack for IE
+// 	if ($.browser.msie) {
+// 	  $('#notInList').click(function() {
+// 	    this.blur();
+// 	    this.focus();
+// 	  });
+// 	}
+
+ });
+ 
+function doEdit(data) {
+	if ((data[5] == "New") || (data[5] == "Updated")) {
+		view(data[0]);
+		return false;
+	} else {
+		return true;
+	}
+}
+
+</script>
+
+<h3>Search results</h3>
+
+#{if certificates}
+<table id="grid" class="display">
+	<thead>
+		<tr>		
+			<th>Certificate Key</th>
+			<th width="100px">Certificate Id</th>
+			<th width="250px">Cert Qty</th>
+			<th width="80px">Denomination</th>
+			<th width="150px">Port Move</th>
+			<th width="80px">Status</th>
+			<th width="50px">Active</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:certificates, as:'certificate'}
+		<tr>
+			<td>
+				${certificate?.certificateKey}
+			</td>
+			<td>
+				${certificate?.certificateId}
+			</td>
+			<td>
+				${certificate?.quantity}
+			</td>
+			<td>
+				${certificate?.denomination}
+			</td>
+			<td>
+				${certificate?.portMode?.lookupCode}
+			</td>
+			<td>
+				${certificate?.recordStatus?.decodeStatus()}
+			</td>
+			<td>
+				${(certificate?.isActive) ? 'Yes' : 'No'}
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>
+
+#{/if}
+#{else}
+<div>No record found</div>
+#{/else}

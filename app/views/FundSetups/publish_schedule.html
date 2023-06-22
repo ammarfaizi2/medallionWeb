@@ -1,0 +1,96 @@
+
+<script type="text/javascript">
+$(function() {
+	$('.buttons input:button').button();
+
+
+	
+	
+});
+</script>
+
+
+	<table>
+		<tr>
+			<td>
+				#{radioButton id:'isUsedAppDate', name:'isUsedAppDate',value:'CALENDAR', label:'Schedule Type', options:scheduleTypeOperators, readOnly:readOnly /}
+				#{hidden id:'isUsedAppDateHidden', name:'faMaster.usedAppDate', value:((faMaster?.usedAppDate)?'true':'false')/}
+			</td>
+		</tr>
+		<tr>
+			<td width="400px">
+					<b>Select Date</b>&nbsp;&nbsp;&nbsp;&nbsp;
+					#{textBox id:'date', name:'date', value:'', class:'calendar', required:true, readOnly:readOnly /} 
+				
+					&nbsp;&nbsp;&nbsp;&nbsp;
+					<!-- #{button id:'newDate', value:'Insert', class:'btn' /}-->
+					<input type="button" id="newDate" value="Insert" style="width: 180px", class="btn" #{if readOnly}disabled="disabled"#{/if}/>
+					<span id="newDateError" class="error">#{error 'New Data is' /}</span>
+				
+			</td>
+			<td width="600px">
+						<div class="buttons" id="selectYearID">
+						<b>Select Year</b>
+					     #{dropDownList id:'year', name:'year', options:years, value:'', readOnly:readOnly, width:'89px'/}
+						<!-- <input id="select"  type="submit" value="View In Calender" /> -->
+						&nbsp;&nbsp;
+						<input type="button" id="select" value="View in Calendar" style="width: 130px" #{if readOnly}disabled="disabled"#{/if}/>
+						</div>
+						<span id="yearErrMsg" class="error"></span>
+				
+			</td>
+		</tr>
+		
+		<tr>
+			<td align="left">
+				<div id="listPublishSchedule" style="overflow-y:scroll;height:150px;width:300px" align="left">
+					#{include 'FundSetups/grid_publish_schedule.html' /}
+				</div>
+			</td>
+			<td></td>
+		</tr>
+		
+		
+     </table>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+<!-- 
+<script type="text/javascript">
+
+</script>
+	    
+		<div class="left" style="height: 80px">	
+			<p>
+				#{textBox id:'date', name:'', value:'', label:'Selehhct Date', width:'60px',class:'capitalize',readOnly:readOnly/}
+				<button id="newRebateModel" #{if readOnly}disabled="disabled"#{/if}>New Data</button>
+				<span id="newRebateError" class="error">#{error 'New Data is' /}</span>
+	    	</p>	
+			<div id="listIpoAgent" style="overflow-y:scroll;height:100px">
+				#{include 'FundSetups/grid_publish_schedule.html' /}
+			</div>
+		</div>
+		<div class="right" style="height: 80px">
+			<p>
+				#{radioButton id:'cashBackStat', name:'cashBackStat',value:((feeMaster?.customerCashBack)?'true':'false'), label:'Cash Back for Customer', options:cashBack, readOnly:readOnly /}
+				#{hidden id:'cashBackStatHidden', name:'feeMaster.customerCashBack', value:((feeMaster?.customerCashBack)?'true':'false') /}
+				
+			</p>
+			<form action="@{list}" class="form">	
+				<b>Select Year</b>
+				#{dropDownList id:'year', name:'year', options:years, value:'', readOnly:readOnly, width:'89px'/}
+				<input id="select" type="submit" value="Select"/>
+				<span id="yearErrMsg" class="error"></span>
+			</form>
+		</div>
+ -->

@@ -1,0 +1,25 @@
+<table id="grid" class="display">
+	<thead>
+		<tr>
+			<th width="100px">Currency No</th>
+			<th width="300px">Name</th>
+			<th width="50px">Status</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:currencies, as:'currency'}
+		<tr>
+			<td class="capitalize">
+				${currency.currencyCode}
+			</td>
+			<td>
+				${currency.description}
+			</td>
+			<td>
+				Active
+			</td>
+			
+		</tr>
+	#{/list}
+	</tbody>
+</table>

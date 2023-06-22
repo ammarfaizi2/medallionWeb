@@ -1,0 +1,176 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Inquiry Unit Registry' /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)||(mode=='view')) /}
+#{script 'lookups.js' /}
+
+<script type="text/javascript">
+	
+	function doEdit(data) {
+		return false;
+	}
+	 
+	 function doView(data) {
+		 return false;
+	 }
+	 
+</script> 
+
+#{if flash.error || errors}
+    <div class="error">
+		<li>${flash.error}</li>
+		#{ifErrors}
+			#{errors}
+				 <li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}
+
+<form id="inquiryUnitRegistryForm" class="form" method="POST" name="unitRegistry">
+	#{hidden id:'dispatch', value:mode/}
+	#{hidden id:'remark', name:'rg.remark', value:rg?.remark/}
+	#{hidden id:'selected', name:'rg.selected', value:rg?.selected/}
+	
+	<p>			
+		#{textBox id:'fundCode', name:'rg.rgProduct.productCode', label:'Fund Code', value:rg?.rgProduct?.productCode, width:'120px', readOnly:readOnly, class:'capitalize', required:true/}
+		#{hidden  id:'fundCodeKey', value:rg?.rgProduct?.productCode /}
+		#{button  id:'fundCodeHelp', value:'?', class:'small', readOnly:readOnly/}
+		#{textBox id:'fundCodeDesc', name:'rg.rgProduct.name', value:rg?.rgProduct?.name, readOnly:true, width:'340px' /}
+		<span id="fundCodeError" class="error"></span>
+	</p>
+	<p>			
+		#{textBox id:'tradeDate', name:'rg.tradeDate', label:'Transaction Date', value:rg?.tradeDate?.format(appProp.dateFormat), class:'calendar', readOnly:readOnly, required:true /} (${appProp.displayDateFormat})
+		<span id="tradeDateError" class="error"></span>
+	</p>
+	<p>
+		#{dropDownList id:'type', name:'rg.type', label:'Type', options:listType, value:rg?.type, readOnly:readOnly, width:'124px' /}
+	</p>	
+	<p id="transactionNoP">			
+		#{textBox id:'transactionNo', name:'rg.redemRefKey', label:'Transaction No', value:rg?.redemRefKey, readOnly:readOnly, width:'120px', class:'numberOnly' /}
+	</p>
+	<div class="buttons">
+		#{button  id:'btnNext', value:'Search', readOnly:false/}
+		#{button  id:'btnClear', value:'Clear', readOnly:false/}
+	</div>
+	
+	<br>
+	<table id="tblTransaction" class="display">
+		<thead>
+			<tr>
+				<th align="center">Trx No</th>
+				<!-- COLOM 1 -->
+				#{if ((rg.type == 'Subscribe')||(rg.type == 'Redeem')) }
+					<th align="center">Trans. No</th>
+				#{/if}
+				#{if (rg.type == 'Switching') }
+					<th align="center">Switching No.</th>
+				#{/if}
+				#{if (rg.type == 'Dividend') }
+					<th align="center">Dividend No</th>
+				#{/if}
+				
+				<!-- COLOM 2 -->
+				#{if ((rg.type == 'Subscribe')||(rg.type == 'Redeem')) }
+					<th align="center">Invest. Acc. No.</th>
+				#{/if}
+				#{if (rg.type == 'Switching') }
+					<th align="center">Fund Code (To)</th>
+				#{/if}
+				#{if (rg.type == 'Dividend') }
+					<th align="center">Dividend Type</th>
+				#{/if}
+				<!-- th align="right">Unit</th-->
+				<th align="right">Amount</th>
+				<th align="right">Price</th>
+				<th align="center">Status</th>
+			</tr>
+		</thead>
+		<tbody>
+			#{if ((rg.type == 'Subscribe')||(rg.type == 'Redeem')) }
+				#{list rgTrades, as:'rgTrade'}
+					#{if (rgTrade?.type == 'Subscribe') } <tr tradeKey=${rgTrade?.tradeKey}  url="@{registrySubscription.cancel(rgTrade?.tradeKey, 'unitRegistry')}"> #{/if}
+					#{if (rgTrade?.type == 'Redeem') } <tr tradeKey=${rgTrade?.tradeKey} url="@{registryRedemption.cancel(rgTrade?.tradeKey, rgTrade?.liquidation, 'unitRegistry')}"> #{/if}
+					<td>${rgTrade?.tradeKey}</td>
+					<td align="center">${rgTrade?.tradeKey}</td>
+					<td align="center">${rgTrade?.rgInvestmentaccount?.accountNumber}</td>
+					<td align="right">${rgTrade?.amount?.format('#,##0.##########')}</td>
+					<td align="right">${priceSubRed?.format('#,##0.##########')}</td>
+					#{if (rg.type == 'Subscribe') }
+						#{if (rgTrade?.tradeStatus?.trim() == 'O') } <td align="center">Open</td> #{/if}
+						#{if (rgTrade?.tradeStatus?.trim() == 'A') } <td align="center">Approved</td> #{/if}
+						#{if (rgTrade?.tradeStatus?.trim() == 'S') } <td align="center">Settled</td> #{/if}
+						#{if (rgTrade?.tradeStatus?.trim() == 'C') } <td align="center">Cancelled</td> #{/if}
+						#{if (rgTrade?.tradeStatus?.trim() == 'R') } <td align="center">Rejected</td> #{/if}
+						#{if ((rgTrade?.tradeStatus?.trim() == 'V')&&(rgTrade?.posted)) } <td align="center">Posted</td> #{/if}
+						#{if ((rgTrade?.tradeStatus?.trim() == 'V')&&(!rgTrade?.posted)) } <td align="center">Valid</td> #{/if}
+					#{/if}
+					#{if (rg.type == 'Redeem') }
+						#{if ((rgTrade?.tradeStatus?.trim() == 'O')&&(!rgTrade?.paid)) } <td align="center">Open</td> #{/if}
+						#{if ((rgTrade?.tradeStatus?.trim() == 'A')&&(!rgTrade?.paid)) } <td align="center">Approved</td> #{/if}
+						#{if ((rgTrade?.tradeStatus?.trim() == 'S')&&(!rgTrade?.paid)) } <td align="center">Settled</td> #{/if}
+						#{if ((rgTrade?.tradeStatus?.trim() == 'C')&&(!rgTrade?.paid)) } <td align="center">Cancelled</td> #{/if}
+						#{if ((rgTrade?.tradeStatus?.trim() == 'R')&&(!rgTrade?.paid)) } <td align="center">Rejected</td> #{/if}
+						#{if ((rgTrade?.tradeStatus?.trim() == 'V')&&(rgTrade?.posted)&&(!rgTrade?.paid)&&(rgTrade?.rgPayment == null)) } <td align="center">Posted</td> #{/if}
+						#{if ((rgTrade?.tradeStatus?.trim() == 'V')&&(!rgTrade?.posted)&&(!rgTrade?.paid)) } <td align="center">Valid</td> #{/if}
+						#{if ((rgTrade?.rgPayment?.paymentStatus?.trim() == 'O')&&(!rgTrade?.paid)) } <td align="center">Paid(O)</td> #{/if}
+						#{if ((rgTrade?.rgPayment?.paymentStatus?.trim() == 'A')&&(rgTrade?.paid)) } <td align="center">Paid(A)</td> #{/if}
+					#{/if}
+					</tr>
+				#{/list}
+			#{/if}
+			
+			#{if (rg.type == 'Switching') }
+				#{list rgSwitchings, as:'rgSwitching'}
+				<tr tradeKey=${rgSwitching?.switchingKey} url="@{registrySwitch.cancel(rgSwitching?.switchingKey, 'unitRegistry')}">
+					<td>${rgSwitching?.switchingKey}</td>
+					<td align="center">${rgSwitching?.switchingKey}</td>
+					<td>${fundCodeTo}</td>
+					<td align="right">${amountForSwitching?.format('#,##0.##########')}</td>
+					<td align="right">${priceForSwitching?.format('#,##0.##########')}</td>
+					#{if (rgSwitching?.tradeStatus?.trim() == 'O') } <td align="center">Open</td> #{/if}
+					#{if (rgSwitching?.tradeStatus?.trim() == 'A') } <td align="center">Approved</td> #{/if}
+					#{if (rgSwitching?.tradeStatus?.trim() == 'S') } <td align="center">Settled</td> #{/if}
+					#{if (rgSwitching?.tradeStatus?.trim() == 'C') } <td align="center">Canceled</td> #{/if}
+					#{if (rgSwitching?.tradeStatus?.trim() == 'R') } <td align="center">Rejected</td> #{/if}
+					#{if (rgSwitching?.tradeStatus?.trim() == 'V') } <td align="center">Valid</td> #{/if}
+				</tr>
+				#{/list}
+			#{/if}
+			
+			
+			#{if (rg.type == 'Dividend') }
+				#{list rgFundActions, as:'rgFundAction'}
+				<tr tradeKey=${rgFundAction?.fundActionKey} url="@{registryFundAction.cancel(rgFundAction?.fundActionKey, 'unitRegistry')}">
+					<td>${rgFundAction?.fundActionKey}</td>
+					<td align="center">${rgFundAction?.fundActionKey}</td>
+					<td>${rgFundAction?.divType}</td>
+					<td align="right">${rgFundAction?.amount?.format('#,##0.##########')}</td>
+					<td align="right">${navPrice?.format('#,##0.##########')}</td>
+					#{if (rgFundAction?.status?.trim() == 'O') } <td align="center">Open</td> #{/if}
+					#{if (rgFundAction?.status?.trim() == 'A') } <td align="center">Approved</td> #{/if}
+					#{if (rgFundAction?.status?.trim() == 'S') } <td align="center">Settled</td> #{/if}
+					#{if (rgFundAction?.status?.trim() == 'C') } <td align="center">Canceled</td> #{/if}
+					#{if (rgFundAction?.status?.trim() == 'R') } <td align="center">Rejected</td> #{/if}
+					#{if (rgFundAction?.status?.trim() == 'V') } <td align="center">Valid</td> #{/if}
+				</tr>
+				#{/list}
+			#{/if}
+		</tbody>
+	</table>
+	
+</form>
+	
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'InquiryUnitRegistry/UnitRegistry.js' /}
+	$(document).ready(function() {
+		$('#new').remove();
+		$('.buttons input:button').button();
+		if ('${mode}'=='view'){
+			UnitRegistry($("#main"));
+		} else {
+			UnitRegistry($("#inquiryUnitRegistryForm"));
+		}
+		
+	});	
+</script>

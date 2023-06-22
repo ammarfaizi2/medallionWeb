@@ -1,0 +1,41 @@
+<table id="gridChargeInvoice" class="display">
+	<thead>
+		<tr>
+			<th width="150px">Charge Group</th>
+			<th width="100px">Tax</th>
+			<th width="100px">Min Charge</th>
+			<th width="100px">Max Charge</th>
+			<th width="80px">Action</th>
+		</tr>
+	</thead>
+	<tbody>
+	 	#{list account?.accountCharges, as:'accountCharge'}
+		<tr>			
+			<td>${accountCharge?.invoiceCharge?.lookupDescription}</td>
+			<td>${accountCharge?.taxMaster?.taxCode}</td>
+			<td>${accountCharge?.minimumValue}</td>
+			<td>
+				#{if accountCharge?.maximumValue}
+					${accountCharge?.maximumValue}
+				#{/if}
+				#{else}
+					*MAX
+				#{/else}
+			</td>
+			<td>
+				#{hidden id:'accountChargeKeyX', name:'accountCharges[' + (accountCharge_index-1) + '].accountChargeKey', value:accountCharge?.accountChargeKey /}
+				#{hidden id:'custodyAccountKeyX', name:'accountCharges[' + (accountCharge_index-1) + '].account.custodyAccountKey', value:accountCharge?.account?.custodyAccountKey /}
+				#{hidden id:'chargeGroupX', name:'accountCharges[' + (accountCharge_index-1) + '].invoiceCharge.lookupId', value:accountCharge?.invoiceCharge?.lookupId /}
+				#{hidden id:'chargeGroupDescX', name:'accountCharges[' + (accountCharge_index-1) + '].invoiceCharge.lookupDescription', value:accountCharge?.invoiceCharge?.lookupDescription /}
+				#{hidden id:'minChargeX', name:'accountCharges[' + (accountCharge_index-1) + '].minimumValue', value:accountCharge?.minimumValue /}
+				#{hidden id:'maxChargeX', name:'accountCharges[' + (accountCharge_index-1) + '].maximumValue', value:accountCharge?.maximumValue /}
+				#{hidden id:'taxCode', name:'accountCharges[' + (accountCharge_index-1) + '].taxMaster.taxCode', value:accountCharge?.taxMaster?.taxCode /}
+				#{hidden id:'taxKey', name:'accountCharges[' + (accountCharge_index-1) + '].taxMaster.taxKey', value:accountCharge?.taxMaster?.taxKey /}
+				#{hidden id:'taxName', name:'accountCharges[' + (accountCharge_index-1) + '].taxMaster.description', value:accountCharge?.taxMaster?.description /}
+				<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} /></center>
+			</td>
+		</tr>
+		#{/list}
+	</tbody>
+</table>
+

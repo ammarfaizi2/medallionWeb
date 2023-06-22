@@ -1,0 +1,104 @@
+#{extends 'templates/main.html' /}
+#{script 'lookups.js' /}
+<h2>Settlement Entry</h2>
+
+<div id="accordion">
+	<h3><a href="#">Search Transaction</a></h3>
+	<form id="searchForm" class="form">
+		#{hidden id:'dispatch', name:'param.dispatch', value:param?.dispatch /}
+		#{hidden id:'readOnly', name:'param.readOnly', value:param?.readOnly /}
+		#{hidden id:'depositoryId', name:'param.depositoryId', value:param?.depositoryId /}
+		#{hidden id:'issuerKey', name:'param.issuerKey', value:param?.issuerKey /}
+		#{hidden id:'ctpRequired', name:'param.ctpRequired', value:param?.ctpRequired /}
+		#{hidden id:'marketOfRiskId', name:'param.marketOfRiskId', value:param?.marketOfRiskId /}
+		#{hidden id:'query', name:'param.query', value:param?.query /}
+		
+		<span id="globalError" class="error"></span>
+		<p> 
+			#{textBox id:'batchNo', name:'param.batchKey', label:'Batch No', value:param?.batchKey, readOnly:'true' /}
+			<span id="batchNoError" class="error"></span>
+		</p>
+		<p>
+			#{textBox id:'settlementDate', name:'param.settlementDate', label:'Settlement Date', readOnly:param.readOnly, value:param?.settlementDate?.format(appProp.dateFormat), class:'calendar', required: true /} (${appProp.displayDateFormat})
+			<span id="settlementDateError" class="error"></span>
+		</p>
+		<p>
+			#{textBox id:'securityType', label:'Security Type', value:param?.securityType?.securityType, class:'capitalize', readOnly:param.readOnly, width:'100px', required: true /}
+			#{hidden  id:'securityTypeKey', name:'param.securityType.securityType', value:param?.securityType?.securityType /}
+			#{button  id:'securityTypeHelp', value:'?', class:'small' , readOnly:param.readOnly /}
+			#{textBox id:'securityTypeDesc', name:'param.securityType.description', value:param?.securityType?.description, readOnly:true, width:'200px' /}
+			<span id="securityTypeError" class="error"></span>
+		</p>
+		<p>
+			#{textBox id:'security', label:'Security Code', name:'param.security.securityId', value:param?.security?.securityId, class:'capitalize', readOnly:param.readOnly, width:'100px', required: true /}
+			#{hidden  id:'securityKey', name:'param.security.securityKey', value:param?.security?.securityKey /}
+			#{button  id:'securityHelp', value:'?', class:'small', readOnly:param.readOnly /}
+			#{textBox id:'securityDesc', name:'param.security.description', value:param?.security?.description, readOnly:true, width:'200px' /}
+			<span id="securityError" class="error"></span>
+		</p>
+		<p> 
+			#{textBox id:'depository', label:'Depository', value:param?.depository, readOnly:true /}
+			#{hidden id:'depositoryHidden', name:'param.depository', value:param?.depository /}
+			<span id="depositoryError" class="error"></span>
+		</p>
+		<p>
+			 #{radioButton id:'sendToDepository', name:'param.sendToDipository', label:'Send To Dipository', value:((param?.sendToDipository)?'true':'false'), options:operators, readOnly:param.readOnly  /} <br/>
+			 <span id="sendToDepositoryError" class="error"></span>
+		</p>
+		<p>
+			<div class="buttons">
+				<input type="button" id="populate" value="Populate" />
+			</div>
+		</p>
+		#{list param.transactionKey, as:'trasKey'}
+			#{hidden name:'param.transactionKey', value:trasKey /}
+		#{/list}
+	</form>
+</div>
+<p>&nbsp;</p>
+<div id="result">
+	<table id="tableSettlement" class="display">
+		<thead>
+			<tr>
+				<th width="20px" field="component|checkbox|none|center|nosort"><input type="checkbox"></th>
+				<th width="75px" field="settlementDate|date|date|center|sort">Settlement Date</th>
+				<th width="50px" field="transactionNumber|string|none|left|sort">Transaction #</th>
+				<th width="100px" field="account.accountNo|string|none|left|sort">Account No</th>
+				<th width="100px" field="account.name|string|none|center|sort">Account Name</th>
+				<th width="100px" field="transactionTemplate.description|string|none|left|sort">Description</th>
+				<th width="100px" field="settlementAmount|number|decimal2|right|sort">Settlement Amount</th>
+				<th width="350px" field="errorDescription|string|none|left|nosort">Error Message</th>
+				<!--
+				<th width="100px" field="account.custodyAccountKey|string|none|left|nosort">Custory Account Key</th>
+				<th width="100px" field="ctpNo|string|none|left|nosort">CtpNo</th>
+				<th width="100px" field="transactionKey|string|none|left|nosort">TransactionKey</th>
+				 
+				<th width="100px" field="security.securityId|string|none|left|nosort">Security Code</th>
+				<th width="100px" field="security.securityType.securityType|string|none|left|nosort">Security Type</th>
+				<th width="100px" field="cancelled|string|none|left|nosort">Cancelled</th>
+				 -->
+				 
+			</tr>
+		</thead>
+		<tbody></tbody>
+	</table>
+	<p id="buttonEntry">
+		<input type="button" id="settle" value="Settle" />
+		<input type="button" id="reset" value="Reset" />
+	</p>
+	<p id="buttonSettle">
+		<input type="button" id="confirm" value="Confirm" />
+		<input type="button" id="back" value="Back" />
+	</p>
+	<p id="buttonConfirm">
+		<input type="button" id="close" value="Close" />
+	</p>	
+</div>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'Transactions/Settlement.js' /}
+	$(document).ready(function() {
+		new Settlement($("#accordion").add("#result"));
+	});
+</script>

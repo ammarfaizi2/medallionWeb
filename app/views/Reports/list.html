@@ -1,0 +1,151 @@
+#{extends 'templates/main.html' /}
+<script type="text/javascript">
+	$(function() {
+		$('.accordion').accordion({
+			collapsible: true ,
+			autoHeight: false
+		});
+	});
+	
+</script>
+
+<div class="accordion">
+
+	<h3><a>Custody Internal Reports</a></h3>
+	<div id="reportGroup" >	
+	#{list items:reportMappings, as:'reportMapping'}
+		#{if reportMapping?.reportList?.reportGroup == 'Custody Internal Reports'}
+			#{list items:reportMapping?.reportList, as:'reportList'}
+			<div id="reportName">
+				<ul>
+					<li><a href=${reportList?.reportUrl} target="_report">${reportList?.reportName}</a></li>
+				</ul>
+			</div>
+			#{/list}
+		#{/if}
+	#{/list}
+	</div>	
+
+	<h3><a>Custody External Reports</a></h3>
+	<div id="reportGroup" >	
+	#{list items:reportMappings, as:'reportMapping'}
+		#{if reportMapping?.reportList?.reportGroup == 'Custody External Reports'}
+			#{list items:reportMapping?.reportList, as:'reportList'}
+			<div id="reportName">
+				<ul>
+					<li><a href=${reportList?.reportUrl} target="_report">${reportList?.reportName}</a></li>
+				</ul>
+			</div> 
+			#{/list}
+		#{/if}
+	#{/list}
+	</div>
+
+	<h3><a>Fund Administration Reports</a></h3>
+	<div id="reportGroup">	
+	#{list items:reportMappings, as:'reportMapping'}
+		#{if reportMapping?.reportList?.reportGroup == 'Fund Administration Reports'}
+			#{list items:reportMapping?.reportList, as:'reportList'}
+			<div id="reportName">
+				<ul>
+					<li><a href=${reportList?.reportUrl} target="_report">${reportList?.reportName}</a></li>
+				</ul>
+			</div>		
+			#{/list}
+		#{/if}
+	#{/list}
+	</div>
+
+	<h3><a href="#">Registry Reports</a></h3>
+	<div id="reportGroup">	
+	#{list items:reportMappings, as:'reportMapping'}
+		#{if reportMapping?.reportList?.reportGroup == 'Registry Reports'}
+			#{list items:reportMapping?.reportList, as:'reportList'}
+			<div id="reportName">
+				<ul>
+					<li><a href=${reportList?.reportUrl} target="_report">${reportList?.reportName}</a></li>
+				</ul>
+			</div>		
+			#{/list}
+		#{/if}
+	#{/list}
+	</div>
+</div>
+	<!-- 	
+	<div>
+		<ul>
+			<li><a href=${reportMapping?.reportList?.reportUrl} target="_report">${reportMapping?.reportList?.reportName}</a></li>
+		</ul>
+	</div> -->
+
+	
+	<!-- h3><a href="#">Custody Internal Reports</a></h3>
+	<div>
+		<ul>
+			<li>Cash Projection Report</li>
+			<li>Cash Report</li>			
+			<li><a href="http://${url}:9080/pentaho/content/reporting/reportviewer/report.html?solution=medallion&path=%2FCustody&name=TransactionListingReport.prpt" target="_report">Custody Transaction Listing</a></li>
+			<li><a href="http://${url}:9080/pentaho/content/reporting/reportviewer/report.html?solution=medallion&path=%2FCustody&name=MonthlyChargesDetailReport.prpt" target="_report">Monthly Charges Detail Report</a></li>
+			<li>Detail Safekeeping Fee Report</li>
+			<li>#{a @param('HoldingBalance')}Holding Balance Report#{/a}</li>
+		</ul>	</div>
+	<h3><a href="#">Custody External Reports</a></h3>
+	<div>
+		<ul>
+			<li>Invoice</li>
+			<li><a href="http://${url}:9080/pentaho/content/reporting/reportviewer/report.html?solution=medallion&path=%2FCustody&name=CustodyPortfolioValuation.prpt" target="_report">Portfolio Valuation Report</a></li>
+			<li>Settlement Confirmation</li>
+			<li>Transaction Confirmation </li>
+		</ul>
+	</div>
+	<h3><a href="#">Corporate Action Reports</a></h3>
+	<div>
+		<ul>
+			<li>Cash Dividend - Notice of Event</li>
+			<li>Cash Dividend - Confirmation</li>
+			<li>Coupon Payment - Notice of Event</li>
+			<li>Coupon Payment - Confirmation</li>
+			<li>Stock Dividend - Notice of Event</li>
+			<li>Stock Dividend - Confirmation</li>
+			<li>Stock Split - Notice of Event</li>
+			<li>Stock Split - Confirmation</li>
+		</ul>
+	</div>
+	<h3><a href="#">Fund Administration Reports</a></h3>
+	<div>
+		<ul>
+			<li>Balance Sheet</li>
+			<li>Income Statement</li>
+s			<li><a href="http://${url}:9080/pentaho/content/reporting/reportviewer/report.html?solution=medallion&path=%2FFund_Admin&name=JournalReport.prpt" target="_report">Journal Report</a></li>
+			<li>Ledger Balance Verification</li>
+			<li>Ledger Report</li>
+			<li><a href="http://${url}:9080/pentaho/content/reporting/reportviewer/report.html?solution=medallion&path=%2FFund_Admin&name=NavReport.prpt" target="_report">NAV Report</a></li>
+			<li><a href="http://${url}:9080/pentaho/content/reporting/reportviewer/report.html?solution=medallion&path=%2FFund_Admin&name=TrialBalance.prpt" target="_report">Trial Balance</a></li>
+		</ul>
+	</div>
+	<h3><a href="#">Registry Reports</a></h3>
+	<div>
+		<ul>
+			<li><a href="http://${url}:9080/pentaho/content/reporting/reportviewer/report.html?solution=medallion&path=%2FRegistry&name=TaTransactionListing.prpt" target="_report">Unit Transaction Listing</a></li>
+			<li><a href="http://${url}:9080/pentaho/content/reporting/reportviewer/report.html?solution=medallion&path=%2FRegistry&name=DailyNAVList.prpt" target="_report">Daily NAV Report</a></li>
+			<li><a href="http://${url}:9080/pentaho/content/reporting/reportviewer/report.html?solution=medallion&path=%2FRegistry&name=Unit+Ownership.prpt" target="_report">Unit Ownership Report</a></li>
+			<li><a href="http://${url}:9080/pentaho/content/reporting/reportviewer/report.html?solution=medallion&path=%2FRegistry&name=TransactionConfirmation.prpt" target="_report">Transaction Confirmation</a></li>
+			<li><a href="http://${url}:9080/pentaho/content/reporting/reportviewer/report.html?solution=medallion&path=%2FRegistry&name=PaymentList.prpt" target="_report">Payment List</a></li>
+		</ul>
+	</div>
+	<h3><a href="#">Transfer Agent External Reports</a></h3>
+	<div>
+		<ul>
+			<li>Monthly Statement</li>
+			<li>Redemption confirmation</li>
+			<li>Subscription confirmation</li>
+		</ul>
+	</div>
+	<h3><a href="#">Selling Agent Internal Reports</a></h3>
+	<div>
+		<ul>
+			<li>AUM report</li>
+			<li>Selling agent fee report</li>
+			<li>Subscription & Redemption per Branch</li>
+		</ul>
+	</div-->

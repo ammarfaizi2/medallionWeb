@@ -1,0 +1,489 @@
+#{extends 'templates/detail1.html' /}
+#{set pageTitle: 'Password Management' /}
+#{set id:pass?.paramId /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{script 'lookups.js' /}
+#{script 'validation/numericOnly.js' /}
+
+<script type="text/javascript">
+	$(function() {
+		// ======== START OF GENERAL FUNCTION ======= //
+		$( "#dialog-message" ).css("display","none");
+		
+		#{ifnot flash.error || errors}
+			if ('${mode}'=='entry'){
+				$('#checkboxChar').attr('checked', true);
+				$('#checkboxNum').attr('checked', true);
+				$('#checkboxSpechar').attr('checked', true);
+			}
+			
+		#{/ifnot}
+		
+		$('input.maxValue').autoNumeric({vMax:50});
+		$('input.maxValue').live('blur', function() {
+			var el = $(this);
+			var id = this.id;
+			var err = $("#" + id + "Err"); 
+			if (el.val() == '') {
+				return;
+			}
+			
+			if (el.val()=='0') {
+				el.addClass('fieldError');
+				err.html("'0' not allowed");
+			} else {
+				el.removeClass('fieldError');
+				err.html("");
+			}
+		});
+		
+		$('input.maxValue1').autoNumeric({vMax:9999});
+		$('input.maxValue1').live('blur', function() {
+			var el = $(this);
+			var id = this.id;
+			var err = $("#" + id + "Err"); 
+			if (el.val() == '') {
+				return;
+			}
+			
+			el.removeClass('fieldError');
+			err.html("");
+			if (el.val()=='0') {
+				el.addClass('fieldError');
+				err.html("'0' not allowed");
+			}
+		});
+		
+		$('#minLength').blur(function(){
+			var minLength = parseFloat($('#minLength').val());
+			var maxLength = parseFloat($('#maxLength').val());
+			
+			$('#maxLength').removeClass('fieldError');
+			$('#maxLengthErr').html("");
+			if (maxLength != ''){
+				if (minLength > maxLength) {
+					$('#maxLength').addClass('fieldError');
+					$('#maxLengthErr').html('Maximum Length must be greater than Minimum Length');
+				} 
+			}
+			
+		});
+		
+		$('#maxLength').blur(function(){
+			var el = $(this);
+			var minLength = parseFloat($('#minLength').val());
+			var maxLength = parseFloat($('#maxLength').val());
+			
+			el.removeClass('fieldError');
+			$('#maxLengthErr').html("");
+			if (minLength != '') {
+				if (minLength > maxLength) {
+					el.addClass('fieldError');
+					$('#maxLengthErr').html('Maximum Length must be greater than Minimum Length');
+				} 
+			}
+			
+		});
+		
+		// ======== END OF GENERAL FUNCTION ======= //
+		
+		// ======== START PART OF RESTRICTED PASSWORD ======= //
+		
+		var tablePassRestricted = $('#gridRestPass').dataTable({
+			aoColumns: [ 
+							 null,
+				             null
+						    ],
+				bJQueryUI:true,
+				aaSorting:[[0,'asc']],
+				bFilter:false,
+				bPaginate:false,
+				bInfo:false
+		});
+		
+		$('#restrictedPassButton').click(function(){
+			var rows = $('#gridRestPass').dataTable().fnGetNodes().length;
+			var found = false;
+			var valueRest = $('#restrictedPass').val();
+			
+			// check duplicate data
+			if (valueRest != '') {
+				for (i = 0; i < rows; i++) {
+					var cell = tablePassRestricted.fnGetData(i);
+					if (valueRest == cell[0]) {
+						$('#restrictedPassErr').html('Password "' + valueRest + '" already exist !');
+						found = true;
+						break;
+					} else {
+						$('#restrictedPassErr').html('');
+					}
+				}
+			
+				if (!found) {
+					tablePassRestricted.fnAddData([
+					                               $('#restrictedPass').val(),
+					                               '<center><input id="deleteButton" type="button" value="Delete" #{if readOnly}disabled="disabled"#{/if} /></center>'+
+					                               '<input type="hidden" name="passRestricteds[' + rows + '].password" value="' + $('#restrictedPass').val() + '" />'
+					                               ]);
+					rows++;
+					$('#restrictedPass').val('');
+				}
+				
+			}
+		});
+		
+		$('#gridRestPass tbody tr #deleteButton').live('click',function(){
+			var row = $(this).parents('tr');
+			var rowNumber = $('#gridRestPass').dataTable().fnGetPosition(row[0]);
+			$("#dialog-message").dialog({
+				autoOpen:false,
+				height:120,
+				width:250,
+				modal:true,
+				resizable : false,
+				buttons: {
+					"Yes": function() {
+						$('#gridRestPass').dataTable().fnDeleteRow(rowNumber);
+ 						var idTable = $("#gridRestPass");
+						var trs = $("tr", idTable);
+						$.each(trs, function(idx, data){
+							var hiddens = $("[type=hidden]", $(this));
+								$(hiddens).eq(0).attr("name", "passRestricteds["+(idx-1)+"].password");
+						});
+						$("#dialog-message").dialog("close");
+					},
+					"No ": function() {
+						$("#dialog-message").dialog("close");
+					}	
+				}
+			});
+			$('#dialog-message').css('overflow','hidden');
+			$("#dialog-message").dialog('open');
+			$('.ui-widget-overlay').css('height',$('body').height());
+		});
+		
+		// ======== END PART OF RESTRICTED PASSWORD ======= //
+		
+		// ======== START PART OF PASSWORD COMBINATION ======= //
+		
+		/***  Default CheckBox for Combi Char *****/
+		if ($('#checkboxChar').is(':checked')){
+//			$('#hasMinChar').attr('disabled', false);
+//			$('#minUpper').attr('disabled', false);
+//			$('#minLower').attr('disabled', false);
+			$('#passCombination p[id=hasMin] label span').html("*");
+			$('#forCharacter p[id=minUp] label span').html("*");
+			$('#forCharacter p[id=minLow] label span').html("*");
+		} else {
+			$('#hasMinChar').val('');
+			$('#minUpper').val('');
+			$('#minLower').val('');
+			$('#hasMinChar').attr('disabled', 'disabled');
+			$('#minUpper').attr('disabled', 'disabled');
+			$('#minLower').attr('disabled', 'disabled');
+			if ((!($('#checkboxNum').is(':checked')))&&(!($('#checkboxSpechar').is(':checked')))){
+				$('#passCombination p[id=hasMin] label span').html("");
+			}
+			$('#forCharacter p[id=minUp] label span').html("");
+			$('#forCharacter p[id=minLow] label span').html("");
+		}
+		
+		$('#checkboxChar').change(function(){
+			if ($('#checkboxChar').is(':checked')){
+				$('#hasMinChar').attr('disabled', false);
+				$('#minUpper').attr('disabled', false);
+				$('#minLower').attr('disabled', false);
+				$('#passCombination p[id=hasMin] label span').html("*");
+				$('#forCharacter p[id=minUp] label span').html("*");
+				$('#forCharacter p[id=minLow] label span').html("*");
+				
+			} else {
+				$('#hasMinChar').val('');
+				$('input[name=pass.minChar]').val('');
+				$('#minUpper').val('');
+				$('input[name=pass.minUpper]').val('');
+				$('#minLower').val('');
+				$('input[name=pass.minLower]').val('');
+				$('#hasMinChar').attr('disabled', 'disabled');
+				$('#minUpper').attr('disabled', 'disabled');
+				$('#minLower').attr('disabled', 'disabled');
+				if ((!($('#checkboxNum').is(':checked')))&&(!($('#checkboxSpechar').is(':checked')))){
+					$('#passCombination p[id=hasMin] label span').html("");
+				}
+				$('#forCharacter p[id=minUp] label span').html("");
+				$('#forCharacter p[id=minLow] label span').html("");
+			}
+		});
+		
+		/***  Default CheckBox for Combi Num *****/
+		if ($('#checkboxNum').is(':checked')){
+/* 			$('#hasMinNum').attr('disabled', false);
+			$('#numOrdered').attr('disabled', false);
+ */			$('#passCombination p[id=hasMin] label span').html("*");
+			$('#forNumeric p[id=pNum] label span').html("*");
+		}  else {
+			$('#hasMinNum').val('');
+			$('input[name=pass.minNum]').val('');
+			$('#numOrdered').val('');
+			$('input[name=pass.numOrdered]').val('');
+			$('#hasMinNum').attr('disabled', 'disabled');
+			$('#numOrdered').attr('disabled', 'disabled');
+			if ((!($('#checkboxChar').is(':checked')))&&(!($('#checkboxSpechar').is(':checked')))){
+				$('#passCombination p[id=hasMin] label span').html("");
+			}
+			$('#forNumeric p[id=pNum] label span').html("");
+		} 
+		
+		$('#checkboxNum').change(function(){
+			if ($('#checkboxNum').is(':checked')){
+ 				$('#hasMinNum').attr('disabled', false);
+				$('#numOrdered').attr('disabled', false);
+ 				$('#passCombination p[id=hasMin] label span').html("*");
+				$('#forNumeric p[id=pNum] label span').html("*");
+			} else {
+				$('#hasMinNum').val('');
+				$('#numOrdered').val('');
+				$('#hasMinNum').attr('disabled', 'disabled');
+				$('#numOrdered').attr('disabled', 'disabled');
+				if ((!($('#checkboxChar').is(':checked')))&&(!($('#checkboxSpechar').is(':checked')))){
+					$('#passCombination p[id=hasMin] label span').html("");
+				}
+				$('#forNumeric p[id=pNum] label span').html("");
+			}
+		});
+		
+		/***  Default CheckBox for Combi Spec Char *****/
+		if ($('#checkboxSpechar').is(':checked')){
+/* 			$('#hasMinSpechar').attr('disabled', false); */
+			$('#passCombination p[id=hasMin] label span').html("*");
+		} else {
+			$('#hasMinSpechar').val('');
+			$('input[name=pass.minSpechar]').val('');
+			$('#hasMinSpechar').attr('disabled', 'disabled');
+			if ((!($('#checkboxChar').is(':checked')))&&(!($('#checkboxNum').is(':checked')))){
+				$('#passCombination p[id=hasMin] label span').html("");
+			}
+		}
+		
+		$('#checkboxSpechar').change(function(){
+			if ($('#checkboxSpechar').is(':checked')){
+				$('#hasMinSpechar').attr('disabled', false);
+				$('#passCombination p[id=hasMin] label span').html("*");
+			} else {
+				$('#hasMinSpechar').val('');
+				$('#hasMinSpechar').attr('disabled', 'disabled');
+				if ((!($('#checkboxChar').is(':checked')))&&(!($('#checkboxNum').is(':checked')))){
+					$('#passCombination p[id=hasMin] label span').html("");
+				}
+			}
+		});
+		
+		// ======== END PART OF PASSWORD COMBINATION ======= //
+		
+		// ======== START PART OF FOR NUMERIC ====== //
+			
+		$("#numOrdered").blur(function(){
+			$('#numOrdered').removeClass("fieldError");
+			$('#numOrderedErr').html("");
+			
+			if (($('#numOrdered').val()=='1') || ($('#numOrdered').val()=='0')){
+				$('#numOrdered').addClass("fieldError");
+				$('#numOrderedErr').html("'0 or 1' not allowed");
+			}
+			
+		});
+		
+		// ======== END PART OF FOR NUMERIC ====== //
+		
+		// ======== START PART OF MORE INFORMATION ====== //
+		$('#expPassWarning').blur(function(){
+			var el = $(this);
+			var id = $('#expPassAfter');
+			var expPassWarn = parseFloat($.fn.autoNumeric.Strip(this));
+			var expPassAfter = parseFloat($.fn.autoNumeric.Strip(id));
+			
+			$('#expPassAfter').removeClass('fieldError');
+			$('#expPassAfterErr').html("");
+			if (expPassAfter != ''){
+				if (expPassWarn > expPassAfter) {
+					$('#expPassAfter').addClass('fieldError');
+					$('#expPassAfterErr').html('Expire Password After must be greater than Expired Password Warning');
+				} 
+			}
+			
+		});
+		
+		$('#expPassAfter').blur(function(){
+			var el = $(this);
+			var id = $('#expPassWarning');
+			var expPassWarn = parseFloat($.fn.autoNumeric.Strip(id));
+			var expPassAfter = parseFloat($.fn.autoNumeric.Strip(this));
+			
+			el.removeClass('fieldError');
+			$('#expPassAfterErr').html("");
+			if (expPassWarn != '') {
+				if (expPassWarn > expPassAfter) {
+					el.addClass('fieldError');
+					$('#expPassAfterErr').html('Expire Password After must be greater than Expired Password Warning');
+				} 
+			}
+			
+		});
+		
+		// ======== END PART OF MORE INFORMATION ====== //
+	});
+	
+	function doSave(){
+		var checkError = $("input").hasClass('fieldError');
+		if  (checkError) return false;
+		else return true;
+	}
+	
+	function doCancel(){
+		location.href = '@{Application.index}';
+		return false;
+	}
+</script>
+
+<style type="text/css">
+	#clearData {margin-left:2 }
+</style>
+
+#{hidden id:'paramId', name:'pass.paramId', value:pass?.paramId /}
+<table>
+<tr>
+	<td>
+		<fieldset id="passCombination" style="width:575px;">
+			<legend>Password Combination</legend>
+			<p>
+				#{textBox id:'minLength', name:'pass.minLength', label:'Minimum Length',value:pass?.minLength, class:'numberOnly maxValue', width:'100px',required:true,readOnly:readOnly, maxLength:50 /}
+				<span class="error">#{error 'Minimum Length is' /}</span>
+				<span id="minLengthErr" class="error"></span>
+			</p>
+			<p>
+				#{textBox id:'maxLength', name:'pass.maxLength', label:'Maximum Length',value:pass?.maxLength, class:'numberOnly maxValue', width:'100px',required:true,readOnly:readOnly, maxLength:50 /}
+				<span class="error">#{error 'Maximum Length is' /}</span>
+				<span id="maxLengthErr" class="error"></span>
+			</p>
+			<p id="pCombination">
+				<label>Combination of<span class="req"> *</span></label>
+				#{checkBox id:'checkboxChar', name:'pass.combiChar', value:pass?.combiChar , readOnly:readOnly /}Character &nbsp; &nbsp;
+				#{checkBox id:'checkboxNum', name:'pass.combiNum', value:pass?.combiNum , readOnly:readOnly /}Numeric &nbsp; &nbsp; &nbsp;
+				#{checkBox id:'checkboxSpechar', name:'pass.combiSpechar', value:pass?.combiSpechar , readOnly:readOnly /}Special Character
+				<span class="error">#{error 'Combination of is' /}</span>
+			</p>
+			<p id="hasMin">
+				#{textBox id:'hasMinChar', name:'pass.minChar', label:'Has Minimum',value:pass?.minChar, class:'numberOnly maxValue', width:'80px',required:true,readOnly:readOnly, maxLength:50 /}
+				<span class="error">#{error 'Has Minimum Character is' /}</span>
+				<span id="hasMinCharErr" class="error"></span>
+				 &nbsp;&nbsp; &nbsp;
+				#{textBox id:'hasMinNum', name:'pass.minNum',value:pass?.minNum, class:'numberOnly maxValue', width:'80px',required:false,readOnly:readOnly, maxLength:50 /}
+				<span class="error">#{error 'Has Minimum Numeric is' /}</span>
+				<span id="hasMinNumErr" class="error"></span>
+				&nbsp; &nbsp;
+				#{textBox id:'hasMinSpechar', name:'pass.minSpechar',value:pass?.minSpechar, class:'numberOnly maxValue', width:'80px',required:false,readOnly:readOnly, maxLength:50 /}
+				<span class="error">#{error 'Has Minimum Spec. Char is' /}</span>
+				<span id="hasMinSpecharErr" class="error"></span>
+			</p>
+		</fieldset>
+	</td>
+	<td rowspan="3">
+		<fieldset id="restricted Password" style="width: 300px;height: 315px">
+			<legend>Restricted Password</legend>
+			<br />
+			<p>
+				#{textBox id:'restrictedPass', name:'restrictedPass',value:restrictedPass, width:'150px',required:false,readOnly:readOnly, maxLength:50 /}
+				#{button id:'restrictedPassButton', value:'Add', readOnly:readOnly /}
+			</p>
+			<br />
+			<span id="restrictedPassErr" class="error"></span>
+			<br />
+			<table id="gridRestPass" class="display">
+				<thead>
+					<tr>
+						<th>Data</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody>
+				#{list passRestricteds, as:'restricted'}
+ 					<tr>
+						<td>${restricted?.password}</td>
+						<td>
+							<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} /></center>
+							#{hidden name:'passRestricteds[' + (restricted_index-1) + '].password', value:restricted?.password /}
+						</td>
+					</tr>
+					#{/list}
+ 				</tbody>
+ 			</table>
+		</fieldset>
+	</td>
+</tr>
+<tr>
+	<td>
+		<div style="float:left;">
+			<fieldset id="forCharacter" style="width: 250px">
+				<legend>For Character</legend>
+				<p id="minUp">
+					#{textBox id:'minUpper', name:'pass.minUpper', label:'Minimum Uppercase',value:pass?.minUpper, class:'numberOnly maxValue', width:'80px',required:true,readOnly:readOnly, maxLength:50 /}
+					<span class="error">#{error 'Minimum Uppercase is' /}</span>
+					<span id="minUpperErr" class="error"></span>
+				</p>
+				<p id="minLow">
+					#{textBox id:'minLower', name:'pass.minLower', label:'Minimum Lowercase',value:pass?.minLower, class:'numberOnly maxValue', width:'80px',required:true,readOnly:readOnly, maxLength:50 /}
+					<span class="error">#{error 'Minimum Lowercase is' /}</span>
+					<span id="minLowerErr" class="error"></span>
+				</p>
+			</fieldset>
+		</div>
+		<div style="float:left;width:300px">
+			<fieldset id="forNumeric" style="width: 300px ;height: 53px">
+				<legend>For Numeric</legend>
+				<p id="pNum">
+					#{textBox id:'numOrdered', name:'pass.numOrdered', value:pass?.numOrdered, label:'Number of Ordered Numeric Not Allowed', class:'numberOnly maxValue', width:'80px',required:true,readOnly:readOnly, maxLength:50 /} (min 2)
+					<span class="error">#{error 'Number of Ordered Numeric Not Allowed is' /}</span>
+					<span id="numOrderedErr" class="error"></span>
+				</p>
+			</fieldset>
+		</div>
+	</td>
+</tr>
+<tr>
+	<td>
+		<fieldset id="moreInformation" style="width: 575;">
+			<legend>More Information</legend>
+			<p>
+				#{textBox id:'maxPassRetry', name:'pass.maxRetry', value:pass?.maxRetry, label:'Max. Password Retry', class:'numberOnly maxValue', width:'80px',required:true, readOnly:readOnly, maxLength:50 /} times then disable user
+				<span class="error">#{error 'Max. Password Retry is' /}</span>
+				<span id="maxPassRetryErr" class="error"></span>
+			</p>
+			<p>
+				#{textBox id:'reusePass', name:'pass.maxReuse', value:pass?.maxReuse, label:'Reuse Password Cycle', class:'numberOnly maxValue', width:'80px',required:true, readOnly:readOnly, maxLength:50 /} times (min 1)
+				<span class="error">#{error 'Reuse Password Cycle is' /}</span>
+				<span id="reusePassErr" class="error"></span>
+			</p>
+			<p>
+				#{textBox id:'disablePeriod', name:'pass.disablePeriod', value:pass?.disablePeriod, label:'Disable Login Period', class:'numberOnly maxValue1', width:'80px',required:true, readOnly:readOnly, maxLength:50 /} days after last login
+				<span class="error">#{error 'Disable Login Period is' /}</span>
+				<span id="disablePeriodErr" class="error"></span>
+			</p>
+			<p>
+				#{textBox id:'expPassWarning', name:'pass.expireWarningPeriod', value:pass?.expireWarningPeriod, label:'Expired Password Warning', class:'numberOnly maxValue1', width:'80px',required:true, readOnly:readOnly, maxLength:50 /} days after last change password
+				<span class="error">#{error 'Expired Password Warning is' /}</span>
+				<span id="expPassWarningErr" class="error"></span>
+			</p>
+			<p>
+				#{textBox id:'expPassAfter', name:'pass.expirePeriod', value:pass?.expirePeriod, label:'Expire Password After', class:'numberOnly maxValue1', width:'80px',required:true, readOnly:readOnly, maxLength:50 /} days after last change password
+				<span class="error">#{error 'Expire Password After is' /}</span>
+				<span id="expPassAfterErr" class="error"></span>
+			</p>
+		</fieldset>
+	</td>
+</tr>
+</table>
+<div id="dialog-message" title="Message Confirmation">
+	<p>
+	<span class="ui-icon ui-icon-notice" style="float:left; margin:0 7px 50px 0;"></span>
+	Are you sure to delete data ? </p>
+</div>

@@ -1,0 +1,151 @@
+
+
+<script type="text/javascript">
+	$(function(){
+		$('.calendar').datepicker();
+		$('#addFeeAccrualByNav').button();
+		$('#cancelFeeAccrualByNav').button();
+		$('#closeFeeAccrualByNav').button();
+		
+		
+		$("#detailFeeTier").dialog({
+			autoOpen:false,
+			modal:true,
+			heigth:'500px',
+			width:'300px',
+			resizable:false
+		});
+		
+		
+		$('#feeAccrualByNavForm #taxCodeNav').lookup({
+			list:'@{Pick.taxMasters()}',
+			get:{
+				url:'@{Pick.taxMaster()}',
+				success: function(data) {
+							$('#feeAccrualByNavForm #taxCodeNav').removeClass('fieldError');
+							$('#feeAccrualByNavForm #taxKeyNav').val(data.code);
+							$('#feeAccrualByNavForm input#taxCodeNav').val(data.taxCode);
+							$('#feeAccrualByNavForm #taxNameNav').val(data.description);
+							$('#h_taxNameNav').val(data.description);
+							$('#feeAccrualByNavForm #taxRateNav').val(data.taxRate);
+							
+						},
+				error: function() {
+						$('#feeAccrualByNavForm #taxCodeNav').addClass('fieldError');
+						$('#feeAccrualByNavForm #taxKeyNav').val('');
+						$('#feeAccrualByNavForm #taxCodeNav').val('');
+						$('#feeAccrualByNavForm #taxNameNav').val('NOT FOUND');
+						$('#h_taxNameNav').val('');
+					}
+			},
+			//key:$('#feeAccrualByNavForm #taxKeyNav'),
+			description:$('#feeAccrualByNavForm #taxNameNav'),
+			help:$('#feeAccrualByNavForm #taxCodeHelpNav')
+		});
+		
+		if ($("#tieringType").val()=='CHARGE_CALCULATION-S'){
+			$("#newDataFeeTier").button("option", "disabled", true);
+		}
+		
+		$('#feeAccrualByNavForm #tieringType').change(function() {
+			var length = $('#detailFeeAccrualByNav #listFeeTier #gridFeeTier').dataTable().fnGetData().length;
+			if ($("#tieringType").val()=='CHARGE_CALCULATION-S'){
+				$("#newDataFeeTier").button("option", "disabled", true);
+				if (length > 1) {
+					$("#addFeeAccrualByNav").button("option", "disabled", true);
+					$("#errGlobal").html("Warning to save! Tiering Type 'Single Value' can't more than one tier");
+				}
+			} else {
+				$('#detailFeeAccrualByNav #feeAccrualByNavForm #tieringType').removeClass('fieldError');
+				$('#errTieringType2').html('');
+				$("#newDataFeeTier").button("option", "disabled", false);
+				$("#addFeeAccrualByNav").button("option", "disabled", false);
+				$("#errGlobal").html("");
+			}
+			var selected = $('#feeAccrualByNavForm #tieringType').val();
+			var selectedText = $('#feeAccrualByNavForm #tieringType option[value=' + selected + ']').text();
+			if (selectedText != '') {
+				selectedText = jQuery.trim(selectedText);
+				selectedText = selectedText.substring(jQuery.trim(selectedText).indexOf('-') + 1);
+			}
+			$('#feeAccrualByNavForm #tieringTypeDesc').val(selectedText);
+		});
+		
+
+	});
+</script>
+<style type="text/css">
+   #errDate {color:red; }
+   #errValueType {color:red; }
+   #errTieringType {color:red; }
+   #errTieringType2 {color:red; }
+   #errTax {color:red; }
+</style>
+<form>
+</form>
+<form id="feeAccrualByNavForm" class="form">
+<p>
+	#{hidden id:'rowPosition' /}
+	#{hidden id:'oldStartDate' /}
+	#{hidden id:'amount' /}
+	#{hidden id:'detailFeeKey', name:'faFeeDetail.id.feeKey', value:faFeeDetail?.id?.feeKey /}
+	#{hidden id:'detailRowNumber', name:'faFeeDetail.id.rowNumber', value:faFeeDetail?.id?.rowNumber /}
+	#{hidden id:'feeKeyMaster', name:'faFeeDetail.faFeeMaster.feeKey', value:faFeeDetail?.faFeeMaster?.feeKey /}
+</p>
+<p>
+<span class="ui-helper-hidden-accessible"><input type="text"/></span>
+	#{textBox id:'startDateNav', name:'startDate', label:'Effective Date', value:faFeeDetail?.startDate?.format(appProp.dateFormat), required:true, class:'calendar',readOnly:readOnly /}
+	#{hidden id:'startDateNavHidden', name:'faFeeDetail.startDate', value:faFeeDetail?.startDate?.format(appProp.dateFormat) /}
+	<b>To</b>
+	#{textBox id:'endDateNav', name:'endDate', value:faFeeDetail?.endDate?.format(appProp.dateFormat), class:'calendar', readOnly:readOnly  /} (${appProp.displayDateFormat})
+	#{hidden id:'endDateNavHidden', name:'faFeeDetail.endDate', value:faFeeDetail?.endDate?.format(appProp.dateFormat) /}
+	<span id="errDate"></span><br />
+	<span id="startDateNavError" class="error"></span>
+	<span id="endDateNavError" class="error"></span>
+</p>
+<p>
+	#{dropDownList id:'valueType', name:'faFeeDetail.valueType.lookupId', label:'Value Type', value:faFeeDetail?.valueType?.lookupId, options:valueType, required:true,readOnly:readOnly /}
+	<span id="errValueType"></span>
+</p>
+<p>
+	#{dropDownList id:'tieringType', name:'faFeeDetail.tieringType.lookupId', label:'Tiering Type', value:faFeeDetail?.tieringType?.lookupId, options:tieringType, required:true,readOnly:readOnly /}
+	#{hidden id:'tieringTypeDesc', name:'faFeeDetail.tieringType.lookupDescription', value:faFeeDetail?.tieringType?.lookupDescription /}
+	<span id="errTieringType"></span>
+</p>
+<p>			
+	#{textBox id:'taxCodeNav', name:'faFeeDetail.taxMaster.taxCode', label:'Tax Code', value:faFeeDetail?.taxMaster?.taxCode, class:'capitalize', readOnly:readOnly, required:true,width:'86px' /}
+	#{hidden id:'taxKeyNav', name:'faFeeDetail.taxMaster.taxKey', value:faFeeDetail?.taxMaster?.taxKey  /}
+	#{button id:'taxCodeHelpNav', value:'?', class:'small', readOnly:readOnly /}
+	#{textBox id:'taxNameNav', name:'faFeeDetail.taxMaster.description', value:faFeeDetail?.taxMaster?.description, readOnly:true, width:'150px' /}
+	#{hidden id:'taxRateNav', name:'faFeeDetail.taxMaster.taxRate', value:faFeeDetail?.taxMaster?.taxRate /}
+	<span id="errTax"></span>
+</p>
+<br />
+<br />
+<span id="errGlobal" class="error"></span>
+<div id="listFeeTier" >
+	#{include 'FeeAccruals/grid_feeTier.html' /}
+</div>
+<br />
+<div class="buttons">
+	#{ifnot confirming}
+		<button id="newDataFeeTier">New Data</button>
+	#{/ifnot}
+</div>
+<p>
+	<div class="buttons">
+		#{ifnot confirming }
+		#{ifnot approval}
+		<button id="addFeeAccrualByNav">Save</button>
+		<button id="cancelFeeAccrualByNav">Cancel</button>
+		#{/ifnot}
+		#{/ifnot}
+		#{if confirming || mode=='view' || approval}
+		<button id="closeFeeAccrualByNav">Close</button>
+		#{/if}
+	</div>
+</p>
+</form>
+<div id="detailFeeTier" title="Detail Fee Accrual Nab">
+	#{include 'FeeAccruals/detail_feeTier.html' /}
+</div>

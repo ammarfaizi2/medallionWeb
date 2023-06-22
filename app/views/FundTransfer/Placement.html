@@ -1,0 +1,90 @@
+#{script 'lookuppaging.js' /}
+#{script 'lookups.js' /}
+
+<form id="rootPlacement" class="form">
+	#{hidden id:'cmsDepDate' /}
+	#{hidden  id:'cmsDepProfKey', name:'param.sysDepPlaceProfile', value:param?.depPlaceProfile /}
+	#{hidden  id:'downloadTypeDep', name:'param.downloadType', value:param?.downloadType /}
+	#{hidden  id:'batchNoRegularDep', name:'',  /}
+	#{hidden  id:'batchNoPremiumDep', name:'',  /}
+	<input id='applicationDate' value="${param.applicationDate}" type="hidden"/>
+	<p>
+		#{textBox id:'fundBatchNoDep', label:'Fund Batch No', width:'120px', readOnly:true, class:'capitalize', required:false /}
+	</p>
+	<p>
+		<label>Placement Date</label>
+		<input id='checkAsOfDate' type='radio' name='checkSettlementDate' checked="checked"/>
+		<b>As Of&nbsp;</b>
+		#{textBox id:'asOfDate', label:'', width:'80px', readOnly:false, class:'calendar', required:false /}
+		<span id="asOfDateErr" class="error"></span>	
+	</p>
+	<p>
+		<label>&nbsp;</label>
+		<input id='checkFromTo' type='radio' name='checkSettlementDate'/>
+		<b>From&nbsp;</b>
+		#{textBox id:'fromDate', label:'', width:'80px', readOnly:true, class:'calendar', required:false /}
+		<b>&nbsp;To&nbsp;</b>
+		#{textBox id:'toDate', label:'', width:'80px', readOnly:true, class:'calendar', required:false /}
+		<span id="fromToErr" class="error"></span>
+	</p>	
+	<p>
+		#{textBox id:'accountNoPl', label:'Account No', width:'120px', readOnly:readOnly, class:'capitalize', required:false /}
+		#{hidden  id:'accountNoPlKey' /}
+		#{button  id:'accountNoPlHelp', value:'?', class:'small', readOnly:readOnly/}
+		#{textBox id:'accountNoPlDesc', readOnly:true, width:'245px' /}
+	</p>
+	<p>
+		&nbsp;
+	</p>
+	<p>
+		<input id='btnPopulatePa' type="button" value="Populate" ></input>
+		<input id='btnReset' type="button" value="Reset"></input>
+	</p>
+	<p>
+		<table id='tblFundTransferPlacement'>
+			<thead>
+				<tr>
+					<td><input id='checkAll' type="checkbox"/></td>
+					<td>No</td>
+					<td>Date</td>
+					<td>Account&nbsp;No</td>
+					<td>Security</td>
+					<td>Currency</td>
+					<td>Deposito&nbsp;No</td>
+					<td>Amount</td>
+					<td>Sender&nbsp;A/C&nbsp;No</td>
+					<td>Sender&nbsp;A/C&nbsp;Name</td>
+					<td>Benef&nbsp;A/C&nbsp;No</td>
+					<td>Benef&nbsp;Bank</td>
+					<td>Benef&nbsp;A/C&nbsp;Name</td>
+					<td>Type</td>
+					<td>Charge&nbsp;Amount</td>
+					<td>Net&nbsp;Payment&nbsp;Amount</td>
+					<td>Payment&nbsp;Type&nbsp;Code</td>
+				</tr>
+			</thead>
+		</table>
+	</p>
+	<p>&nbsp;</p>
+	<p>
+		<div>
+			<input id='btnSave' type="button" value="Save"></input>
+			<input id='btnConfirm' type="button" value="Confirm"></input>
+		</div>
+		<div id='total' style="float: right;position: relative;display: none;">
+			<p>
+				<b>Total&nbsp;Amount&nbsp;<input id='totalAmount' type="text" disabled="disabled"/></b>
+			</p>
+		</div>
+	</p>	
+	<p>
+		&nbsp;
+	</p>	
+</form>	
+
+<script type="text/javascript">
+	#{include 'FundTransfer/Placement.js' /}
+	$(document).ready(function() {
+		Placement($("#rootPlacement"));
+	});
+</script>

@@ -1,0 +1,195 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'TA - Cancel Payment' /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)||(mode=='view')) /}
+
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+<script type="text/javascript">
+	//$("#type").find("option[value='Dividend By Cash']").remove(); 
+	//$("option[value='Dividend By Cash']").remove();
+	$(function() {
+	//	$("#type").find("option[value='Dividend By Investor Option']").remove();
+	});
+	function doEdit(data) {
+		return false;
+	}
+	 
+	 function doView(data) {
+		 return false;
+	 }
+</script> 
+
+<form id="registryCancelPaymentForm" class="form" method="POST" name="cancelPayment">
+	#{hidden id:'dispatch', value:mode/}
+	#{hidden id:'selected', name:'pay.selected', value:pay?.selected/}
+	#{hidden id:'selectedNominal', name:'pay.selectedNominal', value:pay?.selectedNominal/}
+	#{hidden id:'paymentKey', name:'pay.paymentKey', value:pay?.paymentKey/}
+	#{hidden id:'cancelByHidden', value:pay?.cancelBy/}
+	#{hidden id:'appDate', value:appDate?.format(appProp.dateFormat) /}
+
+	<p>			
+		#{textBox id:'fundCode', name:'pay.rgProduct.productCode', label:'Fund Code', value:pay?.rgProduct?.productCode, width:'120px', readOnly:readOnly, class:'capitalize', required:true/}
+		#{hidden  id:'fundCodeKey', value:pay?.rgProduct?.productCode /}
+		#{button  id:'fundCodeHelp', value:'?', class:'small', readOnly:readOnly/}
+		#{textBox id:'fundCodeDesc', name:'pay.rgProduct.name', value:pay?.rgProduct?.name, readOnly:true, width:'340px' /}
+		<span class="error" id="fundCodeError"></span>
+	</p>
+	<p>			
+		#{textBox id:'paymentDate', name:'pay.appDate', label:'Payment Date', value:pay?.appDate?.format(appProp.dateFormat), class:'calendar', required:true, readOnly:readOnly/} (${appProp.displayDateFormat})
+		<span class="error" id="paymentDateError"></span>
+	</p>
+	<p>
+		#{dropDownList id:'type', name:'pay.type', label:'Type', options:listType, value:pay?.type, readOnly:readOnly, width:'194px' /}
+	</p>	
+	<p id=pCancelBy>
+		#{dropDownList id:'cancelBy', name:'pay.cancelBy', label:'Cancel By', value:pay?.cancelBy, readOnly:readOnly, options:cancelBy, width:'124px', required:true /}
+		#{textBox id:'cancelByNo', name:'pay.cancelByNo', value:pay?.cancelByNo, readOnly:readOnly, width:'175px', class:'numberOnly', maxLength:50 /}
+		<span class="error" id="cancelByNoError"></span>
+	</p>
+	<p>
+	 	#{textBox id:'cancelPaymentDate', name:'pay.paymentDate', label:'Cancel Date', value:pay?.paymentDate?.format(appProp.dateFormat), class:'calendar', readOnly:readOnly, required:true/} (${appProp.displayDateFormat})
+	 	<span class="error" id="cancelPaymentDateError"></span>
+	</p>
+	<p>
+	 	#{textBox id:'remarks', name:'pay.remarks', label:'Remarks', value:pay?.remarks, class:'capitalize', readOnly:readOnly, width:'490px',maxLength:100  /}
+	</p>
+	<p>
+		#{textBox id:'totPaidAmount', label:'Total Payment', value:pay?.totalPaidAmount, format:'#,##0.####' ,class:'numeric',readOnly:true, width:'190px'/}
+		#{hidden id:'totPaidAmountStripped', name:'pay.totalPaidAmount', value:pay?.totalPaidAmount /}
+	</p>
+	
+	<div class="buttons">
+		#{button  id:'btnNext', value:'Search', readOnly:false/}
+		#{if flek != "approve"}
+			#{button  id:'btnClear', value:'Clear', readOnly:false/}	
+		#{/if}
+		
+	</div>
+	
+	<br>
+	
+	<div style="display: none">
+	<table id="tblTransaction" class="display" style="display: none;">
+		<thead>
+			<tr>
+				<th>Id</th>
+				<th align="center"><input id="selectAll" name="optionAll" type="checkbox" checked disabled></th>
+				<th>Payment No</th>
+				<th>Trans No</th>
+				<th>Invest Acc No</th>
+				<th>Trade Date</th>
+				<th>Payment Date</th>
+				<th align="right">Payment Amount</th>
+				<th>Bank Code</th>
+				<th>A/N</th>
+				<th>Bank Account</th>
+			</tr>
+		</thead>
+		<tbody>
+			#{list rgTrades, as:'rgTrade'}
+				<tr>
+					<td>${rgTrade?.tradeKey}</td>
+					<td align="center"><input name="option" type="checkbox" value=${rgTrade?.tradeKey} nominal=${rgTrade.paidAmt} checked disabled></td>
+					<td>${rgTrade?.rgPayment?.paymentKey}</td>
+					<td>${rgTrade?.tradeKey}</td>
+					<td>${rgTrade?.rgInvestmentaccount?.accountNumber}</td>
+					<td>${rgTrade?.tradeDate?.format(appProp.dateFormat)}</td>
+					<td>${rgTrade?.paidDate?.format(appProp.dateFormat)}</td>
+					<td align="right">${rgTrade?.paidAmt?.format('#,##0.##########')}</td>
+					<td>${rgTrade?.bankAccount?.bankCode?.thirdPartyName}</td>
+					<td>${rgTrade?.bankAccount?.name}</td>
+					<td>${rgTrade?.bankAccount?.accountNo}</td>
+				</tr>
+			#{/list}
+		</tbody>
+	</table>
+	</div>
+	<div class="buttons">
+		#{button  id:'btnProcess', value:'Process', readOnly:false/}
+	</div>
+	
+	<div id="dlgConfirm" title="Information" class="form">
+		<span style="float:left; margin:0 0px 0px 0;">
+		</span>
+		<input type="hidden" id="dlgRowNo"/>	
+		<p>
+			<label><b>Payment No</b></label>
+			<input id="dlgPayNo" disabled="disabled"/>
+		</p>		
+		<p>
+			<label><b>Dividen No</b></label>
+			<input id="dlgDivNo" disabled="disabled"/>
+		</p>		
+		<p>
+			<label><b>Trans No</b></label>
+			<input id="dlgTranNo" disabled="disabled"/>
+		</p>		
+		<p>
+			<label><b>Invest Acc No</b></label>
+			<input id="dlgInvNo" disabled="disabled"/>
+		</p>		
+		<p>
+			<label><b>Trade Date</b></label>
+			<input id="dlgTradeDate" disabled="disabled"/>
+		</p>		
+		<p>
+			<label><b>Payment Date</b></label>
+			<input id="dlgPayDate" disabled="disabled"/>
+		</p>		
+		<p>
+			<label><b>Payment Amount</b></label>
+			<input id="dlgPayAmt" disabled="disabled"/>
+		</p>		
+		<p>
+			<label><b>Bank Code</b></label>
+			<input id="dlgBankCode" disabled="disabled"/>
+		</p>		
+		<p>
+			<label><b>A/N</b></label>
+			<input id="dlgAN" disabled="disabled"/>
+		</p>		
+		<p>
+			<label><b>Bank Account</b></label>
+			<input id="dlgBankAcct" disabled="disabled"/>
+		</p>		
+		<div class="buttons" >
+			#{button  id:'dlgBtnOk', value:'Ok', readOnly:false/}
+			#{button  id:'dlgBtnCancel', value:'Cancel', readOnly:false/}
+			#{button  id:'dlgBtnClose', value:'Close', readOnly:false/}
+		</div>
+	</div>
+</form>
+
+	<div id="result" style="display:block;">
+	    <table id="tblPTransaction" class="display">
+	        <thead>
+	            <tr>
+	            	<th width="10px" field="component|checkbox|none|center|nosort"><input type="checkbox" disabled="disabled" class="cApp"></th>
+	                <th width="80px" field="rgPayment.paymentKey|string|none|left|sort">Payment No</th>
+	                <th width="80px" field="tradeKey|string|none|left|sort">Trans No</th>
+	                <th width="80px" field="rgInvestmentaccount.accountNumber|string|none|left|sort">Invest Acc No</th>
+	                <th field="tradeDate|date|date|center|sort" width="110px">Trade Date</th>
+	                <th field="paidDate|date|date|center|sort" width="110px">Payment Date</th>
+	                <th field="paidAmt|number|decimal4|right|sort">Payment Amount</th>
+	                <th field="bankAccount.bankCode.thirdPartyName|string|none|left|sort">Bank Code</th>
+	                <th field="bankAccount.name|string|none|left|sort">A/N</th>
+	                <th field="bankAccount.accountNo|string|none|left|sort">Bank Account</th>
+	            </tr>
+	        </thead>
+	        <tbody>
+	        </tbody>
+	    </table>
+	</div>
+	
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'RegistryCancelPayment/CancelPayment.js' /}
+	#{include 'RegistryCancelPayment/pagingApproval.js' /}
+	$(document).ready(function() {
+		$('#new').remove();
+		$('.buttons input:button').button();
+		CancelPayment($("#registryCancelPaymentForm"));
+		Paging($("#result"));
+	});	
+</script>
+

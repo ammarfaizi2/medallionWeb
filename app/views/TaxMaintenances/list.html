@@ -1,0 +1,56 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Tax Maintenance' /}
+
+<script type="text/javascript">
+
+	function doEdit(data) {
+		if ((data[4] == "New") || (data[4] == "Updated")) {
+			view(data[0]);
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+</script>
+
+<table class="display">
+	<thead>
+		<tr>
+			<th width="0">Key</th>
+			<th width="150px">Tax Code</th>
+			<th width="300px">Name</th>
+			<th width="100px">Rate(%)</th>
+			<th width="50px">Status</th>
+			<th width="50px">Active</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:taxMasters, as:'taxMaster'}
+		
+			<tr>
+			<td>
+				  ${taxMaster.taxKey}   
+			</td>
+			<td class="capitalize">
+				  ${taxMaster?.taxCode}   
+			</td>
+			<td>
+				  ${taxMaster?.description}	  
+			</td>	
+			<td> 
+				 ${taxMaster?.taxRate?.format('###.####')}
+			</td>	
+			<td>
+				 ${taxMaster?.recordStatus?.decodeStatus()}
+			</td>	
+			<td>
+				 ${taxMaster?.isActive ? 'Yes':'No'}
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>
+	
+
+

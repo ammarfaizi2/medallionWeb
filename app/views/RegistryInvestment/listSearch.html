@@ -1,0 +1,82 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Investment Account Information' /}
+#{set fixData: true /}
+#{set mode: mode /}
+
+<script type="text/javascript">	
+	$(function() {
+		// Search section
+		$('#accordion').accordion({
+			collapsible: true
+		});
+		$('#birthDate').datepicker();
+		$('.buttons button:first').button({
+			icons: {
+				primary: 'ui-icon-search'
+			}
+		}).next().button();	
+		$('#search').click(function() {
+			search();
+		});
+		// end of Search
+		
+		$('#reset').click(function() {
+			location.href="@{RegistryInvestment.list()}?mode=${mode}";						
+		});
+		
+		$('.buttons input:button').button();
+
+		// Focus on first input:text
+		$('form input:text').first().focus();
+	});
+
+	var search = function() {
+		$('#result .loading').show();
+		$('#result .response').hide();
+		$('#result').show();
+		$.get('@{search()}', $('#searchForm').serialize(), function(data) {
+			checkRedirect(data);
+			$('#result .response').html(data);
+			$('#result .loading').hide();
+			$('#result .response').show();	
+			setupTable();
+		});
+	};
+	
+	//var select = function(id, param) {
+	//	$('#dialog').form('${mode}', { 'id': id, 'param': param });
+	//}
+	
+</script>
+
+<div id="accordion">
+	<h3><a href="#">Search Investment Account</a></h3>
+		<form id="searchForm" class="form">
+
+				<input id="param" name="params.param" type="hidden" value="${param}"/> 
+			<p>
+				#{dropDownList id:'investmentAccountNoOperator', name:'params.InvestmentAccountNoOperator', label:'Account No', options:stringOperators, value:params.investmentAccountNoOperator /}
+				#{textBox id:'investmentAccountSearchNo', name:'params.InvestmentAccountSearchNo', value:params.investmentAccountSearchNo, class:'capitalize' /}
+			</p>
+			<p>
+				#{dropDownList id:'investmentAccountNameOperator', name:'params.InvestmentAccountNameOperator', label:'Name', options:stringOperators, value:params.investmentAccountNameOperator /}
+				#{textBox id:'investmentAccountSearchName', name:'params.InvestmentAccountSearchName', value:params.investmentAccountSearchName, width:'350px', class:'capitalize' /}
+			</p>
+			<p style="display:none">
+				#{dropDownList id:'identificationNoOperator', name:'params.identificationNoOperator', label:'Identification No', options:stringOperators, value:params.identificationNoOperator /}
+				#{textBox id:'investmentAccountSearchIdentificationNo', name:'params.investmentAccountSearchIdentificationNo', value:params.investmentAccountSearchIdentificationNo, width:'200px' /}
+			</p>
+			<p>
+				<div class="buttons">
+					<input type="button" id="search" value="Search" />
+					<input type="button" id="reset" value="Reset" />
+				</div>
+			</p>
+	</form>
+</div>
+	
+<div id="result" style="display:none">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<div class="response"></div>
+</div>
+

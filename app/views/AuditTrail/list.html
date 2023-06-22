@@ -1,0 +1,237 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: '' /}
+#{set fixData: true /}
+#{set mode: mode /}
+
+#{script 'lookups.js' /}
+#{script 'validation/numericOnly.js' /}
+#{script 'external/Util.js' /}
+
+<script type="text/javascript"><!--	
+	$(function() {
+		// Search section
+		$('#accordion').accordion({
+			collapsible: false,
+			autoHeight: false 
+		});
+		$('#bintang').hide();
+		$('#buttonNotInList').hide();
+		$('#birthDate').datepicker();
+		$('.calendar').datepicker();
+		$('.buttons button:first').button({
+			icons: {
+				primary: 'ui-icon-search'
+			}
+		}).next().button();	
+		
+		$('#byGroupAudit').lookup({
+			list:'@{Pick.users()}',
+			get:{
+				url:'@{Pick.user()}',
+				success: function(data){
+					$('#byGroupAudit').removeClass('fieldError');
+					$('#byGroupAuditHidden').val(data.code);
+					$('#groupAuditName').val(data.description);
+					$('#h_groupAuditName').val(data.description);
+				},
+				error : function(data){
+					$('#byGroupAudit').addClass('fieldError');
+					$('#byGroupAudit').val('');
+					$('#byGroupAuditHidden').val('');
+					$('#groupAuditName').val('NOT FOUND');
+					$('#h_groupAuditName').val('');
+				}
+			},
+			
+			description:$('#groupAuditName'),
+			help:$('#groupAuditHelp')
+			
+		});
+		
+		$('#dateFrom').change(function(){
+			var dateFrom = new Date($(this).datepicker('getDate'));
+			var dateTo = new Date($('#dateTo').datepicker('getDate'));
+			if ($('#dateTo').val()!=''){
+				if (dateFrom.getTime() > dateTo.getTime()){
+					$(this).addClass('fieldError');
+					$("#accordion #dateFromError").html(" Date From is greater than Date To");
+					return false;
+				} else {
+					$('#dateFrom').removeClass('fieldError');
+					$('#dateTo').removeClass('fieldError');
+					$("#accordion #dateFromError").html("");
+					$("#accordion #dateToError").html("");
+				}
+			}
+		});
+		
+		$('#dateTo').change(function(){
+			var dateFrom = new Date($('#dateFrom').datepicker('getDate'));
+			var dateTo = new Date($(this).datepicker('getDate'));
+			if ($('#dateFrom').val()!=''){
+				if (dateFrom.getTime() > dateTo.getTime()){
+					$(this).addClass('fieldError');
+					$("#accordion #dateToError").html(" Date To is less than Date From");
+					return false;
+				} else {
+					$('#dateFrom').removeClass('fieldError');
+					$('#dateTo').removeClass('fieldError');
+					$("#accordion #dateToError").html("");
+					$("#accordion #dateFromError").html("");
+				}
+			}
+		});	
+		
+		$('#populate').button();
+		//$('#print').button();
+		$('#reset').button();
+		//$('#radioAll').val(true);
+		
+		$("#radioAll").attr("checked", true);
+		$("#byGroupAudit").attr('disabled', true);
+		$("#byGroupAudit").val("");
+		$("#byGroupAuditHidden").val("");
+		$("#groupAuditHelp").attr('disabled', true);
+		
+		$("#radioAll").click(function(){
+			
+			// editan rizky
+			$('#bintang').hide();
+			$("#accordion #dateFromError").html("");
+			$("#accordion #dateToError").html("");
+			$("#accordion #individualError").html("");
+			$('#byGroupAudit').removeClass('fieldError');
+			$("input[name=auditOption]")[0].checked == true;
+			$("#byGroupAudit").attr('disabled', true);
+			$("#byGroupAudit").val("");
+			$("#byGroupAuditHidden").val("");
+			$("#groupAuditName").val("");
+			$("#groupAuditHelp").attr('disabled', true);
+			
+		});
+		
+		$("#radioIndividual").click(function(){
+			
+			$("input[name=auditOption]")[0].checked == true;
+			$("#byGroupAudit").attr('disabled', false);
+			$("#byGroupAudit").val("");
+			$("#byGroupAuditHidden").val("");
+			$("#groupAuditName").val("");
+			$("#groupAuditHelp").attr('disabled', false);
+			$('#bintang').show();
+			
+		});
+		
+		$('.buttons #reset').click(function() {
+			location.href="@{AuditTrail.list()}";
+		});
+		
+	});
+	
+	var search = function() {
+		$("#accordion #dateFromError").html("");
+		$("#accordion #dateToError").html("");
+		$("#accordian #individualError").html("");
+		if($("#byGroupAudit").val() == "") {
+			$("#byGroupAudit").val("");
+		}
+		$('#result .loading').show();
+		$('#result .response').hide();
+		$('#result').show();
+		$.get('@{search()}', $('#searchForm').serialize(), function(data) {
+			checkRedirect(data);
+			$('#result .response').html(data);
+			$('#result .loading').hide();
+			$('#result .response').show();
+			$('#buttonNotInList').show();
+			setupTable();
+		}); 
+	};
+	
+	function doEdit(){
+		return false;
+	}
+	
+--></script>
+
+<div id="accordion">
+	<h3><a href="#">Login Audit Trail</a></h3>
+	<form id="searchForm" class="form">
+		<input id="param" name="params.param" type="hidden" value="${param}"/> 
+		
+		<fieldset>
+			<legend><b>User ID</b></legend>
+				<p >
+					<input type='radio' id='radioAll' name='auditOption' value='params.isUserId' />
+					<input type="hidden" id='radioAllHidden' name='params.isUserid' value='params.isUserId' />
+					<label>ALL</label>
+				</p>
+				<p>
+					<input type='radio' id='radioIndividual' name='auditOption' value='params.isUserid' />
+					<input type="hidden" id='radioIndividualHidden' name='params.isUserid' value='params.isUserid' />
+					<label style="width: 80px">Individual <span class="req" id="bintang">*</span></label>
+					
+					#{textBox id:'byGroupAudit',width:'100px', name:'', value:'', class:'capitalize individual' /}
+					#{hidden id:'byGroupAuditHidden', name:'params.individualUserKey', value:params?.individualUserKey /}
+					#{button id:'groupAuditHelp', value:'?', class:'small', readOnly:readOnly /}
+					#{textBox id:'groupAuditName', name:'', value:'', readOnly:true, width:'200px' /}
+					<span id="individualError" class="error"></span>
+				</p>
+		</fieldset>
+	
+		<br/>
+		<fieldset>	
+		<legend><b>DATE RANGE</b></legend>
+			<p>
+				<label style="width: 90px">DATE FROM <span class="req">*</span></label>
+				&nbsp;#{textBox id:'dateFrom', name:'params.dateFrom', value:params.dateFrom?.format(appProp.dateFormat), width:'85px',required:true, class:'calendar' /} (${appProp.displayDateFormat})
+				<span id="dateFromError" class="error"></span>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<label style="width: 70px">DATE TO <span class="req">*</span> </label>
+				#{textBox id:'dateTo', name:'params.dateTo', value:params.dateTo?.format(appProp.dateFormat), width:'85px',required:true, class:'calendar' /} (${appProp.displayDateFormat})
+				<span id="dateToError" class="error"></span>
+			</p>
+		</fieldset>
+		
+		<div class="buttons">
+			<input type="button" id="populate" value="POPULATE" />				
+			<!--   input type="button" id="print" value="PRINT" / -->
+			<!--<input style="margin-left: 56em"  type="button" id="reset" value="RESET" />-->
+		</div>
+	</form>
+</div>	
+
+<!--<div id="result" style="display:none">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<div class="response"></div>
+</div>
+-->
+
+<div id="result" style="display:none">
+	<table id="tableaudit" class="display">
+		<thead>
+			<tr>
+				<!--<th field="auditTrailKey|string|none|left|sort">Key</th>-->
+				<th field="user.userId|string|none|left|sort">USER ID</th>
+				<th field="user.userName|string|none|left|sort">USER NAME</th>
+				<th field="user.password|string|none|left|sort">PASSWORD ID</th>
+				<!--<th>USER GROUP</th>-->
+				<th field="loginDate|date|date|center|sort" width="110px">LOGIN DATE</th>
+				<th field="loginTime|string|none|left|sort" width="110px">LOGIN TIME</th>
+				<th field="loginStatus|string|none|left|sort" width="118px">LOGIN STATUS</th>
+				<th field="message|string|none|left|sort" width="150px">MESSAGE</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+	
+</div>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'AuditTrail/AuditTrailPaging.js' /}
+	$(document).ready(function() {
+		Paging($("#accordion").add("#result"));
+	});
+</script>

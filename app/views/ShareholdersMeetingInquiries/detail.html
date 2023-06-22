@@ -1,0 +1,374 @@
+#{set readOnly: ((mode != 'entry') || (mode == 'edit') || confirming) /}
+#{if flash.error || errors}
+    <div class="error">
+    	<b>Error when saving data!</b><br/><br/>
+    	#{if flash.error}
+<li>${flash.error}</li>
+		#{/if}
+		#{ifErrors}
+			#{errors}
+<li>${error.key} ${error} </li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}
+#{script 'date.js', characterset:'utf-8' /}
+#{script 'lookups.js' /}
+#{script 'external/Util.js' /}
+<script type="text/javascript">
+$(function() {
+	$('.calendar').datepicker();
+	$("input.numericOnly").mask("99", { placeholder:"_" });
+	
+	$('#meetingTimeHour').keypress(function() {
+		var el = $(this);
+		var hour = el.val();
+		el.removeClass('fieldError');
+		if (!meetingTimeHour(hour)) {
+				el.addClass('fieldError');
+		} else {
+			el.removeClass('fieldError');
+		}
+	});
+	
+	$('#meetingTimeMinute').keypress(function() {
+		var el = $(this);
+		var minute = el.val();
+		el.removeClass('fieldError');
+		if (!meetingTimeMinute(minute)) {
+			el.addClass('fieldError');
+		} else {
+			el.removeClass('fieldError');
+		}
+	});
+	
+	$('#meetingTimeHour, #meetingTimeMinute').blur(function(){
+		var el = $(this);
+		if (el.val() == '') {
+			el.removeClass('fieldError');
+		} else {
+			if(this.id == "meetingTimeHour"){
+				if(el.val() > 23){
+					el.val('');
+					el.removeClass('fieldError');
+				}
+			} else {
+				if(el.val() > 59){
+					el.val('');
+					el.removeClass('fieldError');
+				}
+			}
+		}
+		
+		if(($('#meetingTimeHour').val() != "") && ($('#meetingTimeMinute').val() != "")){
+				$('#meetingTime').val($('#meetingTimeHour').val()+":"+$('#meetingTimeMinute').val());
+		} else {
+			$('#meetingTime').val("");
+		}
+	})
+	
+	$('#issuerCode').lookup({
+			list:'@{Pick.thirdParties()}?type=THIRD_PARTY-ISSUER',
+			get:{
+				url:'@{Pick.thirdParty()}?type=THIRD_PARTY-ISSUER',
+				success: function(data){
+						$('#issuerCode').removeClass('fieldError');
+						$('#issuerCode').val(data.name);
+						$('#issuerKey').val(data.code);
+						$('#issuerDesc').val(data.description);
+						$('#h_issuerDesc').val(data.description);
+				},
+				error: function(data){
+					$('#issuerCode').addClass('fieldError');
+					$('#issuerCode').val('');
+					$('#issuerKey').val('');
+					$('#issuerDesc').val('NOT FOUND');
+					$('#h_issuerDesc').val('');
+				}
+		},
+		description:$('#issuerDesc'),
+		help:$('#issuerHelp')
+	});
+	
+	$('#issuerCode').change(function() {
+		if ($('#issuerCode').val() == "") {
+			$('#issuerDesc').val("");
+			$('#h_issuerDesc').val("");
+			$('#issuerKey').val("");
+		}
+		$('#securityType').val("");
+		$('#securityTypeDesc').val("");
+		$('#h_securityTypeDesc').val("");
+		$('#securityKey').val("");
+		$('#securityCode').val("");
+		$('#securityCodeDesc').val("");
+		$('#h_securityCodeDesc').val("");
+	});
+		
+	$('#securityType').lookup({
+			list:'@{Pick.securityTypes()}',
+			get:{
+				url:'@{Pick.securityType()}',
+				success: function(data){
+						$('#securityType').removeClass('fieldError');
+						$('#securityType').val(data.code);
+						$('#securityTypeDesc').val(data.description);
+						$('#h_securityTypeDesc').val(data.description);
+				},
+				error: function(data){
+					$('#securityType').addClass('fieldError');
+					$('#securityType').val('');
+					$('#securityTypeDesc').val('NOT FOUND');
+					$('#h_securityTypeDesc').val('');
+				}
+		},
+		//filter:$('#securityType'),
+		description:$('#securityTypeDesc'),
+		help:$('#securityTypeHelp')
+	});
+	
+	$('#securityType').change(function() {
+		if ($('#securityType').val() == "") {
+			$('#securityTypeDesc').val("");
+			$('#h_securityTypeDesc').val("");
+		}
+		$('#securityKey').val("");
+		$('#securityCode').val("");
+		$('#securityCodeDesc').val("");
+		$('#h_securityCodeDesc').val("");
+	});
+	
+	$('#securityCode').change(function() {
+		if ($('#securityCode').val() == "") {
+			$('#securityCodeDesc').val("");
+			$('#h_securityCodeDesc').val("");
+			$('#securityKey').val("");
+		}
+	});
+	
+	$('#securityCode').lookup({
+		list:'@{Pick.securitiesBySecurityTypeAndThirdParty()}',
+		get: {
+			url:'@{Pick.securityBySecurityTypeAndThirdParty()}',
+			success: function(data) {
+				if (data) {
+					$('#securityCode').removeClass('fieldError');
+					$('#securityCode').val(data.securityId);
+					$('#securityKey').val(data.code);
+					$('#securityCodeDesc').val(data.description);
+					$('#h_securityCodeDesc').val(data.description);
+				}
+			},
+			error: function(data) {
+				$('#securityCode').addClass('fieldError');
+				$('#securityCodeDesc').val('NOT FOUND');
+				$('#securityKey').val('');
+				$('#securityCode').val('');
+				$('#h_securityCodeDesc').val('');
+			}
+		},
+		description:$('#securityCodeDesc'),
+		filter: [ $('#securityType'), $('#issuerCode')],
+		help:$('#securityCodeHelp')
+	});
+	
+	if ('${csMeeting?.meetingTime}' !="") {
+		var meetingTime = $('#meetingTime').val().split(":");	
+		$('#meetingTimeHour').val(meetingTime[0]);
+		$('#meetingTimeMinute').val(meetingTime[1]);
+	}
+	
+	$('#isAttached').change(function(){
+		if (!$('#isAttached').is(':checked')){
+			$('#attachFile').disabled();
+			if ($.browser.msie) {
+				$('#attachFile').replaceWith($('#attachFile').clone(true));
+			} else {
+				$('#attachFile').val('');
+			}
+			$('p[id=pAttachFile] label span').html('');
+		} else {
+			$('#attachFile').enabled();
+			$('p[id=pAttachFile] label span').html(' *');
+		}
+	});
+	
+	$('#cancelDate').change(function(){
+		if ($('#cancelDate').val() !== '') {
+			$('p[id=pCancelRemarks] label span').html(' *');
+		} else {
+			$('p[id=pCancelRemarks] label span').html('');
+		}
+	});
+	
+	if ((('${mode}' !== 'entry') || ('${confirming}' !== 'true')) && ('${csMeeting?.attachement}' !== '')) {
+		$('#isAttached').val(true);
+		$("input[name='isAttached']").attr('checked', 'checked');
+	}
+	
+	if ($.browser.msie){
+		$("#cancelRemarks[maxlength]").bind('input propertychange', function() {
+	        var maxLength = $(this).attr('maxlength');  
+	        if ($(this).val().length > maxLength) {  
+	            $(this).val($(this).val().substring(0, maxLength));  
+	        }  
+	    });
+		
+		$("#description[maxlength]").bind('input propertychange', function() {
+	        var maxLength = $(this).attr('maxlength');  
+	        if ($(this).val().length > maxLength) {  
+	            $(this).val($(this).val().substring(0, maxLength));  
+	        }  
+	    });
+	}
+});
+
+function meetingTimeHour(hour) {
+    var meetingTimeHour = /^[0-2]{1}[0-3]{1}$|^23$/;
+    return meetingTimeHour.test(hour);
+}
+
+function meetingTimeMinute(minute) {
+    var meetingTimeMinute = /^[0-5]{1}[0-9]{1}$|^59$/;
+    return meetingTimeMinute.test(minute);
+}
+</script>
+<style type="text/css">
+	textarea{resize: none;}
+</style>
+<form id="shareHoldersMeetingForm" class="form" method="POST" enctype="multipart/form-data">
+	#{hidden name:'mode', value:mode /}
+	#{hidden id:'isActive', name:'csMeeting.isActive', value:csMeeting?.isActive /}
+	<div class="mainEntry">
+		<div class="leftTrx" style="float:left;">
+			<table>
+				<tr>
+					<td>
+						<p>
+							#{textBox id:'meetingNo', label:'Meeting No', value:csMeeting?.meetingKey, width:'120px', readOnly:true /}
+							#{hidden id:'meetingKey', name:'csMeeting.meetingKey', value:csMeeting?.meetingKey /}
+						</p>
+						<p>
+							#{textBox id:'meetingSubject', name:'csMeeting.meetingSubject', label:'Meeting Subject', value:csMeeting?.meetingSubject, width:'120px', readOnly:readOnly, maxLength:250, class:'capitalize', required:true /}
+							<span id="meetingSubjectError" class="error">#{error 'Meeting Subject is' /}</span>
+						</p>
+						<p>
+							#{textBox id:'issuerCode', name:'csMeeting.issuer.thirdPartyCode', label:'Issuer Code', value:csMeeting?.issuer?.thirdPartyCode, class:'lookup capitalize', required:true, readOnly:readOnly, width:'120px' /}
+							#{button id:'issuerHelp', value:'?', class:'small', readOnly:readOnly /}
+							#{textBox id:'issuerDesc', name:'csMeeting.issuer.thirdPartyName', value:csMeeting?.issuer?.thirdPartyName, readOnly:true, width:'241.5px' /}
+							#{hidden id:'issuerKey', name:'csMeeting.issuer.thirdPartyKey', value:csMeeting?.issuer?.thirdPartyKey /}
+							<span id="issuerCodeError" class="error">#{error 'Issuer Code is' /}</span>
+						</p>
+						<p>
+							#{textBox id:'securityType', name:'csMeeting.security.securityType.securityType', label:'Security Type', value:csMeeting?.security?.securityType?.securityType, class:'lookup capitalize', required:true, readOnly:readOnly, width:'120px' /}
+							#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:readOnly /}
+							#{textBox id:'securityTypeDesc', name:'csMeeting.security.securityType.description', value:csMeeting?.security?.securityType?.description, readOnly:true, width:'241.5px' /}
+							<span id="securityTypeError" class="error">#{error 'Security Type is' /}</span>
+						</p>
+						<p>
+							#{textBox id:'securityCode', name:'csMeeting.security.securityId', label:'Security Code', class:'capitalize', value:csMeeting?.security?.securityId, required:true,readOnly:readOnly, width:'120px' /}
+							#{button id:'securityCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+							#{textBox id:'securityCodeDesc', name:'csMeeting.security.description', value:csMeeting?.security?.description, readOnly:true, width:'241.5px' /}
+							#{hidden id:'securityKey', name:'csMeeting.security.securityKey', value:csMeeting?.security?.securityKey /}
+							<span id="securityCodeError" class="error">#{error 'Security Code is' /}</span>
+						</p>	
+						<p>
+							#{textBox id:'announcementDate', name:'csMeeting.announcementDate', label:'Announcement Date', value:csMeeting?.announcementDate?.format(appProp.dateFormat), required:true,readOnly:readOnly,class:'calendar' /}
+							(${appProp.displayDateFormat})
+							<span id="announcementDateError" class="error">#{error 'Announcement Date' /}</span>
+						</p>
+						<p>
+							#{textBox id:'bookCloseDate', name:'csMeeting.bookCloseDate', label:'Recording Date', value:csMeeting?.bookCloseDate?.format(appProp.dateFormat), required:true,readOnly:readOnly,class:'calendar' /}
+							(${appProp.displayDateFormat})
+							<span id="bookCloseDateError" class="error">#{error 'Recording Date' /}</span>
+						</p>
+						<p>
+							#{textBox id:'proxyDeadlineDate', name:'csMeeting.proxyDeadlineDate', label:'Confirmation Date', value:csMeeting?.proxyDeadlineDate?.format(appProp.dateFormat), required:true,readOnly:readOnly,class:'calendar' /}
+							(${appProp.displayDateFormat})
+							<span id="proxyDeadlineDateError" class="error">#{error 'Confirmation Date' /}</span>
+						</p>
+						<p>
+							#{textBox id:'meetingDate', name:'csMeeting.meetingDate', label:'Meeting Date', value:csMeeting?.meetingDate?.format(appProp.dateFormat), required:true,readOnly:readOnly,class:'calendar' /}
+							(${appProp.displayDateFormat})
+							<span id="meetingDateError" class="error">#{error 'Meeting Date' /}</span>
+						</p>
+						<p>			
+							#{textBox id:'meetingTimeHour', name:'meetingTimeHour', label:'Meeting Time', value:meetingTimeHour, readOnly:readOnly, width:'31px',maxLength:2, class:'numericOnly', required:true /}
+							&nbsp;<span>:</span>&nbsp;
+							#{textBox id:'meetingTimeMinute', name:'meetingTimeMinute', value:meetingTimeMinute, readOnly:readOnly, width:'31px',maxLength:2, class:'numericOnly'/}
+							Hour (00-23) : minute (00-59)
+							#{hidden id:'meetingTime', name:'csMeeting.meetingTime', value:csMeeting?.meetingTime /}
+							<span id="meetingTimeError" class="error">#{error 'Hour and minute for Meeting Time is' /}</span>
+						</p>
+						<p>
+							#{textBox id:'meetingPlace1', name:'meetingPlace1', label:'Meeting Place', value:meetingPlace1, class:'capitalize', readOnly:readOnly, width:'390px', maxLength:100, required:true /}<br/>
+							#{textBox id:'meetingPlace2', name:'meetingPlace2', value:meetingPlace2, label:'  ', class:'capitalize', readOnly:readOnly, width:'390px', maxLength:100 /}<br/>
+							#{textBox id:'meetingPlace3', name:'meetingPlace3', value:meetingPlace3, label:'  ', class:'capitalize', readOnly:readOnly, width:'390px', maxLength:55 /}
+							#{hidden id:'meetingPlace', name:'csMeeting.meetingPlace', value:csMeeting?.meetingPlace /}
+							<span id="meetingPlaceError" class="error">#{error 'Meeting Place is' /}</span>
+						</p>
+						<p>
+							#{textBox id:'resultDate', name:'csMeeting.resultDate', label:'Result Date', value:csMeeting?.resultDate?.format(appProp.dateFormat), required:true,readOnly:readOnly,class:'calendar' /}
+							(${appProp.displayDateFormat})
+							<span id="resultDateError" class="error">#{error 'Result Date' /}</span>
+						</p>
+						<p>			
+							#{textArea id:'description', name:'csMeeting.description', label:'Description', value:csMeeting?.description, class:'capitalize', readOnly:readOnly, width:'390px', maxLength:255 /}
+						</p>
+						<p>
+							#{textBox id:'referenceNo', name:'csMeeting.referenceNo', label:'Reference No', value:csMeeting?.referenceNo, width:'120px', readOnly:readOnly, class:'capitalize' /}
+						</p>
+						<p id="pAttachFile">
+							<label>Attach Document<span class="req"></span></label>
+							#{checkBox id:'isAttached', name:'isAttached', value:isAttached, readOnly:readOnly /}
+							#{if ((!confirming)&&(mode=='entry'))}
+								#{fileUpload id:'attachFile', name:'fileAth', value:attachmentFile, class:'all' /}
+								<span id="attachFileError" class="error">#{error 'Attach Document is' /}</span>
+							#{/if}
+							#{else}
+								#{textBox id:'attachmentDoc', name:'attachement',  value:attachement, readOnly:readOnly, width:'200px' /}
+								#{hidden id:'attachmentHidden', name:'csMeeting.attachement', value:csMeeting?.attachement /}
+								#{if ((!csMeeting?.attachement?.trim().equals("")) && (csMeeting?.attachement != null))}
+								&nbsp;&nbsp;
+								Download it <a href="@{attachmentDownload()}/${csMeeting?.meetingKey}">here</a>
+								#{/if}
+							#{/else}
+						</p>
+						<p>
+							#{checkBox id:'distributeEmail', name:'csMeeting.distributeEmail', value:csMeeting?.distributeEmail, label:'Distribute via e-Mail', readOnly:readOnly /}
+						</p>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div style="float:left;overflow:auto;">
+			<table id="cancelMeeting" style="width:350px;">
+				<tr>
+					<td>
+						<p>
+							#{textBox id:'cancelDate', name:'csMeeting.cancelDate', label:'Cancel Date', value:csMeeting?.cancelDate?.format(appProp.dateFormat), required:true, class:'calendar', maxLength:10, readOnly:readOnly /}
+							(${appProp.displayDateFormat})
+							<span id="cancelDateError" class="error">#{error 'Cancel Date is' /}</span>
+						</p>
+						<p id="pCancelRemarks">	
+							<label>Remarks <span class="req"> *</span></label>
+							#{textArea id:'cancelRemarks', name:'csMeeting.cancelRemarks', value:csMeeting?.cancelRemarks, class:'capitalize', width:'110px', maxLength:255, readOnly:readOnly /}
+							<span id="cancelRemarksError" class="error">#{error 'Remarks is' /}</span>
+						</p>
+					</td>
+				</tr>
+			</table>
+			<table id="statusMeeting" style="width:350px;">
+				<tr>
+					<td>
+						<p>
+							#{textBox id:'meetingStatus', label:'Meeting Status', value:csMeeting?.meetingStatus?.decodeDataStatus(), width:'110px', readOnly:true, class:'capitalize' /}
+							#{hidden id:'meetingStatusHidden', name:'csMeeting.meetingStatus', value:csMeeting?.meetingStatus /}
+						</p>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="divclear"></div>
+	</div>
+</form>

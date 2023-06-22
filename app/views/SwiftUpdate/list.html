@@ -1,0 +1,109 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'SWIFT Update' /}
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+
+<div id="root">
+	<h3><a href="#">Search Transaction</a></h3>
+
+	<form id="searchForm" class="form">	
+		#{hidden id:'query', name:'param.query', value:param?.query /}
+		<p>
+			#{dropDownList id:'messageMode', name:'param.messageMode', label:'Message Mode', options:messageModeOptions, value:param.messageMode /}
+		</p>
+		<p>
+			#{textBox id:'fromDate', name:'param.fromDate', label:'Transaction Date', value:param?.fromDate?.format(appProp.dateFormat), class:'calendar', readOnly:false, required:false/}
+			<span id="fromDateErr" class="error">#{error 'PeriodeFrom' /}</span> 
+			<b>&nbsp;To&nbsp;&nbsp;&nbsp;</b>
+			#{textBox id:'toDate', name:'param.toDate', value:param?.toDate?.format(appProp.dateFormat), class:'calendar', readOnly:false, required:true/}(${appProp.displayDateFormat})
+			<span id="toDateErr" class="error">#{error 'PeriodeTo' /}</span>
+		</p>
+		<p>
+			#{textBox id:'settleFromDate', name:'param.settleFrom', label:'Settlement Date', value:param?.settleFrom?.format(appProp.dateFormat), class:'calendar', readOnly:false, required:false/}
+			<span id="settleFromDateErr" class="error">#{error 'PeriodeFrom' /}</span> 
+			<b>&nbsp;To&nbsp;&nbsp;&nbsp;</b>
+			#{textBox id:'settleToDate', name:'param.settleTo', value:param?.settleTo?.format(appProp.dateFormat), class:'calendar', readOnly:false, required:true/}(${appProp.displayDateFormat})
+			<span id="settleToDateErr" class="error">#{error 'PeriodeTo' /}</span>
+		</p>
+		<p>
+			#{textBox id:'sender',width:'100px', name:'', label:'Sender Code', value:'', class:'capitalize' /}
+			#{hidden id:'senderId', name:'param.sender', value:param.sender/}
+			#{button id:'senderHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'senderDesc',width:'250px', name:'param.senderDesc', label:'', value:param.senderDesc, class:'capitalize', readOnly:true /}
+			<span id="senderErr" class="error"></span>
+			<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+		<p>
+		<p>
+			#{textBox id:'receiver',width:'100px', name:'', label:'Receiver Code', value:'', class:'capitalize' /}
+			#{hidden id:'receiverId', name:'param.receiver', value:param.receiver/}
+			#{button id:'receiverHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'receiverDesc',width:'250px', name:'param.receiverDesc', label:'', value:param.receiverDesc, class:'capitalize', readOnly:true /}
+			<span id="receiverErr" class="error"></span>
+		</p>
+		<p>	
+			#{textBox id:'securityType',width:'100px', name:'', label:'Security Type', value:'', class:'capitalize' /}
+			#{hidden id:'securityTypeId', name:'param.securityType', value:param.securityType/}
+			#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'securityTypeDesc',width:'250px', name:'param.securityTypeDesc', label:'', value:param.securityTypeDesc, class:'capitalize', readOnly:true /}
+			<span id="securityTypeErr" class="error"></span>
+		</p>
+		<p>	
+			#{textBox id:'securityCode',width:'100px', name:'', label:'Security Code', value:'', class:'capitalize' /}
+			#{hidden id:'securityCodeId', name:'param.securityCode', value:param.securityCode/}
+			#{button id:'securityCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'securityCodeDesc',width:'250px', name:'param.securityCodeDesc', label:'', value:param.securityCodeDesc, class:'capitalize', readOnly:true /}
+			<span id="securityCodeErr" class="error"></span>
+		</p>
+		<p>	
+			#{textBox id:'isinCode',width:'100px', name:'', label:'ISIN Code', value:'', class:'capitalize' /}
+			#{hidden id:'isinCodeId', name:'param.isinCode', value:param.isinCode/}
+			#{button id:'isinCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'isinCodeDesc',width:'250px', name:'param.isinCodeDesc', label:'', value:param.isinCodeDesc, class:'capitalize', readOnly:true /}
+			<span id="isinCodeErr" class="error"></span>
+		</p>
+		<p>
+			#{dropDownList id:'status', name:'param.status', label:'Status', options:statusOptions, value:param.status /}
+		</p>
+		
+		<p>
+			<div class="buttons">
+				<input type="button" id="search" value="Search" />				
+				<input type="button" id="reset" value="Reset" />
+			</div>
+		</p>
+	
+	</form>
+</div>
+<br>
+<div id="result" style="display:block">
+	<table id="tblSwiftUpdate" class="display">
+		<thead>
+			<tr>
+				<th width="25px" field="messageMode|string|none|center|sort">I/O</th>
+				<th width="75px" field="transactionDate|date|date|center|sort">Transaction Date</th>
+				<th width="50px" field="swiftNo|string|none|left|sort">Swift&nbsp;#</th>
+				<th width="50px" field="transactionNo|string|none|left|sort">Txn&nbsp;#</th>
+				<th width="50px" field="ctp|string|none|left|sort">CTP&nbsp;#</th>
+				<th width="100px" field="accNo|string|none|left|sort">Account&nbsp;No</th>
+				<th width="250px" field="accName|string|none|left|sort">Account&nbsp;Name</th>
+				<th width="250px" field="swiftTypeDesc|string|none|left|sort">Message</th>
+				<th width="100px" field="isinCode|string|none|left|sort">ISIN&nbsp;Code</th>
+				<th width="100px" field="settlementAmount|number|decimal2|right|sort">Settlement&nbsp;Amount</th>
+				<th width="100px" field="status|string|none|center|nosort">Status</th>
+				<th width="100px" field="ackStatus|string|none|center|nosort">Ack&nbsp;Status</th>
+				<th width="100px" field="responseStatus|string|none|center|nosort">Response&nbsp;Status</th>
+				<th width="100px" field="filename|string|none|left|sort">Filename</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+</div>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'SwiftUpdate/list.js' /}
+	$(document).ready(function() {
+		list($("#root").add("#result"));
+	});
+</script>

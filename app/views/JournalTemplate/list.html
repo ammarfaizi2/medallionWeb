@@ -1,0 +1,85 @@
+#{extends 'templates/list1.html' /} 
+#{set pageTitle: 'Journal Template' /}
+#{script 'lookups.js', characterset:'utf-8' /}
+#{script 'lookuppaging.js' /}
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	$(function(){
+		
+		$('#accordion').accordion({
+			collapsible: true
+		});
+		
+		$('.buttons button:first').button({
+			icons: {
+				primary: 'ui-icon-search'
+			}
+		}).next().button();	
+
+		$('#search').click(function() {
+			search();
+			return false;
+		});
+		// end of Search
+		
+		$('#reset').click(function() {
+			location.href="@{list()}";	
+			return false;
+		});
+		
+		$('#new').click(function() {
+			location.href="@{entry()}";			
+		});
+		
+		$('.buttons input:button').button();
+		
+	});
+	
+	var search = function() {
+		
+		$('#result .loading').show();
+		$('#result .response').hide();
+		$('#result').show();
+		$.get('@{search()}', $('#searchForm').serialize(), function(data) {
+			checkRedirect(data);
+			$("#navDateError").html("");
+			$('#result .response').html(data);
+			$('#result .loading').hide();
+			$('#result .response').show();
+			setupTable();
+		});	
+		
+	};
+
+</script>
+
+<style type="text/css">
+  .error { color:red; }
+</style>
+
+<div id="accordion">
+	<h3><a href="#">Search Journal Template</a></h3>
+		<form id="searchForm" class="form">
+			<input id="param" name="params.param" type="hidden" value="${param}"/> 
+			<p>
+				#{dropDownList id:'idOperator', name:'params.idOperator', label:'ID', options:stringOperators, removeEmpty:'true', value:params?.idOperator/}
+				#{textBox id:'idSearchOperator', name:'params.idSearchOperator', value:params?.idSearchOperator, class:'capitalize', maxLength:15  /}
+			</p>
+			<p>
+				#{dropDownList id:'nameOperator', name:'params.nameOperator', label:'Name', options:stringOperators, removeEmpty:'true', value:params?.nameOperator/}
+				#{textBox id:'nameSearchOperator', name:'params.nameSearchOperator', value:params?.nameSearchOperator, class:'capitalize', maxLength:50  /}
+			</p>
+			<p>
+				<div class="buttons">
+					<input type="button" id="search" value="Show"  class="btn"/>
+					<input type="button" id="reset" value="Reset"  class="btn"/>
+				</div>
+			</p>
+		</form>
+</div>
+
+<div id="result" style="display:none">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<div class="response"></div>
+</div>

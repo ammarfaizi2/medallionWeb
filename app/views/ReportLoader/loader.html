@@ -1,0 +1,441 @@
+#{extends 'templates/main.html' /}
+#{stylesheet 'chosen.css' /}    
+
+#{script 'chosen.jquery.js', characterset:'utf-8' /}
+#{script 'jquery.form.js', characterset:'utf-8' /}
+#{script 'jquery.validate.js', characterset:'utf-8' /}
+#{script 'jquery.report.parameter.js', characterset:'utf-8' /}
+#{script 'lookups.js', characterset:'utf-8' /}
+#{script 'lookuppaging.js', characterset:'utf-8' /}
+
+<div class="accordion">
+	#{list mapReport.keySet(), as:'reportGroup'}
+		<h3><a>${reportGroup}</a></h3>
+		<div id="rgroup${reportGroup}" class="form">
+			<div class="accordion">
+			#{list mapReport.get(reportGroup), as:'reports'}
+				#{list reports, as:'report'}
+					<h3 class="hrefloader" xid="${report?.reportLoader?.reportKey}"><a class="hrefloader" xid="${report?.reportLoader?.reportKey}">${report.reportLoader.reportName}</a></h3>
+					<div id="report${report.reportLoader.reportName}" class="formc" style="overflow:visible">
+						<form method="POST" id="form${report.reportLoader.reportKey}" class="formloader #{if report?.reportLoader?.isPentahoLoader }pentaholoader#{/if}#{else}pickerloader#{/else}" novalidate>
+						#{hidden id:'reportKey', name:'reportKey', value:report?.reportLoader?.reportKey /}
+						#{hidden id:'reportFile', name:'reportFile', value:report?.reportLoader?.reportFile /}
+						<div>
+						<p>
+							#{textBox id:'reportFile', name:'reportFile', label:'Report File', value:report.reportLoader.reportFile, readOnly:true, width:'200px' /}
+						</p>
+						</div>
+						 #{if report?.reportLoader?.isPentahoLoader }
+					 	<p>
+						<input type="submit" name="load" value="Load Report" formid="form${report.reportLoader.reportKey}" contentid="content${report.reportLoader.reportKey}" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" style="display:none"/>
+						</p>
+						 #{/if}#{else}
+						<div class="paramholder">
+							
+						</div>
+						<div> 
+						<p>
+							<label>Output Type </label>
+							<select name="outputType" class="outputType"><option value="PDF">PDF</option><option value="XLSX">XLSX</option><option value="XLS">XLS</option><option value="CSV">CSV</option></select>
+						</p>
+						</div>
+						<p>
+							<input type="button" name="load" value="Generate Report" formid="form${report.reportLoader.reportKey}" contentid="content${report.reportLoader.reportKey}" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only generate2" style="display:block"/>
+						</p>
+						#{/else}
+						<div id="content${report.reportLoader.reportKey}" style="display:none;" class="ui-corner-all ui-state-highlight">
+						</div>
+						<div id="report_generated_form${report.reportLoader.reportKey}" style="display:none;width:400px" class="ui-corner-all">
+						</div>
+						</form>
+					</div>
+				#{/list}
+			#{/list}		
+			</div>	
+		</div>
+	#{/list}
+</div>
+<div id="resulttmp" style="display:none">
+	<span class="loading"><img src="@@{'/public/images/loading2.gif'}" style="width:10px;height:10px" />
+</div>
+<script type="text/javascript">
+var ajaxTimeout = ${timeout};
+#{include 'RegistrySubscription/Util.js' /}
+#{include 'RegistrySubscription/jshashtable-2.1.js' /}
+	var accordionMap = new Hashtable();
+	var reportMap = new Hashtable();
+	var varChainMap = new Hashtable();
+	var varChangeMap = new Hashtable();
+	
+	$(document).ready(function(){
+		
+		
+		var contentId;
+		var myTitle = "Load Report";
+		var submitButton;
+		var myContent;
+
+		$( ".accordion form.pickerloader").each(function(idx, form){
+			// prepare Options Object 
+			var options = {
+				dataType: "json",
+				contentType: "application/x-www-form-urlencoded;charset=utf-8",
+			    url:        "@{loadReportParameterVariable()}", 
+			    beforeSubmit : function(arr, form, options){
+					return;
+			    },
+			    success: function(datavar, status, jxhr, form){
+			    	var paramHtml = form.find(".paramholder");
+			    	var reportBtn = form.find(".generate2");
+			    	var formId = form.attr("id");
+
+			    	reportBtn.click(function(){
+				    	var reportContent = form.find("#report_generated_"+formId);
+						reportContent.hide();
+				    	
+						var tmpc_ = 0;
+						var isParameterGood = true;
+			    		var generateParam = "";
+						for(xx_ in datavar){
+							varChainMap.put( datavar[xx_].name, datavar[xx_] );
+							if(paramHtml.find("#"+formId+datavar[xx_].name).hasClass("date")){
+								var tmpDateObj_ = paramHtml.find("#"+formId+datavar[xx_].name);
+								if( tmpDateObj_.datepicker("getDate") != null ){
+									var tmpVal_ = tmpDateObj_.datepicker("getDate").getTime();
+									generateParam = generateParam + "&" + "reportParam["+tmpc_+"].type="+datavar[xx_].type+"&"+
+									"reportParam["+tmpc_+"].value="+tmpVal_+"&"+
+									"reportParam["+tmpc_+"].field="+datavar[xx_].name;
+								}else{
+									isParameterGood = false;
+								}
+							}else if( datavar[xx_].display.lookupId != "REPORT_DISPLAY_TYPE-5" ){
+								var tmpDateObj_ = paramHtml.find("#"+datavar[xx_].name+"Id");
+								var tmpName_ = paramHtml.find("#"+datavar[xx_].name);
+								
+								if(tmpName_.val()==''){
+									isParameterGood = false;
+								}
+								
+								if(tmpDateObj_.val()==''){
+									tmpDateObj_ = paramHtml.find("#"+datavar[xx_].name);
+								}
+								
+								var TmpDateObjVal=encodeURIComponent(tmpDateObj_.val());
+								
+								if(TmpDateObjVal=="ALL")
+									TmpDateObjVal=" All"
+									
+								
+								generateParam = generateParam + "&" + "reportParam["+tmpc_+"].type="+datavar[xx_].type+"&"+
+								"reportParam["+tmpc_+"].value="+TmpDateObjVal+"&"+
+								"reportParam["+tmpc_+"].field="+datavar[xx_].name;
+								if( tmpDateObj_.val() == "" || tmpDateObj_.val() == undefined ){
+			    					isParameterGood = false;
+								}
+								//console.log(form.find("#reportFile").val().indexOf("MonthlyChargesDetailReport"));
+								if(form.find("#reportFile").val().indexOf("MonthlyChargesDetailReport") > -1 && tmpDateObj_.attr("disabled") == false)
+									isParameterGood = true;
+							} else if( datavar[xx_].display.lookupId = "REPORT_DISPLAY_TYPE-5" ){
+								if(datavar[xx_].type == 'String'){
+									var tmpObj_ = paramHtml.find("#"+datavar[xx_].name);
+									generateParam = generateParam + "&" + "reportParam["+tmpc_+"].type="+datavar[xx_].type+"&"+
+									"reportParam["+tmpc_+"].value="+encodeURIComponent(tmpObj_.val())+"&"+
+									"reportParam["+tmpc_+"].field="+datavar[xx_].name;
+								} else {
+									var tmpObj_ = paramHtml.find("#"+datavar[xx_].name);
+									generateParam = generateParam + "&" + "reportParam["+tmpc_+"].type="+datavar[xx_].type+"&"+
+									"reportParam["+tmpc_+"].value="+encodeURIComponent(tmpObj_.val())+"&"+
+									"reportParam["+tmpc_+"].field="+datavar[xx_].name;
+									if( tmpObj_.val() == "" || tmpObj_.val() == undefined ){
+				    					isParameterGood = false;
+									}
+									
+									if(tmpObj_.hasClass('fieldError')){
+										isParameterGood = false;
+									}
+								}
+							}
+							tmpc_++;
+						}
+						
+						var formKey = form.find("#reportKey").val();
+						var outputType = form.find(".outputType").val();
+						var reportContent = form.find("#report_generated_form"+formKey);
+
+						if( !isParameterGood ){
+							  var newContent = 
+								  '<p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>Fill all parameters to generate report!</p>';
+							  reportContent.html( newContent );
+						  
+							  reportContent.addClass("ui-state-error");
+						  
+							  reportContent.removeClass("ui-state-highlight");
+						  
+							  reportContent.fadeIn("slow");
+							  return;
+						}
+						
+						reportBtn.val("Loading now....");
+						$.ajax({
+							  type: 'POST',
+							  url: "@{generateReport()}?"+generateParam+"&reportKey="+formKey+"&outputType="+outputType,
+							  timeout: ajaxTimeout,
+							  async: true,
+							  success: function(data, textStatus, jqXHR){
+								  checkRedirect(data);
+								  if( data.status === "1" ){
+									  var newContent = 
+										  '<p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;">'+
+										  '</span>Success generating report. Download it <a href="@{reportDownload()}/'+data.reportFile+'">here</a></p>';
+									  reportContent.html( newContent );
+									  reportContent.removeClass("ui-state-error");
+
+									  reportContent.addClass("ui-state-highlight");
+									  reportContent.fadeIn("slow");
+																			  
+								  }else if(data.status === "0") {
+									  var newContent = 
+										  '<p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>'+data.message+'</p>';
+									  reportContent.html( newContent );
+								  
+									  reportContent.addClass("ui-state-error");
+								  
+									  reportContent.removeClass("ui-state-highlight");
+								  
+									  reportContent.fadeIn("slow");
+									  
+								  }
+								  reportBtn.val("Generate Report");
+								  
+							  },
+							  error: function(jxhr, status){
+								  var newContent = 
+									  '<p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>timeout request</p>';
+								  reportContent.html( newContent );
+							  
+								  reportContent.addClass("ui-state-error");
+							  
+								  reportContent.removeClass("ui-state-highlight");
+							  
+								  reportContent.fadeIn("slow");
+								  reportBtn.val("Generate Report");
+							  }
+						});
+					});
+			    	
+			    	for(idx in datavar){
+			    		var c_ = datavar[idx];
+			    		//init cap
+			    		c_.label = c_.label.charAt(0).toUpperCase() + c_.label.slice(1);
+			    		var tmpDefValue = (c_.defaultValue == null ? "" : c_.defaultValue);
+			    		if( c_.display.lookupId == "REPORT_DISPLAY_TYPE-1" ){ // picker drop down
+			    			if (c_.refBy != null) {
+				    			console.log(formId+'_'+c_.name+" > "+formId+'_'+c_.refBy);
+				    			varChangeMap.put(formId+'_'+c_.name, formId+'_'+c_.refBy);
+			    			}
+			    			
+			    			paramString = "";
+					    	$.get("@{newlookup()}?elementCode="+c_.name+"&elementType="+c_.type+"&elementLabel="+c_.label+"&elementPicker="+c_.picker.id+"&formId="+formId+"&refBy="+c_.refBy+"&defaultValue="+tmpDefValue+"&readOnly="+c_.readOnly, 
+					    	function(datanew) {					    		
+					    		paramHtml.append( datanew );
+					    		if (c_.refBy != null) {
+						    		$("#"+c_.name, "#"+formId)
+						    			.data('compId',formId+"_"+c_.name)
+						    			.blur(function(){
+						    				var compId = $(this).data('compId');
+						    				var targetId = varChangeMap.get(compId);
+						    				var arr = targetId.split("_");
+						    				var pointer = $("#"+arr[1], "#"+arr[0]); 
+						    				if (pointer.length == 1) {
+						    					if (pointer.val() != 'ALL') {
+						    						$("#"+arr[1], "#"+arr[0]).val("ALL").blur();
+						    					}
+						    				}
+						    		})
+					    		};
+					    	});
+			    		} else if( c_.display.lookupId == "REPORT_DISPLAY_TYPE-4" ){ // Date picker
+					    	$.get("@{newdate()}?elementCode="+c_.name+"&elementType="+c_.type+"&elementLabel="+c_.label+"&formId="+formId+"&refBy="+c_.refBy, 
+							    	function(datanew) {					    		
+							    		paramHtml.append( datanew );
+							    	});
+			    			/*
+			    			var newDate = "<p><label>"+c_.label+"</label>\n<input class=\"date calendar\" type=\"text\" id=\""+formId+c_.name+"\" name=\""+c_.name+"\"/><span id=\""+formId+c_.name+"Error\" class=\"error\"></span></p>";
+			    			paramHtml.append( newDate );
+			    			paramHtml.find("#"+formId+c_.name).datepicker({dateFormat:'${appProp?.jqueryDateFormat}', yearRange: '1000:9999'});
+			    			paramHtml.find("#"+formId+c_.name).datepicker("setDate", new Date());
+			    			*/
+			    		} else if( c_.display.lookupId == "REPORT_DISPLAY_TYPE-5" ){ // plain textbox
+			    			if(c_.type == 'String'){
+			    				var newText = "<p><label>"+c_.label+"</label>\n<input class=\"plaintextbox\" type=\"text\" id=\""+c_.name+"\" name=\""+c_.name+"\"/></p>";
+				    			paramHtml.append( newText );
+			    			} else {
+			    				$.get("@{newNumber()}?elementCode="+c_.name+"&elementType="+c_.type+"&elementLabel="+c_.label+"&formId="+formId+"&refBy="+c_.refBy+"&readOnly="+c_.readOnly, 
+						    	function(datanew) {
+						    		paramHtml.append( datanew );
+						    	});
+			    			}
+			    		}
+			    	}			    	
+			    },
+				error: function(jxhr, status){
+					reportBtn.val(myTitle);
+					var newContent = 
+					  '<p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;">'+
+					  '</span>Error loading report definition.</p>';
+					myContent.html( newContent );
+					myContent.addClass("ui-state-error"); 
+					myContent.removeClass("ui-state-highlight");
+					 
+					myContent.fadeIn("slow");
+				}
+			}; 
+			$( form ).ajaxForm(options);
+		});
+		
+		$( ".accordion form.pentaholoader").each(function(idx, form){
+			// prepare Options Object 
+			var options = {
+				dataType: "json",
+				contentType: "application/x-www-form-urlencoded;charset=utf-8",
+			    url:        "@{loadReportParameterDefinition()}", 
+			    beforeSubmit : function(arr, form, options){
+			    	submitButton = form.find("input[type=submit]");
+					submitButton.val("Loading now....");
+					contentId = submitButton.attr( "contentid" );					
+					myContent = $("#"+contentId);
+					myContent.hide();
+					myContent.fadeOut("slow");
+					myContent.removeClass("ui-state-error");
+					myContent.addClass("ui-state-highlight");
+					return;
+			    },
+			    success: function(data, status, jxhr, form){					
+					myContent.fadeIn("slow");
+					var optionForReportGenerator = {
+						dataSource: data,
+						onComplete: function(){},
+						onSelectChange: function(myForm){ 
+							var formId = myForm.attr("id");
+							myForm.submit();
+						},
+						onGenerateReport: function(myForm, callback){
+							var formId = myForm.attr("id");
+							var dataPost = myForm.serialize();
+							var reportContent = $( "#report_generated_"+formId );
+							reportContent.fadeOut("slow");
+							reportContent.html("");
+							$.ajax({
+								  type: 'POST',
+								  url: "@{generateReport()}",
+								  data: dataPost,
+								  beforeSend: function( xhr ) {
+								  },
+								  success: function(data, textStatus, jqXHR){
+
+									  checkRedirect(data);
+									  if( data.status === "1" ){
+										  var newContent = 
+											  '<p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;">'+
+											  '</span>Success generating report. Download it <a href="@{reportDownload()}/'+data.reportFile+'">here</a></p>';
+										  reportContent.html( newContent );
+										  reportContent.removeClass("ui-state-error");
+
+										  reportContent.addClass("ui-state-highlight");
+										  reportContent.fadeIn("slow");
+																				  
+									  }else if(data.status === "0") {
+										  var newContent = 
+											  '<p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>'+data.message+'</p>';
+										  reportContent.html( newContent );
+									  
+										  reportContent.addClass("ui-state-error");
+									  
+										  reportContent.removeClass("ui-state-highlight");
+									  
+										  reportContent.fadeIn("slow");
+										  
+									  }
+								  },
+								  error: function(jxhr, status){
+									  var newContent = 
+										  '<p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;">'+
+										  '</span>Error generating report.</p>';
+									  reportContent.html( newContent );
+								  
+									  reportContent.addClass("ui-state-error");
+								  
+									  reportContent.removeClass("ui-state-highlight");
+								  
+									  reportContent.fadeIn("slow");
+									  
+								  },
+								  complete: function(jqXHR, textStatus){
+									  if( callback != undefined ){
+										  callback();
+									  }
+								  }
+							});								
+						}
+					};
+					$( form ).generateParameterForm( optionForReportGenerator );
+					submitButton.val(myTitle);
+					  
+				  },
+				  error: function(jxhr, status){
+					  submitButton.val(myTitle);
+					  var newContent = 
+						  '<p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;">'+
+						  '</span>Error loading report definition.</p>';
+					  myContent.html( newContent );
+					  
+					  myContent.addClass("ui-state-error");
+					  
+					  myContent.removeClass("ui-state-highlight");
+					  
+					  myContent.fadeIn("slow");
+				  }
+			}; 
+			$( form ).ajaxForm(options);
+		});
+	});
+	
+
+	$(function() {
+		$('.accordion').accordion({
+			collapsible: true,
+			autoHeight: false,
+			active:1000,
+			event:"click"
+		});
+		
+		var LoaderClickHandler = function(){
+			var xid = $(this).attr("xid");
+			var formId = "form"+xid;
+			if( accordionMap.get(xid) == null ){
+				// put accordion in a state
+				accordionMap.put(xid, xid);
+				
+				// check whether this report had been opened before
+				if( reportMap.get(xid) == null ){
+					reportMap.put(xid, xid);
+					// submit report to load
+					$("#"+formId).submit();
+				}else{
+					// no need to load report
+				}
+			}else{
+				accordionMap.remove(xid);
+			}			
+		};
+		
+		$("a.hrefloader").click(function(){
+			LoaderClickHandler.call(this);
+		});
+		
+		$("h3.hrefloader span").click(function(){
+			LoaderClickHandler.call($(this).parent());
+		});
+	});	
+	
+</script>

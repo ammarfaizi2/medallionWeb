@@ -1,0 +1,89 @@
+#{extends 'templates/main.html' /}
+#{set readOnly:((mode !='edit' && mode !='entry') || confirming) /}
+<script type="text/javascript">
+	$(function() {
+
+		$('#save').click(function(){
+			var resume = true;
+			if(typeof doSave == 'function') {
+				resume = doSave();
+			}
+			
+			if (resume){
+				var action = "@{save()}?mode=${mode}";
+				/* var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+				loading.dialog({
+					closeOnEscape: false,
+					draggable: false,
+					modal: true,
+					resizable: false,
+					open:function() {
+						$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+					} 
+				}); */
+				$('#sectorForm').attr('action', action);
+				$('#sectorForm').submit();
+			}
+		});
+
+		$('#confirm').click(function(){
+			var action = "@{confirm()}?mode=${mode}";
+			/* var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+			loading.dialog({
+				closeOnEscape: false,
+				draggable: false,
+				modal: true,
+				resizable: false,
+				open:function() {
+					$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+				} 
+			}); */
+			$('#sectorForm').attr('action', action);
+			$('#sectorForm').submit();
+		});
+
+		$('#back').click(function(){
+			location.href = '@{back()}?id=${sector?.sectorLimitKey}&mode=${mode}';
+		});
+
+		$('#cancel').click(function(){
+			location.href = '@{list()}';
+			
+		});
+		
+		$('#close').click(function(){
+			location.href = '@{list()}';
+		});
+	});
+</script>
+<h2>Positive Securities Sector</h2>
+#{if flash.error || errors}
+    <div class="error">
+    	Error when saving data!<br/>
+		<li>${flash.error}</li>
+		#{ifErrors}
+			#{errors}
+				 <li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}
+<div id="detail">
+	#{include 'SecuritiesSectors/detail.html' /}	
+</div>
+<div id="actions" class="buttons">
+	#{if confirming}
+		<input type="button" id="confirm" value="Confirm" />
+		<input type="button" id="back" value="Back" />
+	#{/if}
+	#{else}
+		#{if mode=='view' }
+			<input type="button" id="close" value="Close" />
+		#{/if}
+		#{else}
+			<input type="button" id="save" value="Save" />
+			<input type="button" id="cancel" value="Cancel" />
+		#{/else}
+	#{/else}
+</div>
+	

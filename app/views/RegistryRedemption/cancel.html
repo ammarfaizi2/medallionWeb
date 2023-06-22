@@ -1,0 +1,274 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Cancel Redemption' /}
+
+<script type="text/javascript">
+	$(function() {
+		//$(".btn").button();
+		$("#saveCancellation").button();
+		$("#cancelCancellation").button();
+		$("#confirmCancellation").button();
+		$("#backCancellation").button();
+		
+		//$( "#dialog-message1" ).css("display","none");
+		
+		var closeDialogMessage = function() {
+	        $("#dialog-message").dialog("close");
+	    }
+
+	    var backToList = function() {
+	        loading.dialog('open');
+	        location = "@{RegistryCancelTrade.list()}";
+	    }
+	    
+	    var nextProcess = function(){
+			$("#dialog-message").dialog("close");
+			loading.dialog('open');
+			var action = '@{save()}?mode=${mode}&from=cancelTrade&isNewRec=${isNewRec}#{if group}&group=${group}#{/}';
+			$('#registryRedemptionForm').attr('action', action);
+			$('#registryRedemptionForm').submit();
+		}
+	    
+	    if($.browser.msie)
+	    {
+	        $("#remarkForCancel").bind('input propertychange', function() {
+	            var maxLength = 200;  
+	            if ($(this).val().length > maxLength) {  
+	                $(this).val($(this).val().substring(0, maxLength));  
+	            };
+	        });
+	    };
+	    
+	    if ('${from}'=='cancelTradeApp'){
+			$('#saveCancellation').css('display', 'none');
+			$('#cancelCancellation').css('display', 'none');
+			
+			$('#close').click(function() {
+				history.back();
+			});
+		}
+		
+		if ('${from}'=='cancelTrade'){
+			$('#close').css('display', 'none');
+			
+			$('#cancelCancellation').click(function() {
+				location = "@{RegistryCancelTrade.list()}";
+			});
+			$('#close').click(function() {
+				location = "@{RegistryCancelTrade.list()}";
+			});
+		}
+		
+		if ('${from}'=='unitRegistry'){
+			$("#close").button();
+			$('#saveCancellation').css('display', 'none');
+			$('#cancelCancellation').css('display', 'none');
+
+			$('#close').click(function() {
+				location = "@{InquiryUnitRegistry.list()}";
+			});
+		}
+		
+		$('#saveCancellation').click(function() {
+			/*  if (($('#cancelDate').hasClass('fieldError'))||($('#cancelPostDate').hasClass('fieldError')))
+				return false;
+			
+			if (($('#cancelDate').val()=='')||($('#cancelPostDate').val()=='')){
+				if ($('#cancelDate').val()=='') {
+					$('#cancelDateError').html("Required");
+				} else {
+					$('#cancelDateError').html("");
+				}
+				
+				if ($('#cancelPostDate').val()=='') {
+					$('#cancelPostDateError').html("Required");
+				} else {
+					$('#cancelPostDateError').html("");
+				}
+				
+				return false;
+			} */
+
+// 			if (($('#dataPaymentOnApproval').val() == '0') || ($('#dataPaymentOnApproval').val()!='') ||
+// 					($('#dataPaymentAlreadyPaid').val() == '0') || ($('#dataPaymentAlreadyPaid').val() != '')) {
+					
+// 					if (($('#dataPaymentOnApproval').val() == '0') || ($('#dataPaymentOnApproval').val() != '')){
+// 						messageAlertOk('There is an unapproved payment for this trade on payment approval work list', "ui-icon1 ui-icon-circle-close", "Error Message",  closeDialogMessage);
+// 					}
+					
+// 					if (($('#dataPaymentAlreadyPaid').val() == '0') || ($('#dataPaymentAlreadyPaid').val() != '')){
+// 						messageAlertOk('Cannot cancel an already paid trade', "ui-icon1 ui-icon-circle-close", "Error Message",  closeDialogMessage);
+// 					}
+					
+// 					return false;
+// 				}
+			
+			//kebalik isi message
+			if (($('#dataPaymentOnApproval').val() == '0') || ($('#dataPaymentOnApproval').val()!='') ||
+                    ($('#dataPaymentAlreadyPaid').val() == '0') || ($('#dataPaymentAlreadyPaid').val() != '')) {
+                    
+                    if (($('#dataPaymentOnApproval').val() == '0') || ($('#dataPaymentOnApproval').val() != '')){
+                    	messageAlertOk('Cannot cancel an already paid trade', "ui-icon1 ui-icon-circle-close", "Error Message",  closeDialogMessage);
+                    }
+                    
+                    if (($('#dataPaymentAlreadyPaid').val() == '0') || ($('#dataPaymentAlreadyPaid').val() != '')){
+                        messageAlertOk('There is an unapproved payment for this trade on payment approval work list', "ui-icon1 ui-icon-circle-close", "Error Message",  closeDialogMessage);
+                    }
+                    
+                    return false;
+                }
+
+			/*------------------------------------- start cancel validation ---------------------------------------------------------*/
+			//var cancelPostDate = new Date($("#cancelPostDate").val()).getTime();
+            //var cancelDate = new Date($("#cancelDate").val()).getTime();
+            
+            var cancelPostDate = new Date($('#cancelPostDate').datepicker('getDate')).getTime();
+    		var cancelDate = new Date($('#cancelDate').datepicker('getDate')).getTime();
+    		
+    		if(!isNaN(cancelPostDate) && !isNaN(cancelDate))
+            {
+                if (cancelPostDate < cancelDate )
+                {
+                	messageAlertOk('Cancel Date must be before than Cancel Post Date', "ui-icon1 ui-icon-circle-close", "Error Message",  closeDialogMessage);
+                    return false;
+                }
+            }
+
+            //var postDate = new Date($("#postDate").val()).getTime();
+            var postDate = new Date($('#postDate').datepicker('getDate')).getTime();
+            if(!isNaN(cancelPostDate) && !isNaN(postDate))
+            {
+                if (cancelPostDate < postDate )
+                {
+                	messageAlertOk('Cancel Post Date must be later than Cancelled Transaction Post Date', "ui-icon1 ui-icon-circle-close", "Error Message",  closeDialogMessage);
+                    return false;
+                }
+            }
+            /*------------------------------------- end cancel validation ---------------------------------------------------------*/
+
+			if(($('#remarkForCancel').val() == '') || ($.trim($('#remarkForCancel').val()) == ''))
+	        {
+	            $('#remarkForCancelError').html("Required");
+	        }
+	        else
+	        {
+	        	$('#remarkForCancelError').html("");
+				if ('${warningMsg}'=='true'){
+					/* $("#dialog-message1").dialog({
+						autoOpen:false,
+						height:150,
+						width:350,
+						modal:true,
+						resizable : false,
+						buttons: {
+							"Yes": function() {
+								//var action ="@{RegistryCancelTrade.cancelTransaction()}"
+								var action = '@{save()}?mode=${mode}&from=cancelTrade&isNewRec=${isNewRec}#{if group}&group=${group}#{/}';
+								$('#registryRedemptionForm').attr('action', action);
+								$('#registryRedemptionForm').submit();	
+								$("#dialog-message").dialog("close");
+								//alert("Your Cancel No is #${red?.tradeKey}");							
+							},
+							"No ": function() {
+								$("#dialog-message1").dialog("close");
+								return false;
+							}	
+						}
+					});
+					$('#dialog-message1').css('overflow','hidden');
+					$("#dialog-message1").dialog('open'); */
+					messageAlertYesNo("There is dividend transaction no ${tradesNo} related with redeem all, do you want to process ?", "ui-icon ui-icon-notice", "Confirmation Message",nextProcess, closeDialogMessage);
+				} else {
+				
+					//location = "@{RegistryCancelTrade.cancelTransaction(rg)}";
+					/* var action ="@{RegistryCancelTrade.cancelTransaction()}"
+					$('#registryRedemptionForm').attr('action', action);
+					$('#registryRedemptionForm').submit();
+					alert("Your Cancel No is #${red?.tradeKey}"); */
+					var action = '@{save()}?mode=${mode}&from=cancelTrade&isNewRec=${isNewRec}#{if group}&group=${group}#{/}';
+					$('#registryRedemptionForm').attr('action', action);
+					$('#registryRedemptionForm').submit();	
+					return false;
+				}
+	        }
+		});
+		
+		$('#cancelCancellation').click(function(){
+			location.href = '@{RegistryCancelTrade.list()}';
+			return false;
+		});
+
+		$('#confirmCancellation').click(function() {
+			var action = "@{confirm()}?mode=${mode}&from=cancelTrade&isNewRec=${isNewRec}#{if group}&group=${group}#{/}";
+	        loading.dialog('open');
+
+	        $.post(action, $('#registryRedemptionForm').serialize(), function(data, status) {
+	    		checkRedirect(data);
+	            loading.dialog('close');
+	            if (data.status == 'success') {
+	                messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Notification", backToList);
+	            } else if (data.status == 'errorx') {
+	            	messageAlertOk(data.errorx, "ui-icon1 ui-icon-circle-close", "Error Message", backToList);
+	            } else {
+	                messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+	            }
+	        });
+	        
+	        return false;
+		});
+		
+		$('#backCancellation').click(function(){
+			location.href = '@{back()}?id=${rg?.tradeKey}&mode=${mode}&from=cancelTrade';
+			return false;
+		});
+		
+		//$(".buttons").css("display","none");
+		$("#approval-actions").css("display","block");
+		
+		$('#dvNeedCorrection').css("display","none");
+		
+	});
+
+</script>
+
+#{if from == 'unitRegistry' }
+	<h2>Inquiry Unit Redemption</h2>
+#{/if}
+#{else}
+	<h2>Cancel Redemption</h2>
+#{/else}
+
+<div id="detail">
+		#{include 'RegistryRedemption/detail.html' /}
+</div>	
+
+<div id="approval-actions">
+	#{hidden id:'dataPaymentOnApproval' , value:dataPaymentOnApproval /}
+	#{hidden id:'dataPaymentAlreadyPaid' , value:dataPaymentAlreadyPaid /}
+	
+	#{hidden id:'taskId', name:'taskId', value:taskId /}
+	#{hidden id:'keyId', name:'keyId', value:keyId /}
+	#{hidden id:'from', name:'from', value:from /}	
+	
+	<!-- <input type="button" id="ok" value="Confirm Cancellation" class="btn" />
+	<input type="button" id="cancel" value="Cancel" style="margin:5px;" class="btn"/>
+	<input type="button" id="close" value="Close" class="btn" /> -->
+	<div id="actions" class="buttons">
+	#{if confirming}
+		<input type="button" id="confirmCancellation" value="Confirm" />
+		<input type="button" id="backCancellation" value="Back" />
+	#{/if}
+	#{else}
+		<input type="button" id="saveCancellation" value="Save" />
+		<input type="button" id="cancelCancellation" value="Cancel" />
+	#{/else}
+	
+	#{if from == 'unitRegistry'}
+		<input type="button" id="close" value="Close" />
+	#{/if}
+	</div>
+</div>
+<!-- <div id="dialog-message1" title="Message Confirmation">
+	<p>
+	<span class="ui-icon ui-icon-notice" style="float:left; margin:0 7px 50px 0;"></span>
+	There is dividend transaction no ${tradesNo} related with redeem all, do you want to process ? </p>
+</div> -->

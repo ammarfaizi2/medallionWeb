@@ -1,0 +1,96 @@
+<style>
+.btn-disabled{
+	opacity:.35;
+	cursor: default !important;
+}
+</style>
+<script type="text/javascript">
+$(function(){
+	#{if mode == 'entry'}
+		$("#hasDepository").attr('checked',false);
+		$("#hasDepositoryHidden").val('true');
+	#{/if}
+	
+	$("#hasDepository").click(function(){
+		arrangeDepository();
+	});		
+	
+	#{if mode == 'edit'|| confirming || mode=='view' }
+		checkDepository();
+		arrangeDepository();
+	#{/if}
+});
+
+function checkDepository(){
+	if($("#gridSubAccount tbody tr td").html()=='No data available in table' || $("#gridSubAccount tbody tr").length < 1){
+		$("#hasDepository").attr('checked',true);
+	}else if($("#gridSubAccount tbody tr").length > 0){
+		$("#hasDepository").attr('checked',false);
+	}
+}
+
+function arrangeDepository(){
+	var dep = $("#hasDepository:checked").length;
+	if(dep<1){ 
+		//kalo gk dicentang
+		$("#hasDepositoryHidden").val('true'); 
+		$("#addSubAccount").removeAttr('disabled');
+		$("#addSubAccount").removeClass("btn-disabled");
+	}
+	else {
+		//kalo dicentang
+		$("#addSubAccount").attr("disabled","disabled");
+		$("#addSubAccount").addClass("btn-disabled");
+		$("#hasDepositoryHidden").val('false');
+		$("#gridSubAccount tbody tr").each(function(){
+			var row = $(this);
+			var rowNumber = $('#gridSubAccount').dataTable().fnGetPosition(row[0]);
+			
+			$('#gridSubAccount').dataTable().fnDeleteRow(rowNumber);
+			var idTable = $("#listSubAccount #gridSubAccount");
+			var trs = $("tr", idTable);
+			$.each(trs, function(idx, data){
+				var hiddens = $("[type=hidden]", $(this));
+					$(hiddens).eq(0).attr("name", "subAccounts["+(idx-1)+"].subAccountKey");
+					$(hiddens).eq(1).attr("name", "subAccounts["+(idx-1)+"].depository.lookupId");
+					$(hiddens).eq(2).attr("name", "subAccounts["+(idx-1)+"].depository.lookupCode");
+					$(hiddens).eq(3).attr("name", "subAccounts["+(idx-1)+"].depository.lookupDescription");
+					$(hiddens).eq(4).attr("name", "subAccounts["+(idx-1)+"].code");
+					$(hiddens).eq(5).attr("name", "subAccounts["+(idx-1)+"].accountCashUsed.lookupId");
+			});
+		});
+	}
+}
+</script>
+<p>
+<span id="errSubAccount" class="error"></span>
+</p>
+#{checkBox id:'hasDepository', name:'hasDepository', readOnly:readOnly /} Depository Not Required
+<table id="gridSubAccount" class="display">
+	<thead>
+		<tr>
+			<th width="150px">Depository</th>
+			<th width="100px">Sub Account</th>
+			<th width="80px">Action</th>
+		</tr>
+	</thead>
+	<tbody>
+	 	#{list account?.subAccounts, as:'subAccount'}
+		<tr>			
+			<td>${subAccount?.depository?.lookupDescription}</td>
+			<td>${subAccount?.code}</td>
+			
+			<td>
+				#{hidden id:'subAccountKeyX', name:'subAccounts[' + (subAccount_index-1) + '].subAccountKey', value:subAccount?.subAccountKey /}
+				
+				#{hidden id:'depositoryKeyX', name:'subAccounts[' + (subAccount_index-1) + '].depository.lookupId', value:subAccount?.depository?.lookupId /}
+				#{hidden id:'depositoryCodeX', name:'subAccounts[' + (subAccount_index-1) + '].depository.lookupCode', value:subAccount?.depository?.lookupCode /}
+				#{hidden id:'depositoryDescX', name:'subAccounts[' + (subAccount_index-1) + '].depository.lookupDescription', value:subAccount?.depository?.lookupDescription /}
+				#{hidden id:'codeX', name:'subAccounts[' + (subAccount_index-1) + '].code', value:subAccount?.code /}
+				<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} /></center>
+			</td>
+		</tr>
+		#{/list}
+	</tbody>
+</table>
+

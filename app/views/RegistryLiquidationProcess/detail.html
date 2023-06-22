@@ -1,0 +1,158 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: ' ' /}
+#{set id:liq?.rgProduct?.productCode /}
+#{set readOnly:(((mode=='edit')||(mode=='view'))||(confirming)) /}
+#{set readOnlyEdit:(mode!='edit'||(confirming)) /}
+#{script 'lookups.js' /}
+
+#{if flash.error || errors}
+    <div class="error">
+    	<b>Error when saving data!</b><br/><br/>
+    	#{if flash.error}
+<li>${flash.error}</li>
+		#{/if}
+		#{ifErrors}
+			#{errors}
+<li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}
+
+<script type="text/javascript">
+	$(function() {			
+		liquidationGrid();
+		
+		var backToEntry = function() {
+			loading.dialog('open');
+			location = "@{search()}";
+		}
+		
+		var closeDialogMessage = function() {
+			$("dialog-message").dialog('close');
+		}
+		
+		$('#save').click(function(){
+			var checkError = $('input').hasClass('fieldError');
+			
+			if ($('#calculate').val()=='true'){
+				messageAlertOk("Please populate first before continue to save !", "ui-icon1 ui-icon-alert", "Warning Message", closeDialogMessage);
+				return false;
+			}
+			if(checkError){
+				return false;
+			}
+			var action = "@{save()}?mode=${mode}#{if group}&group=${group}#{/}#{if isPartial}&isPartial=${isPartial}#{/}";
+			loading.dialog('open');
+			$('#liquidationProcess').attr('action', action);
+			$('#liquidationProcess').submit();
+			
+		});
+		
+		$('#confirm').click(function() {
+			var action = "@{confirm()}?mode=${mode}#{if group}&group=${group}#{/}#{if param}&param=${param}#{/}#{if isPartial}&isPartial=${isPartial}#{/}";
+			loading.dialog('open');
+			$.post(action, $('#liquidationProcess').serialize(), function(data, status) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Notification", backToEntry);
+				} else {
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+				}
+			});
+		});
+		
+		$('#back').click(function() {
+			location.href = '@{back(id)}?mode=${mode}#{if status}&status=${status}#{/}#{if group}&group=${group}#{/}#{if param}&param=${param}#{/}#{if from}&from=${from}#{/}#{if isPartial}&isPartial=${isPartial}#{/}';		
+		});
+
+		$('#cancel').click(function() {
+			location.href = '@{search()}';
+			
+		});
+		
+	});
+	
+	function liquidationGrid() {
+		var tableLiquid = $('#tabDetail #gridLiquid').dataTable({
+			aoColumnDefs:[
+					{bVisible:true, aTargets:[0]},
+					{bSortable:false,aTargets:[1,2,3,4,5]}   	  
+			   ],
+			  // aaSorting: [[1, 'asc']],
+				bAutoWidth: false,
+				bDestroy: true,
+				bJQueryUI: true,
+				bLengthChange: false,
+				//sPaginationType: 'full_numbers',
+				bInfo: true,
+				bPaginate: false,
+				iDisplayLength:5
+			//	sScrollX:'100%'
+		});
+	}
+
+</script>
+<style type="text/css">
+  #errmsgHigh { color:red; }
+  #gridLiquid {width :100% ; table-layout: fixed;}
+  /* div#gridLiquid_wrapper .ui-widget-header {width:100%;} */
+  /* div#gridLiquid_wrapper.dataTables_wrapper table#gridLiquid.display {width:1210px;} */ 
+</style>
+
+
+<h2>Fund : ${liq?.rgProduct?.productCode} - ${liq?.rgProduct?.name}</h2>
+#{hidden id:'calculate' ,name:'calculate', value:calculate /}
+#{hidden id:'priceRoundValue' ,value:liq?.rgProduct?.priceRoundValue /}
+#{hidden id:'priceRoundType' ,value:liq?.rgProduct?.priceRoundType /}
+#{hidden id:'amountRoundValue' ,value:liq?.rgProduct?.amountRoundValue /}
+#{hidden id:'amountRoundType' ,value:liq?.rgProduct?.amountRoundType /}
+#{hidden id:'unitRoundValue' ,value:liq?.rgProduct?.unitRoundValue /}
+#{hidden id:'unitRoundType' ,value:liq?.rgProduct?.unitRoundType /}
+
+<form id="liquidationProcess" class="form" method="POST">
+#{hidden id:'rgTradeTemp', name:'liq.rgTradeTemp', value:liq?.rgTradeTemp /}
+	<div id="tabs">
+		<ul>
+			<li><a href="#tabMaster">Master</a></li>
+			<li><a href="#tabDetail">Detail</a></li>
+		</ul>
+		<div class="pane" id="tabMaster">
+			#{include 'RegistryLiquidationProcess/tab_master.html' /}
+			
+		</div>
+		<div class="pane" id="tabDetail" >
+			<div id="listLiquid">
+			#{include 'RegistryLiquidationProcess/tab_detail.html' /}
+			</div>
+		</div>	
+	</div>
+</form>
+	<div id="actions" class="buttons">
+		#{if confirming}
+			<input type="button" id="confirm" value="Confirm" />
+			<input type="button" id="back" value="Back" />
+		#{/if}
+		#{else}
+			<input type="button" id="save" value="Save" />
+			<input type="button" id="cancel" value="Cancel" />
+		#{/else}
+	</div>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'RegistryLiquidationProcess/Liquidation.js' /}
+	$(document).ready(function() {
+		$('.buttons input:button').button();
+		$('#tabs').tabs();
+//		$('#tabMaster').css('height', '300');
+//		$('#listLiquid #gridLiquid').css('width', '');
+		$('#clearAll').button();
+		$('#processCalculate').button();
+		$('#calculate').val(true);
+		Liquidation($("#main"));
+	});
+	
+	
+</script>

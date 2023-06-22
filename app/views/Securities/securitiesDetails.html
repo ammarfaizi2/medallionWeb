@@ -1,0 +1,171 @@
+<p> 
+    #{dropDownList id:'depositoryCode', name:'security.depositoryCode.lookupId', label:'Depository', options:depositoryCode, value:security?.depositoryCode?.lookupId, required:true, readOnly:readOnly, width:'175px' /}        
+    <span id="depositoryCodeError" class="error">#{error 'Depository Code is' /}</span>
+</p>
+
+<p class="externalCodeArea">
+    #{textBox id:'externalCode', name:'security.externalCode', label:'External Code', value:security?.externalCode, required: true, class:'capitalize', readOnly:readOnly, width:'109px', maxLength:50 /}
+    <span id="externalCodeError" class="error">#{error 'External Code is' /}</span>
+</p>
+
+<p> 
+    #{dropDownList id:'externalType', name:'security.externalType.lookupId', label:'External Type', options:optionExternalTypes, value:security?.externalType?.lookupId, required:false, readOnly:readOnly, width:'175px' /}        
+    <span id="externalTypeError" class="error">#{error 'ExternalType Code is' /}</span>
+</p>
+
+<p></p>
+
+<div>
+    <fieldset style="border-color:#A6C9E2">
+        <legend style="color: black;"><b>Valuation</b></legend>
+        <div>
+            <table>
+                <tr>
+                    <td>
+                        <label style="width:221px"></label>
+                    </td>
+                    <td align="center">
+                        <input type="checkbox" id="isTrade" name="isTrade" #{if readOnly}disabled="disabled"#{/if} />
+                        #{hidden id:'isTradeHidden', name:'security.checkTrade', value:security?.checkTrade /}
+                    </td>
+                    <td align="center">
+                       <input type="checkbox" id="isAfs" name="isAfs" #{if readOnly}disabled="disabled"#{/if} />
+                        #{hidden id:'isAfsHidden', name:'security.checkAfs', value:security?.checkAfs /}
+                    </td>
+                    <td align="center">
+                        <input type="checkbox" id="isHtm" name="isHtm" #{if readOnly}disabled="disabled"#{/if} />
+                        #{hidden id:'isHtmHidden', name:'security.checkHtm', value:security?.checkHtm /}
+                    </td>
+                </tr>
+                <tr>
+	                <td>
+	                    <label style="width:210px"></label>
+	                </td>
+	                <td id="tdTrade" >
+	                    <label style="width:190px; text-align: center;">TRADE<span class="req"> *</span> </label>
+	                   <span class="error" style="margin-left: -70px">#{error 'TRADE is' /}</span>
+	                </td>
+	                <td align="center">
+	                    <label style="width:180px">AFS</label>
+	                    <span></span>
+	                </td>
+	                <td align="center">
+	                    <label style="width:150px">HTM</label>
+	                </td>
+                </tr>
+                
+                
+                <tr>
+                    <td id="tdValuationMethod">
+                        <label style="width:190px">Valuation Method<span class="req"> *</span></label>
+                    </td>
+                    <td>
+                        #{dropDownList id:'valuationMethodTrade', name:'security.valuationMethodTrade.lookupId', options:valuationMethod, value:security?.valuationMethodTrade?.lookupId, required:true, readOnly:readOnly, width:'175px', class:'trade checkBox' /}
+                    </td>
+                    <td>
+                        #{dropDownList id:'valuationMethodAFS', name:'security.valuationMethodAFS.lookupId', options:valuationMethod, value:security?.valuationMethodAFS?.lookupId, readOnly:readOnly, width:'175px', class:'afs checkBox' /}
+                    </td>
+                    <td>
+                        #{dropDownList id:'valuationMethodHTM', name:'security.valuationMethodHTM.lookupId', options:valuationMethod, value:security?.valuationMethodHTM?.lookupId, readOnly:readOnly, width:'175px', class:'htm checkBox' /}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label style="width:190px"></label>
+                    </td>
+                    <td align="center">
+                        <span id="valuationMethodTradeErrorMessage" class="error">#{error 'Valuation Method For TRADE is' /}</span>
+                    </td>
+                    <td align="center">
+                        <span id="valuationMethodAFSErrorMessage" class="error">#{error 'Valuation Method For AFS is' /}</span>
+                    </td>
+                    <td align="center">
+                        <span id="valuationMethodHTMErrorMessage" class="error">#{error 'Valuation Method For HTM is' /}</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td id="tdMarketPrice">
+                        <label style="width:190px">Market Price<span class="req"> *</span></label>
+                    </td>
+                    <td>
+                        #{dropDownList id:'marketPriceTrade', name:'marketPriceTrade', options:marketPrice, value:security?.marketPriceTrade?.lookupId, readOnly:readOnly, width:'175px', class:'trade'/}
+                        #{hidden id:'marketPriceTradeHidden', name:'security.marketPriceTrade.lookupId', value:security?.marketPriceTrade?.lookupId, class:'trade' /}
+                    </td>
+                    <td>
+                        #{dropDownList id:'marketPriceAFS', name:'marketPriceAFS', options:marketPrice, value:security?.marketPriceAFS?.lookupId, readOnly:readOnly, width:'175px', class:'afs'/}
+                        #{hidden id:'marketPriceAFSHidden', name:'security.marketPriceAFS.lookupId', value:security?.marketPriceAFS?.lookupId, class:'afs' /}
+                    </td>
+                    <td>
+                        #{dropDownList id:'marketPriceHTM', name:'marketPriceHTM', options:marketPrice, value:security?.marketPriceHTM?.lookupId, readOnly:readOnly, width:'175px', class:'htm'/}       
+                        #{hidden id:'marketPriceHTMHidden', name:'security.marketPriceHTM.lookupId', value:security?.marketPriceHTM?.lookupId, class:'htm' /}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                    	 <label style="width:190px"></label>
+                    </td>
+                    <td align="center">
+                    	<span class="error">#{error 'Market Price For TRADE is' /}</span>
+                    </td>
+                    <td align="center">
+                    	<span class="error">#{error 'Market Price For AFS is' /}</span>
+                    </td>
+                    <td align="center">
+                    	<span class="error">#{error 'Market Price For HTM is' /}</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td id="tdAmortization">
+                        <label style="width:190px">Amortization Method<span class="req"> *</span></label>
+                    </td>
+                    <td>
+                        #{dropDownList id:'amortizationMethodTrade', name:'amortizationMethodTrade', options:amortizationMethod, value:security?.amortizationMethodTrade?.lookupId, readOnly:readOnly, width:'175px', class:'trade'/}
+                        #{hidden id:'amortizationMethodTradeHidden', name:'security.amortizationMethodTrade.lookupId', value:security?.amortizationMethodTrade?.lookupId, class:'trade' /}
+                    </td>
+                    <td>
+                        #{dropDownList id:'amortizationMethodAFS', name:'security.amortizationMethodAFS.lookupId', options:amortizationMethod, value:security?.amortizationMethodAFS?.lookupId, readOnly:readOnly, width:'175px', class:'afs'/}
+                        #{hidden id:'amortizationMethodAFSHidden', name:'amortizationMethodAFS', value:security?.amortizationMethodAFS?.lookupId, class:'afs' /}
+                    </td>
+                    <td>
+                        #{dropDownList id:'amortizationMethodHTM', name:'amortizationMethodHTM', options:amortizationMethod, value:security?.amortizationMethodHTM?.lookupId, readOnly:readOnly, width:'175px', class:'htm'/}
+                        #{hidden id:'amortizationMethodHTMHidden', name:'security.amortizationMethodHTM.lookupId', value:security?.amortizationMethodHTM?.lookupId, class:'htm' /}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                    	 <label style="width:190px"></label>
+                    </td>
+                    <td align="center">
+                    	<span class="error">#{error 'Amortization Method For TRADE is' /}</span>
+                    </td>
+                    <td align="center">
+                    	<span class="error">#{error 'Amortization Method For AFS is' /}</span>
+                    </td>
+                    <td align="center">
+                    	<span class="error">#{error 'Amortization Method For HTM is' /}</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </fieldset>
+</div>
+
+<p></p>
+
+<p>         
+    #{hidden id:'minTrxQuantity', name:'minTrxQuantity', label:'Min. Transaction Quantity',value:0, format:'#,##0.####', class:'numeric', required: true, readOnly:readOnly, width:'109px'/}    
+    #{hidden id:'minTrxQuantityStripped', name:'security.minTrxQuantity', value:0 /}
+    <span id="minTrxQuantityError" class="error">#{error 'Min. Transaction Quantity is' /}</span>
+</p>
+
+<p>         
+    #{textBox id:'parPrice', name:'security?.parUnitValue', label:'Initial Price',value:security?.parUnitValue, format:'#,##0.####',  class:'numeric',readOnly:readOnly, required:true, width:'109px' /}
+    #{hidden id:'parPriceStripped', name:'security.parUnitValue', value:security?.parUnitValue /}
+    <span id="percentage">%</span><span class="error">#{error 'Initial Price is' /}</span>
+</p>
+
+<p>         
+    #{textBox id:'listedShare', name:'security?.listedShare', label:'Listed Share', value:security?.listedShare, readOnly:readOnly, format:'#,##0', class:'numericNoMin18', required:true, width:'109px' /}
+    #{hidden id:'listedShareStripped', name:'security.listedShare', value:security?.listedShare /}
+    <span id="listedShareError" class="error">#{error 'Listed Share is' /}</span>
+</p>

@@ -1,0 +1,17 @@
+#{extends 'templates/main.html' /}
+<script type="text/javascript">
+</script>
+
+<div id="detail" title="Days Detail">
+	<h2>Set Holidays</h2>
+	<p>
+		#{checkBox id:'sunday', name:'workday', label:'',value:'' /} Sunday &nbsp;&nbsp;
+		#{checkBox id:'monday', name:'workday', label:'',value:'' /} Monday &nbsp;&nbsp;
+		#{checkBox id:'tuesday', name:'workday', label:'',value:'' /} Tuesday &nbsp;&nbsp;
+		#{checkBox id:'wednesday', name:'workday', label:'',value:'' /} Wednesday &nbsp;&nbsp;
+		#{checkBox id:'thursday', name:'workday', label:'',value:'' /} Thursday &nbsp;&nbsp;
+		#{checkBox id:'friday', name:'workday', label:'',value:'' /} Friday &nbsp;&nbsp;
+		#{checkBox id:'saturday', name:'workday', label:'',value:'' /} Saturday
+	</p>
+	<span id="daysErrorMessage"></span>
+</div>

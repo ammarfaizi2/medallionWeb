@@ -1,0 +1,97 @@
+#{script 'lookuppaging.js' /}
+<script type="text/javascript">
+#{include 'RegistrySubscription/Util.js' /}
+	$(function(){
+		$('#coaCode').blur(function(){
+			if ($('#coaCode').val() == " ") {
+				$('#coaCode').val('');
+				$('#coaMasterKey').val('');
+				$('#coaDescription').val('');
+				$('#h_coaDescription').val('');
+			}
+			$('#newCoaCode').val($('#coaCode').val());
+		});
+		
+		$('#coaCode').dynapopup2({key:'coaMasterKey', help:'coaHelp', desc:'coaDescription'},'PICK_FA_COA', '', 'reportPosition', function(data){
+			if (data) {
+				$('#coaCode').removeClass('fieldError');
+				$('#coaMasterKey').val(data.code);
+				$('#coaDescription').val(data.description);
+				$('#h_coaDescription').val(data.description);
+				$('#coaCodeErrMsg').html("");
+			}
+		},function(data){
+			$('#coaCode').addClass('fieldError');
+			$('#coaMasterKey').val('');
+			$('#coaCode').val('');
+			$('#coaDescription').val('NOT FOUND');
+			$('#h_coaDescription').val('');
+		});
+		
+		$('#coaCode').dynapopup2({key:'coaMasterKey', help:'coaHelp', desc:'coaDescription'},'PICK_FA_COA', '', 'reportPosition', 
+			function(data){
+				if (data) {
+					$('#coaCode').removeClass('fieldError');
+					$('#coaMasterKey').val(data.code);
+					$('#coaDescription').val(data.description);
+					$('#h_coaDescription').val(data.description);
+					$('#coaCodeErrMsg').html("");
+				}
+			},function(data){
+				$('#coaCode').addClass('fieldError');
+				$('#coaMasterKey').val('');
+				$('#coaCode').val('');
+				$('#coaDescription').val('NOT FOUND');
+				$('#h_coaDescription').val('');
+			}
+		);
+		
+		$('#cancelReportMappingDetail').click(function() {
+			$("#detailForReportMappingDetails #reportMappingDetailForm").find("span[id*='Error']").html("");
+			$("#detailForReportMappingDetails #reportMappingDetailForm #coaCode").removeClass('fieldError');
+			$("#detailForReportMappingDetails").dialog('close');
+			return false;
+		});
+		
+		$('#reportMappingDetailForm #reportPosition').change(function() {
+			var selected = $('#reportMappingDetailForm #reportPosition').val();
+			var selectedText = $('#reportMappingDetailForm #reportPosition option[value=' + selected + ']').text();
+			if (selectedText != '') {
+				selectedText = jQuery.trim(selectedText);
+				selectedText = selectedText.substring(jQuery.trim(selectedText).indexOf('-') + 1);
+			}
+			$("#reportMappingDetailForm #reportPositionDesc").val(selectedText);
+			$('#reportPositionErrMsg').html("");
+		});
+	
+	});
+	
+</script>
+<style type="text/css">
+  #errmsgTier { color:red; }
+</style>
+<form></form>
+<form id="reportMappingDetailForm" class="form">
+	<p>
+		#{hidden id:'rowPosition' /}
+		#{hidden id:'oldCoaCode' /}
+		#{hidden id:'newCoaCode' /}
+		#{hidden id:'reportKey', name:'faReportMapDetail.id.reportKey', value:faReportMapDetail?.id?.reportKey /}
+		#{hidden id:'rowNumber', name:'faReportMapDetail.id.rowNumber', value:faReportMapDetail?.id?.rowNumber /}
+		<span id="existError" class="error"></span>
+	</p>
+	<p>
+		#{textBox id:'coaCode', name:'faReportMapDetail.faCoaMaster.coaCode', label:'COA No', value:faReportMapDetail?.faCoaMaster?.coaCode, class:'capitalize', width:'120px', required:true, readOnly:readOnly /}
+		#{hidden id:'coaMasterKey', name:'faReportMapDetail.faCoaMaster.coaMasterKey', value:faReportMapDetail?.faCoaMaster?.coaMasterKey /}
+		#{button id:'coaHelp', value:'?', class:'small', readOnly:readOnly /}
+		<span id="coaCodeErrMsg" class="error"></span>
+	</p>
+	<p>
+		#{textBox id:'coaDescription', name:'faReportMapDetail.faCoaMaster.Description', label:'Account Name', class:'capitalize', value:faReportMapDetail?.faCoaMaster?.Description, readOnly:true, width:'250px' /}
+	</p>
+	<p>
+		#{dropDownList id:'reportPosition', name:'faReportMapDetail.reportPosition.lookupId', label:'Position', value:faTransactionDetail?.reportPosition?.lookupId, options:reportPosition, required:true, readOnly:readOnly, width:'120px' /}
+		#{hidden id:'reportPositionDesc', name:'faReportMapDetail.reportPosition.lookupDescription', value:faReportMapDetail?.reportPosition?.lookupDescription /}
+		<span id="reportPositionErrMsg" class="error"></span>
+	</p>	
+</form>

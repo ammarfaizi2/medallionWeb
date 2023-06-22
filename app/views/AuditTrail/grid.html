@@ -1,0 +1,76 @@
+<script type="text/javascript">
+$(document).ready(function(){
+	
+	// This is the hack for IE
+	if ($.browser.msie) {
+	  $('#notInList').click(function() {
+	    this.blur();
+	    this.focus();
+	  });
+	}
+
+ });
+ 
+</script>
+
+<h3>Search results</h3>
+
+#{if auditTrails}
+<table id="grid" class="display">
+	<thead>
+		<tr>
+			<th>Key</th>
+			<th>USER ID</th>
+			<th>USER NAME</th>
+			<th>PASSWORD ID</th>
+			<th>USER GROUP</th>
+			<th width="110px">LOGIN DATE</th>
+			<th width="110px">LOGIN TIME</th>
+			<th width="118px">LOGIN STATUS</th>
+			<th width="150px">MESSAGE</th>
+		</tr>
+	</thead> 
+	<tbody>
+		#{list auditTrails, as:'auditTrail'}
+			<tr>
+				<td>
+				 	${auditTrail?.auditTrailKey}
+				</td>
+				<td>
+					${auditTrail?.user?.userId}
+				</td>
+				<td >
+					${auditTrail?.user?.userName}
+				</td>
+				
+				<td >
+					${auditTrail?.user?.password}
+				</td>
+				
+				<td >
+					#{list auditTrail?.roles, as:'role'}
+						${role?.roleName} ${role_isLast ? '':','}
+					#{/list}
+				</td>
+				
+				<td align="center">
+					${auditTrail?.loginDate.format('MM/dd/yyyy')}
+				</td>
+				<td align="center">
+					${auditTrail?.loginTime.format('hh:mm:ss aa')}
+				</td>
+				<td >
+					${auditTrail?.loginStatus}
+				</td>
+				<td >
+					${auditTrail?.message}
+				</td>
+			</tr>
+		#{/list}
+	</tbody>
+</table>
+
+#{/if}
+#{else}
+<div>No record found</div>
+#{/else}

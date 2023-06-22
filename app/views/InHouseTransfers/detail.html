@@ -1,0 +1,184 @@
+#{set readOnly:((mode !='edit' && mode !='entry') || confirming) /}
+#{set id: transaction?.transactionKey /}
+
+#{script 'lookups.js', characterset:'utf-8' /}
+
+<script type="text/javascript">
+	#{include 'InHouseTransfers/detail.js' /}
+</script>
+
+#{hidden id:'transactionKey', name:'transaction.transactionKey', value:transaction?.transactionKey /}
+<form id="cashTransactionForm" class="form" method="POST">
+<p>
+	#{textBox id:'transactionNo', name:'transaction.transactionNumber', label:'Transaction No', value:'', class:'capitalize', readOnly:true, width:'85' /}
+</p>
+<p>
+	#{textBox id:'transactionDateGeneral', name:'transactionDateGeneral', label:'Transaction Date', value:'', class:'calendar', required:true, readOnly:readOnly /} (MM/DD/YYYY)
+	<span class="error">#{error 'transaction.transactionDate' /}</span>
+</p>
+<p>	
+	#{dropDownList id:'depositoryCodeGeneral', name:'security.depositoryCode.lookupId', label:'Depository Code', options:depositoryCode, value:'', required:true, readOnly:readOnly, width:'175px' /}		
+	<span class="error">#{error 'security.depositoryCode.lookupId' /}</span>
+</p>
+<p>
+	#{textBox id:'settlementDateGeneral', name:'settlementDateGeneral', label:'SettlementDate Date', value:'', class:'calendar', required:true, readOnly:readOnly /} (MM/DD/YYYY)
+	<span class="error">#{error 'transaction.transactionDate' /}</span>
+</p>
+<p>
+	#{textBox id:'accountNoSource', name:'accountNoSource', label:'Source Account No', value:'', required:true, class:'capitalize', readOnly:readOnly, width:'100px' /}
+	#{hidden id:"accountKeySource", name:'accountKeySource', value:'' /}
+	#{button id:'accountHelpSource', value:'?', class:'small', readOnly:readOnly /}
+	#{textBox id:'accountNameSource', name:'accountNameSource', value:'', readOnly:true, width:'300px' /}
+</p>
+
+<p>
+	#{textBox id:'accountNoTarget', name:'accountNoTarget', label:'Target Account No', value:'', required:true, class:'capitalize', readOnly:readOnly, width:'100px' /}
+	#{hidden id:"accountKeyTarget", name:'accountKeyTarget', value:'' /}
+	#{button id:'accountHelpTarget', value:'?', class:'small', readOnly:readOnly /}
+	#{textBox id:'accountNameTarget', name:'accountNameTarget', value:'', readOnly:true, width:'300px' /}
+</p>
+<br>
+
+<div>
+	#{include 'inHouseTransfers/tab_fromTo.html' /}
+</div>
+<br>
+<div id="tabs" style="height:380px">
+		<ul>
+			<li><a href="#tab1">Detail</a></li>
+			<li><a href="#tab2">Charges</a></li>
+			<li><a href="#tab3">Additional</a></li>
+		</ul>
+		<div id="tab1">
+			<div style="height:320px">
+				<div style="float:left;height:100%">
+					<p>
+						#{textBox id:'quantity', label:'Quantity/Face Value', value:transaction?.quantity, format:'#,##0.####', class:'numeric', required:true, readOnly:readOnly /}
+						#{hidden id:'quantityStripped', name:'transaction.quantity', value:transaction?.quantity /}
+					</p>
+					<p>
+						#{textBox id:'price', label:'Price', value:transaction?.price, format:'#,##0.####', class:'numeric', required:true, readOnly:readOnly /}
+						#{hidden id:'priceStripped', name:'transaction.price', value:transaction?.price /}
+						<span id="percentage">%</span>
+					</p>
+					<p>
+						#{textBox id:'discountAmount', label:'Discount Amount', value:transaction?.discountAmount, format:'#,##0.####', required:true, class:'numeric', readOnly:true /}
+						#{hidden id:'discountAmountStripped', name:'transaction.discountAmount', value:transaction?.discountAmount /}
+					</p>
+					<p>
+						#{textBox id:'discountTaxCode', name:'transaction.discountTaxMaster.taxCode', label:'&nbsp;&nbsp;&nbsp;Tax Code', value:transaction?.discountTaxMaster?.taxCode, class:'capitalized', required:true, readOnly:readOnly, width:'50px' /}
+						#{hidden id:'discountTaxKey', name:'transaction.discountTaxMaster.taxKey1', value:transaction?.discountTaxMaster?.taxKey /}
+						#{button id:'discountTaxHelp', value:'?', class:'small', readOnly:readOnly /}
+						#{textBox id:'discountTaxDesc', name:'transaction.discountTaxMaster.description', value:transaction?.discountTaxMaster?.description, readOnly:true, width:'100px' /}
+					</p>
+					<p>
+						#{textBox id:'discountTax', label:'&nbsp;&nbsp;&nbsp;Tax Amount', value:transaction?.discountTax, format:'#,##0.####', class:'numeric', readOnly:readOnly /}
+						#{hidden id:'discountTaxStripped', name:'transaction.discountTax', value:transaction?.discountTax /}
+					</p>
+					<p>
+						#{textBox id:'discountNet', name:'transaction.discountNet', label:'&nbsp;&nbsp;&nbsp;Disc. after Tax', value:transaction?.discountTax, format:'#,##0.####', class:'numeric', readOnly:true /}
+					</p>
+					<p>
+						#{textBox id:'netAmount', name:'transaction.amount', label:'<i>Nominal</i>', value:transaction?.amount, format:'#,##0.####', class:'numeric', readOnly:true /}
+					</p>
+					<p>
+						#{textBox id:'totalCharges', name:'transaction.totalFee', label:'<i>Total Charges</i>', value:transaction?.totalFee, format:'#,##0.####', class:'numeric', readOnly:true /}
+						<input type="button" id="showCharges" value="&#187;" #{if readOnly}disabled="disabled"#{/if} />
+					</p>
+					<p>
+						#{textBox id:'grossAmount', name:'transaction.grossAmount', label:'<i>Total Amount</i>', value:transaction?.grossAmount, format:'#,##0.####', class:'numeric', readOnly:true /}
+					</p>
+				</div>
+				<div class="right">
+					<p>
+						#{textBox id:'interestRate', label:'Interest Rate/Yield', value:transaction?.interestRate, format:'#,##0.####', class:'numeric', required:true, readOnly:readOnly, width: '80px' /} %
+						#{hidden id:'interestRateStripped', name:'transaction.interestRate', value:transaction?.interestRate /}
+					</p>
+					<p>
+						#{textBox id:'effectiveDate', name:'transaction.effectiveDate', label:'Effective Date', value:transaction?.effectiveDate?.format('MM/dd/yyyy'), required:true, class:'calendar', readOnly:settle /}
+						(MM/DD/YYYY)
+					</p>
+					<p>
+						#{textBox id:'maturityDate', name:'transaction.maturityDate', label:'Maturity Date', value:transaction?.maturityDate?.format('MM/dd/yyyy'), required:true, class:'calendar', readOnly:settle /}
+						(MM/DD/YYYY)
+					</p>
+					<p>
+						#{textBox id:'accruedDays', label:'Accrued Days', value:transaction?.accruedDays, required:true, readOnly:readOnly, width: '50px' /}
+						#{hidden id:'accruedDaysStripped', name:'transaction.accruedDays', value:transaction?.accruedDays /}
+					</p>
+					<p>
+						#{textBox id:'accruedInterest', label:'Accrued Interest', value:transaction?.accruedInterest, format:'#,##0.####', class:'numeric', required:true, readOnly:readOnly /}
+						#{hidden id:'accruedInterestStripped', name:'transaction.accruedInterest', value:transaction?.accruedInterest /}
+					</p>
+					<p>
+						#{textBox id:'taxOnInterestCode', name:'transaction.taxOnInterestMaster.taxCode', label:'&nbsp;&nbsp;&nbsp;Tax Code', value:transaction?.taxOnInterestMaster?.taxCode, class:'capitalized', required:true, readOnly:readOnly, width:'50px' /}
+						#{hidden id:'taxOnInterestKey', name:'transaction.taxOnInterestMaster.taxKey1', value:transaction?.taxOnInterestMaster?.taxKey /}
+						#{button id:'taxOnInterestHelp', value:'?', class:'small', readOnly:readOnly /}
+						#{textBox id:'taxOnInterestDesc', name:'transaction.taxOnInterestMaster.description', value:transaction?.taxOnInterestMaster?.description, readOnly:true, width:'100px' /}
+					</p>
+					<p>
+						#{textBox id:'taxOnInterest', label:'&nbsp;&nbsp;&nbsp;Tax Amount', value:transaction?.taxOnInterest, format: '#,##0.0000', class:'numeric', required:true, readOnly:readOnly /}
+						#{hidden id:'taxOnInterestStripped', name:'transaction.taxOnInterest', value:transaction?.taxOnInterest /}
+					</p>
+					<p>
+						#{textBox id:'taxOnInterestNet', name:'transaction.taxOnInterestNet', label:'&nbsp;&nbsp;&nbsp;Interest after Tax', value:transaction?.taxOnInterestNet, format:'#,##0.####', class:'numeric', readOnly:true /}
+					</p>
+					<p class="spacer"></p>
+					<p>
+						#{textBox id:'proceed', name:'transaction.proceed', label:'<i>Proceed</i>', value:transaction?.proceed, format:'#,##0.####', class:'numeric', readOnly:true /}
+					</p>
+					<p>
+						#{textBox id:'capitalGainTaxCode', name:'transaction.capitalGainTaxMaster.taxCode', label:'&nbsp;&nbsp;&nbsp;Tax Code', value:transaction?.capitalGainTaxMaster?.taxCode, class:'capitalized', required:true, readOnly:readOnly, width:'50px' /}
+						#{hidden id:'capitalGainTaxKey', name:'transaction.capitalGainTaxMaster.taxKey1', value:transaction?.capitalGainTaxMaster?.taxKey /}
+						#{button id:'capitalGainTaxHelp', value:'?', class:'small', readOnly:readOnly /}
+						#{textBox id:'capitalGainTaxtDesc', name:'transaction.capitalGainTaxMaster.description', value:transaction?.capitalGainTaxMaster?.description, readOnly:true, width:'100px' /}
+					</p>
+					<p>
+						#{textBox id:'capitalGainTax', label:'&nbsp;&nbsp;&nbsp;Tax Amount', value:transaction?.capitalGainTax, format:'#,##0.####', class:'numeric', readOnly:readOnly /}
+						#{hidden id:'capitalGainTaxStripped', name:'transaction.capitalGainTax', value:transaction?.capitalGainTax /}
+					</p>
+					<p>
+						#{textBox id:'settlementAmount', name:'transaction.settlementAmount', label:'<i>Net Proceed</i>', value:transaction?.settlementAmount, format:'#,##0.####', class:'numeric', readOnly:true /}
+						#{hidden id:'currency', name:'transaction.currency.currencyCode', value:'IDR' /}
+						#{hidden id:'exchangeRate', name:'transaction.exchangeRate', value:'1' /}
+						#{hidden id:'baseSettlementAmount', name:'transaction.baseSettlementAmount', value:transaction?.baseSettlementAmount /}						
+					</p>
+				</div>
+			</div>
+			<div class="buttons" style="position:relative;top:-30px">
+				<input type="button" id="prev1" value="&lt; Previous" disabled="disabled" />
+				<input type="button" id="next1" value="Next &gt;" />
+			</div>
+		</div>
+		<div id="tab2">
+			<div style="height:290px">
+				<div id="charges" style="overflow-y:scroll;max-height:170px;">
+					
+				</div>
+				<div class="buttons" style="padding-top:5px;">
+					<input type="button" value="Add" id="addCharge" />				
+					<input type="button" value="Reset" id="resetCharge" />		
+					<input type="button" value="Done" id="chargeDone" style="display:none" />
+					
+				</div>		
+			</div>
+			<div class="buttons">
+				<input type="button" id="prev2" value="&lt; Previous" />
+				<input type="button" id="next2" value="Next &gt;" />
+			</div>
+		</div>
+		<div id="tab3">
+			<div style="height:290px">
+				<div id="charges" style="overflow-y:scroll;max-height:170px;">
+					
+				</div>
+			</div>
+			<div class="buttons">
+				<input type="button" id="prev3" value="&lt; Previous" />
+				<input type="button" id="next3" value="Next &gt;" disabled="disabled" />
+			</div>
+		</div>
+	</div>
+
+
+</form>

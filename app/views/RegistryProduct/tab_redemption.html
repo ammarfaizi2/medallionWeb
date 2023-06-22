@@ -1,0 +1,110 @@
+<table>
+	<tr>
+		<td valign="top">
+			<p>	
+				#{textBox id:'redMinAmt', label:'Minimum Amount', labelwidth:'190px', value:prd?.redMinAmt, format:'#,##0.####', class:'numeric', width:'181px', readOnly:readOnly, required:true /}
+				#{hidden  id:'redMinAmtStripped', name:'prd.redMinAmt', value:prd?.redMinAmt /}
+				<span class="error">#{error 'Minimum Amount in tab Redemption is' /}</span>
+			</p>
+
+			<p>	
+				<label style="width: 190px;">Maximum Amount<span id="spanRedMaxAmt" class="req"> *</span></label>
+				#{textBox id:'redMaxAmt', value:prd?.redMaxAmt, format:'#,##0.####', class:'numeric maxValidate', width:'181px', readOnly:readOnly /}
+				#{hidden  id:'redMaxAmtStripped', name:'prd.redMaxAmt', value:prd?.redMaxAmt /}
+				#{checkBox id:'isCheckedRed', name:'prd.checkMaxRed', value:prd?.checkMaxRed, readOnly:readOnly /}Max
+				<span  id="isCheckedRedError" class="error">#{error 'Maximum Amount in tab Redemption is' /}</span>
+				<span id="errmsgMaxRed" class="error"></span>
+			</p>
+
+            <p> 
+                #{textBox id:'redPayPeriod', label:'Default Payment Date', labelwidth:'190px', value:prd?.redPayPeriod, format:'#,##0.####', class:'numericminus', width:'120px', readOnly:readOnly, required:true /}
+                #{hidden  id:'redPayPeriodStripped', name:'prd.redPayPeriod', value:prd?.redPayPeriod /}
+                (T+n)
+                <span class="error">#{error 'Payment Date in tab Redemption is' /}</span>
+            </p>
+
+			<p>
+                <label style="width: 190px;">Maximum Payment Date <span class="req">*</span></label>
+		        #{textBox id:'maximumPaymentDate', name:'prd.maxPaymentDate', value:prd?.maxPaymentDate, readOnly:readOnly, required:true, class:'numericminus', width:'70px' /}
+		        (T+n)
+		        <span class="error">#{error 'Maximum Payment Date is in tab More Information is' /}</span> 
+		    </p>
+
+            <p><span id="paymentDateError" class="error"></span></p>
+
+            <p></p>
+            
+			<fieldset style="width:520px; height:115px">
+                <legend><b>Redemption Fee</b></legend>
+                
+                <p>
+                    #{textBox id:'redTax', name:'prd.taxMasterByRedTaxKey.taxCode', label:'Tax Code', labelwidth:'180px', value:prd?.taxMasterByRedTaxKey?.taxCode, width:'120px', readOnly:readOnly, class:'capitalize', required:true /}
+                    #{hidden  id:'redTaxKey', name:'prd.taxMasterByRedTaxKey.taxKey', value:prd?.taxMasterByRedTaxKey?.taxKey /}
+                    #{button  id:'redTaxHelp',  value:'?', class:'small', readOnly:readOnly /}
+                    #{textBox id:'redTaxDesc', name:'prd.taxMasterByRedTaxKey.description', value:prd?.taxMasterByRedTaxKey?.description, readOnly:true, width:'170px' /}
+                    <span class="error">#{error 'Tax Code in tab Redemption is' /}</span>
+                </p>
+                
+                #{list prd?.redFees, as:'fee'}
+                <p>
+                   #{textBox id:'valueRed['+(fee_index-1)+']', label:'Default Fee (%)', labelwidth:'180px', name:'redFeeTierValue', format:'#,##0.####', value:fee?.value, width:'140px', readOnly:readOnly, required:true /}
+                   #{hidden id:'valueRed['+(fee_index-1)+']Stripped', name:'prd.redFees['+(fee_index-1)+'].value', value:fee?.value /}
+                   (include tax)
+                   <span class="error">#{error 'Default Fee in tab Redemption is' /}</span> 
+                </p>
+
+                <p>
+                   <label style="width: 180px;">Maximum Fee (%)<span id="spanRedFeeTierMaxValue" class="req"> *</span></label>
+                   #{textBox id:'maxValueRed['+(fee_index-1)+']', name:'redFeeTierMaxValue', format:'#,##0.####', width:'140px', value:fee?.maxValue, readOnly:readOnly /}
+                   #{hidden id:'maxValueRed['+(fee_index-1)+']Stripped', name:'prd.redFees['+(fee_index-1)+'].maxValue', value:fee?.maxValue /}
+                   #{hidden id:'tierNumber['+(fee_index-1)+']Stripped', name:'prd.redFees['+(fee_index-1)+'].tierNumber',  value:fee?.tierNumber /}
+                   #{hidden id:'upperLimit['+(fee_index-1)+']Stripped', name:'prd.redFees['+(fee_index-1)+'].upperLimit',  value:fee?.upperLimit /}
+                   #{checkBox id:'isCheckedRedMaxValue['+(fee_index-1)+']', name:'checkRedFeeTierMaxValue['+(fee_index-1)+']', readOnly:readOnly, value: prd?.checkRedFeeTierMaxValue /} Max
+                   #{hidden id:'isCheckedRedMaxValue['+(fee_index-1)+']Stripped', name:'prd.checkRedFeeTierMaxValue'/}
+                </p>
+                
+                <p><span id = "isCheckedRedMaxFeeError" class="error">#{error 'Maximum Fee in tab Redemption is' /}</span></p>
+                #{/list}
+
+            </fieldset>
+		</td>
+		<td valign="top">
+			<fieldset style="width:345px; height:325px">
+				<legend><b>Redemption Window</b></legend>
+				<p>
+					#{radioButton id:'redLock', name:'prd.redLock', label:'Lock', options:operators, value:((prd?.redLock)?'true':'false'), readOnly:readOnly, width:'44px' /}
+				</p>
+				<p>
+					#{textBox id:'redExceptionDate', name:'redExceptionDate', value:'', class:'calendar invalidDateFormat', readOnly:readOnly, width:'80px' /}
+					<input type="button" id="redAddDate" value="Insert" #{if readOnly}disabled='disabled'#{/if}></input> (${appProp.displayDateFormat})
+				</p>
+				<p style="margin-left: 162px">
+					<span id="redExceptionDateError" class="error"></span>
+				</p>
+				<div class="tier-box-IE" style="overflow-y:scroll;max-height:240px">
+					<table id="redExceptionSpecificDate" class="display">
+						<thead>
+							<tr>
+								<th>Date</th>
+								<th>Action</th>
+							</tr>
+						</thead>
+						<tbody>
+							#{list prd?.redLockExceptions, as:'lockException'}
+			 					<tr>
+									<td>${lockException?.id?.exceptionDate?.format(appProp.dateFormat)}</td>
+									<td del='true'>
+										<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} exceDateType="REDEMPTION" /></center>
+										#{hidden id:'exceptionDate'+(lockException_index-1), name:'prd.redLockExceptions[' + (lockException_index-1) + '].id.exceptionDate', value:lockException?.id?.exceptionDate?.format(appProp.dateFormat) /}
+										#{hidden id:'productCode'+(lockException_index-1), name:'prd.redLockExceptions[' + (lockException_index-1) + '].id.productCode', value:lockException?.id?.productCode /}
+										#{hidden id:'exceDateType'+(lockException_index-1), name:'prd.redLockExceptions[' + (lockException_index-1) + '].id.type', value:lockException?.id?.type /}
+									</td>
+								</tr>
+							#{/list}
+			 			</tbody>
+					</table>
+				</div>
+			</fieldset>
+		</td>
+	</tr>
+</table>

@@ -1,0 +1,55 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: ' ' /}
+#{set fixData: true /}
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+	
+<div id="accordion">
+
+	<h3>List Batch Detail</h3>
+	<form id="batchDetailForm" class="form">
+		<p>
+			#{textBox id:'udbatch', displayValue:updBatch?.batchKey, label:'Batch ID', width:'150px'/}
+			#{hidden id:'udbatchKey', name:'updbatch', value:updBatch?.batchKey/}
+			#{button id:'udbatchHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'udbatchDesc', name:'', width:'250px', readOnly:true/}
+			<span class="error">#{error 'Batch ID' /}</span>
+		</p>
+		
+		
+		<input id='btnPopulate' class='buttons ui-button ui-widget ui-state-default ui-corner-all' type="button" value="Populate" ></input>
+		<input id='btnReset' class='buttons ui-button ui-widget ui-state-default ui-corner-all' type="reset" value="Reset" ></input>
+		<br>
+		<br>
+		<p id="contentdetail">
+			<h2>Batch Detail</h2>
+			<table id="displaydetail">
+				<thead>
+					<tr>
+						<th width="7px" class="ui-state-default"><b>Batch ID</b></th>
+						<th width="7px" class="ui-state-default"><b>Batch Detail ID</b></th>
+						<th width="100px" class="ui-state-default"><b>Status</b></th>
+						<th width="500px" class="ui-state-default"><b>Error Description</b></th>
+						<th class="ui-state-default"><b>Raw Message</b></th>
+					</tr>	
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</p>		
+	</form>
+</div>	
+
+<div id="result" style="display:none">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<div class="response"></div>
+</div>
+<script type="text/javascript">
+#{include 'RegistrySubscription/Util.js' /}
+#{include 'RegistrySubscription/Util.js' /}
+	#{include 'UploadDownload/BatchDetail.js' /}
+	$(document).ready(function() {
+		BatchDetail($("#html"));
+	});
+	
+</script>

@@ -1,0 +1,139 @@
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	$(document).ready(function() {
+		$('#new').remove();
+		$('.buttons input:button').button();
+		
+		var html = $("#main");
+		clearAllDefineButton();
+		dividenDetailGrid();
+		//totalUnitAndNetAmount();
+		
+		html.id("btnProcess").click(function(){
+			var id = html.id("dispatchPro").val();
+			if (id) location.href='@{process()}/' + id; 
+		});
+		
+		html.id("btnCancel").click(function(){
+			location.href='@{list()}'; 
+		});
+		
+		html.id("clearAll").click(function(){
+			tableDividen.fnClearTable();
+			$('#fundActionTab').tabs("select", "tab-1");
+			$('#proccess').button("enable");
+			$('.master').attr("disabled", false);
+			$('#tradeUnit').val("");
+			$('#tradeNetAmount').val("");
+			$('#calculate').val(false);
+			if ($('#divType').val() == "") {
+				$('#navDate').attr("disabled", true);
+				$('#paymentDate').attr("disabled", true);
+				$('#postDate').attr("disabled", true);
+			}
+			if ($('#divType').val() == "By Cash") {
+				$('#navDate').attr("disabled", true);
+				$('#postDate').attr("disabled", true);
+			}
+			if ($('#divType').val() == "By Reivestment") {
+				$('#paymentDate').attr("disabled", true);
+			}
+			$("#ratioPerUnitBy").attr("disabled", true);
+			$("#ratio").attr("disabled", true);
+			//alert($('#ratioPerUnit').val());
+			if ($('#ratioPerUnit').val() == "RATIO_PER_UNIT") {
+				$("#amount").attr("disabled", true);
+				$("#ratioPerUnitBy").attr("disabled", false);
+				$("#ratio").attr("disabled", false);
+			}
+			$('#navDate').attr("disabled", false);
+			$('#postDate').attr("disabled", false);
+			
+			return false;
+		});
+	});
+	
+	function dividenDetailGrid() {
+		//DataTables profile section
+		tableDividen = 
+			$('#dividenGrid').dataTable({
+				aoColumnDefs: [
+					{bVisible:false, aTargets:[0]},
+					{bSortable:false,aTargets:[1,2,3,4,5,6,7,8,9]}
+				],					
+				bAutoWidth:false,
+				bFilter:false,
+				bInfo:false,
+				bJQueryUI:true,
+				bSearch:true,
+				bFilter:true,
+				bLengthChange:false
+			});
+		$('#dividenGrid tbody tr').die('click');
+	}
+	
+	function clearAllDefineButton() {
+		$("#clearAll").button();
+		$("#clearAll").css('width', '100px');
+	}
+	
+</script>
+
+<div style="overflow-y:scroll;height:350px;overflow-x:scroll;width:930px">
+	<table id="dividenGrid" class="display">
+		#{hidden id:'dispatchPro', value:id/}
+		<thead>
+			<tr>
+				<th>Invest Acct No</th>
+				<th>Invest Acct No</th>
+				<th>Unit Balance</th>
+				<th>Type</th>
+				<th>Trade Date</th>
+				<th>Post Date</th>
+				<th>Payment Date</th>
+				<th>Unit</th>
+				<th>Price</th>
+				<th>Amount</th>
+			</tr>
+		</thead>
+		<tbody>
+			#{list trades, as:'trade'}
+				<tr>
+					<td>${trade?.rgInvestmentaccount?.accountNumber}</td>
+					<td>${trade?.rgInvestmentaccount?.accountNumber}</td>
+					<td align="right" name="unitCell">${trade?.availabelUnit?.format('#,##0.########')}</td>
+					<td>${trade?.type}</td>
+					<td>${trade?.tradeDate?.format(appProp.dateFormat)}</td>
+					<td>${trade?.postDate?.format(appProp.dateFormat)}</td>
+					<td>${trade?.paymentDate?.format(appProp.dateFormat)}</td>
+					#{if trade?.type == 'Cash FundAction'}
+						<td></td>
+					#{/if}
+					#{else}
+						<td align="right" name="unitCell">
+							${trade?.unit?.format('#,##0.########')}
+						</td>
+					#{/else}
+					<td align="right" name="priceCell">${trade?.price?.format('#,##0.##########')}</td>
+					#{if (taskId != null) }
+						<td align="right" >${trade?.netAmount?.format('#,##0.######')}</td>
+					#{/if}
+					#{else}
+						<td align="right" name="amountCell">${trade?.netAmount?.format('#,##0.######')}</td>
+					#{/else}
+				</tr>
+			#{/list}
+		</tbody>
+	</table>
+</div>
+<div>
+	<hr style="border-color:#A6C9E2">
+	<button id="clearAll" disabled="disabled">Clear All</button>
+	<span width="800px;" style="margin-left:300px"><strong>Total :&nbsp;&nbsp;&nbsp;&nbsp;Unit</strong></span>	
+	<span></span>
+	#{textBox id:'tradeUnit', class:'numeric', readOnly:true, width:'110px', name:'unitCell', value:trade?.totUnit?.format('#,##0.########') /}
+	<span style="margin-left:100px"><strong>Amount</strong></span>
+	<span></span>
+	#{textBox id:'tradeNetAmount', class:'numeric', readOnly:true, width:'110px', name:'amountCell', value:trade?.totNetAmt?.format('#,##0.########') /}</span>
+	<hr style="border-color:#A6C9E2">
+</div>

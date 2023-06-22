@@ -1,0 +1,54 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Inject Nav Price' /}
+#{script 'lookups.js', characterset:'utf-8' /}
+
+<div id="root">
+	<h3><a href="#">Search NAV</a></h3>
+	<form id="searchForm" class="form">
+		<input id="param" name="params.param" type="hidden" value="${param}"/> 
+		#{hidden id:'query', name:'params.query', value:params?.query /}
+		<p>
+			#{textBox id:'navDateFrom', name:'params.navSearchNavDateFrom', label:'Date', value:params?.navSearchNavDateFrom?.format(appProp.dateFormat), width:'85px', class:'calendar', required:true /}(${appProp.displayDateFormat})
+			<span id="navDateFromError" class="error"></span><b>To</b>
+			#{textBox id:'navDateTo', name:'params.navSearchNavDateTo', value:params?.navSearchNavDateTo?.format(appProp.dateFormat), width:'85px', class:'calendar' /}(${appProp.displayDateFormat})
+			<span id="navDateToError" class="error"></span>
+		</p>
+		<p>			
+			#{textBox id:'searchFundCode', name:'params.navSearchProductCode', label:'Fund Code', value:params?.navSearchProductCode, width:'120px', readOnly:readOnly, class:'capitalize' /}
+			#{hidden  id:'searchFundCodeKey', value:nav?.rgProduct?.productCode /}
+			#{button  id:'searchFundCodeHelp', value:'?', class:'small', readOnly:readOnly/}
+			#{textBox id:'searchFundCodeDesc', name:'nav.rgProduct.name', value:nav?.rgProduct?.name, readOnly:true, width:'340px' /}
+			<span id="errmsgSearchFundCode" class="error"></span>
+		</p>
+		<div class="buttons">
+			<input type="button" id="search" value="Search" />
+			<input type="button" id="reset" value="Reset" />
+		</div>
+	</form>
+</div>
+<br />
+<div id="result" style="display:none">
+	<table id="tableNAVPrice" class="display">
+		<thead>
+			<tr>
+				<th width="100px" field="id.navDate|date|date|center|sort">Date</th>
+				<th width="120px" field="id.productCode|string|none|left|sort">Fund Code</th>
+				<th width="80px" field="nav|number|decimal4|right|sort">Nav Price</th>
+				<th width="80px" field="recordStatus|string|decode|center|sort">Status</th>
+				<th width="80px" field="isActive|boolean|yesno|center|sort">Active</th>				
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+</div>
+<div class="buttons">
+	<input type="button" id="newDataNAVPrice" value="New Data" />	
+</div>
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'RegistryNav/NavPaging.js' /}
+	$(document).ready(function() {
+		Paging($("#root").add("#result"));
+	});
+</script>

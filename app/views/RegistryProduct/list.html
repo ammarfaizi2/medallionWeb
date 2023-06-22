@@ -1,0 +1,32 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Product Setup' /}
+
+<div id="root">
+</div>
+
+<div id="result" style="display:block">
+    <table id="tableProductSetup" class="display">
+        <thead>
+            <tr>
+                <th width="100px" field="productCode|string|none|left|sort">Fund Code</th>
+                <th width="300px" field="name|string|none|left|sort">Name</th>
+                <th width="20px" field="recordStatus|string|decode|left|sort">Status</th>
+                <th width="20px" field="isActive|boolean|yesno|left|sort">Active</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<div class="buttons">
+    <input type="button" id="newDataProductSetup" value="New Data" />   
+</div>
+
+<script type="text/javascript">
+    #{include 'RegistrySubscription/Util.js' /}
+    #{include 'RegistryProduct/registryProductList.js' /}
+    $(document).ready(function() {
+        Paging($("#root").add("#result"));
+    });
+</script>

@@ -1,0 +1,45 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'User Maintenance' /}
+
+<script type="text/javascript">
+	function doEdit(data) {
+		if ((data[3] == "New") || (data[3] == "Updated")) {
+			view(data[0]);
+			return false;
+		} else {
+			return true;
+		}
+	}
+</script>
+
+<table class="display">
+	<thead>
+		<tr>
+			<th width="0">Key</th>
+			<th width="200px">User Id</th>
+			<th>Name</th>
+			<th width="120px">Status</th>
+			<th width="120px">Active</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:users, as:'user'}
+			<tr>
+				<td>${user.userKey}</td>
+				<td>${user.userId}</td>
+				<td>${user.userName}</td>
+				<td>${user?.recordStatus?.decodeStatus()}</td>
+				<td>${user?.isActive ? 'Yes':'No'}</td>		
+			</tr>
+		#{/list}
+	</tbody>
+</table>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("#new").button();
+	});
+</script>
+	
+
+

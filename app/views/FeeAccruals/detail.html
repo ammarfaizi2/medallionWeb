@@ -1,0 +1,2359 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Accrual Setup' /}
+#{set id: faFeeMaster?.feeKey /}
+
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+    $(function() {
+        $("#dialog-message-1").css("display","none");
+        $('#save').button();
+        $('#cancel').button();
+        $('#back').button();
+        $('#confirm').button();
+        $('#tabsFeeDetails').tabs();
+        $('.buttons button').button();  
+        var tableFeeTier;
+        var tableFeeDetail;
+        var tableTierAmount;
+        var amount;
+        var newAmount;
+        var closeDialog = function() {
+            $("#dialog-message").dialog('close');   
+        }
+        
+        if (('${mode}'=='entry')||(('${mode}'=='edit')&&(('${faFeeMaster?.recordStatus?.decodeStatus()}'=='Reject') || ($("#status").val() == 'R' )))){
+            $('input[name=isActive]').attr("disabled", "disabled");
+            $('#isChecked').val(false);
+			$('#uPrice').hide();
+			$('#cNo').hide();
+            
+        }
+        
+        if (('${confirming}' != 'true')&&('${mode}' == 'entry')){
+            var faFeeMaster = new Object();
+            faFeeMaster.faFeeDetails = new Array();
+            var faFeeDetails = (faFeeMaster.faFeeDetails);
+        }
+
+        if (('${mode}' == 'edit')||('${confirming}' == 'true')||('${mode}'=='view')) {
+        	var faFeeMaster = ${master.raw()};
+            var faFeeDetails = (faFeeMaster.faFeeDetails);
+            $('#status').val(faFeeMaster.recordStatus);
+            $('#feeKey').val(faFeeMaster.feeKey);
+            $('#feeCode').val(faFeeMaster.feeCode);
+            $('#feeCodeHidden').val($('#feeCode').val());
+            $('#feeName').val(faFeeMaster.description);
+            $('#feeNameHidden').val($('#feeName').val());
+            $('#fundCode').val(faFeeMaster.faMaster.fundCode);
+            $('#fundCodeHidden').val($('#fundCode').val());
+            $('#fundCodeKey').val(faFeeMaster.faMaster.fundKey);
+            $('#fundCodeDesc').val(faFeeMaster.faMaster.fundDescription);
+            $('#unitPrice').autoNumericSet(faFeeMaster.unitPrice);
+		    $('#unitPriceStripped').val(faFeeMaster.unitPrice);
+            
+            if(faFeeMaster.faCoaMaster!= null){
+                $('#coaCode').val(faFeeMaster.faCoaMaster.coaCode);
+                $('#coaMasterKey').val(faFeeMaster.faCoaMaster.coaMasterKey);
+                $('#coaDescription').val(faFeeMaster.faCoaMaster.description); 
+            }
+            
+            $('#fundCodeDescHidden').val($('#fundCodeDesc').val());
+            if ('${id}'!= '') {
+                $('#fundCode').attr('disabled', 'disabled');
+                $('#fundCodeHelp').attr('disabled', 'disabled');
+            }
+            $('#accrualTransCode').val(faFeeMaster.accrualTransaction.transactionCode);
+            $('#accrualTransCodeHidden').val($('#accrualTransCode').val());
+            $('#accrualTransKey').val(faFeeMaster.accrualTransaction.transactionMasterKey);
+            $('#accrualTransDesc').val(faFeeMaster.accrualTransaction.transactionDescription);
+            $('#accrualTransDescHidden').val($('#accrualTransDesc').val());
+            if (faFeeMaster.paymentTransaction  != null) {
+                $('#paymentTransCode').val(faFeeMaster.paymentTransaction.transactionCode);
+                $('#paymentTransCodeHidden').val($('#paymentTransCode').val());
+                $('#paymentTransKey').val(faFeeMaster.paymentTransaction.transactionMasterKey);
+                $('#paymentTransDesc').val(faFeeMaster.paymentTransaction.transactionDescription);
+                $('#paymentTransDescHidden').val($('#paymentTransDesc').val());
+            } else {
+                $('#paymentTransCode').val('');
+                $('#paymentTransCodeHidden').val('');
+                $('#paymentTransKey').val('');
+                $('#paymentTransDesc').val('');
+                $('#paymentTransDescHidden').val('');
+            }
+            $('#isActiveHidden').val(faFeeMaster.isActive);
+            if ($('#isActiveHidden').val() == 'true'){
+                $('input[name="isActive"]')[0].checked = true;
+                if (('${confirming}' == 'true')&&('${mode} != edit')) {
+                    $('#activeYes').attr("disabled","disabled");
+                    $('#activeNo').attr("disabled","disabled");
+                } else if ('${id}'==''){
+                    $('#activeYes').attr("disabled","disabled");
+                    $('#activeNo').attr("disabled","disabled");
+                } else {
+                    $('#activeYes').attr("disabled",false);
+                    $('#activeNo').attr("disabled",false);
+                }
+            } else {
+                $('input[name="isActive"]')[1].checked = true;
+                if (('${confirming}' == 'true')&&('${mode} != edit')) {
+                    $('#activeYes').attr("disabled","disabled");
+                    $('#activeNo').attr("disabled","disabled");
+                } else if ('${id}'==''){
+                    $('#activeYes').attr("disabled","disabled");
+                    $('#activeNo').attr("disabled","disabled");
+                } else if (('${mode}'=='edit')&&(('${faFeeMaster?.recordStatus?.decodeStatus()}'=='Reject') || ($("#status").val() == 'R' ))){
+                    $('input[name=isActive]').attr("disabled", "disabled");
+                } else {
+                    $('#activeYes').attr("disabled",false);
+                    $('#activeNo').attr("disabled",false)
+                }
+            }
+            
+            $('#calculationBaseHidden').val(faFeeMaster.faCalculationBase.lookupId);
+            
+            if ($('#calculationBaseHidden').val() == "FA_CALCULATION_BASE-1"
+            		|| $('#calculationBaseHidden').val() == "FA_CALCULATION_BASE-4"
+            		|| $('#calculationBaseHidden').val() == "FA_CALCULATION_BASE-5") {
+                $("input[name='radioCalculationBase']")[0].checked = true;
+                $("#previousAccrual").val(faFeeMaster.faCalculationBase.lookupId);
+                $('#radioByPreviousNAV').val(faFeeMaster.faCalculationBase.lookupId);
+                $('#previousNAVHidden').val($('#radioByPreviousNAV').val());
+                if (('${confirming}' == 'true')&&('${mode} != edit')) {
+                    $('#radioByPreviousNAV').attr('disabled', 'disabled');
+                    $('#radioByDailyAmount').attr('disabled', 'disabled');
+                    $('#radioByTotalAmount').attr('disabled', 'disabled');
+                } else if (('${mode}==edit')&&('${confirming}'!='true')){
+                    $('#yearBase').attr('disabled', false);
+                    $('#isChecked').attr('disabled', false);
+                    $('#accrualBaseDaily').attr('disabled', 'disabled');
+                    $('#accrualBaseTotal').attr('disabled', 'disabled');
+                } else {
+                    $('#radioByPreviousNAV').attr('disabled', false);
+                    $('#radioByDailyAmount').attr('disabled', false);
+                    $('#radioByTotalAmount').attr('disabled', false);
+                }
+                $('#isChecked').val(faFeeMaster.publishedNav);
+                $('#isCheckedHidden').val($('#isChecked').val());
+                if ($("#isCheckedHidden").val()=='true'){
+                    $("input[name=publishedNav]").attr("checked", true);
+                } else {
+                    $("input[name=publishedNav]").attr("checked", false);
+                }
+                
+                $('#yearBase').val(faFeeMaster.yearBase.lookupId);
+                $('#yearBaseHidden').val($('#yearBase').val());
+            
+                $("#accrualBaseTotal").val("");
+                $("#accrualBaseDaily").val("");
+                
+                if ($('#calculationBaseHidden').val() == "FA_CALCULATION_BASE-1"){
+            		$("#unitPrice").attr('disabled', 'disabled');
+            		$("#coaCode").attr('disabled', 'disabled');
+            		$("#coaHelp").attr('disabled', 'disabled');
+            	}
+            	if ($('#calculationBaseHidden').val() == "FA_CALCULATION_BASE-4"){
+            		$("#unitPrice").attr('disabled', false);
+            		$('#coaCode').val('').blur();
+        			$('#coaCode').removeClass('fieldError');
+            		$("#coaCode").attr('disabled', 'disabled');
+            		$("#coaHelp").attr('disabled', 'disabled');
+            	}
+            	if ($('#calculationBaseHidden').val() == "FA_CALCULATION_BASE-5"){
+            		$("#unitPrice").val("").blur();
+            		$("#unitPrice").attr('disabled', 'disabled');
+            		$("#coaCode").attr('disabled', false);
+            		$("#coaHelp").attr('disabled', false);
+            	}
+            } 
+            if ($('#calculationBaseHidden').val() == "FA_CALCULATION_BASE-2") {
+                $("input[name='radioCalculationBase']")[1].checked = true;
+                $('#radioByDailyAmount').val(faFeeMaster.faCalculationBase.lookupId);
+                $('#radioDailyAmountHidden').val($('#radioByDailyAmount').val());
+        //      amount = $('#detailFeeTierAmount #tierValueAmount').val(); 
+        //      alert(amount);
+                if (('${confirming}' == 'true')&&('${mode} != edit')) {
+                    $('#radioByPreviousNAV').attr('disabled', 'disabled');
+                    $('#radioByDailyAmount').attr('disabled', 'disabled');
+                    $('#radioByTotalAmount').attr('disabled', 'disabled');
+                } else if (('${mode}==edit')&&('${confirming}'!='true')){
+                    $('#yearBase').attr('disabled', 'disabled');
+                    $('#isChecked').attr('disabled', 'disabled');
+                    $('#accrualBaseDaily').attr('disabled', false);
+                    $('#accrualBaseTotal').attr('disabled', 'disabled');
+                } else {
+                    $('#radioByPreviousNAV').attr('disabled', false);
+                    $('#radioByDailyAmount').attr('disabled', false);
+                    $('#radioByTotalAmount').attr('disabled', false);
+                }
+                $('#accrualBaseDaily').val(faFeeMaster.accrualBase.lookupId);
+                $('#accrualBaseDailyHidden').val($('#accrualBaseDaily').val());
+                $('#accrualBaseTotal').val('');
+                $('#accrualBaseTotalHidden').val('');
+                
+                $("#previousAccrual").val("");
+                $("#unitPrice").val("").blur();
+    			$('#coaCode').val('').blur();
+    			$('#coaCode').removeClass('fieldError');
+    			$('#coaCode').attr('disabled', 'disabled');
+    			$('#unitPrice').attr('disabled', 'disabled');
+    			$('#previousAccrual').attr('disabled', 'disabled');
+            //  $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #dailyAmount').val(faFeeTiers.tierValue);
+            //  alert("daily Amount >>>" + ($('#detailFeeAccrualByAmount #feeAccrualByAmountForm #dailyAmount').val()));
+            } 
+            if ($('#calculationBaseHidden').val() == "FA_CALCULATION_BASE-3") {
+                $("input[name='radioCalculationBase']")[2].checked = true;
+                $('#radioByTotalAmount').val(faFeeMaster.faCalculationBase.lookupId);
+                $('#radioTotalAmountHidden').val($('#radioByTotalAmount').val());
+                if (('${confirming}' == 'true')&&('${mode} != edit')) {
+                    $('#radioByPreviousNAV').attr('disabled', 'disabled');
+                    $('#radioByDailyAmount').attr('disabled', 'disabled');
+                    $('#radioByTotalAmount').attr('disabled', 'disabled');
+                } else if (('${mode}==edit')&&('${confirming}'!='true')){
+                    $('#yearBase').attr('disabled', 'disabled');
+                    $('#isChecked').attr('disabled', 'disabled');
+                    $('#accrualBaseDaily').attr('disabled', 'disabled');
+                    $('#accrualBaseTotal').attr('disabled', false);
+                } else {
+                    $('#radioByPreviousNAV').attr('disabled', false);
+                    $('#radioByDailyAmount').attr('disabled', false);
+                    $('#radioByTotalAmount').attr('disabled', false);
+                }
+                $('#accrualBaseTotal').val(faFeeMaster.accrualBase.lookupId);
+                $('#accrualBaseTotalHidden').val($('#accrualBaseTotal').val());
+                $('#accrualBaseDaily').val('');
+                $('#accrualBaseDailyHidden').val('');
+                
+                $("#previousAccrual").val("");
+                $("#unitPrice").val("").blur();
+    			$('#coaCode').val('').blur();
+    			$('#coaCode').removeClass('fieldError');
+    			$('#coaCode').attr('disabled', 'disabled');
+    			$('#unitPrice').attr('disabled', 'disabled');
+    			$('#previousAccrual').attr('disabled', 'disabled');
+            }
+                    
+            if ('${mode}'=='view'){
+                $('#newFeeDetail').button("option", "disabled", true);
+                $('#activeYes').attr("disabled","disabled");
+                $('#activeNo').attr("disabled","disabled");
+                $('#radioByPreviousNAV').attr('disabled', 'disabled');
+                $('#radioByDailyAmount').attr('disabled', 'disabled');
+                $('#radioByTotalAmount').attr('disabled', 'disabled');
+                $('#yearBase').attr('disabled', 'disabled');
+                $('#isChecked').attr('disabled', 'disabled');
+                $('#accrualBaseDaily').attr('disabled', 'disabled');
+                $('#accrualBaseTotal').attr('disabled', 'disabled');                
+            }
+            if ($('#calculationBaseHidden').val() == "FA_CALCULATION_BASE-1"){
+        		$('#uPrice').hide();
+    			$('#cNo').hide();
+        	}
+        	if ($('#calculationBaseHidden').val() == "FA_CALCULATION_BASE-4"){
+        		$('#cNo').hide();
+        		$('#uPrice').show();
+        	}
+        	if ($('#calculationBaseHidden').val() == "FA_CALCULATION_BASE-5"){
+        		$('#cNo').show();
+        		$('#uPrice').hide();
+        	}
+            
+            //return false;
+        }
+        
+       if( '${confirming}' == 'true' || '${mode}'=='view') {
+           $('#unitPrice').attr('disabled', 'disabled');
+           $('#coaCode').attr('disabled', 'disabled');
+           $('#coaHelp').attr('disabled', 'disabled');
+       }       
+
+    //*************************** START FEE DETAIL *************************************//
+    
+    //===== TABEL FEE DETAIL =====//
+    var fmtDate = '${appProp.jqueryDateFormat}';
+        tableFeeDetail = 
+            $('#listFeeDetail #gridFeeDetail').dataTable({
+                aaData: faFeeDetails,
+                aoColumns: [ {
+                                bVisible:false,
+                                mDataProp:'id.rowNumber'
+                             },
+                             {
+                                 mDataProp:'startDate',
+                                 bUseRendered: false,
+                                 fnRender: function(obj) {
+                                    var controls;
+                                    var startDate;
+                                    var stringDate = obj.aData.startDate.toString();
+                                    if (stringDate.substr(2,1) != "/") {
+                                        startDate = $.datepicker.formatDate(fmtDate, new Date(obj.aData.startDate));
+                                    } else {
+                                        startDate = obj.aData.startDate;
+                                    }
+                                        
+                                    controls = startDate;
+                                    controls += '<input type="hidden" name="faFeeDetails[' + obj.iDataRow + '].startDate" value="' + startDate + '" />';
+                                    
+                                    return controls;
+                                }
+                             },
+                             {
+                                 mDataProp:'endDate',
+                                 bUseRendered: false,
+                                  fnRender: function(obj) {
+                                    var controls;
+                                    var endDate;
+                                    var stringDate = obj.aData.endDate.toString();
+                                    if (stringDate.substr(2,1) != "/") {
+                                        endDate = $.datepicker.formatDate(fmtDate, new Date(obj.aData.endDate));
+                                    } else {
+                                        endDate = obj.aData.endDate;
+                                    }
+                                    controls = endDate;
+                                    controls += '<input type="hidden" name="faFeeDetails[' + obj.iDataRow + '].endDate" value="' + endDate + '" />';
+                                    return controls;
+                                }
+                             },
+                             {
+                                mDataProp:'tieringType.lookupDescription',
+                                sDefaultContent: "-",
+                                fnRender: function(obj) {
+                                    var controls;
+                                    controls = obj.aData.tieringType.lookupDescription;
+                                    if (($("input[name=radioCalculationBase]")[1].checked == true)|| 
+                                            ($("input[name=radioCalculationBase]")[2].checked == true))  {
+                                        controls = "-";                                     
+                                    }
+                                    return controls;
+                                }
+                             },
+                             {
+                                mDataprop:'faFeeTiers[0].tierValue',
+                                sClass: 'numeric',
+                      //        bUseRendered: false,
+                                 fnRender: function(obj) {
+                                       var controls;
+                                       if (($("input[name=radioCalculationBase]")[1].checked == true)|| 
+                                            ($("input[name=radioCalculationBase]")[2].checked == true))  
+                                       { 
+                                            controls = obj.aData.faFeeTiers[0].tierValue;
+                                     //         controls = amount;
+                                        } else {
+                                            controls = "-";
+                                        }
+                                       
+                                       return controls;
+                                   }
+                             },
+                             {
+                                 sClass: 'numeric',
+                                 mDataProp:'taxMaster.taxRate',
+                             },
+                             {
+                               fnRender: function(obj) {
+                                   var controls;
+                                   controls = '<center><input id="deleteButton" type="button" value="Delete" #{if readOnly}disabled="disabled"#{/if} /></center>';
+                                   return controls;
+                               }
+                             }
+                             ],
+                aaSorting:[[1,'asc']],
+                bAutoWidth: false,  
+                bDestroy:true,
+                bFilter:false,
+                bInfo:true,     
+                bJQueryUI:true,
+                bPaginate:true,
+                bSearch: false,
+                bLengthChange:false,
+                iDisplayLength:3,
+                sPaginationType: 'full_numbers'
+
+        });
+        
+        //==== END TABEL FEE DETAIL ====//
+    
+        //==== START EVENT EDIT FEE DETAIL ====//
+        
+        $('#listFeeDetail #gridFeeDetail').removeAttr('style');
+        $('#listFeeDetail #gridFeeDetail tbody tr td').die('click');
+        $('#listFeeDetail #gridFeeDetail tbody tr td').live('click', function() {
+        	$("#startDateNav").removeClass('fieldError');
+            $("#startDateNavError").html('');            
+            $("#endDateNav").removeClass('fieldError');
+            $("#endDateNavError").html('');    
+            $("#startDate").removeClass('fieldError');
+            $("#startDateError").html('');    
+            $("#endDate").removeClass('fieldError');
+            $("#endDateError").html('');  
+            $("#errGlobal").html("");
+            
+            if($(this).text() == 'No data available in table')
+            {
+                return false;
+            }else{
+            var rowPos= $(this).parents('tr');
+            var rowPosNumber = tableFeeDetail.fnGetPosition(rowPos[0]);
+            var pos = tableFeeDetail.fnGetPosition(this);
+            if (pos[1] != 5) {
+                $("#errDate").html('');
+                $("#errValueType").html('');
+                $("#errTieringType").html('');
+                $("#errTax").html('');
+                $("#errDateAmount").html('');
+                $("#errTaxAmount").html('');
+                $("#endDateNavError").html('');
+                $("#errDaily").html('');
+                $("#errTotal").html('');
+                $("#endDateNav").removeClass('fieldError');
+                $("#endDate").removeClass('fieldError');
+                var data = tableFeeDetail.fnGetData(this.parentNode);
+                if ($("input[name=radioCalculationBase]")[0].checked == true) { 
+                    
+                    // --- EDIT IF PREVIOUS BY NAV --- //
+                    
+                    $('#feeAccrualByNavForm #tieringType').trigger('change');
+                    $("#detailFeeAccrualByNav #feeAccrualByNavForm #rowPosition").val(rowPosNumber);
+                    $("#detailFeeAccrualByNav #feeAccrualByNavForm #detailFeeKey").val(data.id.feeKey)
+                    $("#detailFeeAccrualByNav #feeAccrualByNavForm #detailRowNumber").val(data.id.rowNumber);
+                    var stringStartDate = data.startDate.toString();
+                    if (stringStartDate.substr(2,1) != "/") {
+                        $("#detailFeeAccrualByNav #feeAccrualByNavForm #startDateNav").val($.datepicker.formatDate(fmtDate, new Date(data.startDate))); 
+                    } else {
+                        $("#detailFeeAccrualByNav #feeAccrualByNavForm #startDateNav").val(data.startDate);
+                    }
+                    
+                    $("#detailFeeAccrualByNav #feeAccrualByNavForm #startDateNavHidden").val((new Date($('#detailFeeAccrualByNav #feeAccrualByNavForm #startDateNav').datepicker("getDate"))).getTime());
+                    $("#detailFeeAccrualByNav #feeAccrualByNavForm #oldStartDate").val((new Date($('#detailFeeAccrualByNav #feeAccrualByNavForm #startDateNav').datepicker("getDate"))).getTime());
+                    
+                    var stringEndDate = data.endDate.toString();
+                    if (stringEndDate.substr(2,1) != "/") {
+                        $("#detailFeeAccrualByNav #feeAccrualByNavForm #endDateNav").val($.datepicker.formatDate(fmtDate, new Date(data.endDate)));
+                    } else {
+                        $("#detailFeeAccrualByNav #feeAccrualByNavForm #endDateNav").val(data.endDate);
+                    }
+                    $("#detailFeeAccrualByNav #feeAccrualByNavForm #endDateNavHidden").val((new Date($('#detailFeeAccrualByNav #feeAccrualByNavForm #endDateNav').datepicker("getDate"))).getTime());
+                    $("#detailFeeAccrualByNav #feeAccrualByNavForm #tieringType").val(data.tieringType.lookupId);
+                    $("#detailFeeAccrualByNav #feeAccrualByNavForm #tieringTypeDesc").val(data.tieringType.lookupDescription);
+                    $("#detailFeeAccrualByNav #feeAccrualByNavForm #valueType").val(data.valueType.lookupId);
+                    $("#detailFeeAccrualByNav #feeAccrualByNavForm #taxRateNav").val(data.taxMaster.taxRate);
+                    $("#detailFeeAccrualByNav #feeAccrualByNavForm #taxCodeNav").val(data.taxMaster.taxCode);
+                    $("#detailFeeAccrualByNav #feeAccrualByNavForm #taxKeyNav").val(data.taxMaster.taxKey);
+                    $("#detailFeeAccrualByNav #feeAccrualByNavForm #taxNameNav").val(data.taxMaster.description);
+                    
+                    tabFeeTier(data);
+                    if (data.tieringType.lookupId == '${tierTypeSingleValue}'){
+                        $('#detailFeeAccrualByNav #feeAccrualByNavForm #newDataFeeTier').button("option", "disabled", true);
+                    } else {
+                        $('#detailFeeAccrualByNav #feeAccrualByNavForm #newDataFeeTier').button("option", "disabled", false);
+                    }
+                    
+                    if ('${mode}'=='view') {
+                        $('#detailFeeAccrualByNav #feeAccrualByNavForm #newDataFeeTier').button("option", "disabled", true);
+                        $('#detailFeeAccrualByNav #feeAccrualByNavForm #addFeeAccrualByNav').hide();
+                        $('#detailFeeAccrualByNav #feeAccrualByNavForm #cancelFeeAccrualByNav').hide();
+                    }
+                    /* if ('${mode}'=='view' || '${approval}'){
+                    
+                        $('#detailFeeAccrualByNav #feeAccrualByNavForm #newDataFeeTier').button("option", "disabled", true);
+                        $('#detailFeeAccrualByNav #feeAccrualByNavForm #addFeeAccrualByNav').hide();
+                        $('#detailFeeAccrualByNav #feeAccrualByNavForm #cancelFeeAccrualByNav').hide();
+                        //$('#detailFeeAccrualByNav #feeAccrualByNavForm #closeFeeAccrualByNav').show();
+                    } else {
+                        
+                    } */
+                    $('#detailFeeAccrualByNav').dialog('open');
+                
+                } else {
+                    
+                    // --- EDIT IF DAILY / TOTAL AMOUNT --- //
+                    
+                    var dataAmount = tableFeeDetail.fnGetData(this.parentNode);
+                    var totalDay = $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #totalDaysHidden').val();
+                    var totalAfterTax = $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #amountAfterTaxHidden').val();
+                    var dailyAfterTax = $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #dailyAmountAfterTaxHidden').val();
+                    $("#detailFeeAccrualByAmount #feeAccrualByAmountForm #rowPositionAmount").val(rowPosNumber);
+                    $("#detailFeeAccrualByAmount #feeAccrualByAmountForm #detailFeeKeyAmount").val(dataAmount.id.feeKey);
+                    $("#detailFeeAccrualByAmount #feeAccrualByAmountForm #detailRowNumberAmount").val(dataAmount.id.rowNumber);
+                    var stringStartDate = data.startDate.toString();
+                    var stringStartDate = data.startDate.toString();
+                    if (stringStartDate.substr(2,1) != "/") {
+                        $("#detailFeeAccrualByAmount #feeAccrualByAmountForm #startDate").val($.datepicker.formatDate(fmtDate, new Date(dataAmount.startDate)));
+                    } else {
+                        $("#detailFeeAccrualByAmount #feeAccrualByAmountForm #startDate").val(dataAmount.startDate);
+                    }
+                    $("#detailFeeAccrualByAmount #feeAccrualByAmountForm #startDateHidden").val((new Date($('#detailFeeAccrualByAmount #feeAccrualByAmountForm #startDate').datepicker("getDate"))).getTime());
+                    $("#detailFeeAccrualByAmount #feeAccrualByAmountForm #oldStartDateAmount").val((new Date($('#detailFeeAccrualByAmount #feeAccrualByAmountForm #startDate').datepicker("getDate"))).getTime());
+                    
+                    var stringEndDate = data.endDate.toString();
+                    if (stringEndDate.substr(2,1) != "/") {
+                        $("#detailFeeAccrualByAmount #feeAccrualByAmountForm #endDate").val($.datepicker.formatDate(fmtDate, new Date(dataAmount.endDate)));
+                    } else {
+                        $("#detailFeeAccrualByAmount #feeAccrualByAmountForm #endDate").val(dataAmount.endDate);
+                    }
+                    $("#detailFeeAccrualByAmount #feeAccrualByAmountForm #endDateHidden").val((new Date($('#detailFeeAccrualByAmount #feeAccrualByAmountForm #endDate').datepicker("getDate"))).getTime());
+                    $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #totalDays').val(totalDay);
+                    $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #taxCode').val(dataAmount.taxMaster.taxCode);
+                    $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #taxKey').val(dataAmount.taxMaster.taxKey);
+                    $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #taxName').val(dataAmount.taxMaster.description);
+                    $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #taxRate').val(dataAmount.taxMaster.taxRate);
+                    $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #amountAfterTax').val(totalAfterTax);
+                    $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #dailyAmountAfterTax').val(dailyAfterTax);
+                    if ($("input[name=radioCalculationBase]")[1].checked == true) {
+                        var dailyAmount = $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #dailyAmount').val();
+                        //var dailyAmount = $('#detailFeeTierAmount #tierValueAmount').val();
+                        $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #dailyAmount').val(dailyAmount);
+                    }
+                    if ($("input[name=radioCalculationBase]")[2].checked == true) { 
+                        var totalAmount = $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #totalAmountHidden').val();
+                        $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #totalAmount').val(totalAmount);
+                    }
+                    
+                    tabTierAmount(dataAmount);
+                    calculateTotalDay();
+                    var feeTiers = $('#listFeeTierAmount #gridFeeTierAmount').dataTable();
+                    var rows =feeTiers.fnGetData();
+                    for (j=0; j<rows.length ;j++) {
+                        $('#detailFeeTierAmount #tierValueAmount').val(dataAmount.faFeeTiers[j].tierValue);
+                        $('#detailFeeTierAmount #tierMaximumRangeAmount').val(dataAmount.faFeeTiers[j].tierMaximumRange);
+                        $('#detailFeeTierAmount #tierRowNumberAmount').val(dataAmount.faFeeTiers[j].id.rowNumber);
+                        $('#detailFeeTierAmount #tierFeeKeyAmount').val(dataAmount.faFeeTiers[j].id.feeKey);
+                        $('#detailFeeTierAmount #tierSequenceAmount').val(dataAmount.faFeeTiers[j].id.tierSequence);
+                    //  amount = $('#detailFeeTierAmount #tierValueAmount').val();
+                        //$('#detailFeeAccrualByAmount #feeAccrualByAmountForm #totalAmount')
+                    }
+                    if ($("input[name=radioCalculationBase]")[1].checked == true) {
+            //          alert($('#detailFeeTierAmount #tierValueAmount').val());
+                        var dailyAmountX = $('#detailFeeTierAmount #tierValueAmount').val();
+                        var $dailyAmountX = $.fn.autoNumeric.Format('dailyAmountX', dailyAmountX);
+                        $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #dailyAmountStripped').val(dailyAmountX);
+                        $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #dailyAmount').val($dailyAmountX);
+                        $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #totalAmount').attr("disabled", "disabled");
+                        var t=setTimeout("calculateDaily()",1000);
+                    }
+                    if ($("input[name=radioCalculationBase]")[2].checked == true) { 
+                        var totalAmountX = $('#detailFeeTierAmount #tierValueAmount').val();
+                        var $totalAmountX = $.fn.autoNumeric.Format('totalAmountX', totalAmountX);
+                        $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #totalAmountStripped').val(totalAmountX);
+                        $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #totalAmount').val($totalAmountX);
+                        $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #dailyAmount').attr("disabled", "disabled");
+                        var t=setTimeout("calculateTotal()",1000);
+                    }
+                    if ('${mode}'=='view' || '${approval}'){
+                        $('#detailFeeAccrualByNav #feeAccrualByNavForm #addFeeAccrualByAmount').hide();
+                    }
+                    $('#detailFeeAccrualByAmount').dialog('open');
+                }
+                $('.ui-widget-overlay').css('height',$('body').height());
+               }
+            }
+        });
+        
+        //===== END EVENT EDIT FEE DETAIL =====//
+        
+        //=============== (1) START PREVIOUS BY NAV =============== //
+        
+        //---- EVENT CLICK BUTTON CANCEL FOR PREVIOUS BY NAV DETAIL ----//
+        $('#cancelFeeAccrualByNav').click(function() {
+            $("input[id*='startDate']").removeClass('fieldError');
+            $("input[id*='endDate']").removeClass('fieldError');
+            $("span[id*='endDate']").html("");
+            $("span[id*='startDate']").html("");
+            $("#detailFeeAccrualByNav input:text").val("");
+            $("#detailFeeAccrualByNav input:hidden").val("");
+            $("#detailFeeAccrualByNav").dialog('close');
+            return false;
+        });
+        
+        $('#closeFeeAccrualByNav').click(function() {
+            $("#detailFeeAccrualByNav").dialog('close');
+            return false;
+        });
+        // -----------------------------------------------------//
+        
+        // ---- EVENT BUTTON NEW DATA FOR FEE DETAIL ---- //
+        $('.buttons #newFeeDetail').click(function() {
+            $("#errDate").html('');
+            $("#errValueType").html('');
+            $("#errTieringType").html('');
+            $("#errTax").html('');
+            $("#errDateAmount").html('');
+            $("#errTaxAmount").html('');
+            $("#errDaily").html('');
+            $("#errTotal").html('');
+            $("#errGlobal").html('');
+            
+            $("#startDateNav").removeClass('fieldError');
+            $("#startDateNavError").html('');            
+            $("#endDateNav").removeClass('fieldError');
+            $("#endDateNavError").html('');    
+            $("#startDate").removeClass('fieldError');
+            $("#startDateError").html('');    
+            $("#endDate").removeClass('fieldError');
+            $("#endDateError").html('');  
+            
+            $("#detailFeeAccrualByAmount #feeAccrualByAmountForm #taxCode").removeClass('fieldError');
+            if ($("input[name='radioCalculationBase']")[0].checked == true) {
+                var data = new Object();
+                data.faFeeTiers = new Array();
+                tabFeeTier(data);
+                var dataFeeTier = new Object();
+                dataFeeTier.id = new Object();
+                dataFeeTier.id.tierSequence = 0;
+                dataFeeTier.tierMaxmimumRange = null;
+                dataFeeTier.tierValue = null;
+                dataFeeTier.id.feeKey = $('#detailFeeTier #feeTierForm #tierFeeKey').val();
+                dataFeeTier.id.rowNumber = $('#detailFeeTier #feeTierForm #tierRowNumber').val();
+                tableFeeTier.fnAddData(dataFeeTier);
+                selectedRow = null;
+                $("#detailFeeAccrualByNav").dialog('open');
+                $('.ui-widget-overlay').css('height',$('body').height());
+                $("#detailFeeAccrualByNav input:text").val("");
+                $("#detailFeeAccrualByNav input:hidden").val("");
+                $("#feeAccrualByNavForm #tieringType").val("");
+                $("#feeAccrualByNavForm #valueType").val("");
+                //$("#feeAccrualByNavForm #startDateNav").val("");
+                $('#detailFeeAccrualByNav #feeAccrualByNavForm #newDataFeeTier').button("option", "disabled", false);
+                return false;
+            }  else {
+                if ($("input[name='radioCalculationBase']")[1].checked == true){
+                    var data = new Object();
+                    data.faFeeTiers = new Array();
+                    tabTierAmount(data);
+                    selectedRow = null;
+                    $("#detailFeeAccrualByAmount").dialog('open');
+                    $('.ui-widget-overlay').css('height',$('body').height());
+                    $("#detailFeeAccrualByAmount input:text").val("");
+                    $("#detailFeeAccrualByAmount input:hidden").val("");
+                    $("#detailFeeAccrualByAmount #feeAccrualByAmountForm #dailyAmount").attr('disabled', false);
+                    $("#detailFeeAccrualByAmount #feeAccrualByAmountForm #totalAmount").attr('disabled', 'disabled');
+                    return false;
+                } else {
+                    var data = new Object();
+                    data.faFeeTiers = new Array();
+                    tabTierAmount(data);
+                    selectedRow = null;
+                    $("#detailFeeAccrualByAmount").dialog('open');
+                    $('.ui-widget-overlay').css('height',$('body').height());
+                    $("#detailFeeAccrualByAmount input:text").val("");
+                    $("#detailFeeAccrualByAmount input:hidden").val("");
+                    $("#detailFeeAccrualByAmount #feeAccrualByAmountForm #totalAmount").attr('disabled', false);
+                    $("#detailFeeAccrualByAmount #feeAccrualByAmountForm #dailyAmount").attr('disabled', 'disabled');
+                    return false;
+                }
+            }
+        });
+        // ---------------------------------------------------------------------------------//
+        
+        //---- EVENT CLICK BUTTON SAVE FOR PREVIOUS BY NAV IN DETAIL ----//
+        $('#detailFeeAccrualByNav #feeAccrualByNavForm #addFeeAccrualByNav').click(function() {
+            var rowPosition = $("#detailFeeAccrualByNav #feeAccrualByNavForm #rowPosition").val();
+            var startDate = $('#detailFeeAccrualByNav #feeAccrualByNavForm #startDateNav').val();
+            var startDateHidden = $('#detailFeeAccrualByNav #feeAccrualByNavForm #startDateNavHidden').val();
+            
+            var endDate = $('#detailFeeAccrualByNav #feeAccrualByNavForm #endDateNav').val();
+            var endDateHidden = $('#detailFeeAccrualByNav #feeAccrualByNavForm #endDateNavHidden').val();
+            
+            var valueType = $('#detailFeeAccrualByNav #feeAccrualByNavForm #valueType').val();
+            var tieringType = $('#detailFeeAccrualByNav #feeAccrualByNavForm #tieringType').val();
+            var taxCode = $('#detailFeeAccrualByNav #feeAccrualByNavForm #taxCodeNav').val();
+            var table = tableFeeDetail.dataTable();
+            var found = false;
+            var datas = table.fnGetData(parseFloat(rowPosition));
+            var feeTiers = $('#detailFeeAccrualByNav #listFeeTier #gridFeeTier').dataTable();
+            var rows = feeTiers.fnGetData();
+			
+            //datas.startDate = (new Date($('#detailFeeAccrualByNav #feeAccrualByNavForm #startDateNav').datepicker("getDate"))).getTime();
+            
+           // console.log("startDate:"+startDate);
+           // console.log(new Date(startDate).getTime());
+            //console.log(startDateHidden);
+            
+           // .datepicker('getDate')
+            
+            //alert("save 1")
+            
+            $("input[id*='startDate']").click().change();
+            // validate
+            if ($('#detailFeeAccrualByNav #feeAccrualByNavForm #startDateNav').hasClass('fieldError')){
+                return false;
+            }
+            
+            if ($('#detailFeeAccrualByNav #feeAccrualByNavForm #endDateNav').hasClass('fieldError')){
+                return false;
+            }
+            
+            if ((startDate == "") || (endDate == "") || (tieringType == "") || (taxCode == "")||(valueType == "")){
+                if ((startDate == "") || (endDate == "")) {
+                    $('#errDate').html('Required');
+                } else {
+                    $('#errDate').html('');
+                }   
+                
+                if (valueType == "" ){
+                    $('#errValueType').html('Required');
+                } else {
+                    $('#errValueType').html('');
+                }
+                
+                if (tieringType == "" ) {
+                    $('#errTieringType').html('Required');
+                } else {
+                    $('#errTieringType').html('');
+                }
+                
+                if (taxCode == "" ) {
+                    $('#errTax').html('Required');
+                } else {
+                    $('#errTax').html('');
+                }
+                
+                return false;
+            }
+            
+            var table1 =$('#listFeeTier #gridFeeTier').dataTable();
+            var cells = table1.fnGetData(0);
+            $("#errGlobal").html("");
+            if (cells.tierValue == null) {
+                $("#errGlobal").html('Click grid "MAX" and fill "Tier Value" into grid before Save Data !').show();
+                return false;
+            }
+            
+            /*if(tieringType == "CHARGE_CALCULATION-S"){
+                if (rows.length > 1) {
+                    $("#detailFeeAccrualByNav #feeAccrualByNavForm #tieringType").addClass('fieldError');
+                    $('#errTieringType2').html('Single Value should only be one tier');
+                    return false;
+                }
+            } */
+                            
+            
+            // ---- ADD PREVIOUS BY NAV TO GRID FOR DATA ALREADY(EDIT DATA) ---- //
+            if (rowPosition != "") {
+                
+                table.fnUpdate($("#detailFeeAccrualByNav #feeAccrualByNavForm #startDateNav").val(),parseFloat(rowPosition),1);
+                table.fnUpdate($("#detailFeeAccrualByNav #feeAccrualByNavForm #endDateNav").val(),parseFloat(rowPosition),2);
+                table.fnUpdate($("#detailFeeAccrualByNav #feeAccrualByNavForm #tieringTypeDesc").val(),parseFloat(rowPosition),3);
+                table.fnUpdate($("#detailFeeAccrualByNav #feeAccrualByNavForm #amount").val(),parseFloat(rowPosition),4);
+                table.fnUpdate($("#detailFeeAccrualByNav #feeAccrualByNavForm #taxRateNav").val(),parseFloat(rowPosition),5);
+
+                datas.id.feeKey = $("#detailFeeAccrualByNav #feeAccrualByNavForm #detailFeeKey").val();
+                datas.id.rowNumber = $("#detailFeeAccrualByNav #feeAccrualByNavForm #detailRowNumber").val();
+                datas.tieringType.lookupId = $("#detailFeeAccrualByNav #feeAccrualByNavForm #tieringType").val();
+                datas.valueType.lookupId = $("#detailFeeAccrualByNav #feeAccrualByNavForm #valueType").val();
+                datas.taxMaster.taxKey = $("#detailFeeAccrualByNav #feeAccrualByNavForm #taxKeyNav").val();
+                datas.taxMaster.taxCode = $("#detailFeeAccrualByNav #feeAccrualByNavForm #taxCodeNav").val();
+                datas.taxMaster.description = $("#detailFeeAccrualByNav #feeAccrualByNavForm #taxNameNav").val();
+                datas.startDate = (new Date($('#detailFeeAccrualByNav #feeAccrualByNavForm #startDateNav').datepicker("getDate"))).getTime();
+                datas.endDate = (new Date($('#detailFeeAccrualByNav #feeAccrualByNavForm #endDateNav').datepicker("getDate"))).getTime();
+                var feeTiers = $('#detailFeeAccrualByNav #listFeeTier #gridFeeTier').dataTable();
+                var rows =feeTiers.fnGetData();
+                datas.faFeeTiers.length = rows.length;
+                for (j=0; j<rows.length ;j++) {
+                    if( datas.faFeeTiers[j] == undefined){
+                        datas.faFeeTiers[j] = new Object();
+                        datas.faFeeTiers[j].id = new Object();
+                        datas.faFeeTiers[j].id.feeKey = rows[j].id.feeKey;
+                        datas.faFeeTiers[j].id.rowNumber = rows[j].id.rowNumber;
+                        datas.faFeeTiers[j].id.tierSequence = rows[j].id.tierSequence;
+                        datas.faFeeTiers[j].tierMaximumRange = (rows[j].tierMaximumRange == "MAX" ) ? null:rows[j].tierMaximumRange;
+                        datas.faFeeTiers[j].tierValue = rows[j].tierValue;
+                    } else {
+                        datas.faFeeTiers[j].tierMaximumRange = (rows[j].tierMaximumRange == "MAX" ) ? null:rows[j].tierMaximumRange;
+                        datas.faFeeTiers[j].tierValue = rows[j].tierValue;
+                    }
+                }
+    
+            } else {
+                
+                // ---- ADD PREVIOUS BY NAV TO GRID FOR DATA EMPTY(NEW DATA) ---- //
+                
+                var datas = new Object();
+                datas.id = new Object();
+                datas.taxMaster = new Object();
+                datas.valueType = new Object();
+                datas.tieringType = new Object();
+                datas.faFeeTiers = new Array();
+                datas.faFeeMaster = new Object();
+                datas.startDate = new Date();
+                datas.endDate = new Date();
+                datas.faFeeTiers.length = rows.length;
+                datas.id.rowNumber = $('#detailFeeAccrualByNav #feeAccrualByNavForm #detailRowNumber').val();
+                datas.startDate = (new Date($('#detailFeeAccrualByNav #feeAccrualByNavForm #startDateNav').datepicker("getDate"))).getTime();
+                datas.endDate = (new Date($('#detailFeeAccrualByNav #feeAccrualByNavForm #endDateNav').datepicker("getDate"))).getTime();
+                $('#detailFeeAccrualByNav #feeAccrualByNavForm #startDateNavHidden').val(datas.startDate);
+                $('#detailFeeAccrualByNav #feeAccrualByNavForm #endDateNavHidden').val(datas.endDate);
+                datas.tieringType.lookupId = $('#detailFeeAccrualByNav #feeAccrualByNavForm #tieringType').val();
+                datas.tieringType.lookupDescription = $('#detailFeeAccrualByNav #feeAccrualByNavForm #tieringTypeDesc').val();
+                datas.valueType.lookupId = $('#detailFeeAccrualByNav #feeAccrualByNavForm #valueType').val();
+                datas.id.feeKey = $('#detailFeeAccrualByNav #feeAccrualByNavForm #detailFeeKey').val();
+                datas.taxMaster.taxCode = $('#detailFeeAccrualByNav #feeAccrualByNavForm #taxCodeNav').val();
+                datas.taxMaster.taxKey = $('#detailFeeAccrualByNav #feeAccrualByNavForm #taxKeyNav').val();
+                datas.taxMaster.description = $('#detailFeeAccrualByNav #feeAccrualByNavForm #taxNameNav').val();
+                datas.taxMaster.taxRate = $('#detailFeeAccrualByNav #feeAccrualByNavForm #taxRateNav').val();
+                datas.faFeeMaster.feeKey = $('#detailFeeAccrualByNav #feeAccrualByNavForm #feeKeyMaster').val();
+                    for (j=0 ; j<rows.length ; j++) {
+                        datas.faFeeTiers[j] = new Object();
+                        datas.faFeeTiers[j].id = new Object();
+                        datas.faFeeTiers[j].id.tierSequence = rows[j].id.tierSequence;
+                        datas.faFeeTiers[j].tierMaximumRange = (rows[j].tierMaximumRange == "MAX" ) ? null:rows[j].tierMaximumRange;
+                        datas.faFeeTiers[j].tierValue = rows[j].tierValue;
+                        datas.faFeeTiers[j].id.feeKey = rows[j].id.feeKey;
+                        datas.faFeeTiers[j].id.rowNumber = rows[j].id.rowNumber;
+                    }
+            //  amount = 0;
+                table.fnAddData(datas);
+            }
+            $('#detailFeeAccrualByNav').dialog('close');
+            return false;
+        });
+        
+        //---- END EVENT CLICK BUTTON SAVE FOR PREVIOUS BY NAV DETAIL ----//
+        
+        //======================  END PREVIOUS BY NAV ====================== //
+        
+        //=============== (2) START DAILY / TOTAL AMOUNT =============== //
+        
+        //---- EVENT CLICK BUTTON CANCEL FOR DAILY / TOTAL AMOUNT DETAIL ----//
+        
+        $('#cancelFeeAccrualByAmount').click(function() {
+            $("input[id*='startDate']").removeClass('fieldError');
+            $("input[id*='endDate']").removeClass('fieldError');
+            $("span[id*='endDate']").html("");
+            $("span[id*='startDate']").html("");
+            $("#detailFeeAccrualByAmount input:text").val("");
+            $("#detailFeeAccrualByAmount input:hidden").val("");
+            $("#detailFeeAccrualByAmount").dialog('close');
+            return false;
+        });
+        
+        // -------------------------------------------------------------//
+        
+        //---- EVENT CLICK BUTTON ADD FOR DAILY / TOTAL AMOUNT DETAIL ----//
+        
+        $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #addFeeAccrualByAmount').click(function() {
+        var rowPositionAmount = $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #rowPositionAmount').val();
+        var tableAmount = $('#feeMasterForm #listFeeDetail #gridFeeDetail').dataTable();
+        var found = false;
+        var dataAmount = tableAmount.fnGetData(parseFloat(rowPositionAmount));
+        var totalDays = $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #totalDays').val();
+        var amountTax = $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #amountAfterTax').val();
+        var dailyTax = $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #dailyAmountAfterTax').val();
+        var startDate = $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #startDate').val();
+        var endDate = $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #endDate').val();
+        
+        var startDateHidden = $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #startDateHidden').val();
+        var endDateHidden = $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #endDateHidden').val();
+        
+        
+        var taxCode = $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #taxCode').val();
+        var dailyAmount = $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #dailyAmount').val();
+        var totalAmount = $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #totalAmount').val();
+        
+        //alert("save 2")
+        if ($('#detailFeeAccrualByAmount #feeAccrualByAmountForm #startDate').hasClass('fieldError')){
+            return false;
+        }
+        
+        if ($('#detailFeeAccrualByAmount #feeAccrualByAmountForm #endDate').hasClass('fieldError')){
+            return false;
+        }
+        
+        if ((startDate == "") || (endDate == "") || (taxCode == "") || (dailyAmount == "") || (totalAmount == "")) {
+            
+            if ((startDate == "") || (endDate == "")) {
+                $("#errDateAmount").html("Required")
+            } else {
+                $("#errDateAmount").html("");
+            }
+            
+            if (taxCode == ""){
+                $('#errTaxAmount').html('Required');
+            } else {
+                $('#errTaxAmount').html('');
+            }
+
+            if ((dailyAmount == "")&&($('#detailFeeAccrualByAmount #feeAccrualByAmountForm #dailyAmount').attr("disabled")!=true)) {
+                $('#errDaily').html('Required');
+            } else {
+                $('#errDaily').html('');
+            }
+            
+            if ((totalAmount == "")&&($('#detailFeeAccrualByAmount #feeAccrualByAmountForm #totalAmount').attr("disabled")!=true)) {
+                $('#errTotal').html('Required');
+            } else {
+                $('#errTotal').html('');
+            }
+            
+            return false;
+        }
+        
+        
+        // -- IF DAILY AMOUNT -- //
+        if($("input[name=radioCalculationBase]")[1].checked == true ) {
+                amount = $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #dailyAmount').val();
+
+                if ($("#detailFeeAccrualByAmount #feeAccrualByAmountForm #dailyAmount").hasClass('fieldError')){
+                    alert("check error field !");
+                    return false;
+                }
+        } 
+        
+        // -- IF TOTAL AMOUNT -- //
+        if ($("input[name=radioCalculationBase]")[2].checked == true) {
+            amount = $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #totalAmount').val();
+
+            if ($("#detailFeeAccrualByAmount #feeAccrualByAmountForm #totalAmount").hasClass('fieldError')){
+                alert("check error field !");
+                return false;
+            }
+        }
+        
+        // ---- ADD DAILY / TOTAL AMOUNT TO GRID FOR DATA ALREADY(EDIT DATA) ---- //
+        if (rowPositionAmount != "") {
+            
+            tableAmount.fnUpdate($("#detailFeeAccrualByAmount #feeAccrualByAmountForm #startDate").val(),parseFloat(rowPositionAmount),1);
+            tableAmount.fnUpdate($("#detailFeeAccrualByAmount #feeAccrualByAmountForm #endDate").val(),parseFloat(rowPositionAmount),2);
+            tableAmount.fnUpdate($("#detailFeeAccrualByAmount #feeAccrualByAmountForm #tieringTypeAmount").val(),parseFloat(rowPositionAmount),3);
+            tableAmount.fnUpdate($("#detailFeeAccrualByAmount #feeAccrualByAmountForm #taxRate").val(),parseFloat(rowPositionAmount),5);
+
+            dataAmount.id.rowNumber = $("#detailFeeAccrualByAmount #feeAccrualByAmountForm #detailRowNumberAmount").val();
+            dataAmount.id.feeKey = $("#detailFeeAccrualByAmount #feeAccrualByAmountForm #detailFeeKeyAmount").val();
+            dataAmount.taxMaster.taxCode = $("#detailFeeAccrualByAmount #feeAccrualByAmountForm #taxCode").val();
+            dataAmount.taxMaster.taxKey = $("#detailFeeAccrualByAmount #feeAccrualByAmountForm #taxKey").val();
+            dataAmount.taxMaster.description = $("#detailFeeAccrualByAmount #feeAccrualByAmountForm #taxName").val();
+            dataAmount.startDate = (new Date($("#detailFeeAccrualByAmount  #feeAccrualByAmountForm #startDate").datepicker("getDate"))).getTime();
+            dataAmount.endDate = (new Date($("#detailFeeAccrualByAmount  #feeAccrualByAmountForm #endDate").datepicker("getDate"))).getTime();
+            $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #totalDaysHidden').val(totalDays);
+            $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #amountAfterTaxHidden').val(amountTax);
+            $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #dailyAmountAfterTaxHidden').val(dailyTax);
+            
+            // -- IF DAILY AMOUNT -- //
+            if ($("input[name=radioCalculationBase]")[1].checked == true) {
+                var totalAmount = $('#detailFeeAccrualByAmount #feeAccrualByAmount #dailyAmountHidden').val();
+                $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #totalAmount').val(totalAmount);
+            }
+            
+            // -- IF TOTAL AMOUNT -- //
+            if ($("input[name=radioCalculationBase]")[2].checked == true) {
+                var totalAmount = $('#detailFeeAccrualByAmount #feeAccrualByAmount #totalAmountHidden').val();
+                $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #dailyAmount').val(dailyAmount);
+            }
+            
+            var feeTiersAmount = $('#listFeeTierAmount #gridFeeTierAmount').dataTable();
+            var rows = feeTiersAmount.fnGetData();
+            dataAmount.faFeeTiers.length = rows.length;
+            
+            for (j=0 ; j<rows.length ; j++) {
+                if(dataAmount.faFeeTiers[j] == undefined) {
+                   dataAmount.faFeeTiers[j] = new Object();
+                   dataAmount.faFeeTiers[j].id = new Object();
+                   dataAmount.faFeeTiers[j].id.rowNumber = rows[j].id.rowNumber;
+                   dataAmount.faFeeTiers[j].id.tierSequence = rows[j].id.tierSequence;
+                   dataAmount.faFeeTiers[j].tierMaximumRange = rows[j].tierMaximumRange;
+                   dataAmount.faFeeTiers[j].tierValue = rows[j].tierValue;
+                   dataAmount.faFeeTiers[j].id.feeKey = rows[j].id.feeKey;
+                } else {
+                   dataAmount.faFeeTiers[j].tierValue = rows[j].tierValue;
+                }
+            }
+            
+            // -- IF DAILY AMOUNT -- //
+            if ($("input[name=radioCalculationBase]")[1].checked == true) {
+                tableAmount.fnUpdate($("#detailFeeAccrualByAmount #feeAccrualByAmountForm #dailyAmount").val(),parseFloat(rowPositionAmount), 4);
+            }
+            
+            // -- IF TOTAL AMOUNT -- //
+            if ($("input[name=radioCalculationBase]")[2].checked == true) {
+                tableAmount.fnUpdate($("#detailFeeAccrualByAmount #feeAccrualByAmountForm #totalAmount").val(),parseFloat(rowPositionAmount),4);
+            }
+                
+        } else {
+            
+            // ---- ADD DAILY / TOTAL AMOUNT TO GRID FOR DATA EMPTY (NEW DATA) ---- //
+
+            var feeTiersAmount = $('#listFeeTierAmount #gridFeeTierAmount').dataTable();
+            var rows = feeTiersAmount.fnGetData();
+            
+            var dataAmount = new Object();
+            dataAmount.id = new Object();
+            dataAmount.tieringType = new Object();
+            dataAmount.valueType = new Object();
+            dataAmount.taxMaster = new Object();
+            dataAmount.faFeeMaster = new Object();
+            dataAmount.faFeeTiers = new Array();
+            dataAmount.startDate = new Date();
+            dataAmount.endDate = new Date();
+            dataAmount.faFeeTiers.length = rows.length;
+
+            dataAmount.id.rowNumber = $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #detailRowNumberAmount').val();
+            dataAmount.id.feeKey = $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #detailFeeKeyAmount').val();
+            dataAmount.startDate = (new Date($('#detailFeeAccrualByAmount #feeAccrualByAmountForm #startDate').datepicker("getDate"))).getTime();
+            dataAmount.endDate = (new Date($('#detailFeeAccrualByAmount #feeAccrualByAmountForm #endDate').datepicker("getDate"))).getTime();
+            $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #startDateHidden').val(dataAmount.startDate);
+            $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #endDateHidden').val(dataAmount.endDate);
+            dataAmount.taxMaster.taxCode = $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #taxCode').val();
+            dataAmount.taxMaster.taxKey = $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #taxKey').val();
+            dataAmount.taxMaster.description = $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #taxName').val();
+            dataAmount.taxMaster.taxRate = $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #taxRate').val();
+            $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #totalDaysHidden').val(totalDays);
+            $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #amountAfterTaxHidden').val(amountTax);
+            $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #dailyAmountAfterTaxHidden').val(dailyTax);
+            $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #totalAmountHidden').val(totalAmount);
+            $('#detailFeeAccrualByAmount #feeAccrualByAmountForm #dailyAmountHidden').val(dailyAmount);
+
+            for (j=0 ; j<rows.length ; j++) {
+                dataAmount.faFeeTiers[j] = new Object();
+                dataAmount.faFeeTiers[j].id = new Object();
+                dataAmount.faFeeTiers[j].id.tierSequence = rows[j].id.tierSequence;
+                dataAmount.faFeeTiers[j].tierMaximumRange = rows[j].tierMaximumRange;
+                dataAmount.faFeeTiers[j].tierValue = rows[j].tierValue;
+                dataAmount.faFeeTiers[j].id.feeKey = rows[j].id.feeKey;
+                dataAmount.faFeeTiers[j].id.rowNumber = rows[j].id.rowNumber;
+            }
+
+            tableAmount.fnAddData(dataAmount);
+        }
+        $('#detailFeeAccrualByAmount').dialog('close');
+        return false;
+    
+    });     
+        //---- END EVENT CLICK BUTTON SAVE FOR DAILY / TOTAL AMOUNT DETAIL ----//
+        
+        //===================  END DAILY / TOTAL AMOUNT ================== //
+        
+        
+        // ==== EVENT DELETE ROW FOR FEE DETAIL ==== //
+        $('#listFeeDetail #gridFeeDetail tbody tr #deleteButton[disabled!=true]').live('click', function() {
+            var row = $(this).parents('tr');
+            var rowNumber = tableFeeDetail.fnGetPosition(row[0]);
+            var deleteFeeDetail = function() {
+                tableFeeDetail.fnDeleteRow(rowNumber);
+                $("#dialog-message").dialog("close");
+            }
+            /* $("#dialog-message-1").dialog({
+                autoOpen:false,
+                height:120,
+                width:250,
+                modal:true,
+                resizable : false,
+                buttons: {
+                    "Yes": function() {
+                        tableFeeDetail.fnDeleteRow(rowNumber);
+                        $("#dialog-message-1").dialog("close");
+                    },
+                    "No ": function() {
+                        $("#dialog-message-1").dialog("close");
+                    }   
+                }
+            });
+            $('#dialog-message-1').css('overflow','hidden');
+            $("#dialog-message-1").dialog('open'); */
+            messageAlertYesNo("Are you sure to delete data ?", "ui-icon ui-icon-notice", "Confirmation Message", deleteFeeDetail, closeDialog);
+        }); 
+        // ===================================================//
+        
+        $("#detailFeeAccrualByAmount").dialog({
+            autoOpen: false,
+            modal:true,
+            heigth:'600px',
+            width:'475px',
+            resizable:false
+        });
+
+        $("#detailFeeAccrualByNav").dialog({
+            autoOpen: false,
+            modal:true,
+            heigth:'600px',
+            width:'550px',
+            resizable:false
+        });
+        
+        //*************************** END FEE DETAIL *************************************//        
+
+        
+        //*************************** START FEE TIER *************************************//
+        
+        //===================== (1) START FEE TIER FOR PREVIOUS BY NAV ===================//
+        
+        // ===== FUNCTION FEE TIER FOR PREVIOUS BY NAV ===== //
+        
+        function tabFeeTier(data) {
+            // ===== TABLE FEE TIER FOR PREVIOUS BY NAV ===== //
+            $("#ui-dialog-title-detailFeeTier").text("Detail Fee Accrual");
+            
+            tableFeeTier = $('#gridFeeTier').dataTable({
+                aaData: data.faFeeTiers,
+                aoColumns:[ {
+                               bVisible:false,
+                               mDataProp:"id.tierSequence"
+                            },
+                            {
+                                bVisible:false,
+                                sType : "numeric",
+                                sDefaultContent: "9999999999999999999999999999999999999999999999",
+                                //mDataProp:'tierMaximumRange',
+                                fnRender: function(obj) {
+                                    var controls;
+                                        controls =  obj.aData.tierMaximumRange;
+                                    return controls;
+                                }
+                            },
+                            {
+                                mDataProp:'tierMaximumRange',
+                                sDefaultContent: "MAX"
+                            },
+                            {
+                                mDataProp:'tierValue',
+                                sDefaultContent: "",
+                                // bUseRendered: false,
+                                fnRender: function(obj) {
+                                    var controls;
+                                    controls = obj.aData.tierValue;
+                                    /* if (obj.aData.tierValue == 0) {
+                                        controls = "";      
+                                    } else {
+                                        return controls;
+                                    } */
+                                    return controls;
+                                }
+                            },
+                            {
+                                fnRender: function(obj) {
+                                    if ((obj.aData.tierMaximumRange == null) || (obj.aData.tierMaximumRange == "") || (obj.aData.tierMaximumRange == "MAX")){
+                                        var controls = '<center><input id="deleteButton" type="button" value="Delete" disabled="disabled" /></center>';
+                                        return controls;
+                                    } else {
+                                        var controls = '<center><input id="deleteButton" type="button" value="Delete" #{if readOnly}disabled="disabled"#{/if} /></center>';
+                                        return controls;
+                                    }
+                                }
+                            }
+                        ],
+            aaSorting:[[1,'asc']],
+            bAutoWidth: false,      
+            bDestroy: true,
+            bFilter: false,
+            bInfo: false,
+            bJQueryUI: true,
+            bPaginate: false,
+            bSearch: false,
+            bLengthChange: false,
+            isDisplayLength:10                      
+            }); 
+            
+            // ===== END FEE TIER FOR PREVIOUS BY NAV ===== //
+            
+            // ===== EVENT EDIT FEE TIER FOR PREVIOUS BY NAV ===== //
+            $('#listFeeTier #gridFeeTier').removeAttr('style');
+            $('#listFeeTier #gridFeeTier tbody tr td').die('click');
+            $('#listFeeTier #gridFeeTier tbody tr td').live('click', function(){
+            	$('#errTierMax').html('');
+                $('#errTierVal').html('');
+                $("#tierValueError").html('');
+                var rowPos = $(this).parents('tr');
+                var rowPosNumber = tableFeeTier.fnGetPosition(rowPos[0]);
+                var pos = tableFeeTier.fnGetPosition(this);
+                cell = tableFeeTier.fnGetData(this.parentNode);
+                if (pos[1] != 2) {
+                    dataFeeTier = tableFeeTier.fnGetData(this.parentNode);
+                    if ((dataFeeTier.tierMaximumRange == null) || (dataFeeTier.tierMaximumRange == "") || (cell.tierMaximumRange == "MAX")){
+                        $("#detailFeeTier #feeTierForm #tierMaximumRange").attr("disabled", "disabled");
+                        $("#detailFeeTier #feeTierForm #tierMaximumRange").val(null);
+                    } else {
+                        $("#detailFeeTier #feeTierForm #tierMaximumRange").attr("disabled", false);
+                        #{if (confirming) || (mode=='view') || (approval)}
+                        $("#detailFeeTier #feeTierForm #tierMaximumRange").attr("disabled", "disabled");
+                        #{/if}
+                    }
+                    $("#detailFeeTier #feeTierForm #rowPosition").val(rowPosNumber);
+                    $("#detailFeeTier #feeTierForm #tierSequence").val(dataFeeTier.id.tierSequence);
+                    $("#detailFeeTier #feeTierForm #tierRowNumber").val(dataFeeTier.id.rowNumber);
+                    $("#detailFeeTier #feeTierForm #tierFeeKey").val(dataFeeTier.id.feeKey);
+                    $("#detailFeeTier #feeTierForm #tierMaximumRange").val(((dataFeeTier.tierMaximumRange == null) || (dataFeeTier.tierMaximumRange == "")) ? "MAX" : dataFeeTier.tierMaximumRange);
+                    $("#detailFeeTier #feeTierForm #tierMaximumRangeStripped").val(dataFeeTier.tierMaximumRange);
+                    $("#detailFeeTier #feeTierForm #tierValue").val(dataFeeTier.tierValue);
+                    $("#detailFeeTier #feeTierForm #tierValueStripped").val(dataFeeTier.tierValue);
+                    $("#detailFeeTier #feeTierForm #oldMaxRange").val($("#detailFeeTier #feeTierForm #tierMaximumRangeStripped").val());
+                    $("#detailFeeTier #feeTierForm #newMaxRange").val($("#detailFeeTier #feeTierForm #oldMaxRange").val());
+                    $("#errTierMax").html('');
+                    $("#errTierVal").html('');
+                    $("#tierValueError").html('');
+                    
+                    $("#percent").html('');
+                    if($("#valueType").val() == "CHARGE_VALUE-P"){
+                        $("#percent").html('%');
+                        $("#tierValue").blur(function(){
+                            isPercent();
+                        });
+                    }
+                    
+                    //$("#detailFeeTier").dialog('open');
+                    $("#detailFeeTier").dialog({
+                        autoOpen:true,
+                        height:175,
+                        width:400,
+                        modal:true,
+                        resizable : false
+                    });
+                    $("#detailFeeTier").css('overflow','hidden');
+                
+                }
+            
+            });
+            // ===== END EVENT EDIT FEE TIER FOR PREVIOUS BY NAV ===== //
+        }
+        
+        // ===== END FUNCTION FEE TIER FOR PREVIOUS BY NAV ===== //
+
+        // ===== EVENT DELETE ROW FEE TIER FOR PREVIOUS BY NAV ===== //
+        
+        $('#listFeeTier #gridFeeTier tbody tr #deleteButton[disabled!=true]').live('click', function() {
+            var row = $(this).parents('tr');
+            var rowNumber = tableFeeTier.fnGetPosition(row[0]);
+            var deleteFeeTier = function() {
+                tableFeeTier.fnDeleteRow(rowNumber);
+                var length = tableFeeTier.fnGetData().length;
+                if ((length == 1)&&($('#detailFeeAccrualByNav #feeAccrualByNavForm #tieringType').val()=='CHARGE_CALCULATION-S')){
+                    $("#addFeeAccrualByNav").button("option", "disabled", false);
+                    $("#errGlobal").html("");
+                }
+                $("#dialog-message").dialog("close");
+            }
+            /* $("#dialog-message-1").dialog({
+                autoOpen:false,
+                height:120,
+                width:250,
+                modal:true,
+                resizable : false,
+                buttons: {
+                    "Yes": function() {
+                        tableFeeTier.fnDeleteRow(rowNumber);
+                        var length = tableFeeTier.fnGetData().length;
+                        if ((length == 1)&&($('#detailFeeAccrualByNav #feeAccrualByNavForm #tieringType').val()=='CHARGE_CALCULATION-S')){
+                            $("#addFeeAccrualByNav").button("option", "disabled", false);
+                            $("#errGlobal").html("");
+                        }
+                        $("#dialog-message-1").dialog("close");
+                    },
+                    "No ": function() {
+                        $("#dialog-message-1").dialog("close");
+                    }   
+                }
+            });
+            $('#dialog-message-1').css('overflow','hidden');
+            $("#dialog-message-1").dialog('open'); */
+            messageAlertYesNo("Are you sure to delete data ?", "ui-icon ui-icon-notice", "Confirmation Message", deleteFeeTier, closeDialog);
+        });
+        // --------------------------------------------------------------------------//
+        
+        //----- EVENT BUTTON NEW DATA FOR FEE TIER -----//
+        $('.buttons #newDataFeeTier').click(function() {
+            var table =$('#listFeeTier #gridFeeTier').dataTable();
+            var cells = table.fnGetData(0);
+            $("#errGlobal").html("");
+            if (cells.tierValue == null) {
+                $("#errGlobal").html('Click grid "MAX" and fill "Tier Value" into grid before add New Data !').show();
+                return false;
+            }
+            
+            //if($('#detailFeeTier #feeTierForm #tierValue').val() == ''){
+            //  $('#errGlobal').html('Click grid "MAX" and fill "Tier Value" into grid before add New Data !')
+            //  return false;
+            //}
+            $('#errTierMax').html('');
+            $('#errTierVal').html('');
+            $("#tierValueError").html('');
+            selectedRow = null;
+            //$("#detailFeeTier").dialog('open');
+            $("#detailFeeTier").dialog({
+                        autoOpen:true,
+                        height:175,
+                        width:400,
+                        modal:true,
+                        resizable : false
+            });
+            $("#detailFeeTier").css('overflow','hidden');
+            
+            $("#detailFeeTier :text").val(""); 
+            $("#detailFeeTier :hidden").val("");
+            $("#detailFeeTier #feeTierForm #tierMaximumRange").attr("disabled", false);
+            $("#percent").html('');
+            if($("#valueType").val() == "CHARGE_VALUE-P"){
+                $("#percent").html('%');
+                $("#tierValue").blur(function(){
+                    isPercent();
+                });
+            }
+            
+            
+            return false;
+        });
+        
+        // --------------------------------------------------------------------------//
+        
+        // ===== EVENT CLICK BUTTON SAVE FEE TIER FOR PREVIOUS BY NAV ===== //
+        
+        $('#detailFeeTier #feeTierForm #addFeeTier').die("click");
+        $('#detailFeeTier #feeTierForm #addFeeTier').live("click", function(){
+            var oldMax =  parseFloat($('#detailFeeTier #feeTierForm #oldMaxRange').val());
+            var newMax =  parseFloat($('#detailFeeTier #feeTierForm #newMaxRange').val());
+            var table =$('#listFeeTier #gridFeeTier').dataTable();
+            var rowPosition = $("#detailFeeTier #feeTierForm #rowPosition").val();
+            var maxTier = $("#detailFeeTier #feeTierForm #tierMaximumRange").val();
+            saveFeeTier();
+            
+            function saveFeeTier() {
+                if ((($("#detailFeeTier #feeTierForm #tierMaximumRange").val() == "") && ($("#detailFeeTier #feeTierForm #tierMaximumRange").attr("disabled") != true)) && 
+                        ($("#detailFeeTier #feeTierForm #tierValue").val()=="")){
+                    $('#errTierMax').html("Required");
+                    $('#errTierVal').html("Required");
+                    return false;
+                    
+                } else if (($("#detailFeeTier #feeTierForm #tierMaximumRange").val() == "") && ($("#detailFeeTier #feeTierForm #tierMaximumRange").attr("disabled") != true)) { 
+                    $('#errTierMax').html("Required");
+                    return false;
+                    //alert("Max Range, Tier Value can not be Empty! ")
+                } else if (($("#detailFeeTier #feeTierForm #tierValue").val()=="")){
+                    $('#errTierVal').html("Required");
+                    return false; 
+                } else {
+                    $("#percent").html('');
+                    if($("#valueType").val() == "CHARGE_VALUE-P"){
+                        $("#percent").html('%');
+                        $("#tierValueError").html("");
+                        $("#tierValue").removeClass('fieldError');
+                        var tierValue = parseFloat($("#tierValueStripped").val());
+                        
+                        if (tierValue > 100) {
+                            $("#tierValue").addClass('fieldError');
+                            $("#tierValueError").html("Tier Value Must be less or equal 100").show();
+                            return false;
+                        } 
+                    }
+                    // ---- ADD FEE TIER BY NAV FOR DATA ALREADY (EDIT DATA) ---- //
+                    var dataFeeTiers = table.fnGetData(parseFloat(rowPosition));
+                    // 
+                    if (rowPosition != "") {
+                        var found = false;
+                        
+                        // Checked Duplicate Row
+                        var rows = table.fnGetNodes().length;
+                        for (i=0 ; i< rows; i++) {
+                            var cells = table.fnGetData(i);
+                            if (maxTier != "MAX") {
+                                if ((maxTier.replace(/,/g,"") == cells.tierMaximumRange) && (oldMax != newMax)) {
+                                    //alert("Data Already Exist!");
+                                    $("#tierValueError").html("Data Already Exist!").show();
+                                    found = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (!found){
+                            table.fnUpdate(($("#detailFeeTier #feeTierForm #tierMaximumRange").val()=="MAX")? "MAX" : $("#detailFeeTier #feeTierForm #tierMaximumRangeStripped").val(),parseFloat(rowPosition),2);
+                            table.fnUpdate($("#detailFeeTier #feeTierForm #tierValueStripped").val(), parseFloat(rowPosition),3);
+                            $('#detailFeeTier').dialog('close');
+                            $("#errGlobal").html('');
+                        }
+                    } else {
+                        // ---- ADD FEE TIER BY NAV FOR DATA EMPTY (NEW DATA) ---- //
+                        var found = false;
+                        
+                        // Check Duplicate Row
+                        var rows = table.fnGetNodes().length;
+                        for (i=0 ; i< rows; i++) {
+                            var cells = table.fnGetData(i);
+                            if ((maxTier.replace(/,/g,"") == cells.tierMaximumRange)) {
+                                //alert("Tier maximum range already Exist!");
+                                $("#tierValueError").html("Tier maximum range already Exist!").show();
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            var dataFeeTier = new Object();
+                            dataFeeTier.id = new Object();
+                            dataFeeTier.id.tierSequence = $("#detailFeeTier #feeTierForm #tierSequence").val();
+                            dataFeeTier.tierMaximumRange = $("#detailFeeTier #feeTierForm #tierMaximumRangeStripped").val();
+                            dataFeeTier.tierValue = $("#detailFeeTier #feeTierForm #tierValueStripped").val();
+                            dataFeeTier.id.rowNumber = $("#detailFeeTier #feeTierForm #tierRowNumber").val();
+                            dataFeeTier.id.feeKey = $("#detailFeeTier #feeTierForm #tierFeeKey").val();
+                            table.fnAddData(dataFeeTier);
+                            $('#detailFeeTier').dialog('close');
+                            
+                        }
+                        
+                    }
+                }
+            }
+            return false;
+            
+        });
+        
+        // ===== END EVENT CLICK BUTTON SAVE FEE TIER FOR PREVIOUS BY NAV ===== //
+        //===================== END FEE TIER FOR PREVIOUS BY NAV ===================//
+    
+        //=================== (2) START FEE TIER FOR DAILY / TOTAL AMOUNT ================//
+        
+    
+        //---- START FUNCTION FOR TABLE FEE TIER DAILY / TOTAL AMOUNT ----//
+        
+            function tabTierAmount(data) {
+            tableTierAmount = $('#listFeeTierAmount #gridFeeTierAmount').dataTable({
+                aaData: data.faFeeTiers,
+                aoColumns:[ {
+                               bVisible:false,
+                               mDataProp:"id.tierSequence"
+                            },
+                            {
+                                mDataProp:'tierValue',
+                                bUseRendered: false,
+                            //  sDefaultContent: null
+                                fnRender: function(obj) {
+                                    var controls;
+                                    controls = obj.aData.tierValue;
+                                    controls += '<input type="hidden" name="faFeeTiers[' + obj.iDataRow + '].tierValue" value="' + obj.aData.tierValue + '" />';
+                                    return controls;
+                                }
+                            }
+                        ],
+            aaSorting:[[0,'asc']],
+            bAutoWidth: false,      
+            bDestroy: true,
+            bFilter: false,
+            bInfo: false,
+            bJQueryUI: true,
+            bPaginate: false,
+            bSearch: false,
+            bLengthChange: false
+        //  isDisplayLength:10                      
+            }); 
+
+        }
+            //---- END FUNCTION FOR TABLE FEE TIER DAILY / TOTAL AMOUNT ----//
+            
+        
+        // ===== EVENT ADD DAILY AMOUNT TO TIER VALUE IN FEE TIER ===== //
+            $('#feeAccrualByAmountForm #dailyAmount').blur(function(){
+                $("#detailFeeTierAmount #tierValueAmount").val($('#detailFeeAccrualByAmount #feeAccrualByAmountForm #dailyAmountStripped').val());
+                var table =$('#listFeeTierAmount #gridFeeTierAmount').dataTable();
+                tableTierAmount.fnClearTable();
+                var dataTierAmount = new Object();
+                dataTierAmount.id = new Object();
+                dataTierAmount.id.tierSequence = $("#detailFeeTierAmount #tierSequenceAmount").val();
+                dataTierAmount.tierMaximumRange = $("#detailFeeTierAmount #tierMaximumRangeAmount").val();
+                dataTierAmount.tierValue = $("#detailFeeTierAmount #tierValueAmount").val();
+                dataTierAmount.id.rowNumber = $("#detailFeeTierAmount #tierRowNumberAmount").val();
+                dataTierAmount.id.feeKey = $("#detailFeeTierAmount #tierFeeKeyAmount").val();
+                table.fnAddData(dataTierAmount);
+                calculateDaily();
+            });
+        // ==================================================================//
+        
+        // ===== EVENT ADD TOTAL AMOUNT TO TIER VALUE IN FEE TIER ===== //
+            $('#feeAccrualByAmountForm #totalAmount').blur(function(){
+                $("#detailFeeTierAmount #tierValueAmount").val($('#detailFeeAccrualByAmount #feeAccrualByAmountForm #totalAmountStripped').val());
+                var table =$('#listFeeTierAmount #gridFeeTierAmount').dataTable();
+                tableTierAmount.fnClearTable();
+                var dataTierAmount = new Object();
+                dataTierAmount.id = new Object();
+                dataTierAmount.id.tierSequence = $("#detailFeeTierAmount #tierSequenceAmount").val();
+                dataTierAmount.tierMaximumRange = $("#detailFeeTierAmount #tierMaximumRangeAmount").val();
+                dataTierAmount.tierValue = $("#detailFeeTierAmount #tierValueAmount").val();
+                dataTierAmount.id.rowNumber = $("#detailFeeTierAmount #tierRowNumberAmount").val();
+                dataTierAmount.id.feeKey = $("#detailFeeTierAmount #tierFeeKeyAmount").val();
+                table.fnAddData(dataTierAmount);
+                calculateTotal();
+            });
+        // ==================================================================//
+        
+        //===================== END FEE TIER FOR DAILY / TOTAL AMOUNT ===================//
+        
+        //*************************** END FEE DETAIL *************************************//    
+        
+        //====== ALL PROCESS IN MAIN FORM (feeMasterForm) ======//  
+        
+    //  $('.errorFee').hide();
+        
+        
+        $("#fundCode").dynapopup('PICK_FA_MASTER', '', "feeCode", function(data){
+        	if (data) {
+            	$('#fundCode').removeClass('fieldError');
+                $('#fundCodeKey').val(data.code);
+                $('#fundCodeDesc').val(data.description);
+                $('#h_fundCodeDesc').val(data.description);
+        	}
+        });
+
+        $("#accrualTransCode").dynapopup2({key:'accrualTransKey', help:'accrualTransHelp', desc:'accrualTransDesc'}, 'PICK_FA_TRX_MASTER', '', "coaPayableCode", function(data){
+        	if (data) {
+        		$('#accrualTransCode').removeClass('fieldError');
+                $('#accrualTransKey').val(data.code);
+                $('#accrualTransDesc').val(data.description);
+                $('#h_accrualTransDesc').val(data.description);
+        	}
+        });
+        
+        $("#paymentTransCode").dynapopup2({key:'paymentTransKey', help:'paymentTransHelp', desc:'paymentTransDesc'}, 'PICK_FA_TRX_MASTER', '', "coaPayableCode", function(data){
+        	if (data) {
+        		$('#paymentTransCode').removeClass('fieldError');
+                $('#paymentTransKey').val(data.code);
+                $('#paymentTransDesc').val(data.description);
+                $('#h_paymentTransDesc').val(data.description);
+        	}
+        });
+        
+        $('#paymentTransCode').lookup({
+            list:'@{Pick.faTransactionMasters()}',
+            get: {
+                url:'@{Pick.faTransactionMaster()}',
+                success: function(data){
+                    if (data) {
+                        $('#paymentTransCode').removeClass('fieldError');
+                        $('#paymentTransKey').val(data.code);
+                        $('#paymentTransDesc').val(data.description);
+                        $('#h_paymentTransDesc').val(data.description);
+                    }
+                },
+                error: function(data){
+                    $('#paymentTransCode').addClass('fieldError');
+                    $('#paymentTransCode').val('');
+                    $('#paymentTransKey').val('');
+                    $('#paymentTransDesc').val('NOT FOUND');
+                    $('#h_paymentTransDesc').val('');
+                }
+            },
+            description:$('#paymentTransDesc'),
+            help:$('#paymentTransHelp')
+        });
+        
+        $('#paymentTransCode').change(function(){
+            if($("#paymentTransCode").val()==''){
+                $('#paymentTransKey').val('');
+                $('#paymentTransCodeHidden').val('');
+            }
+        });
+        
+        // --- FIELDSET CALCULATION BASE -- //
+        
+        //default radio for previous NAV
+        if (('${confirming}'!='true')&&('${mode}'=='entry')){
+            $("input[name=isActive]")[1].checked = true;
+            $("#isActiveHidden").val(false);
+            $("input[name=publishedNav]").attr("checked", false);
+            
+            if($("input[name=radioCalculationBase]")[0].checked = true ) {
+                //$("#radioByPreviousNAV").val("FA_CALCULATION_BASE-1");
+                $("#radioByPreviousNAV").val($("#previousAccrual").val());
+                $("#accrualBaseDaily").attr('disabled', 'disabled');
+                $("#accrualBaseTotal").attr('disabled', 'disabled');
+            }
+        }
+    
+        $("input[name='isActive']").click(function(){
+            if ($("input[name=isActive]")[0].checked == true){
+                $("#isActiveHidden").val(true);
+            } else {
+                $("#isActiveHidden").val(false);
+            }
+        });
+            
+        $("input[name=publishedNav]").change(function(){
+            if ($("input[name=publishedNav]").is(":checked")){
+                $("#isChecked").val(true);
+            } else {
+                $("#isChecked").val(false);
+            }
+        });
+
+        $("#radioByPreviousNAV").click(function(){  
+            $("input[name=radioCalculationBase]")[0].checked == true;
+              //$("#radioByPreviousNAV").val("FA_CALCULATION_BASE-1");
+              $("#radioByPreviousNAV").val($("#previousAccrual").val());
+              $("#yearBase").attr('disabled', false);
+              $("#isChecked").attr('disabled', false);
+              $("#accrualBaseDaily").attr('disabled', 'disabled');
+              $("#accrualBaseDaily").val("");
+              $("#accrualBaseTotal").attr('disabled', 'disabled');
+              $("#accrualBaseTotal").val("");
+              $("input[name=publishedNav]").attr("checked", true);
+              
+              $('#coaCode').attr('disabled', false);
+  			$('#unitPrice').attr('disabled', false);
+  			$('#previousAccrual').attr('disabled', false);
+              tableFeeDetail.fnClearTable();
+         });
+        
+        
+        $("#previousAccrual").change(function(){
+        	$("input[name=radioCalculationBase]")[0].checked = true;
+        	$("#radioByPreviousNAV").val($("#previousAccrual").val());
+        	$("#previousNAVHidden").val($("#previousAccrual").val());
+        	$('#calculationBaseHidden').val($("#previousAccrual").val());
+        	$("#yearBase").attr('disabled', false);
+        	if (($('#calculationBaseHidden').val() == "FA_CALCULATION_BASE-1") || ($('#calculationBaseHidden').val() == "")){
+        		$('#uPrice').hide();
+    			$('#cNo').hide();
+           	 	$('#unitPriceError').html('');
+        	 	$('#coaCodeError').html('');
+    			
+        		$("#unitPrice").attr('disabled', 'disabled');
+        		$("#coaCode").attr('disabled', 'disabled');
+        		$("#coaHelp").attr('disabled', 'disabled');
+        		$("#unitPrice").val("").blur();
+        		
+        	}
+        	if ($('#calculationBaseHidden').val() == "FA_CALCULATION_BASE-4"){
+        		$("#unitPrice").attr('disabled', false);
+        		$('#cNo').hide();
+        		$('#uPrice').show();
+        		$('#unitPriceError').html('');
+        	 	$('#coaCodeError').html('');
+    			$("span[id*='unitPrice']").html("");
+        		$('#coaCode').val('').blur();
+    			$('#coaCode').removeClass('fieldError');
+        		$("#coaCode").attr('disabled', 'disabled');
+        		$("#coaHelp").attr('disabled', 'disabled');
+        	}
+        	if ($('#calculationBaseHidden').val() == "FA_CALCULATION_BASE-5"){
+        		$('#cNo').show();
+        		$('#uPrice').hide();
+        		$('#unitPriceError').html('');
+        	 	$('#coaCodeError').html('');
+        		$("#unitPrice").val("").blur();
+        		$("#unitPrice").attr('disabled', 'disabled');
+        		$("#coaCode").attr('disabled', false);
+        		$("#coaHelp").attr('disabled', false);
+        	}
+        });
+        
+        $("#radioByDailyAmount").click(function(){
+                $("input[name=radioCalculationBase]")[1].checked == true;
+                $('#radioByDailyAmount').val("FA_CALCULATION_BASE-2");
+                $("#accrualBaseDaily").attr('disabled', false);
+                $("#accrualBaseTotal").attr('disabled', 'disabled');
+                $("#accrualBaseTotal").val("");
+                $("#yearBase").attr('disabled', 'disabled');
+                $("#yearBase").val("");
+                $("#isChecked").attr('disabled', 'disabled');
+                $("input[name=publishedNav]").attr("checked", false);
+                
+                $("#accrualBaseDaily").val("ACCRUAL_BASE-ACT");
+                $("#accrualBaseDailyHidden").val("ACCRUAL_BASE-ACT");
+                $("#previousAccrual").val("");
+                $("#unitPrice").val("").blur();
+    			$('#coaCode').val('').blur();
+    			$('#coaCode').removeClass('fieldError');
+    			$('#coaCode').attr('disabled', 'disabled');
+    			$('#unitPrice').attr('disabled', 'disabled');
+    			$('#previousAccrual').attr('disabled', 'disabled');
+                tableFeeDetail.fnClearTable();
+            });
+
+        $("#radioByTotalAmount").click(function(){
+                $("input[name=radioCalculationBase]")[2].checked == true;
+                $("#radioByTotalAmount").val("FA_CALCULATION_BASE-3");
+                $("#accrualBaseTotal").attr('disabled', false);
+                $("#accrualBaseDaily").attr('disabled', 'disabled');
+                $("#accrualBaseDaily").val("");
+                $("#yearBase").attr('disabled', 'disabled');
+                $("#yearBase").val("");
+                $("#isChecked").attr('disabled', 'disabled');
+                $("input[name=publishedNav]").attr("checked", false);
+                // edit rizki
+                $("#accrualBaseTotal").val("ACCRUAL_BASE-ACT");
+                $("#accrualBaseTotalHidden").val("ACCRUAL_BASE-ACT");
+                
+                
+                $("#previousAccrual").val("");
+                $("#unitPrice").val("").blur();
+    			$('#coaCode').val('').blur();
+    			$('#coaCode').removeClass('fieldError');
+    			$('#coaCode').attr('disabled', 'disabled');
+    			$('#unitPrice').attr('disabled', 'disabled');
+    			$('#previousAccrual').attr('disabled', 'disabled');
+    			
+                tableFeeDetail.fnClearTable();
+            });
+    
+    
+        
+        // ==== EVENT BUTTON SAVE ==== //
+        
+        $('#coaCode').dynapopup2({key:'coaMasterKey', help:'coaHelp', desc:'coaDescription'},'PICK_FA_COA_BOTTOM_LEVEL_AND_PARENT', '', 'position', function(data){
+			if (data) {
+				$('#coaCode').removeClass('fieldError');
+				$('#coaMasterKey').val(data.code);
+				$('#coaDescription').val(data.description);
+				$('#h_coaDescription').val(data.description);
+			}
+		},function(data){
+			$('#coaCode').addClass('fieldError');
+			$('#coaMasterKey').val('');
+			$('#coaCode').val('');
+			$('#coaDescription').val('NOT FOUND');
+			$('#h_coaDescription').val('');
+		});
+        
+        $('#save').click(function() {
+            //-- validation Main Form --//
+            var fundCode = $("#fundCode").val();
+            var feeCode = $("#feeCode").val();
+            var feeName = $("#feeName").val();
+            var accrualTrans = $("#accrualTransCode").val();
+         
+            if ($('#radioByPreviousNAV').is(":checked")){
+            	if($('#previousAccrual').val() == ""){
+            		$('#previousAccrualError').html('Required');
+                	return false;
+                }else{
+                	$('#previousAccrualError').html('');	
+            	}
+            }
+            
+            if ((fundCode == "")||(feeCode == "")||(feeName == "")||(accrualTrans == "")||(($("#yearBase").val() == "")&&($("#yearBase").attr("disabled") != true))||
+                    (($("#accrualBaseDaily").val() == "")&&($("#accrualBaseDaily").attr("disabled") != true))||(($("#accrualBaseTotal").val() == "")&&($("#accrualBaseTotal").attr("disabled") != true))){
+                if (fundCode == ""){
+                    $("#fundCode").focus();
+                    $('#fundCode_error').html('Required');
+                } else {
+                    $('#fundCode_error').html('');
+                }
+                
+                if (feeName == ""){
+                    $("#feeName").focus();
+                    $('#feeName_error').html('Required');
+                } else {
+                    $('#feeName_error').html('');
+                }
+                
+                if (feeCode == "") {
+                    $("#feeCode").focus();
+                    $('#feeCode_error').html('Required');
+                } else {
+                    $('#feeCode_error').html('');
+                }
+                
+                if(accrualTrans == ""){
+                    $("#accrualTransCode").focus();
+                    $('#accrualTrans_error').html('Required');
+                } else {
+                    $('#accrualTrans_error').html('');
+                }
+                
+                if ($("input[name='radioCalculationBase']")[0].checked == true){
+                    if (($("#yearBase").val() == "")&&($("#yearBase").attr("disabled") != true)) {
+                        $('#yearBase_error').html('Required');
+                    } else {
+                        $('#yearBase_error').html('');
+                    }
+                }
+                
+                if ($("input[name='radioCalculationBase']")[1].checked == true){
+                    if (($("#accrualBaseDaily").val() == "")&&($("#accrualBaseDaily").attr("disabled") != true)) {
+                        $('#accrualBaseDaily_error').html('Required');
+                    } else {
+                        $('#accrualBaseDaily_error').html('');
+                    }
+                }
+                if ($("input[name='radioCalculationBase']")[2].checked == true){
+                    if (($("#accrualBaseTotal").val() == "")&&($("#accrualBaseTotal").attr("disabled") != true)){
+                        $('#accrualBaseTotal_error').html('Required');
+                    } else {
+                        $('#accrualBaseTotal_error').html('');
+                    }
+                }
+                
+                return false;
+            }
+            
+            if ($('#previousAccrual').val() == "FA_CALCULATION_BASE-4"){
+            	if (($("#unitPrice").val() == "")||(!$("#unitPrice").attr("disabled", "disabled"))) {
+                    $('#unitPriceError').html('Required');
+                    $('#coaCodeError').html('');
+                    return false;
+                } else {
+                    $('#unitPriceError').html('');
+                }
+        	}
+            
+        	if ($('#previousAccrual').val() == "FA_CALCULATION_BASE-5"){
+        		if (($("#coaCode").val() == "")||(!$("#coaCode").attr("disabled", "disabled"))) {
+                    $('#coaCodeError').html('Required');
+                    $('#unitPriceError').html('');
+                    return false;
+                } else {
+                    $('#coaCodeError').html('');
+                }
+        	}
+            
+            var faFeeMaster = new Object();
+            faFeeMaster.faMaster = new Object();
+            faFeeMaster.accrualTransaction = new Object();
+            faFeeMaster.paymentTransaction = new Object();
+            faFeeMaster.faCalculationBase = new Object();
+            faFeeMaster.accrualBase = new Object();
+            faFeeMaster.yearBase = new Object();
+
+            faFeeMaster.faMaster.fundKey = $('#feeMasterForm #fundCodeKey').val();
+            faFeeMaster.faMaster.fundCode = $('#feeMasterForm #fundCode').val();
+            faFeeMaster.faMaster.fundDescription = $('#feeMasterForm #fundCodeDesc').val();
+            faFeeMaster.feeKey = $('#feeMasterForm #feeKey').val();
+            faFeeMaster.feeCode = $('#feeMasterForm #feeCode').val();
+            faFeeMaster.description = $('#feeMasterForm #feeName').val();
+            faFeeMaster.accrualTransaction.transactionMasterKey = $('#feeMasterForm #accrualTransKey').val();
+            faFeeMaster.accrualTransaction.transactionCode = $('#feeMasterForm #accrualTransCode').val();
+            faFeeMaster.accrualTransaction.transactionDescription = $('#feeMasterForm #accrualTransDesc').val();
+            faFeeMaster.paymentTransaction.transactionMasterKey = $('#feeMasterForm #paymentTransKey').val();
+            faFeeMaster.paymentTransaction.transactionCode = $('#feeMasterForm #paymentTransCode').val();
+            faFeeMaster.paymentTransaction.transactionDescription = $('#feeMasterForm #paymentTransDesc').val();
+            
+            faFeeMaster.faCoaMaster = new Object();
+            faFeeMaster.faCoaMaster.coaCode =  $('#coaCode').val();
+            faFeeMaster.faCoaMaster.coaMasterKey =  $('#coaMasterKey').val();
+            faFeeMaster.faCoaMaster.description =  $('#coaDescription').val();
+            
+            faFeeMaster.unitPrice =  $('#unitPriceStripped').val();
+            
+            $('#status').val('${status}');
+            faFeeMaster.recordStatus = $('#feeMasterForm #status').val();
+            //if ($("input[name='isActive']")[0].checked == true){
+                faFeeMaster.isActive = $('#feeMasterForm #isActiveHidden').val();
+            //} else {
+            //  faFeeMaster.isActive = $('#feeMasterForm #isActiveHidden').val();
+            //}
+            if ($("input[name='radioCalculationBase']")[0].checked == true){
+                faFeeMaster.faCalculationBase.lookupId = $('#feeMasterForm #radioByPreviousNAV').val();
+                faFeeMaster.publishedNav = $('#feeMasterForm #isChecked').val();
+                faFeeMaster.yearBase.lookupId = $('#feeMasterForm #yearBase').val();
+
+            } else if ($("input[name='radioCalculationBase']")[1].checked == true){
+                faFeeMaster.faCalculationBase.lookupId = $('#feeMasterForm #radioByDailyAmount').val();
+                faFeeMaster.accrualBase.lookupId = $('#feeMasterForm #accrualBaseDaily').val();
+                var accrualBaseDaily = $("#accrualBaseDaily").val();
+
+            } else {
+                faFeeMaster.faCalculationBase.lookupId = $('#feeMasterForm #radioByTotalAmount').val();
+                faFeeMaster.accrualBase.lookupId = $('#feeMasterForm #accrualBaseTotal').val();
+            }
+            faFeeMaster.faFeeDetails = $('#gridFeeDetail').dataTable().fnGetData();
+            
+            loadingDialog();
+            
+            $.ajax({
+                    type: 'POST',
+                    url: '@{FeeAccruals.save()}?id='+$('#feeKey').val(),
+                    data: JSON.stringify(faFeeMaster),
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    success: function() {
+                        location.href='@{FeeAccruals.confirming()}/'+$('#feeKey').val()+'?mode=${mode}';
+                    }
+                    //return false;
+            });
+            return false;
+        });
+        
+        // ====== END SAVE =====//
+        
+        // ====== EVENT BUTTON CONFIRM =======//
+        $('#confirm').click(function() {
+            loadingDialog();
+            $.ajax({
+                  url: '@{FeeAccruals.confirm()}?id='+$('#feeKey').val(),
+                    success: function(data) {
+                    checkRedirect(data);
+                    if(data == "error") {
+                        location.href='@{FeeAccruals.confirming()}/'+$('#feeKey').val()+'?mode=${mode}';
+                    } else {
+                        location.href='@{FeeAccruals.list()}';
+                    }
+                    return data;    
+                 }
+            });
+            
+        /*
+            //loadingDialog();
+            
+            var request = $.ajax({
+                url: '@{FeeAccruals.confirm()}/'+$('#feeKey').val(),
+            //  success: function() {
+            //      location.href='@{FeeAccruals.list()}';
+            //  }
+            });
+            console.debug(request);
+            console.debug(request.responseText);
+            request.onreadystatechange = function(){
+                if((request.readyState == 4) && (request.status == 200)){
+                    if(request.responseText == "error") {
+                        //location.href='@{FeeAccruals.back()}/'+$('#feeKey').val()+'?mode=edit'+'?status=${status}';
+                        location.href='@{FeeAccruals.confirming()}/'+$('#feeKey').val()+'?mode=${mode}';
+                } else {
+                        location.href='@{FeeAccruals.list()}';
+                    }
+                }
+            }
+            return false;
+        */
+            return false;
+        });
+        
+        //======== END CONFIRM =======//
+        
+        // ====== EVENT BUTTON CANCEL =======//
+        $('#cancel').click(function() {
+            location.href='@{FeeAccruals.list()}';
+            return false;
+        });
+    
+        // ====== EVENT BUTTON BACK =======//
+        $('#back').click(function() {
+            location.href='@{FeeAccruals.back()}/'+$('#feeKey').val()+'?mode=edit';
+            return false;
+        });
+        
+        
+        function loadingDialog(){
+            var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Sending data to server ...</div>').appendTo('body');
+            loading.dialog({
+                closeOnEscape: false,
+                draggable: false,
+                modal: true,
+                resizable: false,
+                open:function() {
+                    $(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+                } 
+            });
+        }
+        
+        $("input[id*='startDate']").change(function() {
+            if(this.value != ""){
+                //alert($("#oldStartDateAmount").val());
+                var type="";
+                var oldStartDate = $("#oldStartDateAmount").val();
+                //var row =  $("#rowPositionAmount").val();
+                if (this.id == "startDateNav") {
+                    //row = $("#rowPosition").val();
+                    oldStartDate = $("#oldStartDate").val();
+                    type = "Nav"
+                }
+                var value = $(this).datepicker('getDate');
+                validateStartEndDate(value,"start", type, oldStartDate);
+            }
+            
+            var id = this.id;
+            var thisId = "#" + id;
+            var errorId = "#" + id + "Error";
+            var compare1 = "#startDate"+type ;
+            var compare2 =  "#endDate"+type;
+            var compare3 = "";
+            var compare1Format = new Date($(compare1).datepicker('getDate')).getTime();
+            var compare2Format = new Date($(compare2).datepicker('getDate')).getTime();
+            var compare3Format = new Date($(compare3).datepicker('getDate')).getTime();
+            var conditionMessageError = "Invalid date format";
+            var errorMsg = "Date To must greather than Date From";
+            validateCompare(thisId, errorId, compare1, compare2, compare3, errorMsg, compare1Format, compare2Format, compare3Format, conditionMessageError);
+
+            var startDateLong = (new Date($('#startDate'+type).datepicker("getDate"))).getTime();
+            $('#startDat'+type+'Hidden').val(startDateLong);
+            
+            if (type != 'Nav') {
+                var endDateLong = (new Date($('#endDate').datepicker("getDate"))).getTime();
+                $('#endDateHidden').val(endDateLong);
+                if($('#feeAccrualByAmountForm #startDate').val() && $('#feeAccrualByAmountForm #endDate').val()){
+                    calculateTotalDay();
+                    if ($("input[name=radioCalculationBase]")[1].checked == true) {
+                        calculateDaily();
+                    }
+                    if ($("input[name=radioCalculationBase]")[2].checked == true) {
+                        calculateTotal();
+                    }
+                }
+            }
+        });
+
+        $("input[id*='endDate']").change(function() {
+            var row = $("#rowPosition").val();
+            if(this.value != ""){
+                var type="";
+                var oldStartDate = $("#oldStartDateAmount").val();
+                //var row =  $("#rowPositionAmount").val();
+                if (this.id == "endDateNav") {
+                    type = "Nav";
+                    oldStartDate = $("#oldStartDate").val();
+                    //row = $("#rowPosition").val();
+                }
+                //if ($("#startDate"+type+"Error").html() != "Invalid date format") {
+                if (!$("#startDate"+type+"Error").hasClass('fieldError')){
+                    var value = $(this).datepicker('getDate');
+                    validateStartEndDate(value,"end", type, oldStartDate);
+                } else {
+                    $('#endDate'+type).val("");
+                    $("input[id*='endDate']").removeClass('fieldError');
+                    $("span[id*='endDate']").html("");
+                }
+                
+                
+                var id = this.id;
+                var thisId = "#" + id;
+                var errorId = "#" + id + "Error";
+                var compare1 = "#startDate"+type ;
+                var compare2 =  "#endDate"+type;
+                var compare3 = "";
+                var compare1Format = new Date($(compare1).datepicker('getDate')).getTime();
+                var compare2Format = new Date($(compare2).datepicker('getDate')).getTime();
+                var compare3Format = new Date($(compare3).datepicker('getDate')).getTime();
+                var conditionMessageError = "Invalid date format";
+                var errorMsg = "Date To must greather than Date From";
+                validateCompare(thisId, errorId, compare1, compare2, compare3, errorMsg, compare1Format, compare2Format, compare3Format, conditionMessageError);
+                
+                var endDateLong = (new Date($('#endDate'+type).datepicker("getDate"))).getTime();
+                $('#endDate'+type+'Hidden').val(endDateLong);
+                
+                if (type != 'Nav') {
+                    var endDateLong = (new Date($('#endDate').datepicker("getDate"))).getTime();
+                    $('#endDateHidden').val(endDateLong);
+                    if($('#feeAccrualByAmountForm #startDate').val() && $('#feeAccrualByAmountForm #endDate').val()){
+                        calculateTotalDay();
+                        if ($("input[name=radioCalculationBase]")[1].checked == true) {
+                            calculateDaily();
+                        }
+                        if ($("input[name=radioCalculationBase]")[2].checked == true) {
+                            calculateTotal();
+                        }
+                    }
+                }
+            }
+        });
+    });
+    
+    
+    //=========================== END PROCESS IN MAIN FORM (feeMasterForm)===========================//
+    
+    function isPercent() {
+        $("#tierValueError").html("");
+        $("#tierValue").removeClass('fieldError');
+        var tierValue = parseFloat($("#tierValueStripped").val());
+        
+        if (tierValue > 100) {
+            $("#tierValue").addClass('fieldError');
+            $("#tierValueError").html("Tier Value Must be less or equal 100").show();
+        } 
+    }
+    
+    
+    function validateStartEndDate(date, command, type, oldStartDate) {
+        var tableFeeAcrualDetail = $('#gridFeeDetail').dataTable();
+        var length = tableFeeAcrualDetail.fnGetNodes().length;
+        var startDateArr = new Array();
+        var endDateArr = new Array();
+        var selectDate = new Date(date).getTime();
+        
+        for (var i=0; i<length; i++) {
+            var cell = tableFeeAcrualDetail.fnGetData(i);
+            //if (oldStartDate != "") {
+                if (oldStartDate != cell.startDate) {
+                    startDateArr[i] = cell.startDate;
+                    endDateArr[i] = cell.endDate;
+            //  }
+            }
+        }
+        
+        startDateArr.sort();
+        endDateArr.sort();
+        if (length != 0) {
+            //console.debug("min start date :"+new Date(startDateArr[0]));
+            if(command == 'start'){
+                $("#endDate"+type+"Error").html("");
+                for(var i=0; i< length;i++){
+                    if ((selectDate >= startDateArr[i]) && (selectDate <= endDateArr[i])) {
+                        $('#startDate'+type).addClass('fieldError');
+                        $("#endDate"+type+"Error").html("'Effective Date *' (From) has been exist");
+                        break;
+                    }
+                    if($("#endDate"+type).val() != ""){
+                        var endDateNew = new Date($("#endDate"+type).datepicker('getDate')).getTime();
+                        //for (var i=0; i<length; i++) {
+                            if (selectDate < startDateArr[i]) {
+                                if (endDateNew >= startDateArr[i]) {
+                                    $('#endDate'+type).val("");
+                                    break;
+                                } 
+                            }
+                        //}
+                    }
+                }
+            }
+            
+            
+            if(command == 'end') {
+                if ($("#startDate"+type).val() != "") {
+                    var newStartDate = new Date($('#startDate'+type).datepicker('getDate')).getTime();
+                    for(var i=0; i<length; i++){
+                        
+                        if ((newStartDate >= startDateArr[i]) && (newStartDate <= endDateArr[i])) {
+                            $('#startDate'+type).addClass('fieldError');
+                            $("#endDate"+type+"Error").html("'Effective Date *' (From) has been exist");
+                            $('#endDate'+type).val("");
+                            break;
+                        }
+                        
+                        if ((selectDate >= startDateArr[i]) && (selectDate <= endDateArr[i])) {
+                            $('#endDate'+type).addClass('fieldError');
+                            $("#endDate"+type+"Error").html("'Effective Date *' (To) has been exist");
+                            break;
+                        }
+                        
+                        if (newStartDate < startDateArr[i]) {
+                            if (selectDate >= startDateArr[i]) {
+                                //if(selectDate > endDateArr[i]){
+                                //  $('#endDate'+type).val("");
+                                //} else {
+                                    $('#endDate'+type).addClass('fieldError');
+                                    $("#endDate"+type+"Error").html("'Effective Date *' (To) has been exist");
+                                //}
+                                break;
+                            } 
+                        }
+                    }
+                } else {
+                    $('#endDate'+type).val("");
+                }
+                
+            }
+            
+        }   
+    }
+    
+    // Function to get the Maximam value in Array
+    Array.max = function( array ){
+    return Math.max.apply( Math, array );
+    };
+
+    // Function to get the Minimam value in Array
+    Array.min = function( array ){
+    return Math.min.apply( Math, array );
+    };
+    
+</script>
+<style type="text/css">
+  .errorFee { color:red; }
+</style>
+<h2>Accrual Setup</h2>
+#{if flash.error || errors}
+    <div class="error">
+        Error when saving data!<br/>
+        <li>${flash.error}</li>
+        #{ifErrors}
+            #{errors}
+                 <li>${error.key} ${error}</li>
+            #{/errors}
+        #{/ifErrors}
+    </div>
+#{/if}
+
+<form></form>
+<form id="feeMasterForm" class="form">
+
+
+<p>
+    #{hidden id:'dataAll' /}
+    #{hidden id:'calculationBaseHidden' /}
+    #{hidden id:'feeKey', name:'faFeeMaster.feeKey', value:faFeeMaster?.feeKey /}
+    #{hidden id:'status', name:'faFeeMaster.recordStatus', value:faFeeMaster?.recordStatus /}
+</p>
+<p>         
+    #{textBox id:'fundCode', name:'fundCode', label:'Fund Code', value:faFeeMaster?.faMaster?.fundCode, class:'capitalize', required:true, readOnly:readOnly, width:'123px', maxLength:50 /}
+    #{hidden id:'fundCodeHidden', name:'faFeeMaster.faMaster.fundCode', value:faFeeMaster?.faMaster?.fundCode /}
+    #{hidden id:'fundCodeKey', name:'faFeeMaster.faMaster.fundKey', value:faFeeMaster?.faMaster?.fundKey /}
+    #{button id:'fundCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+    #{textBox id:'fundCodeDesc', name:'fundDescription' , value:faFeeMaster?.faMaster?.fundDescription, class:'capitalize', required:true, readOnly:true, width:'250px' /}
+    #{hidden id:'fundCodeDescHidden', name:'faFeeMaster.faMaster.fundDescription', value:faFeeMaster?.faMaster?.fundDescription /}
+    <span class="error">#{error 'Fund Code is' /}</span> 
+    <span class="errorFee" id="fundCode_error"></span>
+</p>
+<p>
+    #{textBox id:'feeCode', name:'feeCode', label:'Accrual Code', value:faFeeMaster?.feeCode, class:'capitalize', required:true, readOnly:readOnly, width:'123px', maxLength:50 /}
+    #{hidden id:'feeCodeHidden', name:'faFeeMaster.feeCode', value:faFeeMaster?.feeCode /}
+    <span class="errorFee" id="feeCode_error"></span>
+</p>
+<p>
+    #{textBox id:'feeName', name:'feeName', label:'Accrual Name', value:faFeeMaster?.description, class:'capitalize', required:true, readOnly:readOnly, width:'400px',maxLength:100 /}
+    #{hidden id:'feeNameHidden', name:'faFeeMaster.description', value:faFeeMaster?.description /}
+    <span class="errorFee" id="feeName_error"></span>
+</p>
+<p>
+    <label>Active</label>
+    <input type="radio" id="activeYes" name='isActive' value='faFeeMaster.isActive' />
+    Yes
+    <input type="radio" id="activeNo" name='isActive' value='faFeeMaster.isActive' />
+    No
+    #{hidden id:'isActiveHidden', name:'faFeeMaster.isActive', value:faFeeMaster?.isActive /}
+</p>
+<br />
+<fieldset id="postingRules" style="width:550">
+    <legend>Transaction Template</legend>
+    <p> 
+        #{textBox id:'accrualTransCode', name:'accrualTransCode', value:faFeeMaster?.accrualTransaction?.transactionCode, label:'Accrual Transaction', class:'capitalize', required:true, readOnly:readOnly, width:'100px', maxLength:50 /}
+        #{hidden id:'accrualTransCodeHidden', name:'faFeeMaster.accrualTransaction.transactionCode', value:faFeeMaster?.accrualTransaction?.transactionCode /}
+        #{hidden id:'accrualTransKey', name:'faFeeMaster.accrualTransaction.transactionMasterKey', value:faFeeMaster?.accrualTransaction?.transactionMasterKey /}
+        #{button id:'accrualTransHelp', value:'?', class:'small', readOnly:readOnly /}
+        #{textBox id:'accrualTransDesc', name:'accrualTransDesc' , value:faFeeMaster?.accrualTransaction?.transactionDescription, class:'capitalize', required:true, readOnly:true, width:'250px' /}
+        #{hidden id:'accrualTransDescHidden', name:'faFeeMaster.accrualTransaction.transactionDescription', value:faFeeMaster?.accrualTransaction?.transactionDescription /}
+        <span class="errorFee" id="accrualTrans_error"></span>
+    </p>
+    <p>
+        #{hidden id:'paymentTransCode', name:'paymentTransCode', value:faFeeMaster?.paymentTransaction?.transactionCode, label:'Payment Transaction', class:'capitalize', readOnly:readOnly, width:'100px' , maxLength:50/}
+        #{hidden id:'paymentTransCodeHidden', name:'faFeeMaster.paymentTransaction.transactionCode', value:faFeeMaster?.paymentTransaction?.transactionCode /}
+        #{hidden id:'paymentTransKey', name:'faFeeMaster.paymentTransaction.transactionMasterKey', value:faFeeMaster?.paymentTransaction?.transactionMasterKey /}
+        #{hidden id:'paymentTransHelp', value:'?', class:'small', readOnly:readOnly /}
+        #{hidden id:'paymentTransDesc', name:'paymentTransDesc' , value:faFeeMaster?.paymentTransaction?.transactionDescription, class:'capitalize', required:true, readOnly:true, width:'250px' /}
+        #{hidden id:'paymentTransHidden', name:'faFeeMaster.paymentTransaction.transactionDescription', value:faFeeMaster?.paymentTransaction?.transactionDescription /}
+        <span class="errorFee" id="paymentTrans_error"></span>
+    </p>
+</fieldset>
+<br />
+
+<fieldset id="calculationBasedOn" >
+    <legend>Calculation Based On</legend>
+    <table>
+        <tr>
+            <td valign="top">
+				<table width="100%" >
+					<tr>
+						<td><b>Accrual Base On</b></td>
+						<td>
+							<input type='radio' id='radioByPreviousNAV' name='radioCalculationBase' value='faFeeMaster.faCalculationBase.lookupId' />
+			                <input type="hidden" id='previousNAVHidden' name='faFeeMaster.faCalculationBase.lookupId' value='faFeeMaster.faCalculationBase.lookupId' />
+			                 #{dropDownList id:'previousAccrual', name:'previousAccrual', readOnly:readOnly, options:previousAccrual /}
+			                 <span id="previousAccrualError" class="error"></span>
+						</td>
+					</tr>
+					<tr>	
+						<td>
+							Unit Price <span style="color:red" id="uPrice">*</span>
+						</td>	
+		                <td>
+		               		 <b>:</b>#{textBox id:'unitPrice', value:faFeeMaster?.unitPrice, format:'#,##0.###############', class:'numeric netAmount', readOnly:readOnly /}
+							 #{hidden id:'unitPriceStripped', name:'faFeeMaster.unitPrice', value:faFeeMaster?.unitPrice /}
+							 <span id="unitPriceError" class="error"></span>
+		                </td>
+		            </tr>
+		            <tr>
+		            	<td>
+		            		COA No <span style="color:red" id="cNo">*</span>
+		            	</td>
+		                <td>
+							<b>:</b>#{textBox id:'coaCode', name:'faFeeMaster.faCoaMaster.coaCode',  value:faFeeMaster?.faCoaMaster?.coaCode, class:'capitalize', width:'100px', readOnly:readOnly /}
+							#{hidden id:'coaMasterKey', name:'faFeeMaster.faCoaMaster.coaMasterKey', value:faFeeMaster?.faCoaMaster?.coaMasterKey /}
+							#{button id:'coaHelp', value:'?', class:'small', readOnly:readOnly /}
+							#{textBox id:'coaDescription', name:'faFeeMaster.faCoaMaster.description', class:'capitalize', value:faFeeMaster?.faCoaMaster?.description, readOnly:true, width:'250px' /}
+							&nbsp; <span id="coaCodeError" class="error"></span>
+						</td>
+					</tr>
+					<tr>
+						<td>Year Base</td>
+			            <td>
+				            <b>:</b>
+				            #{dropDownList id:'yearBase', name:'yearBase', value:faFeeMaster?.yearBase?.lookupId, readOnly:readOnly, options:yearBase, required:true/}
+				            #{hidden id:'yearBaseHidden' , name:'faFeeMaster.yearBase.lookupId', value:faFeeMaster?.yearBase?.lookupId /}
+				            <span class="errorFee" id="yearBase_error"></span>
+			            </td>
+			        </tr>
+				</table>
+            </td>
+            <td valign="top" nowrap="nowrap">
+            	<p style="margin-left: 8em">
+                <input type='radio' id='radioByDailyAmount' name='radioCalculationBase' value='faFeeMaster.faCalculationBase.lookupId' />
+                <input type="hidden" id='radioDailyAmountHidden' name='faFeeMaster.faCalculationBase.lookupId' value='faFeeMaster.faCalculationBase.lookupId' />
+                <b>Daily Amount</b>
+                </p>
+            </td>
+            <td valign="top" nowrap="nowrap">
+            <p style="margin-left: 8em">
+                <input type='radio' id='radioByTotalAmount' name='radioCalculationBase' value='faFeeMaster.faCalculationBase.lookupId' />
+                <input type="hidden" id='radioTotalAmountHidden' name='faFeeMaster.faCalculationBase.lookupId' value='faFeeMaster.faCalculationBase.lookupId' />
+                <b>Total Amount</b>
+            </p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+            #{checkBox id:'isChecked', name:'publishedNav', value:faFeeMaster?.publishedNav, readOnly:readOnly /}
+            #{hidden id:'isCheckedHidden', name:'faFeeMaster.publishedNav',value:faFeeMaster?.publishedNav /}
+            <b>Only for NAV Published</b>
+            </td>
+            <td>
+            <p style="margin-left: 9em;display: none;">
+            <b>Accrual Base : </b>
+            #{dropDownList id:'accrualBaseDaily', name:'accrualBaseDaily', value:faFeeMaster?.accrualBase?.lookupId, readOnly:readOnly, options:accrualBase/}
+            #{hidden id:'accrualBaseDailyHidden' , name:'faFeeMaster.accrualBase.lookupId', value:faFeeMaster?.accrualBase?.lookupId /}
+            <span class="errorFee" id="accrualBaseDaily_error"></span>
+            </p>
+            </td>
+            <td>
+            <p style="margin-left: 9em;display: none;">
+            <b>Accrual Base : </b>
+            #{dropDownList id:'accrualBaseTotal', name:'accrualBaseTotal', value:faFeeMaster?.accrualBase?.lookupId, readOnly:readOnly, options:accrualBase,required:true /}
+            #{hidden id:'accrualBaseTotalHidden' , name:'faFeeMaster.accrualBase.lookupId', value:faFeeMaster?.accrualBase?.lookupId /}
+            <span class="errorFee" id="accrualBaseTotal_error"></span>
+            </p>
+            </td>
+        </tr>
+        
+    </table>
+<br />
+<br />
+<div id ="tabsFeeDetails">
+<ul>
+    <li><a href="#tabsFeeDetail-1">Accrual Detail</a></li>
+</ul>
+<div class="pane" id="tabsFeeDetails-1">
+<br />
+    <div id="listFeeDetail">
+        #{include 'FeeAccruals/grid_feeDetail.html' /}
+    </div>
+    <br />
+    <br />
+    <div class="buttons">
+        #{ifnot confirming}
+            <button id="newFeeDetail">New Data</button>
+        #{/ifnot}   
+    </div>
+</div>
+</div>
+</fieldset>
+<br />
+<div class="buttons">
+        #{if mode == 'view'}
+        #{ifnot approval}
+        <button id="cancel">Close</button>
+        #{/ifnot}
+        #{/if}
+        #{else}
+            #{if (!confirming) }
+                <button id="save">Save</button>
+                <button id="cancel">Cancel</button>
+            #{/if}
+            #{if confirming}
+                <button id="confirm">Confirm</button>
+                <button id="back">Back</button>
+            #{/if}
+        #{/else}
+</div>
+</form>
+<div id="detailFeeAccrualByNav" title="Accrual Setup">
+    #{include 'FeeAccruals/feeAccrualByNav.html' /}
+</div>
+<div id="detailFeeAccrualByAmount" title="Accrual Setup Detail">
+    #{include 'FeeAccruals/feeAccrualByAmount.html' /}
+</div>
+<div id="dialog-message-1" title="Message Confirmation">
+    <p>
+    <span class="ui-icon ui-icon-notice" style="float:left; margin:0 7px 50px 0;"></span>
+    Are you sure to delete data ? </p>
+</div>

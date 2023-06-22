@@ -1,0 +1,30 @@
+#{extends 'templates/main.html' /}
+
+<div id="root">
+	<h3>Exchange Rate Maintenance</h3>
+</div>
+
+<div id="result" style="display:block">
+	<table id="tableCurrencyProfile" class="display">
+	    <thead>
+	        <tr>
+	            <th width="150px" field="profileDate|date|date|left|sort">Date</th>
+	            <th width="100px" field="currencyProfile.lookupCode|string|none|left|sort">Exchange Rate Ref.</th>
+	            <th width="100px" field="baseCurrency.currencyCode|string|none|left|sort">Base Currency</th>
+	            <th width="100px" field="recordStatus|string|decode|center|sort">Status</th>
+	            <th width="100px" field="active|boolean|yesno|center|sort">Active</th>
+	        </tr>
+	    </thead>
+	    <tbody></tbody>
+	</table>
+	<br/>
+	<input type="button" id="newData" value="New Data" />
+</div>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'CurrencyProfiles/CurrencyProfilePaging.js' /}
+	$(document).ready(function() {
+		Paging($("#main"));
+	});
+</script>

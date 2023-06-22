@@ -1,0 +1,24 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'CTP Entry' /}
+#{set readOnly:((mode !='edit' && mode !='entry') || confirming) /}
+
+<script type="text/javascript">
+	
+</script>
+
+<h2>CTP Transaction Detail</h2>
+<div id="detail">
+	#{include 'CtpTransaction/detail.html' /}	
+</div>
+
+<div id="actions" class="buttons">
+	#{if confirming}
+		<input type="button" id="confirm" value="Confirm" />
+		<input type="button" id="back" value="Back" />
+	#{/if}
+	#{else}
+		<input type="button" id="saveCtp" value="Save" />
+		<input type="button" id="clear" value="Clear" />
+		<input type="button" id="close" value="Cancel" />
+	#{/else}
+</div>

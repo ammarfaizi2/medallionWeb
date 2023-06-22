@@ -1,0 +1,140 @@
+#{extends 'templates/detail1.html' /}
+#{if mode == 'edit' || mode == 'entry' || mode == 'view'}
+	#{set pageTitle: 'Corporate Action Template Maintenance' /}
+#{/if}
+#{if taskId != null}
+	#{set pageTitle: 'Corporate Action Template Approval' /}
+#{/if}
+
+#{set id:actionTemplate?.actionTemplateKey /}
+
+#{script 'lookups.js' /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{if actionTemplate?.isCoupon==true}
+	#{set readOnlyTarget:true /}
+#{/if}
+#{else}
+	#{set readOnlyTarget:readOnly  /}
+#{/else}
+
+<script type="text/javascript">
+	#{include 'CorporateActionTemplates/CaActionTemplate.js' /}
+	
+</script>
+
+<fieldset>
+	#{hidden id:'targetForFilter', name:'targetForFilter' /}
+	#{hidden name:'actionTemplate.organization.organizationId', value:actionTemplate?.organization?.organizationId /}
+	#{hidden id:'actionTemplateKey', name:'actionTemplate.actionTemplateKey', value:actionTemplate?.actionTemplateKey /}
+	#{hidden id:'status', name:'status', value:status /}
+	<span id="requiredError" class="error"></span>
+	<br />
+	<p>      
+		#{textBox id:'actionCode', name:'actionTemplate.actionCode', label:'Action Code',value:actionTemplate?.actionCode, width:'155px',required:true, class:'capitalize', readOnly:((mode=='entry') ? confirming :true ), maxLength:50 /}
+		<span class="error">#{error 'Action Code is' /}</span>
+	</p>
+	<p>			
+		#{textBox id:'description', name:'actionTemplate.description', label:'Description', value:actionTemplate?.description,required:true, class:'capitalize', readOnly:readOnly, maxLength:100,width:'458px'/}
+		<span class="error">#{error 'Description is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'securityType', name:'actionTemplate.securityType.securityType',label:'Security Type', value:actionTemplate?.securityType?.securityType, class:'capitalize',  readOnly:readOnly,required:true, width:'126px' /}
+		#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'securityTypeDesc', name:'actionTemplate.securityType.description', value:actionTemplate?.securityType?.description, required:true, readOnly:true, width:'300px' /}
+		<span class="error">#{error 'Security Type is' /}</span>
+	</p>
+	<p>
+		#{radioButton id:'isCoupon', name:'actionTemplate.isCoupon', value:((actionTemplate?.isCoupon)?'true':'false'), label:'Coupon Payment', options:trueFalseOperators, readOnly:readOnly /}
+	</p>
+	<p>	
+		#{dropDownList id:'target', name:'target', label:'CA Target Type',options:target, readOnly:readOnlyTarget, value:actionTemplate?.targetType?.lookupId, required:true,  width:'155px' /}
+		<span class="error">#{error 'CA Target Type is' /}</span>
+		#{hidden id:'targetHidden', name:'actionTemplate.targetType.lookupId', value:actionTemplate?.targetType?.lookupId /}
+		
+	</p>
+	<p> 
+		#{textBox id:'sourceTransaction', name:'actionTemplate.sourceTransaction.transactionCode', label:'Transaction Code (Source)', value:actionTemplate?.sourceTransaction?.transactionCode, class:'capitalize',  readOnly:readOnly, width:'126px' /}
+		#{hidden id:'sourceTransactionKey', name:'actionTemplate.sourceTransaction.transactionTemplateKey', value:actionTemplate?.sourceTransaction?.transactionTemplateKey /}
+		#{button id:'sourceTransactionHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'sourceTransactionDesc', name:'actionTemplate.sourceTransaction.description', value:actionTemplate?.sourceTransaction?.description, required:true, readOnly:true, width:'300px'/}
+		&nbsp;<span id="sourceTransactionError" class="error">#{error 'Transaction Code (Source) or (Target) is' /}</span>
+	</p>
+	<p> 
+		#{textBox id:'targetTransaction', name:'actionTemplate.targetTransaction.transactionCode', label:'Transaction Code (Target)', value:actionTemplate?.targetTransaction?.transactionCode, class:'capitalize',  readOnly:readOnly, width:'126px' /}
+		#{hidden id:'targetTransactionKey', name:'actionTemplate.targetTransaction.transactionTemplateKey', value:actionTemplate?.targetTransaction?.transactionTemplateKey /}
+		#{button id:'targetTransactionHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'targetTransactionDesc', name:'actionTemplate.targetTransaction.description', value:actionTemplate?.targetTransaction?.description, required:true, readOnly:true, width:'300px'/}
+		&nbsp;<span id="targetTransactionError" class="error">#{error 'Transaction Code (Source) or (Target) is' /}</span>
+	</p>
+	<br />
+</fieldset>
+<br />
+<fieldset>
+<br />
+
+<p>
+	#{checkBox id:'autoEntProcess', name:'actionTemplate.autoEntitlement', value:actionTemplate?.autoEntitlement, label:'Entitlement Run on', readOnly:readOnly /} Yes
+	#{dropDownList id:'autoSchedule', name:'actionTemplate.lookupEntitlementDate.lookupId', options:lookupEntitlementDate, readOnly:readOnly, value:actionTemplate?.lookupEntitlementDate?.lookupId, width:'233px'  /}
+	<span id="autoScheduleError" class="error"></span>
+</p>
+
+<p>
+	#{dropDownList id:'customerFund', name:'actionTemplate.customerFund.lookupId', options:lookupEntitlementDate, label:'Customer SpecificFund', value:actionTemplate?.customerFund?.lookupId, required:true, readOnly:readOnly, width:'280px' /}
+	<span id="customerFundeOnError" class="error">#{error 'Customer SpecificFund On is' /}</span>
+</p>
+
+<p>
+	#{dropDownList id:'holdingBaseOn', name:'actionTemplate.holdingBase.lookupId', options:lookupEntitlementDate, label:'Holding Base On', value:actionTemplate?.holdingBase?.lookupId, required:true, readOnly:readOnly, width:'280px' /}
+	<span id="holdingBaseOnError" class="error">#{error 'Holding Base On is' /}</span>
+</p>
+
+<p>
+	#{dropDownList id:'holdingType', name:'actionTemplate.holdingType.lookupId', options:holdingType, label:'Holding Type', value:actionTemplate?.holdingType?.lookupId, required:true, readOnly:readOnly, width:'280px' /}
+	<span class="error">#{error 'Holding Type is' /}</span>
+</p>
+<p>			
+	#{textBox id:'executionPrice', name:'executionPrice', label:'Execution Price', value:actionTemplate?.executionPrice, format:'#,##0.####', required:true, class:'numeric', readOnly:readOnly, width:'155px' /}
+	#{hidden id:'executionPriceStripped', name:'actionTemplate.executionPrice', value:actionTemplate?.executionPrice /}
+	<span class="error">#{error 'Execution Price is' /}</span>
+</p>
+<p>
+	#{dropDownList id:'reportTemplate', name:'actionTemplate.reportTemplate.lookupId', options:layoutType, label:'Report/Email Template', value:actionTemplate?.reportTemplate?.lookupId, required:true, readOnly:readOnly, width:'280px' /}
+	<span class="error">#{error 'Report/Email Template Price is' /}</span>
+</p>
+<p>
+	#{dropDownList id:'merCaType', name:'actionTemplate.merCaType', options:merCaTypeOpts, label:'Type CA', value:actionTemplate?.merCaType, required:false, readOnly:readOnly, width:'280px' /}
+</p>
+<br />
+</fieldset>
+<br/>
+<fieldset>
+<br />
+<p>
+	#{radioButton id:'taxApply', name:'actionTemplate.taxApply', value:((actionTemplate?.taxApply)?'true':'false'), label:'Tax Apply', options:trueFalseOperators, readOnly:readOnly /}
+</p>
+
+<p id="pTaxObject">
+	#{dropDownList id:'taxObject', name:'actionTemplate.taxObject.lookupId', options:taxObject, label:'Tax Object', value:actionTemplate?.taxObject?.lookupId , readOnly:readOnly, width:'280px', class:'taxApp', required:true  /}
+	<span class="error">#{error 'Tax Object is' /}</span>
+</p>
+
+<p>
+	#{radioButton id:'hasExercisePrice', name:'actionTemplate.exercisePrice', value:((actionTemplate?.exercisePrice)?'true':'false'), label:'Has Exercise Price', options:trueFalseOperators, readOnly:readOnly, class:'taxApp' /}
+</p>
+
+<p>
+	#{checkBox id:'cekBoxLinkAnnouncement', name:'actionTemplate.cekBoxLinkAnnouncement', value:actionTemplate?.cekBoxLinkAnnouncement, label:'Link Announcement', readOnly:readOnly /} Yes
+	
+	#{textBox id:'actionTemplateLink', name:'actionTemplate.actionTemplateLink.actionCode', value:actionTemplate?.actionTemplateLink?.actionCode, class:'capitalize',  readOnly:readOnly, width:'100px' /}
+	#{hidden id:'actionTemplateLinkKey', name:'actionTemplate.actionTemplateLink.actionTemplateKey', value:actionTemplate?.actionTemplateLink?.actionTemplateKey /}
+	#{button id:'actionTemplateLinkHelp', value:'?', class:'small', readOnly:readOnly /}
+	#{textBox id:'actionTemplateLinkDesc', name:'actionTemplate.actionTemplateLink.description', value:actionTemplate?.actionTemplateLink?.description, required:true, readOnly:true, width:'250px' /}
+	<span id="actionTemplateLinkError" class="error">#{error 'Link Announcement is' /}</span>
+</p>
+
+<p>
+	#{radioButton id:'isActive', name:'isActive', value:((actionTemplate?.isActive)?'true':'false'), label:'Active', options:trueFalseOperators, readOnly:readOnly /}
+	#{hidden id:'isActiveHidden', name:'actionTemplate.isActive', value:((actionTemplate?.isActive)?'true':'false') /}
+</p>
+<br />
+</fieldset>

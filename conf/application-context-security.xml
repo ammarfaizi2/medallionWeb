@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+
+	<bean id="authenticationManager" class="org.springframework.security.authentication.ProviderManager">
+    	<property name="providers" ref="remoteAuthenticationProvider" />
+    </bean>
+    
+    <bean id="remoteAuthenticationProvider" class="org.springframework.security.authentication.rcp.RemoteAuthenticationProvider">
+		<property name="remoteAuthenticationManager"><ref bean="remoteAuthenticationManager"/></property>
+	</bean>
+	
+	<bean id="remoteAuthenticationManager" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="rmi://localhost/AuthenticationService" />
+		<property name="serviceInterface" value="org.springframework.security.authentication.rcp.RemoteAuthenticationManager" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>
+ 
+   	<!-- 
+    <bean id="contextSource"
+        class="org.springframework.security.ldap.DefaultSpringSecurityContextSource">
+	  <constructor-arg value="ldap://localhost:10389/dc=example,dc=com"/>
+	  <property name="userDn" value="uid=admin,ou=system"/>
+	  <property name="password" value="secret"/>
+	</bean>
+    
+    <bean id="ldapAuthenticationProvider" class="org.springframework.security.ldap.authentication.LdapAuthenticationProvider">
+    	<constructor-arg>
+		   <bean class="org.springframework.security.ldap.authentication.BindAuthenticator">
+		     <constructor-arg ref="contextSource"/>
+		     <property name="userDnPatterns">
+		       <list><value>uid={0},ou=people,o=medallion</value></list>
+		     </property>
+		   </bean>
+		 </constructor-arg>
+		 <constructor-arg>
+		   <bean
+		     class="org.springframework.security.ldap.userdetails.DefaultLdapAuthoritiesPopulator">
+		     <constructor-arg ref="contextSource"/>
+		     <constructor-arg value="ou=groups"/>
+		     <property name="groupRoleAttribute" value="ou"/>
+		   </bean>
+		 </constructor-arg>
+    </bean>
+    <security:ldap-server url="ldap://localhost:10389/dc=example,dc=com" />
+     -->
+    <!--
+    Usernames/Passwords are
+        rod/koala
+        dianne/emu
+        scott/wombat
+        peter/opal
+    -->
+	<!--    
+    <bean id="daoAuthenticationProvider" class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
+    	<property name="userDetailsService" ref="inMemoryDaoImpl"/>
+		<property name="passwordEncoder" ref="passwordEncoder"/>
+    </bean>
+    
+    <bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.Md5PasswordEncoder" />
+    
+    <bean id="inMemoryDaoImpl" class="org.springframework.security.core.userdetails.memory.InMemoryDaoImpl">
+    	<property name="userMap">
+    		<value>
+    			superuser=18c6d818ae35a3e8279b5330eda01498, ROLE_SUPERVISOR, ROLE_USER, ROLE_TELLER
+    			rod=a564de63c2d0da68cf47586ee05984d7, ROLE_SUPERVISOR, ROLE_USER, ROLE_TELLER
+    			dianne=65d15fe9156f9c4bbffd98085992a44e, ROLE_USER, ROLE_TELLER
+    			scott=2b58af6dddbd072ed27ffc86725d7d3a, ROLE_USER
+    			peter=22b5c9accc6e1ba628cedc63a72d57f8, ROLE_USER
+    		</value>
+    	</property>
+    </bean>
+     -->
+</beans>

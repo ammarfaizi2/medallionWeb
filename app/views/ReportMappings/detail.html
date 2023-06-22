@@ -1,0 +1,167 @@
+#{extends 'templates/main.html' /}
+#{set id:faReportMapping?.reportKey /}
+#{set group: group /}
+#{if flash.error || errors}
+    <div class="error">
+    	Error when saving data!<br/>
+		<li>${flash.error}</li>
+		#{ifErrors}
+			#{errors}
+				 <li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}
+
+<script type="text/javascript">
+	$(function() {
+		var message = "";
+		var closeDialog = function() {
+			$("#dialog-message").dialog('close');	
+		}
+		
+		$('#save, #cancel, #confirm, #back, #delete').button();
+		$( "#dialog-message-Delete" ).css("display","none");
+		// Action buttons 
+		$('#save').click(function() {
+			var resume = true;
+			if (typeof doSave == 'function') { 
+				resume = doSave();
+			}
+			if (resume) {
+				var action = "@{save()}?mode=${mode}#{if group}&group=${group}#{/}";
+				var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+				loading.dialog({
+					closeOnEscape: false,
+					draggable: false,
+					modal: true,
+					resizable: false,
+					open:function() {
+						$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+					} 
+				});
+				$('#reportMappingForm').attr('action', action);
+				$('#reportMappingForm').submit();
+			}
+		});
+		$('#confirm').click(function() {
+/*			var action = "@{confirm()}?mode=${mode}#{if group}&group=${group}#{/}";
+			$.ajax({
+				  url: submit(action),
+				  success: function() {
+					  location.href='@{list()}#{if group}/${group}#{/}';
+				  } */
+				  var resume = true;
+					if(typeof doConfirm == 'function') {
+						resume = doConfirm();
+					}
+					if (resume) submit('@{confirm()}?mode=${mode}#{if group}&group=${group}#{/}');	  
+			});
+			
+			
+	//	});
+		$('#back').click(function() {
+			location.href='@{back(id)}?mode=${mode}#{if group}&group=${group}#{/}';
+		});
+		$('#cancel').click(function() {
+			location.href='@{list()}#{if group}/${group}#{/}';
+		});
+		$('#delete').click(function() {
+			message = "Are you sure want to delete Report Mapping with ID '${faReportMapping?.reportLabelId}' ?"
+			var deleteReportMapping = function() {
+				$("#dialog-message").dialog("close");
+				$.post('@{delete()}/${faReportMapping?.reportKey}', function(data) {
+		    		checkRedirect(data);
+					if (data=='success') {
+						var backToList = location.href='@{list()}#{if group}/${group}#{/}';
+						message = "Success : Report Mapping with ID '${faReportMapping?.reportLabelId}' is deleted";
+						messageAlertOk(message, "ui-icon ui-icon-circle-check", "Notofication", backToList);
+						//alert("Success : Report Mapping with ID '${faReportMapping?.reportLabelId}' is deleted")
+						//location.href='@{list()}#{if group}/${group}#{/}';
+					} else {
+						//alert("Error : Report Mapping with ID ${faReportMapping?.reportLabelId} is not deleted")
+						message = "Error : Report Mapping with ID '${faReportMapping?.reportLabelId}' is not deleted";
+						messageAlertOk(message, "ui-icon ui-icon-circle-check", "Notofication", backToList);
+						return false;
+					}
+				});
+			}
+			messageAlertYesNo(message, "ui-icon ui-icon-notice", "Confirmation Message", deleteReportMapping, closeDialog);
+			/* $("#dialog-message-Delete").dialog({
+				autoOpen:false,
+				height:150,
+				width:250,
+				modal:true,
+				resizable : false,
+				buttons: {
+					"Yes": function() {
+						$("#dialog-message-Delete").dialog("close");
+						$.post('@{delete()}/${faReportMapping?.reportKey}', function(data) {
+							if (data=='success') {
+								alert("Success : Report Mapping with ID '${faReportMapping?.reportLabelId}' is deleted")
+								location.href='@{list()}#{if group}/${group}#{/}';
+							} else {
+								alert("Error : Report Mapping with ID ${faReportMapping?.reportLabelId} is not deleted")
+								return false;
+							}
+						});
+					},
+					"No ": function() {
+						$("#dialog-message-Delete").dialog("close");
+					}	
+				}
+			});
+			$('#dialog-message-Delete').css('overflow','hidden');
+			$("#dialog-message-Delete").dialog('open');
+			//location.href='@{list()}#{if group}/${group}#{/}'; */
+			
+		});
+	});	
+	
+	function submit(action, id) {
+		var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+		loading.dialog({
+			closeOnEscape: false,
+			draggable: false,
+			modal: true,
+			resizable: false,
+			open:function() {
+				$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+			} 
+		});
+	//	$.post(action, $('#reportMappingForm').serialize(), function(data, status, xhr) {
+	//		loading.dialog('close');
+			//if (data.status == 'success') {
+			//	location = "@{entry()}";
+			//} else {
+			//	alert(data.error);
+			//}
+	//	});
+		$('#reportMappingForm').attr('action', action);
+		$('#reportMappingForm').submit();
+	}
+</script>
+<h2>Report Mapping</h2>
+
+#{hidden id:'group', name:'group', value:group /}
+<div id="detail">
+	#{include 'ReportMappings/form.html' /}	
+</div>
+<div id="actions" class="buttons">
+	#{if confirming}
+		<input type="button" id="confirm" value="Confirm" />
+		<input type="button" id="back" value="Back" />
+	#{/if}
+	#{else}
+		<input type="button" id="save" value="Save" />
+		<input type="button" id="cancel" value="Cancel" />
+		#{if mode != 'entry'}
+			<input type="button" id="delete" value="Delete" />
+		#{/if}
+	#{/else}
+</div>
+<div id="dialog-message-Delete" title="Delete Message Confirmation">
+	<p>
+	<span class="ui-icon ui-icon-notice" style="float:left; margin:0 7px 50px 0;"></span>
+	Are you sure want to delete Report Mapping with ID '${faReportMapping?.reportLabelId}' ?</p>
+</div>

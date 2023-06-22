@@ -1,0 +1,151 @@
+#{extends 'templates/main.html' /}
+
+<script type="text/javascript">
+	$(function() {
+		
+		var backToList = function() {
+			loading.dialog('open');
+			location = "@{list()}";
+		}
+		
+		// Action buttons 
+		/* $('#confirm').click(function() {
+			$(".prematch").remove(); 
+			var action = "@{confirm()}";
+			loading.dialog('open');
+			$.post(action, $('#transactionForm').serialize(), function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status ==  'success') {
+					loading.dialog('close');
+					messageAlertOk(data.messages, "ui-icon ui-icon-circle-check", "Notification", backToList);
+				} else {
+					loading.dialog('close');
+					messageAlertOk(data.messages, "ui-icon1 ui-icon-circle-close", "Error Message", backToList);
+				}
+			});
+		}); */
+		
+		function confirmTrans(){
+			$(".prematch").remove(); 
+			var action = "@{confirm()}";
+			loading.dialog('open');
+			$.post(action, $('#transactionForm').serialize(), function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status ==  'success') {
+					loading.dialog('close');
+					messageAlertOk(data.messages, "ui-icon ui-icon-circle-check", "Notification", backToList);
+				} else {
+					loading.dialog('close');
+					messageAlertOk(data.messages, "ui-icon1 ui-icon-circle-close", "Error Message", backToList);
+				}
+			});
+		}
+		
+		$('#confirm').click(function() {
+			$.get("@{CustodyCancelPortfolioTransaction.getInfoTrans()}?transactionNo=${transaction?.transactionNumber}", function(data) {
+				checkRedirect(data);
+				if(data.result =="0"){
+					confirmTrans();
+				}
+				if(data.result =="1"){
+					messageAlertOk("Can not cancel transaction. Swift Message already Settled", "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);	
+				}
+				if(data.result =="2"){
+					confirmTrans();
+				}
+			});
+		});
+		
+		$('#back').click(function() {
+			location.href = "@{back()}?id=${transaction?.transactionKey}&fromView=viewCsCancelTrade&mode=${mode}";
+		});
+		
+		$('#clear').click(function() {
+			location.href="@{entry()}";			
+		});
+		
+		$('#close').click(function() {
+			location.href = "@{list()}";
+		})
+		
+		/* $('#saveCancel').click(function(){
+			$(".prematch").remove(); 
+			$("#settlementAgentCode").attr('disabled', false);
+			$("#settlementAgentHelp").attr('disabled', false);
+			$("#settlementAgentName").attr('disabled', false);
+			$("#settlementAmountAdj").attr('disabled', false);
+			$("#forSettlePrematch :input").attr("disabled", false);
+			var action = "@{save()}?fromView=viewCsCancelTrade";
+			loading.dialog('open');
+			$('#transactionForm').attr('action', action);
+			$('#transactionForm').submit();
+		}); */
+		
+		function submitTrans(){
+			$(".prematch").remove(); 
+			$("#settlementAgentCode").attr('disabled', false);
+			$("#settlementAgentHelp").attr('disabled', false);
+			$("#settlementAgentName").attr('disabled', false);
+			$("#settlementAmountAdj").attr('disabled', false);
+			$("#forSettlePrematch :input").attr("disabled", false);
+			var action = "@{save()}?fromView=viewCsCancelTrade";
+			loading.dialog('open');
+			$('#transactionForm').attr('action', action);
+			$('#transactionForm').submit();
+		}
+		
+		var goSave = function() {
+			submitTrans();
+		}
+		
+		$('#saveCancel').click(function(){
+			$.get("@{CustodyCancelPortfolioTransaction.getInfoTrans()}?transactionNo=${transaction?.transactionNumber}", function(data) {
+				checkRedirect(data);
+				if(data.result =="0"){
+					submitTrans();
+				}
+				if(data.result =="1"){
+					messageAlertOk("Can not cancel transaction. Swift Message already Settled", "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);	
+				}
+				if(data.result =="2"){
+					messageAlertYesNoCancel("SWIFT Message still in progress ["+data.remark+"]. Do you really want to cancel this transaction?", "ui-icon ui-icon-notice", "Confirmation Message",goSave, closeDialogMessage, closeDialogMessage)
+				}
+			});
+			
+		});
+
+
+	});	
+</script>
+
+<!--   #{if flash.error || errors}
+    <div class="error">
+    	<b>Error when saving data!</b><br/><br/>
+    	#{if flash.error}
+<li>${flash.error}</li>
+		#{/if}
+		#{ifErrors}
+			#{errors}
+<li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}-->
+
+<h2>Cancel Portfolio Transaction Detail</h2>
+<div id="detail">
+	#{include 'Transactions/detail.html' /}	
+</div>
+
+<div id="actions" class="buttons">
+	#{if confirming}
+		<input type="button" id="confirm" value="Confirm" />
+		<input type="button" id="back" value="Back" />
+	#{/if}
+	#{else}
+		<input type="button" id="saveCancel" value="Save" />
+		<input type="button" id="close" value="Back" />
+	#{/else}
+</div>

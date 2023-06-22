@@ -1,0 +1,142 @@
+#{extends 'templates/detail1.html' /}
+#{set pageTitle : "Migrate" /}
+#{script 'lookuppaging.js' /}
+#{script 'jquery.form.js' /}
+
+<form id="searchForm" class="form" class="form" method="POST" novalidate enctype="application/x-www-form-urlencoded">
+	<div id="continer">
+		<input type="hidden" id="displayDateFormat" value="${result.displayDateFormat}"/>
+		<input type="hidden" id="jQuerydisplayDateFormat" value="${result.jQuerydisplayDateFormat}"/>
+		<input type="hidden" id="dateMask" value="${result.dateMask}"/>
+		
+		<input type="hidden" id="defMonth" value="${result.defMonth}"/>
+		<input type="hidden" id="defYear" value="${result.defYear}"/>
+			
+		<table id="table">
+			<thead>
+				<tr>
+					<td width="200px" align="center">Run</td>
+					<td width="600px">Name</td>
+					<td width="2000px">Progress</td>
+				</tr>
+			</thead>
+			<tbody id="tBody">
+				#{list audits, as:'audit'}
+					<tr>
+						<td align="center" valign="top"><input id="${audit.var}" class="btnProcess" type="button" value="Process" process='${audit.processCode}'></td>
+						<td valign="top"><b class="lblTitle">${audit.title}</b></td>
+						<td>
+							<table border="0" width="100%">
+								<tbody>
+									<tr>
+										<td><div class="barProgress"><div  class="progress-label"></div></div></td>
+									</tr>
+									<tr>
+										<td>
+											<div class="divAccordion">
+												<h3><a href="#">Parameters</a></h3>
+												<div class="parameter" process='${audit.processCode}'>
+												#{if audit.processCode == 'PROCESS_CIPS_ENTITTLEMENT'}
+													<p>
+														#{textBox id:'recordingDate', name:'recordingDate', label:'Recording Date', value:result?.defAppDate?.format(appProp.dateFormat), class:'calendar', required:'true'/}&nbsp;/&nbsp;(${appProp.displayDateFormat})
+														<span id="recordingDateErr" class="error">#{error 'Recording Date' /}</span>
+													<!-- 
+													<p>
+														#{textBox id:'caType', name:'caType', value:'', label:'CA Type', class:'capitalize', required:'true', width:'100px' /}
+														#{hidden id:'caTypeKey', name:'caTypeKey', value:''/}
+														#{button id:'caTypeHelp', value:'?', class:'small' /}
+														#{textBox id:'caTypeDesc', name:'caTypeDesc', value:'', readOnly:true, width:'222px' /}
+														<span id="caTypeErr" class="error">#{error 'CA Type' /}</span>			
+													</p>
+													<p>
+														#{textBox id:'security', name:'security', value:'', label:'Security', class:'capitalize', required:'true', width:'100px' /}
+														#{hidden id:'securityKey', name:'securityKey', value:''/}
+														#{button id:'securityHelp', value:'?', class:'small' /}
+														#{textBox id:'securityDesc', name:'securityDesc', value:'', readOnly:true, width:'222px' /}
+														<span id="securityErr" class="error">#{error 'Security' /}</span>			
+													</p>
+													<p>	
+														#{textBox id:'referenceNo', name:'referenceNo', value:'', label:'Reference No', readOnly:false, width:'150px', maxLength:20, size:20, class:'numberOnly', required:'true' /}
+														<span id="referenceNoErr" class="error">#{error 'Reference No' /}</span>
+													</p>
+													 -->														
+													</p>			
+												#{/if}
+												#{if audit.processCode == 'PROCESS_CIPS_SUMMARY_HOLDING'}
+													<p>
+														#{textBox id:'asOfDate', name:'asOfDate', label:'As Of Date', value:result?.defAppDate?.format(appProp.dateFormat), class:'calendar', required:'true'/}&nbsp;/&nbsp;(${appProp.displayDateFormat})
+														<span id="asOfDateErr" class="error">#{error 'As Of Date' /}</span>
+													</p>
+												#{/if}
+												#{if audit.processCode == 'PROCESS_CIPS_CUST_ACTIVITY'}
+													<p>
+														#{textBox id:'month', name:'month', value:result?.defMonth, label:'Month', readOnly:false, width:'85px', maxLength:2, size:2, class:'numberOnly', required:'true' /}
+														<span id="monthErr" class="error">#{error 'Month' /}</span>
+													</p>
+													<p>	
+														#{textBox id:'year', name:'year', value:result?.defYear, label:'Year', readOnly:false, width:'85px', maxLength:4, size:4, class:'numberOnly', required:'true' /}
+														<span id="yearErr" class="error">#{error 'Year' /}</span>
+													</p>
+												#{/if}
+												#{if audit.processCode == 'PROCESS_CIPS_LKPBU'}
+													<p>
+														#{textBox id:'month', name:'month', value:result?.defMonth, label:'Month', readOnly:false, width:'85px', maxLength:2, size:2, class:'numberOnly', required:'true' /}
+														<span id="monthErr" class="error">#{error 'Month' /}</span>
+													</p>
+													<p>	
+														#{textBox id:'year', name:'year', value:result?.defYear, label:'Year', readOnly:false, width:'85px', maxLength:4, size:4, class:'numberOnly', required:'true' /}
+														<span id="yearErr" class="error">#{error 'Year' /}</span>
+													</p>
+												#{/if}
+												#{if audit.processCode == 'PROCESS_CIPS_POSISI_BI'}
+													<p>
+														#{textBox id:'month', name:'month', value:result?.defMonth, label:'Month', readOnly:false, width:'85px', maxLength:2, size:2, class:'numberOnly', required:'true' /}
+														<span id="monthErr" class="error">#{error 'Month' /}</span>
+													</p>
+													<p>	
+														#{textBox id:'year', name:'year', value:result?.defYear, label:'Year', readOnly:false, width:'85px', maxLength:4, size:4, class:'numberOnly', required:'true' /}
+														<span id="yearErr" class="error">#{error 'Year' /}</span>
+													</p>
+												#{/if}
+												</div>
+											</div>										
+										</td>
+									</tr>
+									<tr>
+										<td valign="top">
+											<table width="100%">
+												<tbody>
+													<tr>
+														<td style="width: 10px"><label>Last Processed</label></td>
+														<td class="lblLastProcess">${audit.strLastProcess}</td>
+													</tr>
+													<tr>
+														<td style="width: 10px"><label>Status</label></td>
+														<td class="lblStatus">...</td>
+													</tr>
+													<tr>
+														<td style="width: 10px"><label>Duration</label></td>
+														<td class="lblDuration">...</td>
+													</tr>
+												</tbody>
+											</table>												
+										</td>
+									</tr>
+									
+								</tbody>
+							</table>
+						</td>
+					</tr>
+				#{/list}
+			</tbody>
+		</table>
+	</div>	
+</form>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'GeneralUpload/Migrate.js' /}
+	$(document).ready(function() {
+		new Migrate($("#continer"));
+	});
+</script>

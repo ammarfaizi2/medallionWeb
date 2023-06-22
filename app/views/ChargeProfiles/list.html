@@ -1,0 +1,40 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle:'Charge Profile Maintenance' /}
+
+<script type="text/javascript">
+
+	function doEdit(data) {
+		if ((data[3] == "New") || (data[3] == "Updated")) {
+			view(data[0]);
+			return false;
+		} else {
+			return true;
+		}
+	}
+		
+</script>
+
+<table class="display">
+	<thead>
+		<tr>
+			<th>key</th>
+			<th width="150">Code</th>
+			<th>Description</th>
+			<th width="130">Status</th>
+			<th width="120">Default</th>
+			<th width="120">Active</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:profiles, as:'profile'}
+		<tr>
+			<td>${profile?.chargeProfileKey}</td>
+			<td class="capitalize">${profile?.name}</td>
+			<td class="capitalize">${profile?.description}</td>
+			<td>${profile?.recordStatus?.decodeStatus()}</td>
+			<td>${(profile?.isDefault)?'Yes':'No'}</td>
+			<td>${(profile?.isActive)?'Yes':'No'}</td>			
+		</tr>
+	#{/list}
+	</tbody>
+</table>

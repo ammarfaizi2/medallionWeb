@@ -1,0 +1,60 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Third Party Retail Group Maintenance' /} 
+
+<script type="text/javascript">
+
+	function doEdit(data) {
+		if('${lookup?.lookupId}' == 'THIRD_PARTY-SELLING_AGENT') {
+			if ((data[4] == "New") || (data[4] == "Updated")) {
+				view(data[0]);
+				return false;
+			} else {
+				return true;
+			}
+		} else {
+			if ((data[3] == "New") || (data[3] == "Updated")) {
+				view(data[0]);
+				return false;
+			} else {
+				return true;
+			}
+		}
+		
+	}
+	
+</script>
+
+<table class="display">
+	<thead>
+		<tr>
+			<th>Key</th>
+			<th width="150px">Code</th>
+			<th width="300px">Name</th>
+				<th width="50px">Status</th>
+			<th width="50px">Active</th>
+			
+		</tr>
+	</thead>
+	<tbody>
+		
+		#{list items:thirdParties, as:'thirdParty'}
+			<tr>
+				<td>
+					${thirdParty?.thirdPartyKey} 
+				</td>
+				<td>
+					${thirdParty?.thirdPartyCode} 
+				</td>
+				<td>
+					${thirdParty?.thirdPartyName}
+				</td>
+				<td>
+					${thirdParty?.recordStatus?.decodeStatus() }
+				</td>
+				<td>
+				 	${thirdParty?.isActive ? 'Yes':'No'}
+				</td>
+			</tr>
+		#{/list}
+	</tbody>
+</table>

@@ -1,0 +1,40 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Transaction Template Maintenance' /}
+
+<script type="text/javascript">
+
+	function doEdit(data) {
+		if ((data[4] == "New") || (data[4] == "Updated")) {
+			view(data[0]);
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+</script>
+
+<table class="display">
+	<thead>
+		<tr>
+			<th>Key</th>
+			<th width="100px">Transaction Code</th>
+			<th>Description</th>
+			<th width="100px">Security Type</th>
+			<th width="80px">Status</th>
+			<th width="50px">Active</th>
+		</tr>
+	</thead>
+	<tbody>
+		#{list items:transactionTemplates, as:'transactionTemplate'}
+		<tr>
+			<td>${transactionTemplate?.transactionTemplateKey}</td>
+			<td>${transactionTemplate?.transactionCode}</td>
+			<td>${transactionTemplate?.description}</td>
+			<td>${transactionTemplate?.securityType.securityType}</td>
+			<td>${transactionTemplate?.recordStatus?.decodeStatus()}</td>
+			<td>${(transactionTemplate?.isActive) ? 'Yes' : 'No'}</td>
+		</tr>
+		#{/list}
+	</tbody>
+</table>

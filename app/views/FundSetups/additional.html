@@ -1,0 +1,47 @@
+<script type="text/javascript">
+
+</script>
+<div>
+	<p>
+		#{radioButton id:'autoEmail', name:'autoEmail',value:((faMaster?.autoEmail)?'true':'false'), label:'Email Automatically', options:operators, readOnly:readOnly /}
+		#{hidden id:'autoEmailHidden', name:'faMaster.autoEmail', value:((faMaster?.autoEmail)?'true':'false') /}
+	</p>
+	<p>
+		<label></label>
+		#{textBox id:'emailHidden', name:'emailHidden', label:'', value:'', readOnly:true, width:'250px', maxLength:50 /}
+	</p>
+	<p>
+		#{radioButton id:'published', name:'published',value:((faMaster?.published)?'true':'false'), label:'Publish to Media', options:operators, readOnly:readOnly /}
+		#{hidden id:'publishedHidden', name:'faMaster.published', value:((faMaster?.published)?'true':'false') /}
+	</p>
+	<p>
+		#{radioButton id:'reportTime', name:'reportTime',value:((faMaster?.reportTime)?'true':'false'), label:'Generate to E-Reporting', options:operators, readOnly:readOnly /}
+		#{hidden id:'reportTimeHidden', name:'faMaster.reportTime', value:((faMaster?.reportTime)?'true':'false') /}
+	</p>
+	<p>
+		<label></label>
+		#{dropDownList id:'eReportTime', name:'faMaster.eReportTime.lookupId', value:faMaster?.eReportTime?.lookupId, label:'',options:eTime,readOnly:readOnly/}
+		<span class="error">#{error 'Generate to E-Reporting is' /}</span>
+	</p>
+	<p id="pEreportCode">
+		#{textBox id:'eReportCode', name:'faMaster.eReportCode', label:'E-Report Code', value:faMaster?.eReportCode, class:'capitalize', readOnly:readOnly, width:'250px',required:true, maxLength:50 /}
+		<span class="error">#{error 'E-Report Code is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'additionalCode1', name:'faMaster.additionalCode1', label:'Additional Code 1', value:faMaster?.additionalCode1, class:'capitalize', readOnly:readOnly, width:'250px', maxLength:50 /}
+		<span class="error">#{error 'Additional Code 1 is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'additionalCode2', name:'faMaster.additionalCode2', label:'Additional Code 2', value:faMaster?.additionalCode2, class:'capitalize', readOnly:readOnly, width:'250px', maxLength:50 /}
+		<span class="error">#{error 'Additional Code 2 is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'additionalCode3', name:'faMaster.additionalCode3', label:'Additional Code 3', value:faMaster?.additionalCode3, class:'capitalize',  readOnly:readOnly, width:'250px', maxLength:50 /}
+		<span class="error">#{error 'Additional Code 3 is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'additionalCode4', name:'faMaster.additionalCode4', label:'Additional Code 4', value:faMaster?.additionalCode4, class:'capitalize',  readOnly:readOnly, width:'250px', maxLength:50 /}
+		<span class="error">#{error 'Additional Code 4 is' /}</span>
+	</p>
+</div>
+			

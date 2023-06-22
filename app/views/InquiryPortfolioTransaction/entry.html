@@ -1,0 +1,46 @@
+#{extends 'templates/main.html' /}
+
+<script type="text/javascript">
+	$(function() {
+		
+		var backToList = function() {
+			loading.dialog('open');
+			location = "@{list()}";
+		}
+		
+		$("#forSettlePrematch :input").attr("disabled", true);
+		$("#forSettlePrematch2 :input").attr("disabled", true);
+		
+		$('#clear').click(function() {
+			location.href="@{entry()}";			
+		});
+		
+		$('#close').click(function() {
+			location.href = "@{list()}";
+		})
+		
+	});	
+</script>
+
+#{if flash.error || errors}
+    <div class="error">
+    	<b>Error when saving data!</b><br/><br/>
+    	#{if flash.error}
+<li>${flash.error}</li>
+		#{/if}
+		#{ifErrors}
+			#{errors}
+<li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}
+
+<h2>Inquiry Portfolio Transaction Detail</h2>
+<div id="detail">
+	#{include 'Transactions/detail.html' /}	
+</div>
+
+<div id="actions" class="buttons">
+	<input type="button" id="close" value="Close" />
+</div>

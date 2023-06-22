@@ -1,0 +1,114 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Cancel Invoice' /}
+#{set readOnly: ((mode != 'edit' && mode != 'entry') || confirming) /}
+#{set cancelOnly: ((mode == 'edit' || mode == 'entry') || confirming) /}
+#{set editOnly: ((mode == 'edit' || mode == 'entry') || confirming) /}
+#{set id:csBilling?.billingKey /}
+#{if flash.error}
+    <p style="color:#c00">
+        ${flash.error}
+    </p>
+#{/if}
+#{script 'date.js', characterset:'utf-8' /}
+#{script 'lookups.js' /}
+
+<form id="cancelInvoiceForm" class="form" method="POST">
+<div style="float:left;">
+    #{hidden id:'rowNumber' /}
+    #{hidden id:'rowPosition' /}
+    #{hidden id:'mode', name:'mode', value:mode /}
+    
+	<p>
+	    #{textBox id:'invoiceNo', label:'Invoice No', value:csBilling?.invoiceNo, width:'120px', readOnly:true /}
+	    #{hidden id:'billingKey', name:'csBilling.billingKey', value:csBilling?.billingKey /}
+	</p>
+	
+	<p>
+	    #{textBox id:'customerCode', name:'csBilling.customer.customerNo', label:'Customer Code', value:csBilling?.customer?.customerNo, class:'capitalize', width:'120px', maxLength:50, readOnly:readOnly /}
+	    #{hidden id:'customerKey', name:'csBilling.customer.customerKey', value:csBilling?.customer?.customerKey /}
+	    #{button id:'customerHelp', value:'?', class:'small', readOnly:readOnly /}
+	    #{textBox id:'customerDesc', name:'csBilling.customer.customerName', value:csBilling?.customer?.customerName, class:'capitalize', readOnly:true, maxLength:100, width:'241.5px' /}
+	    <span class="error">#{error 'Customer Code is' /}</span>
+	</p>
+	
+	<p>
+	    #{textBox id:'billingMonth', name:'csBilling.billingMonth', label:'Invoice Month/Year', value:csBilling?.billingMonth, class:'capitalize', readOnly:readOnly , width:'25px', maxLength:25 /}
+	    /
+	    #{textBox id:'billingYear', name:'csBilling.billingYear', readOnly:true, width:'50px', value:csBilling?.billingYear, readOnly:readOnly, width:'40px', maxLength:40 /}
+	    <span class="error">#{error 'Name is' /}</span>
+	</p>
+	
+	<p>
+	    #{textBox id:'invoiceDate', name:'csBilling.invoiceDate', label:'Invoice Date', value:csBilling?.invoiceDate?.format(appProp.dateFormat), required:true, readOnly:readOnly, class:'calendar', maxLength:10 /}
+	    <span id="invoiceDateFromError" class="error">#{error 'Invoice Date From is' /}</span>
+	</p>
+	
+	<p>
+	    #{textBox id:'dueDate', name:'csBilling.dueDate', label:'Due Date', value:csBilling?.dueDate?.format(appProp.dateFormat), required:true, readOnly:readOnly, class:'calendar', maxLength:10 /}
+	    <span id="dueDateFromError" class="error">#{error 'Due Date From is' /}</span>
+	</p>
+</div>
+<div class="right">
+	<p>
+	   #{textBox id:'cancelDate', name:'csBilling.cancelDate', label:'Cancel Date', value:csBilling?.cancelDate?.format(appProp.dateFormat), required:true, readOnly:editOnly, class:'calendar', maxLength:10 /} 
+	</p>
+	<p>
+	   <span id="cancelDateError" class="error" style="margin-left:10px;"></span>
+	</p>
+    <p>
+	   #{textArea id:'remarksCancel', label:'Remarks', name:'csBilling.remarksCancel', value:csBilling?.remarksCancel, required:true, class:'capitalize', width:'165px', maxLength:200, readOnly:editOnly /}
+    </p>
+    <p>
+        <label></label>
+        <span id="remarksCancelError" class="error"></span>
+    </p>
+</div>
+<div class="divclear"></div>
+<br>
+<p></p>
+<table id="grid" class="display">
+    <thead>
+         <tr>
+            <th></th>
+             <th width="100px">Charges Group</th>
+             <th width="80px">Amount</th>
+             <th width="8px">Tax Amount</th>
+             <th width="80px">Amount after Tax</th>
+         </tr>
+     </thead>
+     <tbody>
+     #{list csBilling.details, as:'csBillingDetail'}
+         <tr>
+            <td></td>
+            <td>
+                ${csBillingDetail.chargeGroup.lookupDescription}
+            </td>
+            <td align="right">
+                ${csBillingDetail.billingFee.format('#,##0.##########')}
+            </td>
+            <td align="right">
+                ${csBillingDetail.billingTax.format('#,##0.##########')}
+            </td>
+            <td align="right">
+                ${csBillingDetail.billingAmount.format('#,##0.##########')}
+            </td>
+        </tr>
+     #{/list}
+     </tbody>
+</table>
+    <br>
+	<span style="margin-left: 65em;" ><b>Total Amount</b></span>
+	#{textBox id:'totalAmount', class:'numeric', value:csBilling?.totBillAmnt.format('#,##0.##########'), readOnly:true, width:'150px' /}
+</form>
+<input type="hidden" id="dummy" />
+
+<script type="text/javascript">
+//biar table ga bs diklik
+function doEdit(data){
+    return false;
+}
+
+function doView(data){
+    return false;
+}
+</script>

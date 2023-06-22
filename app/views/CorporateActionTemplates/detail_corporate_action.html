@@ -1,0 +1,104 @@
+
+<script type="text/javascript">
+	$(function(){
+		$('#cancelCorporateAction').click(function() {
+			$("#detailCorporateAction").dialog('close');
+		});
+		
+		$('#addCorporateAction').click(function(){
+			saveCorporateAction();
+			$('#detailCorporateAction').dialog('close');	
+			$(':hidden').attr('name').replace('index', rowCount);
+		
+		});		
+	})
+	
+		$('#transactionCode1').lookup({
+			list:'@{Pick.transactionTemplates()}',
+			get:'@{Pick.transactionTemplate()}',
+			key:$('#transactionTemplateKey1'),
+			filter:'$transaction',
+			description:$('#transactionTemplateDescription1'),
+			help:$('#transactionTemplateHelp')
+		});
+	
+	var selectedRow;
+	function editCorporateAction(actionDetail) {
+		selectedRow = actionDetail;
+		$('#corporateActionForm #actionTemplateKey1').val($(selectedRow).find('#actionTemplateKeyX').val());
+		$('#corporateActionForm #detailTemplateType').val($(selectedRow).find('#detailTemplateTypeX').val());
+		$('#corporateActionForm #transactionTemplateKey').val($(selectedRow).find('#transactionTemplateKeyX').val());
+		$('#corporateActionForm #actionDetailKey').val($(selectedRow).find('#actionDetailKeyX').val());
+		$('#corporateActionForm #transactionCode1').val($(selectedRow).find('#transactionCodeX').val());
+		//alert($('#corporateActionForm #transactionCode1').val());
+		$('#corporateActionForm #transactionTemplateDescription1').val($(selectedRow).find('#transactionTemplateDescriptionX').val())
+		$('#corporateActionForm #isSource').val($(selectedRow).find('#isSourceX').val())
+		$("#detailCorporateAction #filterTransaction").val($("#targetForFilter").val());
+	}
+	
+	function saveCorporateAction() {
+		if (selectedRow){
+			$(selectedRow).find(':nth-child(1)').html($('#corporateActionForm #transactionCode1').val());
+			$(selectedRow).find(':nth-child(2)').html($('#corporateActionForm #transactionTemplateDescription1').val());
+			$(selectedRow).find(':nth-child(3) span').html($('#corporateActionForm #isSource').val()== 'true' ? 'Source' : 'Target');
+			$(selectedRow).find('#actionDetailKeyX').val($('#corporateActionForm #actionDetailKey').val());
+			$(selectedRow).find('#descriptionX').val($('#corporateActionForm #description').val());
+			$(selectedRow).find('#actionTemplateKeyX').val($('#corporateActionForm #actionTemplateKey1').val());
+			$(selectedRow).find('#transactionTemplateKeyX').val($('#corporateActionForm #transactionTemplateKey1').val());
+			$(selectedRow).find('#transactionCodeX').val($('#corporateActionForm #transactionCode1').val());
+			$(selectedRow).find('#transactionTemplateDescriptionX').val($('#corporateActionForm #transactionTemplateDescription1').val());
+			$(selectedRow).find('#detailTemplateTypeX').val($('#corporateActionForm #detailTemplateType').val());
+			$(selectedRow).find('#isSourceX').val($('#corporateActionForm #isSource').val());
+			
+		} else {
+			 $('#listCorporateAction #gridCorporateAction .dataTables_empty').each(function() {
+					$(this).parent().remove();
+				 });
+			var index = $('#listCorporateAction #gridCorporateAction tbody tr').length;
+			var row = $('#listCorporateAction #gridCorporateAction tfoot tr:first').clone();
+			row.find(':nth-child(1)').html($('#corporateActionForm #transactionCode1').val());
+			row.find(':nth-child(2)').html($('#corporateActionForm #transactionTemplateDescription1').val());
+			row.find(':nth-child(3)').prepend($('#corporateActionForm #isSource').val() == 'true' ? 'Source' : 'Target');			
+			
+			row.find('#transactionTemplateDescriptionX').val($('#corporateActionForm #transactionTemplateDescription1').val());
+			row.find('#transactionCodeX').val($('#corporateActionForm #transactionCode1').val());
+			row.find('#actionDetailKeyX').val($('#corporateActionForm #actionDetailKey').val());
+			row.find('#actionTemplateKeyX').val($('#corporateActionForm #actionTemplateKey1').val());
+			row.find('#transactionTemplateKeyX').val($('#corporateActionForm #transactionTemplateKey1').val());
+			row.find('#detailTemplateTypeX').val($('#corporateActionForm #detailTemplateType').val());
+			row.find('#isSourceX').val($('#corporateActionForm #isSource').val());
+			
+			row.appendTo($('#listCorporateAction #gridCorporateAction tbody'));
+			
+			row.find('#transactionTemplateDescriptionX').attr('name', 'actionDetails[' + index + '].description');
+			row.find('#actionDetailKeyX').attr('name', 'actionDetails[' + index + '].actionDetailKey');
+			row.find('#actionTemplateKeyX').attr('name', 'actionDetails[' + index + '].actionTemplateMaster.actionTemplateKey');
+			row.find('#transactionTemplateKeyX').attr('name', 'actionDetails[' + index + '].transactionTemplate.transactionTemplateKey');
+			row.find('#transactionCodeX').attr('name', 'actionDetails[' + index + '].transactionTemplate.transactionCode');
+			row.find('#isSourceX').attr('name', 'actionDetails[' + index + '].isSource');
+				
+		}
+		selectedRow = null;
+	
+	}
+	
+</script>
+<div id="corporateActionForm" class="form">
+	#{hidden id:'filterTransaction', name:'filterTransaction' /}
+	#{hidden id:'actionTemplateKey1', name:'actionDetail.actionTemplateMaster.actionTemplateKey', value:actionDetail?.actionTemplateMaster?.actionTemplateKey /}
+	#{hidden id:'actionDetailKey', name:'actionDetail.actionDetailKey' /}
+	<p>
+		#{textBox id:'transactionCode1', name:'actionDetail.transactionTemplate.transactionCode', label:'Transaction Template', value:actionDetail?.transactionTemplate?.transactionCode, readOnly:readOnly, required:true, width:'85px' /}
+		#{hidden id:'transactionTemplateKey1', name:'actionDetail.transactionTemplate.transactionTemplateKey', value:actionDetail?.transactionTemplate?.transactionTemplateKey /}
+		#{button id:'transactionTemplateHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'transactionTemplateDescription1', name:'actionDetail?.description',  required:true, readOnly:true, width:'330'/}
+	</p>
+	<p>
+		#{dropDownList id:'isSource', name:'actionDetail?.isSource', value:((actionDetail?.isSource)?'true':'false'), label:'Apply To', options:operators, readOnly:readOnly /}
+	</p>
+
+		<div class="buttons">
+			#{button id:'addCorporateAction', value:'Save' /}
+			#{button id:'cancelCorporateAction', value:'Cancel' /}
+		</div>
+</div>

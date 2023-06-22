@@ -1,0 +1,404 @@
+#{extends 'templates/detail1.html' /}
+#{set pageTitle: 'PDI Loader' /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{set id:report?.reportKey /}
+
+#{script 'jquery.rc4.js' /}
+<script type="text/javascript">
+	$(function() {
+		// 0 already used by default. start the next generated html with this counter as suffix
+		var tmpCounter = 1;
+		
+		jQuery.fn.resetAndDisabled = function(){
+			html = $(this);
+			html.val("");
+			//html.css("display", "none");
+			html.attr("disabled", "disabled");
+			
+			// add a replacement hidden element
+			var currName = html.attr( "name" );
+			var currId = html.attr( "id" );
+			console.log( "disabling "+currName );
+			// remove any posibility for existing element
+			var existingObjName = "input[type=hidden]";
+			console.log( "resetAndDisabled:try to find:"+ existingObjName);
+			$( existingObjName ).each( function(idx, obj){
+				if( currName == $(obj).attr("name") &&
+						currId == $(obj).attr("refid")){
+					$(obj).remove();
+				}
+			} );
+			var newHidden = $( document.createElement( "input" ) );
+			newHidden.attr( "type", "hidden" );
+			newHidden.attr( "name", currName );
+			newHidden.attr( "refid", currId );
+			newHidden.val( "" );
+			html.after( newHidden );
+			html.fadeIn();
+		};
+
+		jQuery.fn.reActivate = function(){
+			html = $(this);
+			//html.css("display", "block");
+			
+			// remove any posibility for existing hidden element
+			var currName = html.attr( "name" );
+			var currId = html.attr( "id" );
+			var existingObjName = "input[type=hidden]";
+			console.log( "reActivate:try to find:"+ existingObjName);
+			var existingObj = html.find( existingObjName );
+			$( existingObjName ).each( function(idx, obj){
+				if( currName == $(obj).attr("name") &&
+					currId == $(obj).attr("refid")){
+					$(obj).remove();
+				}
+			} );			
+			html.attr("disabled", "");
+			html.fadeIn();
+		};
+
+		var dataTypes = [];
+		#{if dataTypes != null}
+			#{list dataTypes, as:'type'}
+				dataTypes.push( { "value": "${type.value}", "text" : "${type.text}" } );
+			#{/list}
+		#{/if}
+		
+		var displayTypes = [];
+		#{if displayTypes != null}
+			#{list displayTypes, as:'display'}
+				displayTypes.push( { "value": "${display.value}", "text" : "${display.text}" } );
+			#{/list}
+		#{/if}
+		
+		var lookupGroups = [];
+		#{if lookupGroups != null}
+			#{list lookupGroups, as:'lookup'}
+				lookupGroups.push( { "value": "${lookup.value}", "text" : "${lookup.text}" } );
+			#{/list}
+		#{/if}
+		
+		// enable file upload
+		$( "#form.form" ).attr("enctype", "multipart/form-data");
+		
+		$.addNewParam = function (options){
+			var tbodys = $( "#inputtableparam tbody" );
+			var lastSequence = $( 'input[name="paramSequence[]"]' ).last();
+			console.log( lastSequence[0] );
+			if( lastSequence[0] !== undefined ){
+				tmpCounter = parseInt( lastSequence.val() , 10) + 1;
+			}
+			console.log( "tmpCounter "+tmpCounter );
+			var newrow = document.createElement( "tr" );
+			var newcola = document.createElement( "td" );
+			var newcolb = document.createElement( "td" );
+			var newcolc = document.createElement( "td" );
+			var newcold = document.createElement( "td" );
+			var newcole = document.createElement( "td" );
+			var newcolf = document.createElement( "td" );
+			var newcolg = document.createElement( "td" );
+			
+			var displayDropdown = document.createElement( "select" );
+			$(displayDropdown).attr( "id", "paramListDisplay_"+tmpCounter );
+			$(displayDropdown).attr( "class", "forDisplayType" );
+			$(displayDropdown).attr( "style", "width:120px" );
+			$(displayDropdown).attr( "name", "paramListDisplay[]" );
+			
+			var dataDropdown = document.createElement( "select" );
+			$(dataDropdown).attr( "id", "paramListData_"+tmpCounter );
+			$(dataDropdown).attr( "class", "forDataType" );
+			$(dataDropdown).attr( "style", "width:120px" );
+			$(dataDropdown).attr( "name", "paramListData[]" );
+			$(dataDropdown).attr( "display", "none" );
+
+			var lookupDropdown = document.createElement( "select" );
+			$(lookupDropdown).attr( "id", "paramListLookup_"+tmpCounter );
+			$(lookupDropdown).attr( "class", "forLookupGroup" );
+			$(lookupDropdown).attr( "style", "width:120px" );
+			$(lookupDropdown).attr( "name", "paramListLookup[]" );
+			$(lookupDropdown).attr( "display", "none" );
+
+			
+			$(newcola).html( '<input id="paramListName[]" name="paramListName[]" type="text" value="" style="width:120px"/>' );
+			$(newcolb).html( '<input id="paramListValue[]" name="paramListValue[]" type="text" value="" style="width:120px"/>' );
+			$(newcolc).append( displayDropdown );
+			$(newcold).append( dataDropdown );
+			$(newcole).html( '<input id="paramListLength_'+tmpCounter+'" name="paramListLength[]" type="text" value="" class="numeric" style="width:50px" style="display:none"/>' );
+			$(newcolf).append( lookupDropdown );
+			
+			$(displayDropdown).append( "<option></option>" );
+			for(i = 0; i < displayTypes.length; i++) {
+				type = displayTypes[i];
+				$(displayDropdown).append( "<option value="+type.value+"> "+type.text+" </option>" );
+			}
+
+			$(dataDropdown).append( "<option></option>" );
+			for(i = 0; i < dataTypes.length; i++) {
+				type = dataTypes[i];
+				$(dataDropdown).append( "<option value="+type.value+"> "+type.text+" </option>" );
+			}
+
+			$(lookupDropdown).append( "<option></option>" );
+			for(i = 0; i < lookupGroups.length; i++) {
+				type = lookupGroups[i];
+				$(lookupDropdown).append( "<option value="+type.value+"> "+type.text+" </option>" );
+			}
+			
+			// create field for hidden sequence order
+			var hiddenSequence = $( document.createElement( "input" ) );
+			hiddenSequence.attr( "id", "new_paramSequence_"+tmpCounter );
+			hiddenSequence.attr( "name", "paramSequence[]" );
+			hiddenSequence.attr( "type", "hidden" );
+			hiddenSequence.val( tmpCounter );
+			$( newcola ).append( hiddenSequence );
+			
+			// create a remove image
+			var removeImg = $( document.createElement( "img" ) );
+			removeImg.attr( "src", "@{'/public/images/remove.png'}" );
+			removeImg.addClass( "remove_param" );
+			$( newcolg ).append( removeImg );
+			// for removed field flag
+			var hiddenRemove = $( document.createElement( "input" ) );
+			hiddenRemove.attr( "id", "paramRemoved_"+tmpCounter );
+			hiddenRemove.attr( "name", "paramRemoved[]" );
+			hiddenRemove.attr( "type", "hidden" );
+			hiddenRemove.val( "0" );
+			$( newcola ).append( hiddenRemove );
+			
+			$(newrow).append( newcola );
+			$(newrow).append( newcolb );
+			$(newrow).append( newcolc );
+			$(newrow).append( newcold );
+			$(newrow).append( newcole );
+			$(newrow).append( newcolf );
+			$(newrow).append( newcolg );
+	
+			tbodys.last().append($(newrow));			
+		};
+		$("#addnewparam").click( function() {
+			$.addNewParam();
+		} );
+		
+		$("img.remove_param").live( "click",function() {
+			var html = $( this );
+			var currentRow = html.parent().parent();
+			currentRow.fadeOut( "slow" );
+			// set remove flag
+			var removedField = currentRow.find( "input[name='paramRemoved[]']" );
+			console.log( removedField );
+			if( removedField[0] !== undefined ){
+				removedField.val( "1" );
+			}
+			
+		} );
+		$(".forDataType").live( "change", function() {
+			html = $(this);
+			displayValue = html.val();
+			htmlId = html.attr("id" );
+			
+			splitId = htmlId.split("_");
+			prefixId = splitId[0];
+			suffixId = splitId[1];
+			
+			lengthSuffix = "paramListLength_";
+			console.log("displayValue:"+displayValue);
+			console.log( $("#"+lengthSuffix+suffixId) );
+			if( displayValue == "DATA_TYPE-STR" ) { //STRING
+				$("#"+lengthSuffix+suffixId).reActivate();
+			}else{
+				$("#"+lengthSuffix+suffixId).resetAndDisabled();
+			}
+		});
+		
+		$(".forDisplayType").live( "change", function() {
+			html = $(this);
+			displayValue = html.val();
+			htmlId = html.attr("id" );
+			
+			splitId = htmlId.split("_");
+			prefixId = splitId[0];
+			suffixId = splitId[1];
+			
+			dataSuffix = "paramListData_";
+			lengthSuffix = "paramListLength_";
+			lookupSuffix = "paramListLookup_";
+			
+			if( displayValue == "DISPLAY_TYPE-1" ) { //1-TEXTBOX
+				$("#"+dataSuffix+suffixId).reActivate();
+				$("#"+lookupSuffix+suffixId).resetAndDisabled();
+				
+				$("#"+lengthSuffix+suffixId).reActivate();
+				
+			}else if( displayValue == "DISPLAY_TYPE-2" ){ //2-DROPDOWN
+				$("#"+dataSuffix+suffixId).resetAndDisabled();
+				$("#"+lengthSuffix+suffixId).resetAndDisabled();
+				
+				$("#"+lookupSuffix+suffixId).reActivate();
+			}else if( displayValue == "DISPLAY_TYPE-3" ){ // 3-DATE
+				$("#"+dataSuffix+suffixId).val( "DATA_TYPE-DAT" );
+
+				$("#"+dataSuffix+suffixId).resetAndDisabled();
+				$("#"+lengthSuffix+suffixId).resetAndDisabled();
+				$("#"+lookupSuffix+suffixId).resetAndDisabled();
+			}else {
+				$("#"+dataSuffix+suffixId).resetAndDisabled();
+				$("#"+lengthSuffix+suffixId).resetAndDisabled();
+				$("#"+lookupSuffix+suffixId).resetAndDisabled();
+			}
+		});
+		
+		// apply to data already in the document
+		$(".forDisplayType").change();
+		
+		$('input[name=isActive]').change(function(){
+			$("input[name='report.isActive']").val($("input[name='isActive']:checked").val());
+		});
+				
+	});
+	
+</script>		
+#{if !confirming}
+<p>
+	#{fileUpload name:'attachment', id:'attachment', label:'Transformation File', required:true /}
+	${report?.reportFile}
+	<span class="error">#{error 'File' /}</span>
+</p>
+#{/if}
+#{else}
+<p>
+	#{textBox id:'attachment', name:'attachment', label:'Transformation File', value:report?.reportFile, readOnly:readOnly, width:'200px', required:true /}
+	<span class="error">#{error 'File' /}</span>
+</p>
+#{/else}
+
+<p>
+	<label>Parameter</label>
+	<table id="inputtableparam">				
+		#{if !confirming}
+		<thead>
+			<tr>
+				<th width="120px">Name</th>
+				<th width="120px">Value</th>
+				<th width="120px">Display Type</th>
+				<th width="120px">Data Type</th>
+				<th width="50px">Length</th>
+				<th width="120px">Lookup Group</th>
+			</tr>
+		</thead>				
+		<tbody>
+			#{if report?.gnReportPdiParams == null || report?.gnReportPdiParams?.size() == 0}
+				<script type="text/javascript" language="javascript">
+				$(function() {
+					$.addNewParam();
+				});
+				</script>
+			#{/if}
+			#{else}
+				#{list report?.gnReportPdiParams, as:'pdiParam'}
+				<tr>
+					<td>
+						#{textBox id:'paramListName_'+pdiParam.paramKey, name:'paramListName[]', value:pdiParam.paramName, readOnly:readOnly, width:'120px', required:false /}
+						#{hidden id:'paramSequence_'+pdiParam.paramKey, name:'paramSequence[]', value:pdiParam.sequenceOrder /}
+						#{hidden id:'paramRemoved_'+pdiParam.paramKey, name:'paramRemoved[]', value:"0" /}
+					</td>
+					<td>
+						#{textBox id:'paramListValue_'+pdiParam.paramKey, name:'paramListValue[]', value:pdiParam.defaultValue, readOnly:readOnly, width:'120px', required:false /}
+					</td>
+					<td>
+						#{dropDownList id:'paramListDisplay_'+pdiParam.paramKey, name:'paramListDisplay[]', label:'', options:displayTypes, value:pdiParam.displayType?.lookupId, required:false, readOnly:readOnly, width:'120px', class:'forDisplayType'/}
+					</td>
+					<td>
+						#{dropDownList id:'paramListData_'+pdiParam.paramKey, name:'paramListData[]', label:'', options:dataTypes, value:pdiParam.dataType?.lookupId, required:false, readOnly:readOnly, width:'120px', class:'forDataType'/}
+					</td>
+					<td>
+						#{textBox id:'paramListLength_'+pdiParam.paramKey, name:'paramListLength[]', value:pdiParam.length, readOnly:readOnly, width:'50px', required:false, class:'numeric forLength' /}
+					</td>
+					<td>
+						#{dropDownList id:'paramListLookup_'+pdiParam.paramKey, name:'paramListLookup[]', label:'', options:lookupGroups, value:pdiParam.gnLookupGroup?.lookupGroup, required:false, readOnly:readOnly, width:'120px', class:'forLookupGroup'/}
+					</td>
+					<td>
+						<img class="remove_param" src="@{'/public/images/remove.png'}"/>
+					</td>
+					
+				</tr>
+				#{/list}
+			#{/else}
+			</tbody>
+			<tfoot>
+				<tr>
+					<td colspan="5"></td>
+					<td><input type="button" value="Add Parameter" name="addnewparam" id="addnewparam" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"/></td>
+				</tr>
+			</tfoot>					
+		#{/if}
+		#{else}
+			#{if report.gnReportPdiParams?.size() > 0}
+			<thead>
+				<tr>
+				<th width="120px">Name</th>
+				<th width="120px">Value</th>
+				<th width="120px">Display Type</th>
+				<th width="120px">Data Type</th>
+				<th width="50px">Length</th>
+				<th width="120px">Lookup Group</th>
+				</tr>
+			</thead>				
+			<tbody>
+				#{list report?.gnReportPdiParams, as:'pdiParam'}
+				<tr>
+					<td>
+						#{textBox id:'paramListName[]', name:'paramListName[]', value:pdiParam.paramName, readOnly:readOnly, width:'120px', required:false /}
+						#{hidden id:'paramSequence_'+pdiParam.paramKey, name:'paramSequence[]', value:pdiParam.sequenceOrder /}
+						#{hidden id:'paramRemoved_'+pdiParam.paramKey, name:'paramRemoved[]', value:"0" /}
+					</td>
+					<td>
+						#{textBox id:'paramListValue[]', name:'paramListValue[]', value:pdiParam.defaultValue, readOnly:readOnly, width:'120px', required:false /}
+					</td>
+					<td>
+						#{textBox id:'paramListDisplay[]', name:'paramListDisplay[]', value:pdiParam.displayType?.lookupId, readOnly:readOnly, width:'120px', required:false /}
+					</td>
+					<td>
+						#{textBox id:'paramListData[]', name:'paramListData[]', value:pdiParam.dataType?.lookupId, readOnly:readOnly, width:'120px', required:false /}
+					</td>
+					<td>
+						#{textBox id:'paramListLength[]', name:'paramListLength[]', value:pdiParam.length, readOnly:readOnly, width:'50px', required:false /}
+					</td>
+					<td>
+						#{textBox id:'paramListLookup[]', name:'paramListLookup[]', value:pdiParam.gnLookupGroup?.lookupGroup, readOnly:readOnly, width:'120px', required:false /}
+					</td>										
+				</tr>
+				#{/list}
+			</tbody>
+			#{/if}
+			#{else}
+				None
+			#{/else}
+		#{/else}
+	</table>
+</p>
+<p>
+
+</p>
+#{hidden id:'reportKey', name:'report.reportKey', value:report?.reportKey /}
+#{hidden id:'reportFile', name:'report.reportFile', value:report?.reportFile /}
+#{hidden id:'realFileName', name:'report.realFileName', value:report?.realFileName /}
+#{hidden id:'isAttachment', name:'isAttachment', value:isAttachment /}
+
+<p>
+	#{textBox id:'seqNo', name:'report.sequenceNo', label:'Sequence No', value:report?.sequenceNo, readOnly:readOnly, class:'numberOnlyNoZero numeric', width:'80px', required:true /}
+	<span class="error">#{error 'Sequence No' /}</span>
+</p>
+<p>
+	#{textBox id:'report.reportGroup', name:'report.reportGroup', label:'Group', value:report?.reportGroup , width:'200px', required:true, readOnly:readOnly /}
+	<span class="error">#{error 'Report group' /}</span>
+</p>
+<p>
+	#{textBox id:'report.reportName', name:'report.reportName', label:'Name', value:report?.reportName, required:true, readOnly:readOnly, width:'200px'  /}
+	<span class="error">#{error 'Report name' /}</span>
+</p>
+
+<p>
+	#{radioButton id:'isActive', name:'isActive', value:((report?.isActive)?'true':'false'), label:'Active', options:operators, readOnly:readOnly, required:true /}
+	#{hidden id:'isActiveHidden', name:'report.isActive', value:((report?.isActive)?'true':'false') /}
+	<span class="error">#{error 'Active' /}</span>
+</p>

@@ -1,0 +1,530 @@
+#{set id: bankAccount?.bankAccountKey /}
+
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{script 'lookups.js' /}
+
+<script type="text/javascript"><!--	
+	$(function() {
+		$('#paymentChargeOverwrite').hide();
+		$('#paymentChargeOverwrite').val($('#paymentCharge').val()).blur();
+
+		$('#bankCode').attr("disabled", "disabled");
+		$('#bankCodeHelp').attr("disabled", "disabled");
+		
+		if ((('${mode}'=='entry') || ('${mode}'=='edit')) && ('${confirming}' !== 'true')) {
+			$('#bankCode').removeAttr("disabled");
+			$('#bankCodeHelp').removeAttr("disabled");
+		}
+					
+		if ($.browser.msie){
+			$("#description[maxlength]").bind('input propertychange', function() {
+		        var maxLength = $(this).attr('maxlength');  
+		        if ($(this).val().length > maxLength) {  
+		            $(this).val($(this).val().substring(0, maxLength));  
+		        }  
+		    });
+		}
+		
+		if (('${mode}'=='entry') || (('${mode}'=='edit') && (('${bankAccount?.recordStatus?.decodeStatus()}' == 'Reject') || ($("#status").val() == 'R')))) {
+			$('input[name=isActive]').attr("disabled", "disabled");
+		}
+		
+		$('input[name=invoiceAccount]').change(function(){
+			$("input[name='bankAccount.invoiceAccount']").val($("input[name='invoiceAccount']:checked").val());
+		});
+		
+		$('input[name=overwriteBankChargesRead]').change(function(){
+			$("input[name='overwriteBankChargesEl']").val($("input[name='overwriteBankChargesRead']:checked").val());
+			if ('${confirming}'  == '') {
+				if ($("input[name='overwriteBankChargesRead']:checked").val() == undefined) {
+					$('#paymentChargeOverwrite').attr("disabled", "disabled");
+					$('#paymentChargeOverwrite').val('');
+					$('#paymentCharge').val('')
+					$('#paymentChargeStripped').val('');
+					$('#paymentChargeOverwrite').removeClass('fieldError');
+					$("#ErrorOverwrite").html("");
+				} else {
+					$('#paymentChargeOverwrite').val('0').blur();
+					$('#paymentCharge').val('0').blur();
+					$('#paymentChargeStripped').val('0').blur();
+					/* var overChargeValue = $('#paymentChargeOverwrite').val();
+					var typeCodeValue = $('#paymentCharge').val();
+					if(overChargeValue == typeCodeValue){
+						$('#paymentChargeOverwrite').addClass('fieldError');
+						$("#ErrorOverwrite").html(" Overwrite Bank Charges can't be same with payment default");
+					}else{
+						$('#paymentChargeOverwrite').removeClass('fieldError');
+						$("#ErrorOverwrite").html("");
+					} */
+					
+					$('#paymentChargeOverwrite').removeAttr("disabled");
+				}
+			}
+		});
+		
+		//var defaultBankCode = '${defaultbankcode}';
+		
+		$('input[name=isActive]').change(function(){
+			$("input[name='bankAccount.isActive']").val($("input[name='isActive']:checked").val());
+		});
+		
+		
+		//$('#bankCode').dynapopup('PICK_GN_THIRD_PARTY', 'THIRD_PARTY-BANK', "null");
+		
+		$('#bankCode').dynapopup2({key:'bankAccountKey', help:'bankCodeHelp', desc:'bankCodeName'},'PICK_GN_THIRD_PARTY', "THIRD_PARTY-BANK", "null", 
+				function(data){
+					if (data) {
+						$('#bankCode').removeClass('fieldError');
+						$('#bankCodeKey').val(data.code);
+						$('#bankCodeName').val(data.description);
+						$('#h_bankCodeName').val(data.description);
+						
+						var valBankCode = $('#bankCode').val();
+						
+						/* $.get("@{getPaymentTypeFromIncludedList()}?bankCode="+valBankCode, function(data) {
+							checkRedirect(data);
+							$("#paymentType option" ).remove();
+							for( var el in data ){
+								var curr_ = data[el];
+								$("#paymentType" ).append("<option value='"+curr_.value+"'>"+curr_.text+"</option>");									
+							}
+						});
+						
+						//$("#paymentType option:eq("+data.defaultpaymenttype+")").attr('selected','selected');
+						
+						if ($('#paymentType').val() != '') {
+							$('#paymentTypeHidden').val($('#paymentType').val());
+							
+							var paymenttype = $('#paymentTypeHidden').val();
+							$.get("@{getDefaultPaymentCharges()}", {'paymentType':paymenttype}, function(data) {
+								checkRedirect(data);
+								$('#paymentCharge').autoNumericSet(data.defaultpaymentcharge);
+								$('#paymentChargeStripped').val(data.defaultpaymentcharge);
+							});
+						}
+						
+						if ($('#bankCode').val() == defaultBankCode) {
+							$('#paymentType').attr("disabled", "disabled");
+							$('#paymentCharge').attr("disabled", "disabled");
+							
+							
+						} else if ($('#bankCode').val() != defaultBankCode) {
+							$('#paymentType').removeAttr("disabled");
+							
+						} */
+					}
+				},
+				function(){
+					$('#bankCode').addClass('fieldError');
+					$('#bankCodeName').val('NOT FOUND');
+					$('#bankCode').val('');
+					$('#bankCodeKey').val('');
+					$('#h_bankCodeName').val('');
+				}
+		); 
+		
+		/* $('#bankCode').lookup({
+			list:'@{Pick.thirdParties()}?type=THIRD_PARTY-BANK',
+			get:{
+				url:'@{Pick.thirdParty()}?type=THIRD_PARTY-BANK',
+				success: function(data) {
+					if (data) {
+						$('#bankCode').removeClass('fieldError');
+						$('#bankCodeKey').val(data.code);
+						$('#bankCodeName').val(data.description);
+						$('#h_bankCodeName').val(data.description);
+						
+						var valBankCode = $('#bankCode').val();
+						
+						$.get("@{getPaymentTypeFromIncludedList()}?bankCode="+valBankCode, function(data) {
+							checkRedirect(data);
+							$("#paymentType option" ).remove();
+							for( var el in data ){
+								var curr_ = data[el];
+								$("#paymentType" ).append("<option value='"+curr_.value+"'>"+curr_.text+"</option>");									
+							}
+						});
+						
+						//$("#paymentType option:eq("+data.defaultpaymenttype+")").attr('selected','selected');
+						
+						if ($('#paymentType').val() != '') {
+							$('#paymentTypeHidden').val($('#paymentType').val());
+							
+							var paymenttype = $('#paymentTypeHidden').val();
+							$.get("@{getDefaultPaymentCharges()}", {'paymentType':paymenttype}, function(data) {
+								checkRedirect(data);
+								$('#paymentCharge').autoNumericSet(data.defaultpaymentcharge);
+								$('#paymentChargeStripped').val(data.defaultpaymentcharge);
+							});
+						}
+						
+						if ($('#bankCode').val() == defaultBankCode) {
+							$('#paymentType').attr("disabled", "disabled");
+							$('#paymentCharge').attr("disabled", "disabled");
+							
+							
+						} else if ($('#bankCode').val() != defaultBankCode) {
+							$('#paymentType').removeAttr("disabled");
+							
+						}
+					}
+				},
+				error : function(data) {
+					$('#bankCode').addClass('fieldError');
+					$('#bankCodeName').val('NOT FOUND');
+					$('#bankCode').val('');
+					$('#bankCodeKey').val('');
+					$('#h_bankCodeName').val('');
+				}
+			},
+			key:$('#bankCodeKey'),
+			description:$('#bankCodeName'),
+			help:$('#bankCodeHelp')
+		}); */
+
+		$('#currency').lookup({
+			list:'@{Pick.currencies()}',
+			get:'@{Pick.currency()}',
+			get:{
+				url:'@{Pick.currency()}',
+				success: function(data) {
+					if (data) {
+						$('#currency').removeClass('fieldError');
+						$('#currencyCode').val(data.code);
+						$('#currencyDesc').val(data.description);
+						$('#h_currencyDesc').val(data.description);
+					}
+				},
+				error : function(data) {
+					$('#currency').addClass('fieldError');
+					$('#currencyDesc').val('NOT FOUND');
+					$('#currency').val('');
+					$('#currencyCode').val('');
+					$('#h_currencyDesc').val('');
+				}
+			},
+			key:$('#currencyCode'),
+			description:$('#currencyDesc'),
+			help:$('#currencyHelp')
+		});
+		
+		$('#bankCode').change(function(){
+			if ($('#bankCode').val() == "") {
+				$('#bankCode').val("");
+				$('#bankCodeKey').val("");
+				$('#bankCodeName').val("");
+				$('#h_bankCodeName').val("");
+				
+				$('#paymentType').removeAttr("disabled");
+			}
+			
+			/* var valBankCode = $('#bankCode').val();
+			
+			$.get("@{getPaymentTypeFromIncludedList()}?bankCode="+valBankCode, function(data) {
+				checkRedirect(data);
+				$("#paymentType option" ).remove();
+				for( var el in data ){
+					var curr_ = data[el];
+					$("#paymentType" ).append("<option value='"+curr_.value+"'>"+curr_.text+"</option>");									
+				}
+			});
+			
+			//$("#paymentType option:eq("+data.defaultpaymenttype+")").attr('selected','selected');
+			
+			if ($('#paymentType').val() != '') {
+				$('#paymentTypeHidden').val($('#paymentType').val());
+				
+				var paymenttype = $('#paymentTypeHidden').val();
+				$.get("@{getDefaultPaymentCharges()}", {'paymentType':paymenttype}, function(data) {
+					checkRedirect(data);
+					$('#paymentCharge').autoNumericSet(data.defaultpaymentcharge);
+					$('#paymentChargeStripped').val(data.defaultpaymentcharge);
+				});
+			}
+			
+			if ($('#bankCode').val() == defaultBankCode) {
+				$('#paymentType').attr("disabled", "disabled");
+			
+			} else if ($('#bankCode').val() != defaultBankCode) {
+				$('#paymentType').removeAttr("disabled");
+			} */
+		});
+
+		$('#currency').change(function(){
+			if ($('#currency').val() == "") {
+				$('#currency').val("");
+				$('#currencyCode').val("");
+				$('#currencyDesc').val("");
+				$('#h_currencyDesc').val("");
+			}
+		});
+		
+		$('#paymentType').change(function(){
+			var paymenttype = $('#paymentType').val();
+			$('#paymentTypeHidden').val(paymenttype);
+			$.get("@{getDefaultPaymentCharges()}", {'paymentType':paymenttype}, function(data) {
+				checkRedirect(data);
+				$('#paymentCharge').autoNumericSet(data.defaultpaymentcharge);
+				$('#paymentChargeStripped').val(data.defaultpaymentcharge);
+			});
+		});
+		
+		$('#interestRate').change(function(){
+			$('#interestRate').value($(this).val().toNumber(","), true, 4, null);
+		});
+		
+		$('#interestRate').value($('#interestRate').val().toNumber(","), true, 4, null);
+		
+		if ('${confirming}' == '') {
+			if ($("input[name='overwriteBankChargesRead']:checked").val() == undefined) {
+				$('#paymentChargeOverwrite').attr("disabled", "disabled");
+			} else {
+				$('#paymentChargeOverwrite').removeAttr("disabled");
+			}
+		}
+		/* if ('${mode}'!='entry') {
+			 $('#overwritedbankcharge').show();			 
+			if (('${mode}'=='edit') && ('${confirming}' == '')) {
+				//$('#paymentCharge').removeAttr("disabled");
+				
+				var valBankCode = $('#bankCode').val();
+				
+				$.get("@{getPaymentTypeFromIncludedList()}?bankCode="+valBankCode, function(data) {
+					checkRedirect(data);
+					$("#paymentType option" ).remove();
+					for( var el in data ){
+						var curr_ = data[el];
+						$("#paymentType" ).append("<option value='"+curr_.value+"'>"+curr_.text+"</option>");									
+					}
+					//alert('${bankAccount?.paymentType?.lookupId}');
+					$('#paymentType').val('${bankAccount?.paymentType?.lookupId}');
+					//$('#paymentTypeHidden').val('${bankAccount?.paymentType?.lookupId}');
+				});
+				
+				if ($('#bankCode').val() == defaultBankCode) {
+					$('#paymentType').attr("disabled", "disabled");
+					$('#paymentCharge').attr("disabled", "disabled");
+					
+				} else if ($('#bankCode').val() != defaultBankCode) {
+					$('#paymentType').removeAttr("disabled");
+				//	$('#paymentCharge').removeAttr("disabled");
+				}
+			}
+		} else if ('${mode}'=='entry') {
+			$('#overwritedbankcharge').show();
+			
+			var valBankCode = $('#bankCode').val();
+			
+			if(valBankCode != '') {
+				$.get("@{getPaymentTypeFromIncludedList()}?bankCode="+valBankCode, function(data) {
+					checkRedirect(data);
+					$("#paymentType option" ).remove();
+					for( var el in data ){
+						var curr_ = data[el];
+						$("#paymentType" ).append("<option value='"+curr_.value+"'>"+curr_.text+"</option>");									
+					}
+					$('#paymentType').val('${bankAccount?.paymentType?.lookupId}');
+				});
+			}
+		} */
+		
+		 if($('#paymentChargeOverwrite').val() != ""){
+			// if($('#paymentChargeOverwrite').val() == $('#paymentCharge').val()){
+				    /* $('#overwriteBankCharges').removeAttr("checked");
+				    $('#paymentChargeOverwrite').attr("disabled", "disabled");
+				    $('#paymentChargeOverwrite').val('');
+				 	//$('#overwriteBankCharges').attr("checked", true);
+					//$('#paymentChargeOverwrite').removeAttr("disabled");
+			 }else{ */
+				 $('#overwriteBankCharges').attr("checked", true);
+				 $('#paymentChargeOverwrite').removeAttr("disabled");
+			 // }
+		}else{
+			$('#overwriteBankCharges').attr("checked", false);
+			 $('#overwriteBankCharges').removeAttr("checked");
+			 $('#paymentChargeOverwrite').val('');
+		}
+		
+		//$('#paymentChargeOverwrite').change(function(){
+			//var overChargeValue = $('#paymentChargeOverwrite').val();
+			//var typeCodeValue = $('#paymentCharge').val();
+			/* if(overChargeValue == typeCodeValue){
+				$(this).addClass('fieldError');
+				$("#ErrorOverwrite").html(" Overwrite Bank Charges can't be same with payment default");
+				return false;
+			}else{
+				$(this).removeClass('fieldError');
+				$("#ErrorOverwrite").html("");
+			} */
+			
+		//});
+
+		/* $('#save').click(function(){			
+			return false;
+		}); */
+
+		if($("#isUpload").val() == 'true'){
+			$("#liCustNo").find("label").text("Investor No");
+			$("#liFullName").find("label").text("Investor Name");
+			$("#liInterestRate").hide();
+			$("#liInterestBase").hide();
+			$("#liPaymentType").hide();
+			$("#overwritedbankcharge").hide();
+			$('li[id=idBic] label span').html('');
+			$('li[id=idBr] label span').html('');
+		}
+	});
+-->
+</script>
+
+<style type="text/css">
+	#invoiceAccountErrmsg { color:red; }
+</style>
+
+<div id="bank-account-detail">
+	<ul>
+		<li>
+			#{hidden id:'isUpload', name:'isUpload', value:bankAccount?.isUpload /}
+			#{hidden id:'status', name:'status', value:status /}
+			#{hidden id:'cif', name:'bankAccount.customer.customerKey', label:'CIF', value:bankAccount?.customer?.customerKey, required:true, readOnly:true, width:'100px' /}
+			<span class="error">#{error 'bankAccount.customer.customerKey' /}</span>
+		</li>
+		<li>
+			#{hidden id:'clientNo', name:'bankAccount.bankAccountKey', label:'Client No', value:bankAccount?.bankAccountKey, required:true, class:'capitalize numberOnly', readOnly:true,  width:'100px' /}
+		</li>
+		<li id="liCustNo">
+			#{textBox id:'customerNo', name:'bankAccount.customer.customerNo', label:'Customer Code', value:bankAccount?.customer?.customerNo, required:true, readOnly:true, width:'305px', class:'capitalize' /}
+		</li>
+		<li id="liFullName">
+			#{textBox id:'fullName', name:'bankAccount.customer.customerName', label:'Customer Name', value:bankAccount?.customer?.customerName, required:true, readOnly:true,  width:'304px', class:'capitalize' /}		
+		</li>
+		<div id="bankAccountNoDiv">
+			<li>
+				#{textBox id:'bankAccountNo', name:'bankAccount.accountNo', label:'Account No', value:bankAccount?.accountNo, required:true, readOnly:readOnly, width:'130px', maxLength:'50', class:'capitalize' /}
+				<span class="error">#{error 'Account No is' /}</span>
+			</li>
+			<li> 
+				#{if bankAccount?.isUpload}
+					
+				#{/if}
+				#{else}
+					#{checkBox id:'invoiceAccount', name:'invoiceAccount', value:bankAccount?.invoiceAccount, readOnly:true, label:' ' /}This bank account is used for invoicing
+				#{/else}
+				#{hidden id:'invoiceAccountHidden', name:'bankAccount.invoiceAccount', value:bankAccount?.invoiceAccount /}
+				<!-- <br/> -->
+				<span id="invoiceAccountErrmsg" class="error">#{error 'Invoice Account is' /}</span>
+			</li>
+		</div>	
+		<li>
+			#{textBox id:'bankCode', name:'bankAccount.bankCode.thirdPartyCode', label:'Bank Code', value:bankAccount?.bankCode?.thirdPartyCode,width:'57px', maxLength:'25', class:'capitalize', required:true /}
+			#{hidden id:'bankCodeKey', name:'bankAccount.bankCode.thirdPartyKey', value:bankAccount?.bankCode?.thirdPartyKey /}
+			#{button id:'bankCodeHelp', value:'?', class:'small', readOnly:readOnly  /}
+			#{textBox id:'bankCodeName', name:'bankAccount.bankCode.thirdPartyName', value:bankAccount?.bankCode?.thirdPartyName, readOnly:true, width:'216px' /}
+			<span class="error">#{error 'Bank Code is' /}</span>
+		</li>
+		<li>
+			#{textBox id:'accountHolderName', name:'bankAccount.name', label:'Beneficiary Name', value:bankAccount?.name, required:true, readOnly:readOnly, width:'306px', maxLength:'100', class:'capitalize' /}
+			<span class="error">#{error 'Account Holder Name is' /}</span>
+		</li>
+		<li>
+			#{textBox id:'currency', name:'bankAccount.currency.currencyCode', label:'Currency', value:bankAccount?.currency?.currencyCode, class:'capitalize', required:true, readOnly:readOnly, width:'57px', maxLength:'25' /}
+			#{button id:'currencyHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'currencyDesc', name:'bankAccount.currency.description', value:bankAccount?.currency?.description, readOnly:true, width:'216px' /}		
+			<span class="error">#{error 'Currency is' /}</span>
+		</li>
+		<!-- TODO: Modify by Fadly #7525  -->
+		<li id="idBr">
+			#{textBox id:'branch', name:'bankAccount.branchCode.lookupCode', label:'Branch', value:bankAccount?.branchCode?.lookupCode, readOnly:readOnly, width:'57px', class:'capitalize' /} 
+			#{hidden id:'branchKey', name:'bankAccount.branchCode.lookupId', value:bankAccount?.branchCode?.lookupId /}
+			#{button id:'branchHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'branchDesc', name:'bankAccount.branchCode.lookupDescription', value:bankAccount?.branchCode?.lookupDescription, readOnly:true, width:'216px' /}
+			<span class="error">#{error 'Branch is' /}</span>
+		</li>
+		<!-- end #7525 -->
+		<li id="idBic" style="display:none">
+			#{textBox id:'bicCode', name:'bankAccount.bicCode', label:'BIC Code', value:bankAccount?.bicCode, required:false, readOnly:readOnly, width:'306px', maxLength:'50', class:'capitalize' /}
+			<span class="error">#{error 'BIC Code is' /}</span>
+		</li>
+		<li id="liPaymentType" style="display:none">
+			#{dropDownList id:'paymentType', label:'Payment Type Code', name:'paymentType', value:bankAccount?.paymentType?.lookupId, options:paymentType, removeEmpty:'true', readOnly:readOnly, width:'125px', required:false /}
+			#{hidden id:'paymentTypeHidden', name:'bankAccount.paymentType.lookupId', value:bankAccount?.paymentType?.lookupId /}
+			<span class="error">#{error 'Payment Type is' /}</span>
+			#{textBox id:'paymentCharge', value:bankAccount?.paymentCharge, format:'#,##0.####', class:'numeric', readOnly:true, width:'180px' /}
+			#{hidden id:'paymentChargeStripped', name:'bankAccount.paymentCharge', value:bankAccount?.paymentCharge /}
+		</li>
+		<div id="overwritedbankcharge">
+			<li> 
+				#{checkBox id:'overwriteBankCharges', name:'overwriteBankChargesRead', value:overwriteBankChargesVal, readOnly:readOnly, label:' ' /}Waive Bank Charges
+				#{hidden id:'overwriteBankChargesHidden', name:'overwriteBankChargesEl', value:overwriteBankChargesVal /}
+				<!-- <br/> -->
+				#{textBox id:'paymentChargeOverwrite', label:' ', value:paymentChargeOverwriteVal, format:'#,##0.####', class:'numeric', readOnly:readOnly, width:'180px' /}
+				#{hidden id:'paymentChargeOverwriteStripped', name:'paymentChargeOverwriteEl', value:paymentChargeOverwriteVal /}
+				<span class="error">#{error 'Overwrite Payment Charge is' /}</span>
+				<span id="ErrorOverwrite" class="error"></span>
+			</li>
+		</div>	
+					
+		<li id="liInterestRate">
+			#{textBox id:'interestRate', label:'Interest Rate', value:bankAccount?.interestRate, format:'#,##0.####', class:'percent', readOnly:readOnly, required:true, width:'100px' /}
+			#{hidden id:'interestRateStripped', name:'bankAccount.interestRate', value:bankAccount?.interestRate /}		
+			<span id="percentage">%</span>
+			<span id="errmsgInterest" class="error">#{error 'Interest Rate is' /}</span>
+		</li>	
+		<li id="liInterestBase">
+			#{dropDownList id:'interestBase', label:'Accrual Type', name:'bankAccount.interestBase', value:bankAccount?.interestBase, options:interestBase, readOnly:readOnly, width:'104px', removeEmpty:'true' /}&nbsp;<b>/</b>&nbsp;
+			<span class="error">#{error 'Accrual Type is' /}</span>
+			#{dropDownList id:'yearBase', name:'bankAccount.yearBase', value:bankAccount?.yearBase, options:yearBase, readOnly:readOnly, removeEmpty:'true' /} (Month/Year)
+			<span class="error">#{error 'Year Base is' /}</span>
+		</li>
+		<li>
+			#{textBox id:'description', name:'bankAccount.description', value:bankAccount?.description, label:'Description', readOnly:readOnly, class:'capitalize', width:'310px', maxLength:200  /}
+		</li>
+		<li>
+			#{radioButton id:'isActive', name:'isActive', value:((bankAccount?.isActive)?'true':'false'), label:'Active', options:operators, readOnly:readOnly /}
+			#{hidden id:'isActiveHidden', name:'bankAccount.isActive', value:((bankAccount?.isActive)?'true':'false') /}
+		</li>
+		<!--  
+		<li>s
+			#{textBox id:'accruedInterest', name:'bankAccount.accruedInterest', label:'Accured Interest', value:bankAccount?.accruedInterest, format:'#,##0.####', class:'numeric', required:true, readOnly:readOnly, width:'100px' /}
+			<span class="error">#{error 'bankAccount.accruedInterest' /}</span>
+		</li>
+		<li>
+			#{textBox id:'balance', name:'bankAccount.balance', label:'Balance', value:bankAccount?.balance, format:'#,##0.####', class:'numeric', readOnly:true, width:'100px' /}
+		</li>		
+		-->	
+	</ul>
+</div>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	//TODO: Add by Fadly #7525
+	$('#branch').blur(function(){
+		console.log("aaa");
+		if (($('#branch').val() == "") || ($('#branch').isChange())){
+			$('#branch').removeClass('fieldError');
+			$('#h_branchDesc').val("");
+		}
+	});
+	$('#branch').lookup({
+		list:'@{Pick.lookups()}?group=AML_BRANCH',
+		get:{
+			url:'@{Pick.lookup()}?group=AML_BRANCH',
+			success: function(data) {
+				$('#branch').removeClass('fieldError');
+				$('#branchKey').val(data.code);
+				$('#branchDesc').val(data.description);
+				$('#h_branchDesc').val(data.description);
+			},
+			error: function(data) {
+				$('#branch').addClass('fieldError');
+				$('#branchDesc').val('NOT FOUND');
+				$('#branch').val('');
+				$('#branchKey').val('');
+				$('#h_branchDesc').val('');
+			}
+		},
+		description:$('#branchDesc'),
+		help:$('#branchHelp')
+	});
+	//End #7525
+</script>

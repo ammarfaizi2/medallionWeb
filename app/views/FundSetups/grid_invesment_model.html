@@ -1,0 +1,46 @@
+<div>
+	<p>
+		#{checkBox id:'autoFIMM', name:'autoFIMM', value:faMaster?.autoFIMM, readOnly:readOnly /}Fix Income is categorized as Money Market if less or equal than 1 year
+		#{hidden id:'autoFIMMHidden', name:'faMaster.autoFIMM', value:faMaster?.autoFIMM /}
+	</p>
+</div>
+<table id="gridInvestmentModel" class="display">
+	<thead>
+		<tr>
+			<th>Security Class</th>
+			<th>Minimum %</th>
+			<th>Maximum %</th>
+			<th width="150px">Action</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>
+				
+			</td>
+		</tr>
+	#{list faMaster?.faInvestmentModels, as:'faInvestmentModel'}
+		<tr>
+			<td>
+				${faInvestmentModel?.securityClass?.lookupCode }
+			</td>
+			<td class="numeric">
+				${faInvestmentModel?.min }
+			</td>
+			<td  class="numeric">
+				${faInvestmentModel?.max }
+			</td>
+			<td>
+				#{hidden name:'faInvestmentModels[' + (faInvestmentModel_index-1) + '].investmentModelKey', value:faInvestmentModel?.investmentModelKey /}
+				#{hidden name:'faInvestmentModels[' + (faInvestmentModel_index-1) + '].faMaster.fundKey', value:fainvestmentModel?.faMaster?.fundKey /}
+				#{hidden name:'faInvestmentModels[' + (faInvestmentModel_index-1) + '].securityClass.lookupCode', value:faInvestmentModel?.securityClass?.lookupCode /}
+				#{hidden name:'faInvestmentModels[' + (faInvestmentModel_index-1) + '].securityClass.lookupId', value:faInvestmentModel?.securityClass?.lookupId /}
+				#{hidden name:'faInvestmentModels[' + (faInvestmentModel_index-1) + '].securityClass.lookupDescription', value:faInvestmentModel?.securityClass?.lookupDescription /}
+				#{hidden name:'faInvestmentModels[' + (faInvestmentModel_index-1) + '].min', value:faInvestmentModel?.min /}
+				#{hidden name:'faInvestmentModels[' + (faInvestmentModel_index-1) + '].max', value:faInvestmentModel?.max /}
+				<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} /></center>
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>

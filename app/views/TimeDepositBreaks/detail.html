@@ -1,0 +1,189 @@
+#{set readOnly: ((mode != 'edit' && mode != 'entry') || confirming || settlement) /}
+#{set settle: ((mode != 'edit' && mode != 'entry') || confirming) /} 
+
+#{if flash.error}
+    <p style="color:#c00">
+        ${flash.error}
+    </p>
+#{/if}
+#{script 'date.js', characterset:'utf-8' /}
+<script type="text/javascript">
+
+	$(function() {
+
+		$('#tabs').tabs();
+		
+		$('#accountNo').lookup({
+			list:'@{Pick.accounts()}',
+			get:function() {
+				$.get('@{Pick.account()}', {'code':$('#accountNo').val()}, function(data) {
+					checkRedirect(data);
+					if (data) {
+						$('#accountNo').removeClass('fieldError');
+						$('#accountName').val(data.description);
+						$('#h_accountName').val(data.description);
+						$('#accountKey').val(data.code);
+						$('#transactionCode').focus();
+						getCharges(true);
+					} else {
+						$('#accountNo').addClass('fieldError');
+						$('#accountName').val('NOT FOUND');
+						$('#h_accountName').val('');
+						$('#accountKey').val('');						
+					}
+				});
+			},
+			help:$('#accountHelp')
+		});
+
+		$('#settlementDate').datepicker();
+		$('#transactionDate').datepicker();
+		$('.calendar').datepicker();
+
+		$('#next1').click(function() {
+			$('#tabs').tabs('select', 1);
+			if (tab2Visited) {
+				$('#next2').focus();
+			} else {
+				$('#chargeList input:text').first().focus();
+			}
+		});
+		$('#prev2').click(function() {
+			$('#tabs').tabs('select', 0);
+		});
+		$('#next2').click(function() {
+			$('#tabs').tabs('select', 2);
+			//$('input:text').first().focus();
+		});
+		$('#prev3').click(function() {
+			$('#tabs').tabs('select', 1);
+		});
+		
+	});
+</script>
+#{script 'lookups.js' /}
+<form id="timeDepositBreakForm" class="form" method="POST">
+	<p>
+		#{textBox id:'transactionNo', name:'transaction.transactionNumber', label:'Transaction No', value:'', required:'', readOnly:readOnly,width:'85px'/}
+		#{hidden id:'transactionKey', name:'transaction.transactionKey', value:'' /}
+	</p>
+	<p>
+		#{textBox id:'custodyAccount', name:'transaction.custodyAccount', label:'Custody Account', value:'', required:'', class:'calendar', width:'200px', readOnly:readOnly /}
+	</p>
+	<p>
+		#{textBox id:'custodyName', name:'transaction.custodyName', label:'Custody Name', value:'', required:'', readOnly:readOnly, width:'200px' /}
+	</p>
+	<p>
+		#{textBox id:'securuityCode', name:'transaction.securityCode', label:'Security Code', value:'', required:'', readOnly:true /}
+	</p>
+	<p>
+		#{textBox id:'securuityName', name:'transaction.securityName', label:'Security Name', value:'', required:'', readOnly:true /}
+	</p>
+	</br>
+	<div id="tabs" style="height:325px;width:750px">
+		<ul>
+			<li><a href="#tab1">Detail</a></li>
+			<li><a href="#tab2">Charges</a></li>
+			<li><a href="#tab3">Additional</a></li>
+		</ul>
+		<div id="tab1">
+			<div style="height:220px">
+				<div style="float:left;height:90%">
+					<p>
+						#{textBox id:'amount', label:'Amount', value:transaction?.amount,  required:'', format:'#,##0.####', class:'numeric', readOnly:readOnly /}
+						#{hidden id:'amountStripped', name:'transaction.amount', value:transaction?.amount /}
+					</p>
+					<p>
+						#{textBox id:'interestRate', label:'Interest Rate', value:transaction?.interestRate, format:'#,##0.####', class:'numeric', required:'', readOnly:readOnly /}%
+						#{hidden id:'interestRateStripped', name:'transaction.interestRate', value:transaction?.interestRate /}
+					</p>
+					<p>
+						#{textBox id:'accrualType', name:'transaction.accrualType',  label:'Accrual Type', value:'', readOnly:true /}
+					</p>
+					</br>
+					<p>
+						#{textBox id:'periodOfInterest', name:'transaction.periodOfInterest', label:'Period of Interest', value:'',format:'', class:'numeric', readOnly:readOnly , width:'50px' /}
+						#{radioButton id:'isPeriodOfInterest', name:'isPeriodOfInterest', value:'',  options:operators, readOnly:readOnly, required:'' /}
+					</p>
+					<p>
+						#{textBox id:'effectiveDate', name:'transaction.effectiveDate', label:'Effective Date', value:'', class:'calendar', readOnly:true /}
+					</p>
+					<p>
+						#{textBox id:'maturityDate', name:'transaction.maturityDate', label:'Maturity Date', value:'',  class:'calendar', readOnly:true /}
+					</p>
+					<p>
+						#{textBox id:'breakDate', name:'transaction.breakDate', label:'Break Date', value:'',  class:'calendar', readOnly:true /}
+					</p>
+					<p>
+					<label>Finalty Charge : </label>
+					</p>
+					<p>
+						<input type='radio' name='transaction.finaltyCharge' value='' />
+						<label style="width:135px">By Amount</label>
+						<input type='textBox' name='transaction.charge' value='' class='numeric'/>
+					</p>
+					<p>
+						<input type='radio' name='transaction.finaltyCharge' value='' />
+						<label style="width:135px">By Percent</label>
+						<input type='textBox' name='transaction.charge' value='' class='numeric' readOnly="true" /> %
+					</p>
+				</div>
+				
+				<div class="right">
+				
+					<p>
+						#{textBox id:'interestAmount', label:'Interest Amount', value:'',  class:'numeric', required:'', readOnly:true /}
+						#{hidden id:'interestAmountStripped', name:'transaction.interestAmount', value:''/}
+					</p>
+					<p>
+						#{dropDownList id:'interestTaxId', name:'transaction.interestTaxId', label:'Interest Tax Id', value:'', option:'', readOnly:readOnly /}
+					</p>
+					<p>
+						#{textBox id:'taxOnInterestAmount', label:'Interest Amount', value:'', class:'numeric', required:'', readOnly:true /} 
+						#{hidden id:'taxOnInterestAmountStripped', name:'transaction.taxOnInterestAmount', value:''/}
+					</p>
+					</br></br>
+					<p>
+						#{dropDownList id:'bilyetBankIssuer', name:'transaction.bilyetBankIssuer', label:'Bilyet Bank Issuer', value:'', option:'', readOnly:readOnly /}					
+					</p>
+					<p>
+						#{textBox id:'bilyetAccount', name:'transaction.bilyetAccount', label:'Bilyet Account', value:'', readOnly:readOnly /}
+						
+					</p>
+					<p class="spacer"></p>
+				</div>
+			</div>
+			<br />
+			<div class="buttons">
+				<input type="button" id="prev1" value="&lt; Previous" disabled="disabled" />
+				<input type="button" id="next1" value="Next &gt;" />
+			</div>
+		</div>
+		<div id="tab2">
+			<div style="height:220px">
+				<div id="charges" style="overflow-y:scroll;max-height:170px;">
+					#{include 'Transactions/chargeList.html' /}
+				</div>
+				<div class="buttons" style="padding-top:5px;">
+					<input type="button" value="Add" id="addCharge" />				
+					<input type="button" value="Reset" id="resetCharge" />		
+					<input type="button" value="Done" id="chargeDone" style="display:none" />
+					#{hidden id:'chargeKey', name:'chargeKey', value:''  /}
+				</div>		
+			</div>
+			<div class="buttons">
+				<input type="button" id="prev2" value="&lt; Previous" />
+				<input type="button" id="next2" value="Next &gt;" />
+			</div>
+		</div>
+		<div id="tab3">
+			<div style="height:220px">
+				
+			</div>
+			<div class="buttons">
+				<input type="button" id="prev3" value="&lt; Previous" />
+				<input type="button" id="next3" value="Next &gt;" disabled="disabled" />
+			</div>
+		</div>
+	</div>
+</form>

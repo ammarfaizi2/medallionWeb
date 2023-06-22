@@ -1,0 +1,148 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Release Pledging Transaction' /}
+#{set fixData: true /}
+#{set mode: mode /}
+#{script 'lookuppaging.js' /}
+<!-- #{script 'lookups.js' /} -->
+
+<script type="text/javascript">	
+	#{include 'RegistrySubscription/Util.js' /}
+
+	$(function() {
+		// Search section
+		$('#accordion').accordion({
+			collapsible: true
+		});
+		
+		$('#TransactionNoOperator').children().eq(0).remove();
+
+		$('.buttons button:first').button({
+			icons: {
+				primary: 'ui-icon-search'
+			}
+		}).next().button();	
+		$('#search').click(function() {
+			search();
+		});
+		// end of Search
+		
+		$('#cifCode').change(function(){
+			if ($('#cifCode').val() == ""){
+				$('#cifCode').removeClass('fieldError');
+				$('#cifKey').val("");
+				$('#cifDesc').val("");
+				$('#h_cifDesc').val("");
+			}	
+		});
+		
+		$('#cifCode').dynapopup2({key:'cifKey', help:'cifHelp', desc:'cifDesc'},'PICK_CF_MASTER', "", "null", 
+				function(data){
+					if (data) {
+						$('#cifCode').removeClass('fieldError');
+						$('#cifKey').val(data.code);
+						$('#cifDesc').val(data.description);
+						$('#h_cifDesc').val(data.description);
+					}
+				},
+				function(){
+					$('#cifCode').addClass('fieldError');
+					$('#cifKey').val('');
+					$('#cifCode').val('');
+					$('#cifDesc').val('NOT FOUND');
+					$('#h_cifDesc').val('');
+				}
+			);
+		
+// 		$('#cifCode').lookup({
+// 			list:'@{Pick.cifs()}',
+// 			get:{
+// 				url:'@{Pick.customer()}',
+// 				success: function(data){
+// 					$('#cifCode').removeClass('fieldError');
+// 					$('#cifCode').val(data.customerNo);
+// 					$('#cifKey').val(data.code);
+// 					$('#cifDesc').val(data.description);
+// 					$('#h_cifDesc').val(data.description);
+// 				},
+// 				error: function(data){
+// 					$('#cifCode').addClass('fieldError');
+// 					$('#cifKey').val('');
+// 					$('#cifCode').val('');
+// 					$('#cifDesc').val('NOT FOUND');
+// 					$('#h_cifDesc').val('');
+// 				}
+// 			},
+// 			description:$('#cifDesc'),
+// 			help:$('#cifHelp')
+// 		});
+		
+		$('#reset').click(function() {
+			location.href="@{CloseCancelPledgings.list()}";		
+		});
+		
+		$('.buttons input:button').button();
+			
+	
+	});
+	
+	function validateSearch() {
+		if ($('#cifCode').val() == '') {
+			$('#errCIFCode').html('required');
+		} else {
+			$('#errCIFCode').html('');
+			return true;
+		}
+		return false;
+	}
+	
+	var search = function() {
+		var resultValidate = validateSearch();
+		if (!resultValidate) {
+			return;
+		}
+		
+		$('#result .loading').show();
+		$('#result .response').hide();
+		$('#result').show();
+		$.get('@{search()}?param=${param}&group=${group}', $('#searchForm').serialize(), function(data) {
+			checkRedirect(data);
+			$('#result .response').html(data);
+			$('#result .loading').hide();
+			$('#result .response').show();
+			setupTable();
+		});
+	};
+	
+</script>
+
+<div id="accordion">
+	<h3><a href="#">Search Transaction</a></h3>
+	<form id="searchForm" class="form">
+		<input id="param" name="params.param" type="hidden" value="${param}"/>
+		<p>      
+			#{textBox id:'cifCode', name:'pledging.customer.customerNo', label:'Customer Code', value:pledging?.customer?.customerNo, readOnly:readOnly, required:true, class:'capitalize', width:'100px' /}
+			#{hidden id:'cifKey', name:'params.customerCodeSearchId', value:params?.customerCodeSearchId /}
+			#{button id:'cifHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'cifDesc', name:'pledging.customer.customerName', value:pledging?.customer?.customerName, readOnly:true, width:'300px' /}
+			<span id="errCIFCode" class="error"></span>
+		</p>
+		<p>			
+			#{textBox id:'transactionDate', name:'params.releasePledgingSearchDate', label:'Transaction Date', value:params?.releasePledgingSearchDate?.format(appProp.dateFormat), class:'calendar', readOnly:readOnly /} (${appProp.displayDateFormat})
+		</p>
+		<p>
+			#{dropDownList id:'TransactionNoOperator', name:'params.ReleasePledgingNoOperator', label:'Transaction No', options:stringOperators, value:params?.ReleasePledgingNoOperator /}
+			#{textBox id:'transactionSearchNo', name:'params.releasePledgingSearchNoOperator', value:params?.releasePledgingSearchNoOperator, class:'numberOnly' /}
+		</p>
+		<p>
+			<div class="buttons">
+				<input type="button" id="search" value="Search" />				
+				<input type="button" id="reset" value="Reset" />					
+			</div>
+		</p>
+	</form>
+</div>	
+
+<div id="result" style="display:none">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<div class="response"></div>
+</div>

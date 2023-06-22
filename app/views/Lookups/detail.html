@@ -1,0 +1,111 @@
+#{extends 'templates/detail1.html' /}
+#{set group: group /}
+#{set code:lookup?.lookupCode/}
+#{if code == null}
+	#{set code:''/}
+#{/if}
+#{set pageTitle:'Lookup Maintenance ' +'- '+ group +' - '+ code /}
+#{set id:lookup?.lookupId?.replace('/', '|')/}
+#{set readOnly:((mode!='edit' && mode!='entry')||confirming) /}
+
+#{script 'validation/numericOnly.js' /}
+#{script 'lookups.js' /}
+
+<script type="text/javascript">
+$(function() {	
+	if (('${mode}'=='entry')||(('${mode}'=='edit')&& (('${lookup?.recordStatus?.decodeStatus()}'=='Reject')||($("#status").val() == 'R')))){
+		$('input[name=lookup.isActive]').attr("disabled", "disabled");
+		
+	}
+	
+	$("#lookupSequence").blur(function(){
+		var seq = $("#lookupSequence").val();
+		if ((seq < 1)&&(seq != '')){
+			$("#lookupSequence").addClass('fieldError');
+			$("#errmsgSeq").html('0 not allowed!');
+			return false;
+		} else {
+			$("#lookupSequence").removeClass('fieldError');
+			$("#errmsgSeq").html('');
+		}
+	});
+});
+
+	function doSave(){
+		if ($("#lookupSequence").hasClass('fieldError')){
+			$("#lookupSequence").focus();
+			return false;
+		}
+		return true;
+	}
+</script>
+<style type="text/css">
+  #errmsgSeq { color:red; }
+</style>
+
+<form id="chargeMasterForm" class="form" method="POST">
+#{hidden id:'status', name:'status', value:status /}
+#{hidden id:'lookupId', name:'lookup.lookupId', value:lookup?.lookupId?.replace('/', '|') /}
+#{hidden id:'systemField', name:'lookup.systemField', value:(lookup?.systemField ? true : false) /}
+#{hidden id:'lookupGroup', name:'lookup.lookupGroup.lookupGroup', value:lookup?.lookupGroup?.lookupGroup /}
+#{hidden id:'organizationId', name:'lookup.organization.organizationId', value:lookup?.organization?.organizationId /}
+<div id="lookups">
+	<p>			
+		#{textBox id:'lookupCode', name:'lookup.lookupCode', label:'Code', value:lookup?.lookupCode, class:'capitalize', width:'125px', required:true, readOnly:((mode=='entry')?confirming:true), maxLength:50  /}
+		<span class="error">#{error 'Code is' /}</span>
+	</p>
+	<p>			
+		#{textBox id:'lookupDesc', name:'lookup.lookupDescription', label:'Description', value:lookup?.lookupDescription, width:'300px', required:true, readOnly:readOnly, class:'capitalize', maxLength:100/}
+		<span class="error">#{error 'Description is' /}</span>
+	</p> 
+	<p>
+		 #{textBox id:'lookupSequence', name:'lookup.lookupSequence', label:'Sequence', value:lookup?.lookupSequence, width:'100px',readOnly:readOnly , class:'numberOnly', maxLength:9/} 
+		 <span id="errmsgSeq"></span>
+	</p>
+	#{list lookup?.detail, as:'detail'}
+		<p>
+			 #{hidden id:'detail-'+detail?.lookupDetailKey, name:'lookup.detail['+(detail_index-1)+'].lookupDetailKey', value:detail?.lookupDetailKey /}
+			 #{hidden id:'udf-'+detail?.lookupDetailKey, name:'lookup.detail['+(detail_index-1)+'].udfMaster.udfMasterKey', value:detail?.udfMaster?.udfMasterKey /}
+			 #{hidden id:'udf-'+detail?.udfMaster?.fieldName, name:'lookup.detail['+(detail_index-1)+'].udfMaster.fieldName', value:detail?.udfMaster?.fieldName /}
+			 #{hidden id:'udf-'+detail?.udfMaster?.sequence, name:'lookup.detail['+(detail_index-1)+'].udfMaster.sequence', value:detail?.udfMaster?.sequence /}
+			 #{hidden id:'udf-'+detail?.udfMaster?.label, name:'lookup.detail['+(detail_index-1)+'].udfMaster.label', value:detail?.udfMaster?.label, kind:'label' /}
+			 #{hidden id:'udf-'+detail?.udfMaster?.dataType?.lookupId, name:'lookup.detail['+(detail_index-1)+'].udfMaster.dataType.lookupId', value:detail?.udfMaster?.dataType?.lookupId /}
+			 #{hidden id:'udf-'+detail?.udfMaster?.displayType?.lookupId, name:'lookup.detail['+(detail_index-1)+'].udfMaster.displayType.lookupId', value:detail?.udfMaster?.displayType?.lookupId /}
+			 #{hidden id:'udf-'+detail?.udfMaster?.required, name:'lookup.detail['+(detail_index-1)+'].udfMaster.required', value:detail?.udfMaster?.required /}
+			 <!--  START -->
+			#{if detail?.udfMaster?.displayType?.lookupId == 'DISPLAY_TYPE-2'}
+				#{if detail?.udfMaster?.label.contains('Currency')}
+					#{dropDownList id:'udfsValue['+(detail_index-1)+']', name:'lookup.detail['+(detail_index-1)+'].detailValue', label:detail?.udfMaster?.label,value:detail?.detailValue , options:currencyOpt, readOnly:readOnly, class:'empty', maxlength:detail?.udfMaster?.length, required:detail?.udfMaster?.required /}
+				#{/if}
+			#{/if}
+			
+			#{elseif detail?.udfMaster?.dataType?.lookupId == 'DATA_TYPE-STR'}
+				#{textBox id:'udfsValue['+(detail_index-1)+']', name:'lookup.detail['+(detail_index-1)+'].detailValue', label:detail?.udfMaster?.label, value:detail?.detailValue , maxLength:detail?.udfMaster?.length, readOnly:readOnly, class:'empty capitalize', maxlength:detail?.udfMaster?.length, required:detail?.udfMaster?.required /}
+			#{/elseif}
+			
+			#{elseif detail?.udfMaster?.dataType?.lookupId == 'DATA_TYPE-NUM'}
+				#{textBox id:'udfsValue['+(detail_index-1)+']', name:'lookup.detail['+(detail_index-1)+'].detailValue', label:detail?.udfMaster?.label, value:detail?.detailValue ,class:'numeric calculate', maxLength:detail?.udfMaster?.length, readOnly:readOnly, maxlength:detail?.udfMaster?.length, required:detail?.udfMaster?.required  /}
+			#{/elseif}
+			
+			<!-- TODO: Add by Fadly #7525 -->
+			#{elseif detail?.udfMaster?.dataType?.lookupId == 'DATA_TYPE-BOL'}
+				#{radioButton id:'udfsValue['+(detail_index-1)+']', name:'lookup.detail['+(detail_index-1)+'].detailValue', label:detail?.udfMaster?.label, value:detail?.detailValue, options:operators, readOnly:readOnly, required:detail?.udfMaster?.required /} <br/>
+			#{/elseif}
+			<!-- End #7525 -->
+			
+			#{else}
+				#{textBox id:'udfsValue['+(detail_index-1)+']', name:'lookup.detail['+(detail_index-1)+'].detailValue', label:detail?.udfMaster?.label, value:detail?.detailValue , class:'calendar empty', readOnly:readOnly, maxlength:detail?.udfMaster?.length, required:detail?.udfMaster?.required /}(MM/DD/YYYY)
+			#{/else}		
+			<span class="error">#{error '${detail?.udfMaster?.label} is' /}</span>
+				 
+			 <!--  END   -->
+		</p>
+	#{/list}		
+	<p>
+		 #{radioButton id:'isActive', name:'lookup.isActive', label:'Active', value:((lookup?.isActive)?'true':'false'), options:operators, readOnly:readOnly  /} <br/>
+		
+	</p>
+		
+</div>
+</form>
+			

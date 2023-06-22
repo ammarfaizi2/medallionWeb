@@ -1,0 +1,271 @@
+<script type="text/javascript">
+$(function(){
+	
+	$('#addFeeAccrualByAmount').button();
+	$('#cancelFeeAccrualByAmount').button();
+	$('.calendar').datepicker();
+	
+	$('#listFeeTierAmount').css("display", "none");
+	$('#feeAccrualByAmountForm #taxCode').lookup({
+		list:'@{Pick.taxMasters()}',
+		get:{
+			url:'@{Pick.taxMaster()}',
+			success: function(data) {
+						$('#feeAccrualByAmountForm #taxCode').removeClass('fieldError');
+						$('#feeAccrualByAmountForm #taxKey').val(data.code);
+						$('#feeAccrualByAmountForm input#taxCode').val(data.taxCode);
+						$('#feeAccrualByAmountForm #taxName').val(data.description);
+						$('#h_taxName').val(data.description);
+						$('#feeAccrualByAmountForm #taxRate').val(data.taxRate);
+						
+						if ($("input[name='radioCalculationBase']")[1].checked == true){
+							calculateDaily();
+						}
+						if ($("input[name='radioCalculationBase']")[2].checked == true){
+							calculateTotal();
+						}
+					},
+			error: function() {
+					$('#feeAccrualByAmountForm #taxCode').addClass('fieldError');
+					$('#feeAccrualByAmountForm #taxKey').val('');
+					$('#feeAccrualByAmountForm #taxCode').val('');
+					$('#feeAccrualByAmountForm #taxName').val('NOT FOUND');
+					$('#h_taxName').val('');
+				}
+		},
+		description:$('#feeAccrualByAmountForm #taxName'),
+		help:$('#feeAccrualByAmountForm #taxCodeHelp')
+	});
+	
+
+});
+
+function calculateTotalDay() {
+	if ($("input[name='radioCalculationBase']")[1].checked == true){
+		if ($("#feeMasterForm #accrualBaseDaily").val() == "ACCRUAL_BASE-30"){
+			$("#feeAccrualByAmountForm #accruedDays").val("30");
+		} else if ($("#feeMasterForm #accrualBaseDaily").val() == "ACCRUAL_BASE-31") {
+			$("#feeAccrualByAmountForm #accruedDays").val("31");
+		} else {
+			$("#feeAccrualByAmountForm #accruedDays").val("0");
+		}
+	}
+	
+	if ($("input[name='radioCalculationBase']")[2].checked == true){
+		if ($("#feeMasterForm #accrualBaseTotal").val() == "ACCRUAL_BASE-30"){
+			$("#feeAccrualByAmountForm #accruedDays").val("30");
+		} else if ($("#feeMasterForm #accrualBaseTotal").val() == "ACCRUAL_BASE-31") {
+			$("#feeAccrualByAmountForm #accruedDays").val("31");
+		} else {
+			$("#feeAccrualByAmountForm #accruedDays").val("0");
+		}	
+	}
+	var startDate = $("#feeAccrualByAmountForm #startDate").val();
+	var endDate = $("#feeAccrualByAmountForm #endDate").val();
+	var accruedDays = $("#feeAccrualByAmountForm #accruedDays").val();
+
+	$.ajax({
+		url: '@{FeeAccruals.calculateDay()}?startDate='+startDate+'&endDate='+endDate+'&base='+accruedDays,
+		success: function(data) {
+			checkRedirect(data);
+			$('#feeAccrualByAmountForm #totalDays').val(data);
+		}
+	});
+}
+
+function calculateTotal() {
+
+	// Calculate Amount After Tax
+	var taxRate = $('#detailFeeAccrualByAmount #taxRate').val();
+	var totalAmount =  $('#detailFeeAccrualByAmount #totalAmountStripped').val();
+	var amountAfterTax = 0;
+	amountAfterTax = ((Number(taxRate)/100)+1) * totalAmount;
+	var $amountAfterTax = $.fn.autoNumeric.Format('amountAfterTax', amountAfterTax);
+	$('#detailFeeAccrualByAmount #amountAfterTax').val($amountAfterTax);
+	$('#detailFeeAccrualByAmount #amountAfterTaxStripped').val(amountAfterTax);
+
+	// Calculate Daily Amount
+	 var totalDays = $('#detailFeeAccrualByAmount #totalDays').val();
+	 var dailyAmount = 0;
+	 dailyAmount = totalAmount / totalDays;
+	 var $dailyAmount = $.fn.autoNumeric.Format('dailyAmount', dailyAmount);
+	 $('#detailFeeAccrualByAmount #dailyAmount').val($dailyAmount);
+	 $('#detailFeeAccrualByAmount #dailyAmountStripped').val(dailyAmount);
+	 
+	 // Calculate Daily Amount After Tax
+	 var dailyAmountAfterTax = 0;
+	 dailyAmountAfterTax = ((Number(taxRate)/100)+1) * dailyAmount;
+	 var $dailyAmountAfterTax = $.fn.autoNumeric.Format('dailyAmountAfterTax', dailyAmountAfterTax); 
+	 $('#detailFeeAccrualByAmount #dailyAmountAfterTax').val($dailyAmountAfterTax);
+	 $('#detailFeeAccrualByAmount #dailyAmountTaxStripped').val(dailyAmountAfterTax);
+	 
+	//check if error
+	 if(($('#detailFeeAccrualByAmount #amountAfterTax').val() == 'NaN') ||
+		($('#detailFeeAccrualByAmount #dailyAmount').val() == 'NaN') ||
+		($('#detailFeeAccrualByAmount #dailyAmountAfterTax').val() == 'NaN')){
+		$('#detailFeeAccrualByAmount #totalAmount').addClass('fieldError');
+		$("#errmsg_total").html("oops, value too large !").show();
+	} else {
+		$('#detailFeeAccrualByAmount #totalAmount').removeClass('fieldError');
+		$('#errmsg_total').html("");
+	}
+	 
+	 return false;
+}
+
+function calculateDaily(){
+
+	//Calculate Daily Amount After Tax
+	var taxRate = $('#detailFeeAccrualByAmount #taxRate').val();
+	var dailyAmount = $('#detailFeeAccrualByAmount #dailyAmountStripped').val();
+	var dailyAmountAfterTax = 0;
+	dailyAmountAfterTax = ((Number(taxRate)/100)+1) * dailyAmount;
+	var $dailyAmountAfterTax = $.fn.autoNumeric.Format('dailyAmountAfterTax', dailyAmountAfterTax); 
+	$('#detailFeeAccrualByAmount #dailyAmountAfterTax').val($dailyAmountAfterTax);
+	$('#detailFeeAccrualByAmount #dailyAmountTaxStripped').val(dailyAmountAfterTax);
+	
+	// Calculate Total Amount
+	var totalDays = $('#detailFeeAccrualByAmount #totalDays').val();
+	var totalAmount = 0;
+	totalAmount = dailyAmount * totalDays;
+	var $totalAmount = $.fn.autoNumeric.Format('totalAmount', totalAmount);
+	$('#detailFeeAccrualByAmount #totalAmountStripped').val(totalAmount);
+	$('#detailFeeAccrualByAmount #totalAmount').val($totalAmount);
+	
+	//Calculate Total Amount After Tax
+	var totalAmountAfterTax = 0;
+	totalAmountAfterTax = ((Number(taxRate)/100)+1) * totalAmount;
+	var $totalAmountAfterTax = $.fn.autoNumeric.Format('totalAmountAfterTax', totalAmountAfterTax);
+	$('#detailFeeAccrualByAmount #amountAfterTax').val($totalAmountAfterTax);
+	$('#detailFeeAccrualByAmount #amountAfterTaxStripped').val(totalAmountAfterTax);
+	
+	//check error value
+	if(($('#detailFeeAccrualByAmount #amountAfterTax').val() == 'NaN') ||
+			($('#detailFeeAccrualByAmount #totalAmount').val() == 'NaN') ||
+			($('#detailFeeAccrualByAmount #dailyAmountAfterTax').val() == 'NaN')){
+			$('#detailFeeAccrualByAmount #dailyAmount').addClass('fieldError');
+			$("#errmsg_daily").html("oops, value too large !").show();
+		} else {
+			$('#detailFeeAccrualByAmount #dailyAmount').removeClass('fieldError');
+			$('#errmsg_daily').html("");
+		}
+	
+	return false;
+}
+
+</script>
+<style type="text/css">
+  .errmsg { color:red; }
+  #errDateAmount { color:red; }
+  #errTaxAmount { color:red; }
+  #errDaily { color:red; }
+  #errTotal { color:red; }
+</style>
+<form>
+</form>
+<form id="feeAccrualByAmountForm" class="form">
+#{hidden id:'rowPositionAmount' /}
+#{hidden id:'oldStartDateAmount' /}
+#{hidden id:'tieringTypeAmount' /}
+#{hidden id:'totalDaysHidden' /}
+#{hidden id:'totalAmountHidden' /}
+#{hidden id:'amountAfterTaxHidden' /}
+#{hidden id:'dailyAmountHidden' /}
+#{hidden id:'dailyAmountAfterTaxHidden' /}
+#{hidden id:'days', name:'days', value:days /}
+#{hidden id:'accruedDays', name:'accruedDays', value:accruedDays /}
+#{hidden id:'detailFeeKeyAmount', name:'faFeeDetail.id.feeKey', value:faFeeDetail?.id?.feeKey /}
+	#{hidden id:'detailRowNumberAmount', name:'faFeeDetail.id.rowNumber', value:faFeeDetail?.id?.rowNumber /}
+<p>
+	<span class="ui-helper-hidden-accessible"><input type="text"/></span>
+	#{textBox id:'startDate', name:'startDate', label:'Effective Date', value:faFeeDetail?.startDate?.format(appProp.dateFormat), required:true, readOnly:readOnly ,class:'calendar'/}
+	#{hidden id:'startDateHidden', name:'faFeeDetail.startDate', value:faFeeDetail?.startDate?.format(appProp.dateFormat) /}
+	<b>To</b>
+	#{textBox id:'endDate', name:'endDate', value:faFeeDetail?.endDate?.format(appProp.dateFormat), class:'calendar', readOnly:readOnly /} (${appProp.displayDateFormat})
+	#{hidden id:'endDateHidden', name:'faFeeDetail.endDate', value:faFeeDetail?.endDate?.format(appProp.dateFormat) /}
+	<span id="errDateAmount"></span><br />
+	<span id="startDateError" class="error"></span>
+	<span id="endDateError" class="error"></span>
+</p>
+<p>
+	#{textBox id:'totalDays', name:'totalDays', label:'Total Days', value:totalDays, readOnly:true, width:'86px', class:'numeric'/}
+</p>
+<p>			
+	#{textBox id:'taxCode', name:'faFeeDetail.taxMaster.taxCode', label:'Tax Code', value:faFeeDetail?.taxMaster?.taxCode, class:'capitalize', required:true, readOnly:readOnly, width:'86px' /}
+	#{hidden id:'taxKey', name:'faFeeDetail.taxMaster.taxKey', value:faFeeDetail?.taxMaster?.taxKey  /}
+	#{button id:'taxCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+	#{textBox id:'taxName', name:'faFeeDetail.taxMaster.description', value:faFeeDetail?.taxMaster?.description, readOnly:true, width:'150px' /}
+	#{hidden id:'taxRate', name:'faFeeDetail.taxMaster.taxRate', value:faFeeDetail?.taxMaster?.taxRate /}
+	<span id="errTaxAmount"></span>
+</p>
+<p>
+	#{textBox id:'totalAmount', name:'totalAmount', label:'Total Amount', value:totalAmountA, required:true, readOnly:readOnly, format:'#,##0.####', width:'110px', class:'numeric' /}
+	#{hidden id:'totalAmountStripped', name:'totalAmountStripped', value:totalAmountA /}
+	<span id="errTotal"></span>
+	<span style="center" class="errmsg" id="errmsg_total"></span>
+</p>
+<p>
+	#{textBox id:'amountAfterTax', name:'amountAfterTax', label:'Amount After Tax', value:totalAmountB, readOnly:true, width:'110px', format:'#,##0.####', class:'numeric'/}
+	#{hidden id:'amountAfterTaxStripped', name:'amountAfterTaxStripped', value:totalAmountB /}
+</p>
+<p>
+	#{textBox id:'dailyAmount', name:'dailyAmount', label:'Daily Amount', value:totalAmountC, required:true, readOnly:readOnly, format:'#,##0.####', width:'110px', class:'numeric'/}
+	#{hidden id:'dailyAmountStripped', name:'dailyAmountStripped', value:totalAmountC /}
+	<span id="errDaily"></span>
+	<span style="center" class="errmsg" id="errmsg_daily"></span>
+</p>
+<p>
+	#{textBox id:'dailyAmountAfterTax', name:'dailyAmountAfterTax', label:'Daily Amount After Tax', value:totalAmountD, readOnly:true, format:'#,##0.####', width:'110px', class:'numeric'/}
+	#{hidden id:'dailyAmountTaxStripped', name:'dailyAmountTaxStripped', value:totalAmountD /}
+</p>
+<div id="listFeeTierAmount">
+	<table id="gridFeeTierAmount" class="display">
+	<thead>
+		<tr>
+			<th>Tier Sequence</th>
+			<th>Value</th>
+		</tr>
+	</thead>
+		<tbody>
+		#{list faFeeDetail?.faFeeTiers, as:'faFeeTier'}
+		<tr>
+			<td>
+				${faFeeTier?.id?.tierSequence}
+			</td>
+			<td>
+				${faFeeTier?.tierValue}
+				#{hidden id:'tierValueAmount', name:'faFeeTiers[' + (faFeeTier_index-1) + '].tierMaximumRange', value:faFeeTier?.tierMaximumRange /}
+				#{hidden id:'tierMaximumRangeAmount', name:'faFeeTiers[' + (faFeeTier_index-1) + '].tierValue', value:faFeeTier?.tierValue /}
+				#{hidden id:'tierRowNumberAmount', name:'faFeeTiers[' + (faFeeTier_index-1) + '].id.rowNumber', value:faFeeTier?.id?.rowNumber /}
+				#{hidden id:'tierFeeKeyAmount', name:'faFeeTiers[' + (faFeeTier_index-1) + '].id.feeKey', value:faFeeTier?.id?.feeKey /}
+				#{hidden id:'tierSequenceAmount', name:'faFeeTiers[' + (faFeeTier_index-1) + '].id.tierSequence', value:faFeeTier?.id?.tierSequence /}
+			</td>
+		</tr>
+	#{/list}
+		</tbody>
+	</table>
+</div>
+<p>
+	<div class="buttons">
+		#{ifnot confirming}
+		#{ifnot approval}
+		<button id="addFeeAccrualByAmount">Save</button>
+		<button id="cancelFeeAccrualByAmount">Cancel</button>
+		#{/ifnot}
+		#{/ifnot}
+		#{if confirming || mode=='view' || approval}
+		<button id="cancelFeeAccrualByAmount">Close</button>
+		#{/if}
+	</div>
+</p>
+<div id="detailFeeTierAmount">
+<p>
+	#{hidden id:'rowPositionTierAmount' /}
+	#{hidden id:'tierFeeKeyAmount', name:'faFeeTier.id.feeKey', value:faFeeTier?.id?.feeKey /}
+	#{hidden id:'tierRowNumberAmount', name:'faFeeTier.id.rowNumber', value:faFeeTier?.id?.rowNumber /}
+	#{hidden id:'tierSequenceAmount', name:'faFeeTier.id.tierSequence', value:faFeeTier?.id?.tierSequence /}
+	#{hidden id:'tierMaximumRangeAmount', name:'faFeeTier.tierMaximumRange', value:faFeeTier?.tierMaximumRange /}
+	#{hidden id:'tierValueAmount', name:'faFeeTier.tierValue', value:faFeeTier?.tierValue /}
+</p>	
+</div>
+</form>

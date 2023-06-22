@@ -1,0 +1,89 @@
+#{extends 'templates/main.html' /}
+
+#{if flash.error}
+    <p style="color:#c00">
+        ${flash.error}
+    </p>
+#{/if}
+<div id="detail">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<form id="form" class="form">
+	</form>
+	<div class="error" style="display:none"></div>
+</div>
+
+<script type="text/javascript">
+$(function() {		
+	$('#detail').dialog({
+		autoOpen: false,
+		title:'Approval Detail',
+		closeOnEscape:false,
+		modal:true,
+		resizable:false,
+		height:510,
+		width:800
+	})
+	$('form').submit(function() {
+		return false;
+	})
+})
+
+var show = function(id) {
+	$('#detail .loading').show()
+	$('#detail .form').hide()
+	$('#detail .error').hide()
+	$('#detail').dialog('open')
+	$('#detail .form').load('@{form()}/'+id + '?mode=${mode}', function(response, status, xhr) {
+		if(status == 'error') {
+			var msg = "Error when loading form: "
+			$('#detail .error').html(msg + xhr.status + " " + xhr.statusText)
+			$('#detail .error').show()
+			$('#detail .loading').hide()
+		} else {
+			$('#detail .loading').hide()
+			$('#detail .form').show()
+		}
+	})
+}
+
+var save = function(id, mode) {
+	$.post('@{save()}/id=' + id + '?mode=' + mode,
+		$('#detail #form').serialize(),
+		function(data) {
+			checkRedirect(data);
+			reload(data)			
+		}
+	)
+}
+
+var ditolak = function (id) {
+	$.post('@{reject()}/' + id,
+		function(data) {
+			checkRedirect(data);
+			alert("Berhasil Reject!");			
+		}
+	);
+};
+
+var approve = function(id) {
+	$.post('@{approve()}/id=' + id,
+		function(data) {
+			checkRedirect(data);
+			alert("Berhasil Approve!");			
+		}
+	)
+}
+
+var close = function() {
+	alert("Close!!");
+	$('#detail').dialog('close');
+}
+
+var back = function(id) {
+	show(id)
+}
+	var reload = function(data) {
+	$('#detail #form').html(data)
+}
+
+</script>

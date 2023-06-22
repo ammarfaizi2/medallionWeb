@@ -1,0 +1,119 @@
+#{extends 'templates/main.html' /} 
+#{set journalMasterKey:faJournalMaster?.journalMasterKey /}
+
+<script type="text/javascript">
+	$(function() {
+		$('#save').button();
+		$('#clear').button();
+		$('#confirm').button();
+		$('#back').button();
+		$('#cancel').button();
+		
+		var backToList = function() {
+			location = "@{list()}";
+		}
+		
+		var closeDialogMessage = function() {
+			$("dialog-message").dialog('close');
+		}
+		
+		// Action buttons 
+		$('#save').click(function() {
+			var resume = true;
+			if (typeof doSave == 'function') { 
+				resume = doSave();
+			}
+			if (resume) {
+				var action = "@{save()}";
+				var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+				loading.dialog({
+					closeOnEscape: false,
+					draggable: false,
+					modal: true,
+					resizable: false,
+					open:function() {
+						$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+					} 
+				});
+				$('#JournalTemplateForm').attr('action', action);
+				$('#JournalTemplateForm').submit();
+			}
+		});
+		$('#confirm').click(function() {
+			var action = "@{confirm()}";
+			var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+			loading.dialog({
+				closeOnEscape: false,
+				draggable: false,
+				modal: true,
+				resizable: false,
+				open:function() {
+					$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+				} 
+			});
+			$.post(action, $('#JournalTemplateForm').serialize(), function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Notification", backToList);
+				} else {
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+				}
+			});
+			
+		});
+		$('#back').click(function() {
+			location.href="@{back()}?id=${journalMasterKey}&mode=${mode}";
+		});
+		$('#clear').click(function() {
+			if ('${mode}'==='entry') {
+				location.href='@{entry()}';	
+			} else if ('${mode}'==='edit') {
+				location.href='@{edit()}/${journalMasterKey}';	
+			}
+		});$('#cancel').click(function() {
+			location.href="@{list()}";
+		});
+		
+		if ($('#remarksCorrection').val() != '') {
+			$('#needCorrection').attr('checked', true);
+		} else {
+			$('#needCorrection').removeAttr('checked');
+		}
+		
+		if ('${mode}'==='edit') {
+			$('#dvNeedCorrection').css("display","");
+		} else {
+			$('#dvNeedCorrection').css("display","none");
+		}
+	});	
+</script>
+<h2>Journal Template</h2>
+#{if flash.error || errors}
+    <div class="error">
+    	Error when saving data!<br/>
+		<li>${flash.error}</li>
+		#{ifErrors}
+			#{errors}
+				 <li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}
+<div id="detail">
+	#{include 'JournalTemplate/detail.html' /}	
+</div>
+<div id="actions" class="buttons">
+	#{if confirming}
+		<input type="button" id="confirm" value="Confirm" />
+		<input type="button" id="back" value="Back" />
+	#{/if}
+		#{elseif ((mode == 'entry') || (mode == 'edit')) && (!confirming)}
+		<input type="button" id="save" value="Save" />
+		<input type="button" id="clear" value="Clear" />
+		<input type="button" id="cancel" value="Cancel"/>
+	#{/elseif}
+	#{else}
+		<input type="button" id="cancel" value="Close" />
+	#{/else}
+</div>

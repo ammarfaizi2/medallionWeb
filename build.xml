@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
+              To include a user specific buildfile here, simply create one in the same
+              directory with the processing instruction <?eclipse.ant.import?>
+              as the first entry and export the buildfile again. --><project basedir="." default="build" name="medallionWeb">
+    <property environment="env"/>
+    <property name="spring.link" value="../play/modules/spring-1.0.2/src"/>
+    <property name="secure.link" value="../play/modules/secure/app"/>
+    <property name="play.location" value="../play"/>
+    <property name="libraries.location" value="../libraries"/>
+    <property name="medallionModel.location" value="../medallionModel"/>
+    <property name="medallionService.location" value="../medallionService"/>
+    <property name="medallionPluginService.location" value="../MedallionPluginService"/>
+    <property name="project_loc:medallionWeb" value="."/>
+    <property name="project_loc:play" value="../play"/>
+    <property name="junit.output.dir" value="junit"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.6"/>
+    <property name="source" value="1.6"/>
+    <path id="Spring Framework 3.1.0.userclasspath">
+        <pathelement location="${libraries.location}/spring-framework-3.1.0/dist/org.springframework.beans-3.1.0.RELEASE.jar"/>
+	</path>
+    <path id="Hibernate 3.6.0.userclasspath">
+        <pathelement location="${libraries.location}/hibernate-3.6.0/antlr-2.7.6.jar"/>
+        <pathelement location="${libraries.location}/hibernate-3.6.0/commons-collections-3.1.jar"/>
+        <pathelement location="${libraries.location}/hibernate-3.6.0/dom4j-1.6.1.jar"/>
+        <pathelement location="${libraries.location}/hibernate-3.6.0/hibernate3.jar"/>
+        <pathelement location="${libraries.location}/hibernate-3.6.0/hibernate-jpa-2.0-api-1.0.0.Final.jar"/>
+        <pathelement location="${libraries.location}/hibernate-3.6.0/javassist-3.12.0.GA.jar"/>
+        <pathelement location="${libraries.location}/hibernate-3.6.0/jta-1.1.jar"/>
+        <pathelement location="${libraries.location}/hibernate-3.6.0/slf4j-api-1.6.1.jar"/>
+    </path>	
+    <path id="medallionWeb.classpath">
+        <pathelement location="bin"/>
+        <pathelement location="${play.location}/framework/lib/activation-1.1.1.jar"/>
+        <pathelement location="${play.location}/framework/lib/antlr-2.7.6.jar"/>
+        <pathelement location="${play.location}/framework/lib/c3p0-0.9.1.2.jar"/>
+        <pathelement location="${play.location}/framework/lib/commons-beanutils-1.8.3.jar"/>
+        <pathelement location="${play.location}/framework/lib/commons-codec-1.4.jar"/>
+        <pathelement location="${play.location}/framework/lib/commons-email-1.2.jar"/>
+        <pathelement location="${play.location}/framework/lib/commons-logging-1.1.1.jar"/>
+        <pathelement location="${play.location}/framework/lib/dom4j-1.6.1.jar"/>
+        <pathelement location="${play.location}/framework/lib/ehcache-core-2.0.0.jar"/>
+        <pathelement location="${play.location}/framework/lib/ezmorph-1.0.3.jar"/>
+        <pathelement location="${play.location}/framework/lib/hibernate-jpa-2.0-api-1.0.0.Final.jar"/>
+        <pathelement location="${play.location}/framework/lib/jamon-2.7.jar"/>
+        <pathelement location="${play.location}/framework/lib/javassist-3.9.0.GA.jar"/>
+        <pathelement location="${play.location}/framework/lib/jaxen-1.1.jar"/>
+        <pathelement location="${play.location}/framework/lib/jj-imaging.jar"/>
+        <pathelement location="${play.location}/framework/lib/jj-simplecaptcha.jar"/>
+        <pathelement location="${play.location}/framework/lib/jj-textile.jar"/>
+        <pathelement location="${play.location}/framework/lib/jj-wikitext.jar"/>
+        <pathelement location="${play.location}/framework/lib/jregex-1.2_01.jar"/>
+        <pathelement location="${play.location}/framework/lib/jsr107cache-1.0.jar"/>
+        <pathelement location="${play.location}/framework/lib/jta-1.1.jar"/>
+        <pathelement location="${play.location}/framework/lib/junit-4.8.1.jar"/>
+        <pathelement location="${play.location}/framework/lib/oval-1.50.jar"/>
+        <pathelement location="${play.location}/framework/lib/signpost-core-1.2.jar"/>
+        <pathelement location="${play.location}/framework/lib/slf4j-api-1.6.1.jar"/>
+        <pathelement location="${play.location}/framework/lib/slf4j-log4j12-1.6.1.jar"/>
+        <pathelement location="${libraries.location}/commons-dbcp.jar"/>
+        <pathelement location="${libraries.location}/commons-pool.jar"/>
+        <pathelement location="${libraries.location}/hibernate-3.6.0/hibernate3.jar"/>
+        <pathelement location="${play.location}/framework/lib/bcprov-jdk15-1.45.jar"/>
+        <pathelement location="${play.location}/framework/lib/cglib-nodep-2.2.jar"/>
+        <pathelement location="${play.location}/framework/lib/commons-collections-3.2.1.jar"/>
+        <pathelement location="${play.location}/framework/lib/commons-fileupload-1.2.2.jar"/>
+        <pathelement location="${play.location}/framework/lib/commons-io-2.0.1.jar"/>
+        <pathelement location="${play.location}/framework/lib/commons-lang-2.6.jar"/>
+        <pathelement location="${play.location}/framework/lib/snakeyaml-1.7.jar"/>
+        <pathelement location="${play.location}/framework/lib/javax.inject-1.0.jar"/>
+        <pathelement location="${play.location}/framework/lib/commons-javaflow-1066591.jar"/>
+        <pathelement location="${play.location}/framework/lib/xstream-1.3.jar"/>
+        <pathelement location="${play.location}/framework/lib/mail-1.4.3.jar"/>
+        <pathelement location="lib/ojdbc14.jar"/>
+        <pathelement location="${play.location}/framework/lib/gson-1.7.1.jar"/>
+        <pathelement location="lib/jackson-hibernate-0.7.0.jar"/>
+        <pathelement location="lib/jackson-all-1.9.1.jar"/>
+        <pathelement location="lib/com.springsource.org.aopalliance-1.0.0.jar"/>
+        <pathelement location="lib/activiti-engine-5.8.jar"/>
+        <pathelement location="${play.location}/framework/play-1.2.4.jar"/>
+        <pathelement location="${play.location}/framework/lib/async-http-client-1.6.5.jar"/>
+        <pathelement location="${play.location}/framework/lib/groovy-all-1.7.10.jar"/>
+        <pathelement location="${play.location}/framework/lib/joda-time-2.0.jar"/>
+        <pathelement location="${play.location}/framework/lib/log4j-1.2.16.jar"/>
+        <pathelement location="${play.location}/framework/lib/memcached-2.6.jar"/>
+        <pathelement location="${play.location}/framework/lib/netty-3.2.5.Final.jar"/>
+        <pathelement location="${play.location}/framework/lib/org.eclipse.jdt.core-3.8.0.v_C03.jar"/>
+        <pathelement location="${libraries.location}/spring-framework-3.1.0/dist/org.springframework.aop-3.1.0.RELEASE.jar"/>
+        <pathelement location="${libraries.location}/spring-framework-3.1.0/dist/org.springframework.beans-3.1.0.RELEASE.jar"/>
+        <pathelement location="${libraries.location}/spring-framework-3.1.0/dist/org.springframework.context-3.1.0.RELEASE.jar"/>
+        <pathelement location="${libraries.location}/spring-framework-3.1.0/dist/org.springframework.context.support-3.1.0.RELEASE.jar"/>
+        <pathelement location="${libraries.location}/spring-framework-3.1.0/dist/org.springframework.core-3.1.0.RELEASE.jar"/>
+        <pathelement location="${libraries.location}/spring-framework-3.1.0/dist/org.springframework.expression-3.1.0.RELEASE.jar"/>
+        <pathelement location="${libraries.location}/spring-framework-3.1.0/dist/org.springframework.orm-3.1.0.RELEASE.jar"/>
+        <pathelement location="${libraries.location}/spring-framework-3.1.0/dist/org.springframework.transaction-3.1.0.RELEASE.jar"/>
+        <pathelement location="${libraries.location}/spring-security-3.1.0/dist/spring-security-config-3.1.0.RELEASE.jar"/>
+        <pathelement location="${libraries.location}/spring-security-3.1.0/dist/spring-security-core-3.1.0.RELEASE.jar"/>
+        <pathelement location="${libraries.location}/spring-ldap-1.3.1/spring-ldap-1.3.1.RELEASE-all.jar"/>
+        <pathelement location="${libraries.location}/spring-security-3.1.0/dist/spring-security-ldap-3.1.0.RELEASE-sources.jar"/>
+        <pathelement location="${libraries.location}/spring-security-3.1.0/dist/spring-security-ldap-3.1.0.RELEASE.jar"/>
+        <pathelement location="${libraries.location}/pentaho/kettle-core.jar"/>
+        <pathelement location="lib/commons-httpclient-3.1.jar"/>
+        <pathelement location="lib/jxl.jar"/>
+        <pathelement location="lib/opencsv-2.3.jar"/>
+        <pathelement location="lib/xmlbeans-2.3.0.jar"/>
+        <pathelement location="lib/javadbf-0.4.0.jar"/>
+        <pathelement location="lib/jasypt-1.9.1.jar"/>
+    	
+    	<pathelement location="lib/bcmail-jdk15on-156.jar"/>
+    	<pathelement location="lib/bcprov-ext-jdk15on-156.jar"/>
+    	<pathelement location="lib/bcprov-jdk14-146.jar"/>
+    	<pathelement location="lib/bcprov-jdk14-156.jar"/>
+		<pathelement location="lib/itextpdf-5.5.7.jar"/>
+    	<pathelement location="lib/bcprov-jdk15on-156.jar"/>    	
+    	<pathelement location="lib/itextpdf-5.5.7.jar"/>
+    	<pathelement location="lib/itext-pdfa-5.5.7.jar"/>
+    	<pathelement location="lib/itext-xtra-5.5.7.jar"/>
+    	<pathelement location="lib/pdfbox-app-2.0.5.jar"/>
+    	
+        <pathelement location="lib/pentaho-reporting-engine-classic-core-3.9.0-GA.jar"/>
+        <pathelement location="${libraries.location}/pentaho/libbase-1.2.4.jar"/>
+        <pathelement location="${libraries.location}/pentaho/poi-3.6.jar"/>
+        <pathelement location="${libraries.location}/pentaho/poi-ooxml-3.6.jar"/>
+        <pathelement location="${libraries.location}/pentaho/poi-ooxml-schemas-3.6.jar"/>
+        <path refid="medallionModel.classpath"/>
+        <path refid="medallionService.classpath"/>
+        <path refid="medallionPluginService.classpath"/>
+        <path refid="Spring Framework 3.1.0.userclasspath"/>
+        <pathelement location="${libraries.location}/zip4j_1.3.1/zip4j_1.3.1.jar"/>
+    </path>
+    <path id="medallionModel.classpath">
+        <pathelement location="${medallionModel.location}/bin"/>
+		<path refid="Hibernate 3.6.0.userclasspath"/>
+    </path>
+    <path id="medallionService.classpath">
+        <pathelement location="${medallionService.location}/bin"/>
+    </path>
+    <path id="medallionPluginService.classpath">
+        <pathelement location="${medallionPluginService.location}/bin"/>
+    </path>
+    <path id="Kettle 4.2.0.userclasspath">
+        <pathelement location="${libraries.location}/pentaho/kettle-core.jar"/>
+        <pathelement location="${libraries.location}/pentaho/kettle-db.jar"/>
+        <pathelement location="${libraries.location}/pentaho/kettle-dbdialog.jar"/>
+        <pathelement location="${libraries.location}/pentaho/kettle-engine.jar"/>
+        <pathelement location="${libraries.location}/pentaho/kettle-vfs-20100924.jar"/>
+        <pathelement location="${libraries.location}/pentaho/drools-api-5.0.1.jar"/>
+        <pathelement location="${libraries.location}/pentaho/drools-compiler-5.0.1.jar"/>
+        <pathelement location="${libraries.location}/pentaho/drools-core-5.0.1.jar"/>
+    </path>
+    <path id="Pentaho Reporting Engine 3.9.0.userclasspath">
+        <pathelement location="${libraries.location}/pentaho/pentaho-reporting-engine-classic-core-3.9.0-GA.jar"/>
+        <pathelement location="${libraries.location}/pentaho/libloader-1.2.5.jar"/>
+        <pathelement location="${libraries.location}/pentaho/libbase-1.2.4.jar"/>
+        <pathelement location="${libraries.location}/pentaho/libdocbundle-1.2.1.jar"/>
+        <pathelement location="${libraries.location}/pentaho/libfonts-1.2.1.jar"/>
+        <pathelement location="${libraries.location}/pentaho/libformat-1.2.1.jar"/>
+        <pathelement location="${libraries.location}/pentaho/libformula-1.2.1.jar"/>
+        <pathelement location="${libraries.location}/pentaho/libpixie-1.2.1.jar"/>
+        <pathelement location="${libraries.location}/pentaho/librepository-1.2.1.jar"/>
+        <pathelement location="${libraries.location}/pentaho/libserializer-1.2.1.jar"/>
+        <pathelement location="${libraries.location}/pentaho/libxml-1.2.1.jar"/>
+    </path>
+    <path id="run.medallionWeb.classpath">
+        <path refid="Kettle 4.2.0.userclasspath"/>
+        <path refid="Pentaho Reporting Engine 3.9.0.userclasspath"/>
+        <pathelement location="${play.location}/modules/kettle/lib/jersey-apache-client-1.7.jar"/>
+        <pathelement location="${play.location}/modules/kettle/lib/jersey-client-1.7.jar"/>
+        <pathelement location="${play.location}/modules/kettle/lib/jersey-core-1.7.jar"/>
+        <path refid="medallionWeb.classpath"/>
+        <pathelement location="conf"/>
+    </path>
+    <path id="run.medallionWeb.bootclasspath">
+        <fileset dir="${java.home}/lib" includes="*.jar"/>
+        <fileset dir="${java.home}/lib/ext" includes="*.jar"/>
+        <path refid="Kettle 4.2.0.userclasspath"/>
+        <path refid="Pentaho Reporting Engine 3.9.0.userclasspath"/>
+    </path>
+    <path id="run.Test medallion.classpath">
+        <pathelement location="D:/framework/play/modules/testrunner/lib/play-testrunner.jar"/>
+        <path refid="medallionWeb.classpath"/>
+        <pathelement location="conf"/>
+    </path>
+    <target name="init">
+        <mkdir dir="bin"/>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="app">
+                <exclude name="**/*.java"/>
+                <exclude name="views/"/>
+            </fileset>
+        </copy>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="${spring.link}">
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="${secure.link}">
+                <exclude name="**/*.java"/>
+                <exclude name="views/**"/>
+            </fileset>
+        </copy>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="test">
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete dir="bin"/>
+    </target>
+    <target depends="clean" name="cleanall"/>
+    <target depends="build-subprojects,build-project" name="build"/>
+    <target name="build-subprojects">
+        <ant antfile="build.xml" dir="${medallionModel.location}" inheritAll="false" target="build-project">
+        </ant>
+        <ant antfile="build.xml" dir="${medallionService.location}" inheritAll="false" target="build-project">
+        </ant>
+        <ant antfile="build.xml" dir="${medallionPluginService.location}" inheritAll="false" target="build-project">
+		</ant>
+	</target>
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+            <src path="${spring.link}"/>
+            <src path="${secure.link}"/>
+            <src path="app"/>
+            <src path="test"/>
+            <exclude name="views/**"/>
+            <exclude name="views/"/>
+            <classpath refid="medallionWeb.classpath"/>
+        </javac>
+    </target>
+    <target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
+        <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
+        <antcall target="build"/>
+    </target>
+    <target name="Reader">
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes" printsummary="withOutAndErr">
+            <formatter type="xml"/>
+            <test name="dbf.Reader" todir="${junit.output.dir}"/>
+            <classpath refid="medallionWeb.classpath"/>
+        </junit>
+    </target>
+    <target name="medallionWeb">
+        <java classname="play.server.Server" failonerror="true" fork="yes">
+            <jvmarg line="-Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n -Dplay.debug=yes -Dplay.id=dev -Dapplication.path=&quot;${project_loc:medallionWeb}&quot; -Djava.endorsed.dirs=&quot;${project_loc:play}/framework/endorsed&quot; -javaagent:&quot;${project_loc:play}/framework/play-1.2.4.jar&quot;"/>
+            <classpath refid="run.medallionWeb.classpath"/>
+            <bootclasspath>
+                <path refid="run.medallionWeb.bootclasspath"/>
+            </bootclasspath>
+        </java>
+    </target>
+    <target name="Test medallion">
+        <java classname="play.server.Server" failonerror="true" fork="yes">
+            <jvmarg line="-Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n -Dplay.debug=yes -Dplay.id=test -Dapplication.path=&quot;${project_loc:medallionWeb}&quot; -Djava.endorsed.dirs=&quot;D:\framework\play/framework/endorsed&quot; -javaagent:&quot;D:\framework\play/framework/play.jar&quot;"/>
+            <classpath refid="run.Test medallion.classpath"/>
+        </java>
+    </target>
+    <target name="junitreport">
+        <junitreport todir="${junit.output.dir}">
+            <fileset dir="${junit.output.dir}">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report format="frames" todir="${junit.output.dir}"/>
+        </junitreport>
+    </target>
+</project>

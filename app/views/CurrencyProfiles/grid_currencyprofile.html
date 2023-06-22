@@ -1,0 +1,40 @@
+<table id="gridCurrencyExchange" class="display">
+	<thead>
+		<tr>
+			<th>Other Currency</th>
+			<th>Unit Currency</th>
+			<th>Exchange Rate</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list currencyProfile?.currencyProfileDetails, as:'currencyExchangeDetails'}
+		<tr>
+			<td>
+				<span id="entryOtherToBase">
+				${currencyExchangeDetails?.sourceCurrency?.currencyCode}
+				#{hidden name:'currencyExchangeDetails[' + (currencyExchangeDetails_index-1) + '].sourceCurrency.currencyCode', value:currencyExchangeDetails?.sourceCurrency?.currencyCode /}
+				#{hidden name:'currencyExchangeDetails[' + (currencyExchangeDetails_index-1) + '].sourceCurrency.description', value:currencyExchangeDetails?.sourceCurrency?.description /}
+				</span>
+				<span id="entryBaseToOther">
+				${currencyExchangeDetails?.targetCurrency?.currencyCode}
+				#{hidden name:'currencyExchangeDetails[' + (currencyExchangeDetails_index-1) + '].targetCurrency.currencyCode', value:currencyExchangeDetails?.targetCurrency?.currencyCode /}
+				#{hidden name:'currencyExchangeDetails[' + (currencyExchangeDetails_index-1) + '].targetCurrency.description', value:currencyExchangeDetails?.targetCurrency?.description /}
+				</span>
+			</td>
+			<td>
+				${currencyExchangeDetails?.unitCurrency?.format('##,##0.####')}
+				#{hidden name:'currencyExchangeDetails[' + (currencyExchangeDetails_index-1) + '].unitCurrency', value:currencyExchangeDetails?.unitCurrency /}
+			</td>
+			<td>
+				${currencyExchangeDetails?.exchangeRate?.format('##,##0.####')}
+				#{hidden name:'currencyExchangeDetails[' + (currencyExchangeDetails_index-1) + '].exchangeRate', value:currencyExchangeDetails?.exchangeRate /}
+			</td>
+			<td>
+				<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled='disabled'#{/if} /></center>
+				#{hidden name:'currencyExchangeDetails[' + (currencyExchangeDetails_index-1) + '].currencyExchangeKey', value:currencyExchangeDetails?.currencyExchangeKey /}
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>

@@ -1,0 +1,75 @@
+#{extends 'templates/main.html' /}
+
+<script type="text/javascript">
+	//var transaction = $.parseJSON('${data.raw()}');
+	//var transaction = null;
+	$(function() {
+		$('.calendar').datepicker();	
+		$('.numeric').change(function() {
+			calculate();
+		});
+		//bind($('#form'), transaction);
+		
+		$('#retrieve').click(function() {
+			$.get('@{testJSON()}', function(data) {
+				checkRedirect(data);
+				var transaction = data;
+				bind($('#form'), transaction);
+			});		
+		});
+	});
+	
+	Number.prototype.toDate = function() {
+		var date = new Date(this.valueOf());
+		return date;
+	};
+		
+	Date.prototype.format = function(format) {
+		return $.datepicker.formatDate(format, this);
+	}
+	
+	function bind(form, obj) {
+		$(form).find("input").each(function() {
+			var el = $(this);
+			var id = el.attr('id');
+			if (obj[id]) {
+				if (el.attr('type') == 'text') {					 
+					console.debug( el.attr('class'));
+					if (el.hasClass('hasDatepicker')) {
+						el.datepicker('setDate', obj[id].toDate());
+					} else if (el.hasClass('numeric')) {
+						el.autoNumericSet(obj[id]);
+					} else {
+						el.val(obj[id]);
+					}
+				}
+			}
+		});
+		//$('#transactionDate').datepicker('setDate', transaction.transactionDate.toDate());
+		//$('#quantity').autoNumericSet(transaction.quantity);		
+		//$('#price').autoNumericSet(transaction.price);		
+	}
+	
+	function calculate() {
+		var quantity = $('#quantity').autoNumericGet();
+		var price = $('#price').autoNumericGet();
+		var amount = quantity * price;
+		$('#amount').autoNumericSet(amount);
+	}
+</script>
+
+<form id="form" class="form">
+	<p>
+		#{textBox id:'transactionDate', name:'transactionDate', label:'Transaction Date', required:true, class:'calendar' /} (mm/dd/yyyy)
+	</p>
+	<p>
+		#{textBox id:'quantity', name:'quantity', label:'Quantity', class:'numeric' /}
+	</p>
+	<p>
+		#{textBox id:'price', name:'price', label:'Price', class:'numeric' /}
+	</p>
+	<p>
+		#{textBox id:'amount', name:'amount', label:'Amount', class:'numeric', readOnly:true /}
+	</p>
+	<input type="button" id="retrieve" value="Retrieve" />
+</form>

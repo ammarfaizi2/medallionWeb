@@ -1,0 +1,26 @@
+#{hidden id:'rowNumber' /}
+<div style="overflow-y:scroll;height:170px;">
+    <table style="width:100%;" id="listNavMin">
+        <tr>
+            <td valign="top">
+               <table id="navMinTable" class="display">
+                    <thead>
+                        <tr>
+                            <th style="width:70px">Effective To</th>
+                            <th style="width:50px">Max Counter</th>
+                            <th style="width:50px">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </table>
+    <div class="buttons">
+        #{ifnot confirming}
+            <button id="newNavDialog" #{if readOnly}disabled="disabled"#{/if}>New Data</button>
+            <p><span id="btnNewNavDialogError" class="error"></span></p>
+        #{/ifnot}
+    </div>
+</div>

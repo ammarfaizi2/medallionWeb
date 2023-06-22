@@ -1,0 +1,118 @@
+#{extends 'templates/main.html' /}
+
+<script type="text/javascript">
+$(function() {
+	var backToWorkList = function() {
+		loading.dialog('open');
+		if ($("#from").val() == 'listBatch') {
+			location = "@{Approvals.listbatch()}";
+		} else {
+			location = "@{Approvals.list()}";
+		};
+	}
+	
+	$('.buttons input:button').button();
+	
+	var closeDialogMessage = function() {
+		$("#dialog-message").dialog('close');
+		return false;
+	}
+	
+	var allowApprove = function(){
+		var action = "@{approveSettlement()}?keyId=${transaction?.transactionKey}&taskId=${taskId}";
+		#{if corporateAnnouncement}
+			action = "@{approveSettlement()}?keyId=${entitlement?.settlementNumber}&taskId=${taskId}&typeTransaction=corporateaction-settlement";
+		#{/if}
+		loading.dialog('open');
+		$.post(action, function(data, status, xhr) {
+    		checkRedirect(data);
+			loading.dialog('close');
+			if (data.status == 'success') {
+				//alert(data.message);
+				messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+			} else {
+				//alert(data.error);
+				messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+			}
+		});
+	}
+
+	$('#approve').click(function() {
+		var trxStlQty;
+		var trxPortQty;
+		if (('${transaction.actualSettledQuantity}'==null)||('${transaction.actualSettledQuantity}'=='')){
+			trxStlQty = 0;
+		} else {
+			trxStlQty = '${transaction.actualSettledQuantity}';
+		}
+		
+		if (('${transaction.portfolioQuantity}'==null)||('${transaction.portfolioQuantity}'=='')){
+			trxPortQty = 0;
+		} else {
+			trxPortQty = '${transaction.portfolioQuantity}';
+		}
+		var quantity = parseFloat($('#quantityStripped').val());
+		var settleQuantity = parseFloat(trxStlQty);
+		var portoQuantity = parseFloat(trxPortQty);
+		console.log('quantity = ' +quantity);
+		console.log('settleQuantity = ' +settleQuantity);
+		console.log('portoQuantity = ' +portoQuantity);
+		if (($('#holdingRefs').val()!='') && ((quantity > settleQuantity) || (quantity > portoQuantity))){
+			messageAlertOk("Sold Quantity cannot be more than Available Trx Quantity", "ui-icon1 ui-icon-circle-close", "Approval Message", closeDialogMessage);
+			return false;
+		} else if (('1' == '${cbestEnabled}') && ($('#isSentToDepository').val()=='true')&&($('#depositoryCode').val()=='${depositoryCbest}')){
+			messageAlertYesNo("This settlement is waiting from C-BEST, do you want to force settle ?", "ui-icon ui-icon-notice", "Confirmation Message",allowApprove, closeDialogMessage);
+		} else {
+			allowApprove();
+		}
+	});
+
+	// ACTION BUTTON REJECT
+	$('#reject').click(function() {
+		var action = "@{rejectSettlement()}?keyId=${transaction?.transactionKey}&taskId=${taskId}";
+		#{if corporateAnnouncement}
+			action = "@{rejectSettlement()}?keyId=${entitlement?.settlementNumber}&taskId=${taskId}";
+		#{/if}
+		loading.dialog('open');
+		$.post(action, function(data, status, xhr) {
+    		checkRedirect(data);
+			loading.dialog('close');
+			if (data.status == 'success') {
+				//alert("Transaction No : '${transaction?.transactionKey}' is " + data);
+				//alert(data.message);
+				messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+			}else{
+				messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+			}
+		});
+	});
+	//===============
+		
+	$('#back').click(function() {
+		if ($("#from").val() == 'listBatch') {
+			location.href="@{Approvals.listbatch()}";
+		} else {
+			location.href="@{Approvals.list()}";
+		}
+	});
+});	
+</script>
+
+
+
+#{if corporateAnnouncement}
+	<h2>Corporate Action Settlement Approval</h2>
+	#{include 'Entitlements/master_detail.html' /}
+#{/if}
+#{else}
+	<h2>Settlement Approval</h2>
+	#{include 'Transactions/detail.html' /}
+#{/else}
+#{hidden id:'from', name:'from', value:from /}
+<p>
+	<div class="buttons">
+		<input type="button" id="approve" value="Approve" />
+		<input type="button" id="reject" value="Reject" />
+		<input type="button" id="back" value="Cancel" />
+	</div>
+</p>

@@ -1,0 +1,135 @@
+#{extends 'templates/detail1.html' /}
+#{set pageTitle: 'Third Party Issuer Maintenance' /}
+#{set id:thirdParty?.thirdPartyKey /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{set codeDisabled:(mode=='edit') /}
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+#{script 'validation/numericOnly.js' /}
+
+<script type="text/javascript">
+#{include 'RegistrySubscription/Util.js' /}
+#{include 'ThirdPartyIssuers/Issuer.js' /}
+
+function doCancel(){
+	location.href = '@{list()}?group=THIRD_PARTY-ISSUER';
+}
+
+</script>
+
+<form id="thirdParyIssuerForm" class="form" method="POST">
+#{hidden id:'thirdPartykey', name:'thirdParty.thirdPartyKey', value:thirdParty?.thirdPartyKey /}
+#{hidden name:'thirdParty.organization.organizationId', value:thirdParty?.organization?.organizationId /}
+#{hidden id:'thirdPartyType', name:'thirdParty.thirdPartyType.lookupId', value:thirdParty?.thirdPartyType?.lookupId /}
+
+<p>
+	#{textBox id:'thirdPartyCode', name:'thirdPartyCode', label:'Code', value:thirdParty?.thirdPartyCode, class:'capitalize', width:'100px',required:true, readOnly:(codeDisabled ? codeDisabled : readOnly), maxLength:50 /}
+	#{hidden id:'thirdPartyCodeHidden', name:'thirdParty.thirdPartyCode', value:thirdParty?.thirdPartyCode /}
+	<span class="error">#{error 'Code is' /}</span>
+</p>
+<p>
+	#{textBox id:'thirdPartyName', name:'thirdParty.thirdPartyName', label:'Name', value:thirdParty?.thirdPartyName, class:'capitalize', width:'300px',required:true,readOnly:readOnly, maxLength:50 /}
+	<span class="error">#{error 'Name is' /}</span>
+</p>
+<p>
+	#{textBox id:'contact1', name:'thirdParty.contact1', label:'Contact Person 1',value:thirdParty?.contact1, class:'capitalize', width:'300px',readOnly:readOnly, maxLength:100 /}
+	<span class="error">#{error 'Contact Person 1 is' /}</span>
+</p>
+<p>	
+	<label style="margin-left: 5em">Position</label>
+	<span style="margin-left: -5em">
+	#{textBox id:'contactPosition1', name:'thirdParty.contact1Position',value:thirdParty?.contact1Position, class:'capitalize', width:'300px',readOnly:readOnly, maxLength:100 /}
+	<span class="error">#{error 'Position 1 is' /}</span>
+	</span>
+</p>
+<p>
+	#{textBox id:'contact2', name:'thirdParty.contact2', label:'Contact Person 2',value:thirdParty?.contact2, class:'capitalize', width:'300px',readOnly:readOnly, maxLength:100 /}
+	<span class="error">#{error 'Contact Person 2 is' /}</span>
+</p>
+<p>	
+	<label style="margin-left: 5em">Position</label>
+	<span style="margin-left: -5em">
+	#{textBox id:'contactPosition2', name:'thirdParty.contact2Position', value:thirdParty?.contact2Position, class:'capitalize', width:'300px',readOnly:readOnly, maxLength:100 /}
+	<span class="error">#{error 'Position 2 is' /}</span>
+	</span>
+</p>
+<p>			
+	#{textBox id:'address1Ext', name:'thirdParty.address1Ext', label:'Address', value:thirdParty?.address1Ext, readOnly:readOnly, class:'capitalize', width:'300px', maxLength:74 /}
+	<span class="error">#{error 'Address is' /}</span>
+</p>
+<p>	
+	<label></label>		
+	#{textBox id:'address2Ext', name:'thirdParty.address2Ext', value:thirdParty?.address2Ext, readOnly:readOnly, class:'capitalize', width:'300px', maxLength:74 /}
+	<span class="error">#{error 'Address 2 is' /}</span>
+</p>
+<p>	
+	<label></label>		
+	#{textBox id:'address3Ext', name:'thirdParty.address3Ext', value:thirdParty?.address3Ext, readOnly:readOnly, class:'capitalize', width:'300px', maxLength:75 /}
+	#{hidden id:'address1Hide', name:'thirdParty.address1', value:thirdParty?.address1 /}
+</p>
+<p>
+	#{textBox id:'address1CountryCode',required:true, name:'thirdParty.address1Country.lookupCode', label:'Country', value:thirdParty?.address1Country?.lookupCode, dataold:thirdParty?.address1Country?.lookupCode,  class:'capitalize', readOnly:readOnly, width:'50px' /}
+	#{hidden id:'address1Country', name:'thirdParty.address1Country.lookupId', value:thirdParty?.address1Country?.lookupId /}
+	#{button id:'address1CountryHelp', value:'?', class:'small', readOnly:readOnly /}	
+	#{textBox id:'address1CountryDesc', name:'thirdParty.address1Country.lookupDescription', value:thirdParty?.address1Country?.lookupDescription, readOnly:true, width:'216px' /}
+	&nbsp;<span class="error">#{error 'Country is' /}</span>
+</p>
+<p>
+	#{textBox id:'address1StateCode', name:'thirdParty.address1State.lookupCode', label:'State', value:thirdParty?.address1State?.lookupCode, dataold:thirdParty?.address1State?.lookupCode, class:'capitalize', readOnly:readOnly, width:'50px' /}
+	#{hidden id:'address1State', name:'thirdParty.address1State.lookupId', value:thirdParty?.address1State?.lookupId /}
+	#{button id:'address1StateHelp', value:'?', class:'small', readOnly:readOnly /}
+	#{textBox id:'address1StateDesc', name:'thirdParty.address1State.lookupDescription', value:thirdParty?.address1State?.lookupDescription, readOnly:true, width:'216px' /}
+</p>
+<p>
+	#{textBox id:'address1AreaCode', name:'thirdParty.address1Area.lookupCode', label:'Area', value:thirdParty?.address1Area?.lookupCode, class:'capitalize', readOnly:readOnly, width:'50px' /}
+	#{hidden id:'address1Area', name:'thirdParty.address1Area.lookupId', value:thirdParty?.address1Area?.lookupId /}
+	#{button id:'address1AreaHelp', value:'?', class:'small', readOnly:readOnly /}
+	#{textBox id:'address1AreaDesc', name:'thirdParty.address1Area.lookupDescription', value:thirdParty?.address1Area?.lookupDescription, readOnly:true, width:'216px' /}				
+</p>
+<p>			
+	#{textBox id:'address1ZipCode', name:'thirdParty.address1ZipCode', label:'Postal Code', value:thirdParty?.address1ZipCode, readOnly:readOnly, class:'capitalize', width:'300px', maxLength:50 /}
+	<span class="error">#{error 'Postal Code is' /}</span>
+</p>
+<p>			
+	#{textBox id:'address1Phone1', name:'thirdParty.address1Phone1', label:'Phone', value:thirdParty?.address1Phone1, readOnly:readOnly, width:'300px', maxLength:50 /}
+	<span class="error">#{error 'Phone is' /}</span>
+</p>
+<p>			
+	#{textBox id:'address1Phone2', name:'thirdParty.address1Phone2', label:'Mobile Phone', value:thirdParty?.address1Phone2, readOnly:readOnly, width:'300px', maxLength:50 /}
+	<span class="error">#{error 'Mobile Phone is' /}</span>
+</p>
+<p>			
+	#{textBox id:'address1Phone3', name:'thirdParty.address1Phone3', label:'Fax Number', value:thirdParty?.address1Phone3, readOnly:readOnly, width:'300px', maxLength:50 /}
+	<span class="error">#{error 'Fax Number is' /}</span>
+</p>
+<p>
+	#{textBox id:'bankCode', name:'thirdParty.bankCode.thirdPartyCode', label:'Bank Code', value:thirdParty?.bankCode?.thirdPartyCode, class:'capitalize', readOnly:readOnly, width:'50px' /}
+	#{hidden id:'bankCodeKey', name:'thirdParty.bankCode.thirdPartyKey', value:thirdParty?.bankCode?.thirdPartyKey /}
+	#{button id:'bankCodeHelp', value:'?', class:'small', readOnly:readOnly /}
+	#{textBox id:'bankCodeName', name:'thirdParty.bankCode.thirdPartyName', value:thirdParty?.bankCode?.thirdPartyName, readOnly:true, width:'216px' /}				
+</p>
+<p>
+	#{dropDownList id:'ownerShip', name:'thirdParty.ownerShip.lookupId', label:'Ownership', value:thirdParty?.ownerShip?.lookupId, options:ownership, required:true, readOnly:readOnly, removeEmpty:'true', width:'300px'/}
+	<span class="error">#{error 'Ownership is' /}</span>
+</p>
+<p>
+	#{textBox id:'issuerPaidUp', label:'Paid Up Capital', value:thirdParty?.issuerPaidUp, format:'#,##0.####', class:'numeric', required:true, readOnly:readOnly /}
+	#{hidden id:'issuerPaidUpStripped', name:'thirdParty.issuerPaidUp', value:thirdParty?.issuerPaidUp /}
+	<span class="error">#{error 'Paid Up Capital is' /}</span>
+</p>
+<p>	<!-- start #6066 -->		
+	#{textBox id:'lkpbuId', name:'thirdParty.lkpbu.lookupCode', label:'APOLO Code', value:thirdParty?.lkpbu?.lookupCode, required:true, readOnly:readOnly, width:'80px', class:'capitalize' /}
+	#{hidden id:'lkpbuKey', name:'thirdParty.lkpbu.lookupId', value:thirdParty?.lkpbu?.lookupId /}
+	#{button id:'lkpbuHelp', value:'?', class:'small', readOnly:readOnly /}
+	#{textBox id:'lkpbuDesc', name:'thirdParty.lkpbu.lookupDescription', value:thirdParty?.lkpbu?.lookupDescription, readOnly:true, width:'216px' /}
+	<span class="error">#{error 'APOLO Code is' /}</span>
+	<!-- end #6066 -->
+</p>
+<p>	
+	#{textArea id:'remarks', name:'thirdParty.remarks', label:'Remarks', value:thirdParty?.remarks, readOnly:readOnly, class:'capitalize', width:'300px', maxLength:50/}
+</p>
+<p>
+	#{radioButton id:'isActive', name:'isActive', value:((thirdParty?.isActive)?'true':'false'), label:'Active', options:operators, readOnly:readOnly /}
+	#{hidden id:'isActiveHidden', name:'thirdParty.isActive', value:((thirdParty?.isActive)?'true':'false') /}
+</p>
+</form>

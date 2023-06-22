@@ -1,0 +1,129 @@
+#{extends 'templates/main.html' /}
+#{set readOnly:((mode !='edit' && mode !='entry') || confirming) /}
+
+#{if flash.error || errors}
+    <div class="error">
+    	Error when saving data!<br/>
+		<li>${flash.error}</li>
+		#{ifErrors}
+			#{errors}
+				 <li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}
+
+<script type="text/javascript">
+	var closeDialogMessage = function() {
+		$("#dialog-message").dialog("close");
+	}
+	
+	$(function() {
+		$('.buttons input:button').button();
+		
+		/* var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+		loading.dialog({
+			closeOnEscape: false,
+			draggable: false,
+			modal: true,
+			resizable: false,
+			open:function() {
+				$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+			} 
+		});
+		loading.dialog('close'); */
+		
+		var backToEntry = function() {
+			loading.dialog('open');
+			location = "@{entry()}";
+		}
+
+		// Action buttons
+		$('#save').click(function(){
+			var checkError = $("input").hasClass('fieldError');
+			if (checkError) {
+				console.debug("[SAVE] 1");
+				return false;
+			}
+			if (typeof doSave == 'function') { 
+				resume = doSave();
+				console.debug("[SAVE] 2");
+				//return false;
+			} 
+			if (resume) {
+				var action = "@{save()}?mode=${mode}";
+				loading.dialog('open');
+				$('#registryFundActionForm').attr('action', action);
+				$('#registryFundActionForm').submit();
+			}
+		});
+
+		$('#confirm').click(function() {
+			var action = "@{confirm()}?mode=${mode}";
+			loading.dialog('open');
+			$.post(action, $('#registryFundActionForm').serialize(), function(data, status) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					//alert("Fund Action Key #" + data.fundActionKey);
+					//location = "@{entry()}";
+					messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Notification", backToEntry);
+				} else {
+					//alert(data.error);
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+				}
+			});
+		});
+	
+		$('#back').click(function() {
+			location.href='@{back()}?id=${id}&mode=${mode}#{if group}&group=${group}#{/if}#{if isNewRec}&isNewRec=${isNewRec}#{/if}#{if status}&status=${status}#{/if}';
+			return false;
+		});
+		
+		$('#clear').click(function() {
+			location.href = '@{entry()}';
+			
+		});
+	});
+	
+	// validate populate
+	function doSave() {
+		
+		var divDate = new Date($("#divDate").val());
+		var effectiveDate = $("#effectiveDate").val();
+
+		$("#divDateError").html("");
+		if (effectiveDate > divDate.getTime()) {
+			$("#divDateError").html("Div date can't less than Effective Date Fund").show();
+			console.debug("[SAVE] 2a");
+			return false;
+		} 
+		
+		var dividenGrid = $('#tblSummary').dataTable();
+		if (dividenGrid.fnGetNodes().length == 0) {
+			//alert("Please calculate your Dividen before saved");
+			messageAlertOk("Please Distribute your Dividen before saved", "ui-icon1 ui-icon-alert", "Warning Message", closeDialogMessage);
+			console.debug("[SAVE] 2b");
+			return false;
+		} else {
+			console.debug("[SAVE] 2c");
+			$('#calculated').val(true);
+			return true;
+		}
+	}
+</script>
+<h2>Dividen Entry</h2>
+<div id="detail">
+	#{include 'RegistryFundAction/detail.html' /}	
+</div>
+<div id="actions" class="buttons">
+	#{if confirming}
+		<input type="button" id="confirm" value="Confirm" />
+		<input type="button" id="back" value="Back" />
+	#{/if}
+	#{else}
+		<input type="button" id="save" value="Save" />
+		<input type="button" id="clear" value="Clear" />
+	#{/else}
+</div>
+	

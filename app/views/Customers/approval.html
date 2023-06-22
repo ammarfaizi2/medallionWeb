@@ -1,0 +1,141 @@
+#{extends 'templates/main.html' /}
+
+<script type="text/javascript">
+	$(function() {
+		$(".btn").button();
+		$(".btn").css("width", "100px");
+		
+		var backToWorkList = function() {
+			loading.dialog('open');
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			};
+		}
+		
+		$('#approve').click(function() {
+			
+			var maintenanceLogKey = '${maintenanceLogKey}';
+			
+			$().fetchSync("@{validateAmlDataBeforApprove()}", 
+					{
+						'maintenanceLogKey' : maintenanceLogKey
+					}, function(response) {
+						if (response) {
+							resultCode = response.resultCode;
+							resultMessage = response.resultMessage;
+							var datas = response.amlCustomer;
+							if (resultCode == "0") {
+								approve(backToWorkList);
+							} else {
+								
+								var checkYesFunction = function() {
+									$("#dialog-message").dialog("close");
+									approve(backToWorkList);
+								};
+								var checkNoFunction = function() {
+									$("#dialog-message").dialog("close");
+								};
+
+								messageAlertYesNo(resultMessage, "ui-icon ui-icon-notice", "Confirmation Message", checkYesFunction, checkNoFunction);
+								
+							}
+						} 
+				});
+		});
+		$('#reject').click(function() {
+			var action = "@{reject()}?keyId=${customer?.customerKey}&taskId=${taskId}&maintenanceLogKey=${maintenanceLogKey}&operation=${operation}";
+			loading.dialog('open');
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					messageAlertOk("Code : '${customer?.customerNo}' is Rejected", "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+				}else{
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+				}
+			});
+		});
+		
+		//$(".buttons").css("display","none");
+		$('#close').css('display','none');
+		$("#approval-actions").css("display","block");
+		
+		$('#closeWorkflow').click(function() {
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			}
+		});
+	});
+	
+	function approve(backToWorkList) {
+		
+		var closeDialogMessage = function() {
+			$("#dialog-message").dialog("close");
+		}
+		
+		var action = "@{approve()}?keyId=${customer?.customerKey}&taskId=${taskId}&maintenanceLogKey=${maintenanceLogKey}&operation=${operation}";
+		loading.dialog('open');
+		$.post(action, function(data, status, xhr) {
+    		checkRedirect(data);
+			loading.dialog('close');
+			if (data.status == 'success') {
+				var custNo = data.custNo;
+				var currentCustNo = '${customer?.customerNo}';
+				if(currentCustNo == ''||currentCustNo=='**AUTO**'||currentCustNo==null){
+					if(custNo!= ''){
+						if($("#customerNo").val()==''||$("#customerNo").val()=='**AUTO**'){
+							changeTitle(custNo);
+							$("#customerNo").val(custNo);
+						}
+						messageAlertOk("Code : '"+custNo+"' is Approved", "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+					}
+				}else{
+					messageAlertOk("Code : '${customer?.customerNo}' is Approved", "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+				}
+			} 
+			
+			if (data.status == 'error'){
+				messageAlertOk("Code : '${customer?.customerNo}' can not approve cause "+data.message+" ${customer?.currency?.currencyCode}", "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);	
+			}
+				
+				//alert("Can't approved, Code : '${customer?.customerNo}'");
+				/* if ($("#from").val() == 'listBatch') {
+					location = "@{Approvals.listbatch()}";
+				} else {
+					location = "@{Approvals.list()}";
+				} */
+			//}
+		});		
+	}
+
+	function changeTitle(custNo){
+		var custName = "Customer : "+custNo+" - "+$("#customerName").val();
+		$("#detail h2").text(custName);
+	}
+</script>
+#{if group=='CUSTOMER'}
+	<h2>Customer Maintenance Approval</h2>
+#{/if}
+#{if group=='INVESTOR'}
+	<h2>Investor Maintenance Approval</h2>
+#{/if}
+<div id="detail">
+	<form id="form" class="form">
+		#{include 'Customers/detail.html' /}
+	</form>
+</div>	
+
+<div id="approval-actions">
+	<input type="button" id="approve" value="Approve" class="btn" />
+	<input type="button" id="reject" value="Reject" class="btn" />	
+	<input type="button" id="closeWorkflow" value="Cancel" class="btn" />
+
+	#{hidden id:'taskId', name:'taskId', value:taskId /}
+	#{hidden id:'maintenanceLogKey', name:'maintenanceLogKey', value:maintenanceLogKey /}
+	#{hidden id:'operation', name:'operation', value:operation/}
+	#{hidden id:'from', name:'from', value:from /}
+</div>

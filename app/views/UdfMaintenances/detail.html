@@ -1,0 +1,309 @@
+#{extends 'templates/detail1.html' /}
+#{if group == 'UDF_CATEGORY-C'}
+	#{set groupNew : 'CUSTOMER' /}
+	#{set pageTitle: 'Customer UDF Maintenance' /}
+#{/if}
+#{if group == 'UDF_CATEGORY-T'}
+	#{set groupNew : 'TRANSACTION' /}
+	#{set pageTitle: 'Transaction UDF Maintenance' /}
+#{/if}
+#{if group == 'UDF_CATEGORY-S'}
+	#{set groupNew : 'SECURITY' /}
+	#{set pageTitle: 'Security UDF Maintenance' /}
+#{/if}
+
+#{if taskId != null}
+	#{set pageTitle: 'UDF Master Maintenance Approval' /}
+#{/if}
+
+#{set mode: mode /}
+#{set id:udfMaster?.udfMasterKey /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{script 'lookups.js' /}
+#{script 'validation/numericOnly.js', characterset:'utf-8' /}
+<script type="text/javascript">
+	$(function(){
+		
+		if (('${mode}'=='entry') || (('${mode}'=='edit') && (('${udfMaster?.recordStatus?.decodeStatus()}' == 'Reject')|| ($("#status").val() == 'R' )))) {
+			$('input[name=isActive]').attr("disabled", "disabled");
+		}
+		
+		$('input[name=isActive]').change(function(){
+			$("input[name='udfMaster.isActive']").val($("input[name='isActive']:checked").val());
+		});
+		
+		$("#lookupGroup").change(function() {
+			$("#lookupGroupHidden").val($("#lookupGroup").val());
+		});
+	  
+		$("#displayType").change(function() {
+			$("#displayTypeHidden").val($("#displayType").val());
+		});
+		
+		$("#dataType").change(function() {
+			$("#dataTypeHidden").val($("#dataType").val());
+		});
+		  
+		  //console.debug(${dataTypes});
+		// var tes = ${dataTypes.size()};
+		// console.debug(${dataTypes.size()});
+		
+		
+		 /*
+		
+		  
+		   
+		   //if ($("#displayType").val() == "DISPLAY_TYPE-2") {
+			//   $(".disabledForDataType").attr('disabled', false);
+			//}
+		   
+		
+			if ($("#dataType").val() == "DATA_TYPE-DAT") {
+				$(".disabledForDataType").attr('disabled','disabled');
+				$("#lookupGroup").val("");
+			} else {
+					if (($("#displayType").val() == "DISPLAY_TYPE-1") || ( $("#displayType").val() == "DISPLAY_TYPE-2") ) {
+						if ($("#displayType").val() == "DISPLAY_TYPE-1") {
+							$("#lookupGroup").attr('disabled','disabled');
+							
+						} 
+					} else {
+					$(".disabledForDataType").attr('disabled', false);
+					}
+			}
+	
+
+		   $("#dataType").change(function() {
+				if ($("#dataType").val() == "DATA_TYPE-DAT") {
+					$("#length").val("");
+					$("#displayType").val("DISPLAY_TYPE-3");
+					$("#displayTypeHidden").val($("#displayType").val());
+					$("#lookupGroup").val("");
+					$(".disabledForDataType").attr('disabled', 'disabled');
+				} else {					
+							$("#length").val("");
+							$("#displayType").val("");
+							$("#displayTypeHidden").val($("#displayType").val());
+							$("#lookupGroup").val("");
+							$(".disabledForDataType").attr('disabled', false);
+						}
+			})
+		
+					
+			$("#displayType").change(function() {
+				if ($("#displayType").val() == "DISPLAY_TYPE-1") {
+					$("#displayTypeHidden").val($("#displayType").val());
+					$("#lookupGroup").val("");
+					$("#lookupGroupHidden").val($("#lookupGroup").val());
+					$("#lookupGroup").attr('disabled','disabled');
+				} else {
+					if (($("#dataType").val() == "DATA_TYPE-STR" || "DATA_TYPE-NUM") && ( $("#displayType").val() != "DISPLAY_TYPE-2")) {
+						alert("This display type only for data type date.");
+						$("#displayType").val("");
+						$("#displayTypeHidden").val($("#displayType").val());
+					} else {
+						$("#displayTypeHidden").val($("#displayType").val());
+						$("#lookupGroup").val();
+						$("#lookupGroup").attr('disabled', false);
+					}
+				}
+		})
+*/
+
+		
+		if ($("#displayType").val() == "DISPLAY_TYPE-1") {
+			$("#lookupGroup").attr("disabled","disabled");
+			//$("#dataType option[value='DATA_TYPE-DAT']").hide();
+			$("#dataType option[value='DATA_TYPE-DAT']").attr("disabled","disabled");
+			$("p[id='lkpGrp'] label span").html("");
+			$("p[id='dtTyp'] label span").html("*");
+			$("p[id='lngth'] label span").html("*");
+		} else if ($("#displayType").val() == "DISPLAY_TYPE-2") {
+			$("#dataType").attr("disabled","disabled");
+			$("#length").attr("disabled","disabled");
+			$("p[id='lkpGrp'] label span").html("*");
+			$("p[id='dtTyp'] label span").html("");
+			$("p[id='lngth'] label span").html("");
+		} else if ($("#displayType").val() == "DISPLAY_TYPE-3") {
+			$("#dataType").val("DATA_TYPE-DAT");
+			$("#dataType").attr("disabled","disabled");
+			$("#lookupGroup").attr("disabled","disabled");
+			$("#length").attr("disabled","disabled");
+			$("p[id='lkpGrp'] label span").html("");
+			$("p[id='dtTyp'] label span").html("");
+			$("p[id='lngth'] label span").html("");
+		} else {
+			//$("#dataType option[value='DATA_TYPE-DAT']").show();
+			$("#dataType option[value='DATA_TYPE-DAT']").removeAttr("disabled");
+			$("p[id='lkpGrp'] label span").html("*");
+			$("p[id='dtTyp'] label span").html("*");
+			$("p[id='lngth'] label span").html("*");
+		}
+	
+		if (($("#categoryId").val() == "UDF_CATEGORY-S") || ($("#categoryId").val() == "UDF_CATEGORY-T")) {
+			$("p.customer_only").css("display", "none");
+		}
+		
+		$("#displayType").change(function() {
+			if ($("#displayType").val() == "DISPLAY_TYPE-1") {
+				//$("#dataType option[value='DATA_TYPE-DAT']").hide().html("");
+				$("#dataType option[value='DATA_TYPE-DAT']").attr("disabled","disabled");
+				//$("#displayType").append('<option value="foo" selected="selected">Foo</option>');
+				$("#lookupGroup").attr("disabled","disabled");
+				$("#lookupGroup").val("");
+				$("#dataType").val("");
+				$("#length").val("");
+				$("#lookupGroupHidden").val($("#lookupGroup").val());
+				$("#dataType").attr("disabled",false);
+				$("#length").attr("disabled",false);
+				$("p[id='lkpGrp'] label span").html("");
+				$("p[id='dtTyp'] label span").html("*");
+				$("p[id='lngth'] label span").html("*");
+			} else if ($("#displayType").val() == "DISPLAY_TYPE-2") {
+				$("p[id='lkpGrp'] label span").html("*");
+				$("p[id='dtTyp'] label span").html("");
+				$("p[id='lngth'] label span").html("");
+				//$("#dataType").val("DATA_TYPE-STR");
+				//$("#dataTypeHidden").val($("#dataType").val());
+				$("#dataType").val("");
+				$("#dataTypeHidden").val($("#dataType").val());
+				$("#length").val("");
+				$("#dataType").attr("disabled","disabled");
+				$("#length").attr("disabled","disabled");
+				$("#lookupGroup").attr("disabled",false);
+				$("#lookupGroup").val("");
+				$("#lookupGroupHidden").val($("#lookupGroup").val());
+			} else if ($("#displayType").val() == "DISPLAY_TYPE-3") {
+				$("#dataType").val("DATA_TYPE-DAT");
+				//$("#dataType option[value='DATA_TYPE-DAT']").html("DAT-DATE");
+				$("#dataType option[value='DATA_TYPE-DAT']").removeAttr("disabled");
+				$("#dataTypeHidden").val($("#dataType").val());
+				$("#lookupGroup").val("");
+				$("#length").val("");
+				$("#lookupGroupHidden").val($("#lookupGroup").val());
+				$("#dataType").attr("disabled","disabled");
+				$("#lookupGroup").attr("disabled","disabled");
+				$("#length").attr("disabled","disabled");
+				$("p[id='lkpGrp'] label span").html("");
+				$("p[id='dtTyp'] label span").html("");
+				$("p[id='lngth'] label span").html("");
+			} else {
+				//$("#dataType option[value='DATA_TYPE-DAT']").show().html("DAT-DATE");
+				$("#dataType option[value='DATA_TYPE-DAT']").removeAttr("disabled");
+				$("#dataType").val("");
+				$("#dataTypeHidden").val($("#dataType").val());
+				$("#length").val("");
+				$("#lookupGroup").val("");
+				$("#lookupGroupHidden").val($("#lookupGroup").val());
+				$("#dataType").attr("disabled",false);
+				$("#length").attr("disabled",false);
+				$("#lookupGroup").attr("disabled",false);
+				$("p[id='lkpGrp'] label span").html("*");
+				$("p[id='dtTyp'] label span").html("*");
+				$("p[id='lngth'] label span").html("*");
+			}
+			
+		})
+		
+	/*
+		 $("#dataType").change(function() {
+				if (($("#displayType").val() == "DISPLAY_TYPE-1") && ($("#dataType").val() == "DATA_TYPE-DAT")) {
+					alert("Data type 'Date' is not allowed for display type 'textbox' !");
+					$("#dataType").val("");
+				} 
+		})
+		
+	*/	
+		
+		$("#fieldName").blur(function(){
+				var el = $(this);
+				var length = el.val().length;
+				var word = el.val();
+				el.removeClass('fieldError');
+				$("#errmsg").html("");
+	
+				if (word.indexOf(" ") >= 0) {
+					el.addClass('fieldError');
+					$("#errmsg").html("Space Not Allowed").show();
+				}
+			})
+	});
+
+	function doSave(){
+		var el = $("#fieldName");
+		var length = el.val().length;
+		var word = el.val();
+		//if ($("#displayType").val() == "DISPLAY_TYPE-2") {
+		//	$("#lookupGroup").attr('disabled','disabled');
+		//} 
+
+		if (word.indexOf(" ") >= 0) {
+			alert("Error, Please check your Field Name !")
+			return false;
+		} else {
+			return true;
+		}		
+	}
+
+	function doCancel(){
+		location.href='@{list()}#{if group}?group=${group}#{/}';
+	}
+
+
+</script>
+<style type="text/css">
+  #errmsg { color:red; }
+  .numberOnly { text-align: right; }
+</style>
+
+#{hidden id:'status', name:'status', value:status /}
+#{hidden id:'lookupGroupDisabled', name:'lookupGroupDisabled', value:lookupGroupDisabled /}
+#{hidden id:'lookupGroupDisabled1', name:'lookupGroupDisabled1', value:lookupGroupDisabled1 /}
+#{hidden id:'udfMasterKey', name:'udfMaster.udfMasterKey', value:udfMaster?.udfMasterKey /}
+<p> 
+	
+	#{textBox id:'category', name:'udfMaster.category.lookupDescription', label:'Category', value:groupNew, class:'capitalize',  readOnly:true, width:'110px' /}
+	#{hidden id:'categoryId', name:'udfMaster.category.lookupId', value:group /} 
+	#{hidden id:'organizationId', name:'udfMaster.category.organization.orgazationId', value:udfMaster?.category?.organization?.organizationId /}
+</p>
+<p class="customer_only">
+	#{dropDownList id:'customerType', name:'udfMaster.customerType.lookupId', label:'Customer Type', options:customerTypes, value:udfMaster?.customerType?.lookupId, required:true, readOnly:readOnly, width:'114px' /}
+	<span class="error">#{error 'Customer Type is' /}</span>
+</p>
+<p>      
+	#{textBox id:'fieldName', name:'udfMaster.fieldName', label:'Field Name', value:udfMaster?.fieldName, class:'capitalize',  required:true, readOnly:((mode=='entry') ? confirming : true ), width:'220px', maxLength:75 /}(e.g. FIRST_NAME)
+	&nbsp;<span id="errmsg"></span><span class="error">#{error 'Field Name is' /}</span>
+</p>
+<p>
+	#{dropDownList id:'displayType', name:'display', label:'Display Type', options:displayTypes, value:udfMaster?.displayType?.lookupId, required:true, width:'114px', readOnly:readOnly ,class:'disabledForDataType'/}
+	#{hidden id:'displayTypeHidden', name:'udfMaster.displayType.lookupId', value:udfMaster?.displayType?.lookupId /}
+	<span class="error">#{error 'Display Type is' /}</span>
+</p>
+<p id="dtTyp">
+	#{dropDownList id:'dataType', name:'dataType', options:dataTypes, label:'Data Type', value:udfMaster?.dataType?.lookupId, readOnly:readOnly, required:true, width:'114px' /}
+	#{hidden id:'dataTypeHidden', name:'udfMaster.dataType.lookupId', value:udfMaster?.dataType?.lookupId /}
+	<span class="error">#{error 'Data Type is' /}</span>
+</p>
+<p id="lngth">
+	#{textBox id:'length', name:'udfMaster.length', label:'Length', value:udfMaster?.length, readOnly:readOnly, required:true, class:'disabledForDataType numberOnly' ,width:'110px', maxLength:4 /}
+	<span class="error">#{error 'Length is' /}</span>
+<p id="lkpGrp">
+	#{dropDownList id:'lookupGroup', name:'lookGroup', label:'Lookup Group', options:lookupGroups, value:udfMaster?.lookupGroup?.lookupGroup, required:true, readOnly:readOnly, width:'224px', class:'disabledForDataType'/}
+	#{hidden id:'lookupGroupHidden', name:'udfMaster.lookupGroup.lookupGroup', value:udfMaster?.lookupGroup?.lookupGroup/}
+	<span class="error">#{error 'Lookup Group is' /}</span>
+</p>
+<p>
+	#{textBox id:'label', name:'udfMaster.label', label:'Label', value:udfMaster?.label, class:'capitalize', required:true, readOnly:readOnly, width:'220px' , maxLength:100 /}
+	<span class="error">#{error 'Label is' /}</span>
+</p>
+<p>
+	#{textBox id:'sequence', name:'udfMaster.sequence', label:'Sequence', value:udfMaster?.sequence, class:'numberOnly', required:true, readOnly:readOnly, width:'110px' , maxLength:2 /}
+	<span class="error">#{error 'Sequence is' /}</span>
+</p>
+<p>
+	#{radioButton id:'isActive', name:'isActive', value:((udfMaster?.isActive)?'true':'false'), label:'Active', options:operators, readOnly:readOnly /}
+	#{hidden id:'isActiveHidden', name:'udfMaster.isActive', value:((udfMaster?.isActive)?'true':'false') /}
+</p>
+
+
+

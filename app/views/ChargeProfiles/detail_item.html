@@ -1,0 +1,396 @@
+<script type="text/javascript">
+	$(function() {
+		//$('.buttons input:button').button();
+		$('#cancelItem').click(function() {
+		$("#detailItem").dialog('close');
+		return false;
+		});
+		
+		$('#closeItem').click(function() {
+		$("#detailItem").dialog('close');
+		return false;
+		});
+		
+		$('#itemForm #itemChargeMasterCode').lookup({
+			list:'@{Pick.charges()}',
+			get:{
+				url: '@{Pick.charge()}',
+				success: function(data) {
+					if (data) {
+						$('#itemForm #itemChargeMasterCode').removeClass('fieldError');
+						$('#itemForm #itemChargeMasterKey').val(data.code);
+						$('#itemForm #itemChargeMasterDescription').val(data.description);
+						$('#itemForm #h_itemChargeMasterDescription').val(data.description);
+						$("#itemForm #errmsgChargeCode").html("");
+					}
+				},
+				error: function(data) {
+					$('#itemForm #itemChargeMasterCode').addClass('fieldError');
+					$('#itemForm #itemChargeMasterKey').val('');
+					$('#itemForm #itemChargeMasterCode').val('');
+					$('#itemForm #itemChargeMasterDescription').val('NOT FOUND');
+					$('#itemForm #h_itemChargeMasterDescription').val('');
+				}
+			},
+			
+			description:$('#itemForm #itemChargeMasterDescription'),
+			help:$('#itemForm #itemChargeMasterHelp')
+		});
+
+		$('#itemForm #itemSecurityClass').lookup({
+			list:'@{Pick.lookups()}?group=SECURITY_CLASS',
+			get:{
+				url:'@{Pick.lookup()}?group=SECURITY_CLASS',
+				success: function(data) {
+					if (data) {
+						$('#itemForm #itemSecurityClass').removeClass('fieldError');
+						$('#itemForm #itemSecurityClassKey').val(data.code);
+						$('#itemForm #itemSecurityClassDesc').val(data.description);
+						$('#itemForm #h_itemSecurityClassDesc').val(data.description);
+						
+						// security type
+						$('#itemForm #itemSecurityType').val('');
+						$('#itemForm #itemSecurityTypeDesc').val('');
+						$('#itemForm #h_itemSecurityTypeDesc').val('');
+						
+						// security id
+						$('#itemForm #itemSecurityId').val('');
+						$('#itemForm #itemSecurityIdKey').val('');
+						$('#itemForm #itemSecurityIdDesc').val('');
+						$('#itemForm #h_itemSecurityIdDesc').val('');
+						
+						// transaction template
+						$('#itemForm #itemTransactionCode').val('');
+						$('#itemForm #itemTransactionCodeKey').val('');
+						$('#itemForm #itemTransactionCodeDesc').val('');
+						$('#itemForm #h_itemTransactionCodeDesc').val('');
+						$('#itemForm #errmsgSecClass').html('');
+					}
+				},
+				error: function(data){
+					$('#itemForm #itemSecurityClass').addClass('fieldError');
+					$('#itemForm #itemSecurityClassKey').val('');
+					$('#itemForm #itemSecurityClass').val('');
+					$('#itemForm #itemSecurityClassDesc').val('NOT FOUND');
+					$('#itemForm #h_itemSecurityClassDesc').val('');
+				}
+			},
+			description:$('#itemForm #itemSecurityClassDesc'),
+			help:$('#itemForm #securityClassHelp'),
+			nextControl:$('#itemForm #itemSecurityType')
+		});
+
+		$('#itemForm #itemSecurityType').lookup({
+			list:'@{Pick.securityTypes()}',
+			get: {
+				url: '@{Pick.securityType()}',
+				success: function(data) {
+					if (data) {
+						$('#itemForm #itemSecurityType').removeClass('fieldError');
+						$('#itemForm #itemSecurityType').val(data.code);
+						$('#itemForm #itemSecurityTypeDesc').val(data.description);
+						$('#itemForm #h_itemSecurityTypeDesc').val(data.description);
+						
+						// security id
+						$('#itemForm #itemSecurityId').val('');
+						$('#itemForm #itemSecurityIdKey').val('');
+						$('#itemForm #itemSecurityIdDesc').val('');
+						
+						// transaction template
+						$('#itemForm #itemTransactionCode').val('');
+						$('#itemForm #itemTransactionCodeKey').val('');
+						$('#itemForm #itemTransactionCodeDesc').val('');
+						$('#itemForm #errmsgSecType').html('');
+					}
+				},
+				error: function(data) {
+					$('#itemForm #itemSecurityType').addClass('fieldError');
+					$('#itemForm #itemSecurityType').val('');
+					$('#itemForm #itemSecurityTypeDesc').val('NOT FOUND');
+					$('#itemForm #h_itemSecurityTypeDesc').val('');
+				}
+			},
+			description:$('#itemForm #itemSecurityTypeDesc'),
+			filter:$('#itemForm #itemSecurityClassKey'),
+			help:$('#itemForm #securityTypeHelp'),
+			nextControl:$('#itemForm #itemSecurityId')
+		});
+
+		$('#itemForm #itemSecurityId').lookup({
+			list:'@{Pick.securities()}',
+			get: {
+				url: '@{Pick.securityPickForChargeItem()}',
+				success: function(data) {
+					if (data){
+						$('#itemForm #itemSecurityId').removeClass('fieldError');
+						$('#itemForm #itemSecurityIdKey').val(data.code);
+						$('#itemForm #itemSecurityIdDesc').val(data.description);
+						$('#itemForm #h_itemSecurityIdDesc').val(data.description);
+						$('#itemForm #itemSecurityType').val(data.securityType);
+						$('#itemForm #itemSecurityTypeDesc').val(data.securityTypeDesc);
+						$('#itemForm #h_itemSecurityTypeDesc').val(data.securityTypeDesc);
+						$('#itemForm #itemSecurityClass').val(data.securityClass);
+						$('#itemForm #itemSecurityClassKey').val(data.securityClassKey);
+						$('#itemForm #itemSecurityClassDesc').val(data.securityClassDesc);
+						$('#itemForm #h_itemSecurityClassDesc').val(data.securityClassDesc);
+						$("input[name=checkSecType]").attr('checked',false);
+						$("input[name=checkSecClass]").attr('checked',false);
+						$('#itemForm #itemSecurityClass').attr('disabled', false);
+						$('#itemForm #securityClassHelp').attr('disabled', false);
+						$('#itemForm #itemSecurityType').attr('disabled', false);
+						$('#itemForm #securityTypeHelp').attr('disabled', false);
+						$('#itemForm #itemTransactionCode').val('');
+						$('#itemForm #itemTransactionCodeKey').val('');
+						$('#itemForm #itemTransactionCodeDesc').val('');
+						$('#itemForm #errmsgSecId').html('');
+					}
+				},
+				error: function(data) {
+					$('#itemForm #itemSecurityId').addClass('fieldError');
+					$('#itemForm #itemSecurityIdKey').val('');
+					$('#itemForm #itemSecurityIdDesc').val('NOT FOUND');
+					$('#itemForm #itemSecurityId').val('');
+					$('#itemForm #h_itemSecurityIdDesc').val('');
+				}
+			},
+			description:$('#itemForm #itemSecurityIdDesc'),
+			filter:$('#itemForm #itemSecurityType'),
+			help:$('#itemForm #securityHelp'),
+			nextControl:$('#itemForm #itemTransactionCode')
+		});	
+		
+		$('#itemForm #itemTransactionCode').lookup({
+			list:'@{Pick.transactionTemplateWithSecurityTypes()}',
+			get: {
+				url: '@{Pick.transactionTemplateWithSecurityType()}',
+				success: function(data) {
+					if(data){
+						$('#itemForm #itemTransactionCode').removeClass('fielError');
+						$('#itemForm #itemTransactionCodeKey').val(data.code);
+						$('#itemForm #itemTransactionCodeDesc').val(data.description);
+						$('#itemForm #h_itemTransactionCodeDesc').val(data.description);
+						$('#itemForm #errmsgTransCode').html('');
+					}
+				},
+				error: function(data) {
+					$('#itemForm #itemTransactionCode').addClass('fielError');
+					$('#itemForm #itemTransactionCodeKey').val('');
+					$('#itemForm #itemTransactionCodeDesc').val('NOT FOUND');
+					$('#itemForm #itemTransactionCode').val('');
+					$('#itemForm #h_itemTransactionCodeDesc').val('');
+				}
+			},
+			description:$('#itemForm #itemTransactionCodeDesc'),
+			filter:$('#itemForm #itemSecurityType'),
+			help:$('#itemForm #transactionHelp')
+		});
+		
+		$('#itemForm #itemSecurityClass').change(function(){
+			if ($('#itemForm #itemSecurityClass').val() == '') {
+				$('#itemForm #itemSecurityClassKey').val('');
+				$('#itemForm #itemSecurityClass').val('');
+				$('#itemForm #itemSecurityClassDesc').val('');
+				$('#itemForm #h_itemSecurityClassDesc').val('');
+			}
+		});
+		
+		$('#itemForm #itemSecurityType').change(function(){
+			if ($('#itemForm #itemSecurityType').val() == '') {
+				$('#itemForm #itemSecurityType').val('');
+				$('#itemForm #itemSecurityTypeDesc').val('');
+				$('#itemForm #h_itemSecurityTypeDesc').val('');
+			}
+		});
+		
+		$('#itemForm #itemSecurityId').change(function(){
+			if ($('#itemForm #itemSecurityId').val() == '') {
+				$('#itemForm #itemSecurityId').val('');
+				$('#itemForm #itemSecurityIdKey').val('');
+				$('#itemForm #itemSecurityIdDesc').val('');
+				$('#itemForm #h_itemSecurityIdDesc').val('');
+			}
+		});
+		
+		$('#itemForm #itemTransactionCode').change(function(){
+			if ($('#itemForm #itemTransactionCode').val() == '') {
+				$('#itemForm #itemTransactionCode').val('');
+				$('#itemForm #itemTransactionCodeKey').val('');
+				$('#itemForm #itemTransactionCodeDesc').val('');
+				$('#itemForm #h_itemTransactionCodeDesc').val('');
+			}
+		});
+		
+		
+		$('#itemForm #checkSecClass').change(function(){
+			if ($('#itemForm #checkSecClass').is(":checked")){
+				$('#itemForm #itemSecurityClass').attr('disabled', 'disabled');
+				$('#itemForm #securityClassHelp').attr('disabled', 'disabled');
+				$('#itemForm #itemSecurityClass').val('');
+				$('#itemForm #itemSecurityClassDesc').val('');
+				$('#itemForm #h_itemSecurityClassDesc').val('');
+				$('#itemForm #errmsgSecClass').html('');
+				
+				// security type 
+				$('#itemForm #checkSecType').attr("checked", true);
+				$('#itemForm #itemSecurityType').attr('disabled', 'disabled');
+				$('#itemForm #securityTypeHelp').attr('disabled', 'disabled');
+				$('#itemForm #itemSecurityType').val('');
+				$('#itemForm #itemSecurityTypeDesc').val('');
+				$('#itemForm #h_itemSecurityTypeDesc').val('');
+				$('#itemForm #errmsgSecType').html('');
+				
+				// security id
+				$('#itemForm #checkSecId').attr("checked", true);
+				$('#itemForm #itemSecurityId').attr('disabled', 'disabled');
+				$('#itemForm #securityHelp').attr('disabled', 'disabled');
+				$('#itemForm #itemSecurityId').val('');
+				$('#itemForm #itemSecurityIdKey').val('');
+				$('#itemForm #itemSecurityIdDesc').val('');
+				$('#itemForm #h_itemSecurityIdDesc').val('');
+				$('#itemForm #errmsgSecId').html('');
+				
+				// transaction template
+				$('#itemForm #checkTrans').attr("checked", true);
+				$('#itemForm #itemTransactionCode').val('');
+				$('#itemForm #itemTransactionCodeDesc').val('');
+				$('#itemForm #itemTransactionCodeKey').val('');
+				$('#itemForm #h_itemTransactionCodeDesc').val('');
+				$('#itemForm #errmsgTransCode').html('');
+				$('#itemForm #itemTransactionCode').attr('disabled', 'disabled');
+				$('#itemForm #transactionHelp').attr('disabled', 'disabled');
+				
+			} else {
+				$('#itemForm #itemSecurityClass').attr('disabled', false);
+				$('#itemForm #securityClassHelp').attr('disabled', false);
+			}
+		});
+		
+		$('#itemForm #checkSecType').change(function(){
+			if ($('#itemForm #checkSecType').is(":checked")){
+				$('#itemForm #itemSecurityType').attr('disabled', 'disabled');
+				$('#itemForm #securityTypeHelp').attr('disabled', 'disabled');
+				$('#itemForm #itemSecurityType').val('');
+				$('#itemForm #itemSecurityTypeDesc').val('');
+				$('#itemForm #h_itemSecurityTypeDesc').val('');
+				$('#itemForm #errmsgSecType').html('');
+				
+				// security id
+				$('#itemForm #checkSecId').attr("checked", true);
+				$('#itemForm #itemSecurityId').attr('disabled', 'disabled');
+				$('#itemForm #securityHelp').attr('disabled', 'disabled');
+				$('#itemForm #itemSecurityId').val('');
+				$('#itemForm #itemSecurityIdKey').val('');
+				$('#itemForm #itemSecurityIdDesc').val('');
+				$('#itemForm #h_itemSecurityIdDesc').val('');
+				$('#itemForm #errmsgSecId').html('');
+				
+				// transaction template
+				$('#itemForm #checkTrans').attr("checked", true);
+				$('#itemForm #itemTransactionCode').val('');
+				$('#itemForm #itemTransactionCodeDesc').val('');
+				$('#itemForm #itemTransactionCodeKey').val('');
+				$('#itemForm #h_itemTransactionCodeDesc').val('');
+				$('#itemForm #errmsgTransCode').html('');
+				$('#itemForm #itemTransactionCode').attr('disabled', 'disabled');
+				$('#itemForm #transactionHelp').attr('disabled', 'disabled');
+			} else {
+				$('#itemForm #itemSecurityType').attr('disabled', false);
+				$('#itemForm #securityTypeHelp').attr('disabled', false);
+			}
+		});
+
+		$('#itemForm #checkSecId').change(function(){
+			if ($('#itemForm #checkSecId').is(":checked")){
+				$('#itemForm #itemSecurityId').attr('disabled', 'disabled');
+				$('#itemForm #securityHelp').attr('disabled', 'disabled');
+				$('#itemForm #itemSecurityId').val('');
+				$('#itemForm #itemSecurityIdKey').val('');
+				$('#itemForm #itemSecurityIdDesc').val('');
+				$('#itemForm #h_itemSecurityIdDesc').val('');
+				$('#itemForm #errmsgSecId').html('');
+				
+				// transaction template
+				$('#itemForm #checkTrans').attr("checked", true);
+				$('#itemForm #itemTransactionCode').val('');
+				$('#itemForm #itemTransactionCodeDesc').val('');
+				$('#itemForm #itemTransactionCodeKey').val('');
+				$('#itemForm #h_itemTransactionCodeDesc').val('');
+				$('#itemForm #itemTransactionCode').attr('disabled', 'disabled');
+				$('#itemForm #transactionHelp').attr('disabled', 'disabled');
+			} else {
+				$('#itemForm #itemSecurityId').attr('disabled', false);
+				$('#itemForm #securityHelp').attr('disabled', false);
+				$('#itemForm #itemSecurityId').focus();
+			}
+		});
+		
+		$('#itemForm #checkTrans').change(function(){
+			if ($('#itemForm #checkTrans').is(":checked")){
+				$('#itemForm #itemTransactionCode').attr('disabled', 'disabled');
+				$('#itemForm #transactionHelp').attr('disabled', 'disabled');
+				$('#itemForm #itemTransactionCode').val('');
+				$('#itemForm #itemTransactionCodeDesc').val('');
+				$('#itemForm #itemTransactionCodeKey').val('');
+				$('#itemForm #h_itemTransactionCodeDesc').val('');
+				$('#itemForm #errmsgTransCode').html('');
+			} else {
+				$('#itemForm #itemTransactionCode').attr('disabled', false);
+				$('#itemForm #transactionHelp').attr('disabled', false);
+			}
+		});		
+		
+	});
+	
+</script>
+<form></form>
+<form id="itemForm" class="form">
+	
+	<p>	
+		#{hidden id:'rowPosition' /}
+		#{hidden id:'oldChargeMaster' /}
+		#{hidden id:'newChargeMaster' /}
+		#{hidden id:'chargeItemKey', name:'item.chargeItemKey', value:item?.chargeItemKey /}
+		#{textBox id:'itemChargeMasterCode', name:'item.chargeMaster.chargeCode', label:'Charge Code', class:'capitalize', value:item?.chargeMaster?.chargeCode,  readOnly:readOnly, width:'100px', required:true/}
+		#{button id:'itemChargeMasterHelp', value:'?', class:'small', readOnly:readOnly  /}		
+		#{hidden id:'itemChargeMasterKey', name:'item.chargeMaster.chargeKey', value:item?.chargeMaster?.chargeKey /}
+		#{textBox id:'itemChargeMasterDescription', name:'item.chargeMaster.description', value:item?.chargeMaster?.description,  readOnly:true, width:'250px'/}
+		#{hidden id:'hiddenChargeCode', name:'hiddenChargeCode', value:'hiddenChargeCode' /}
+		<span id="errmsgChargeCode" class="error"></span>
+	</p>
+	<p>
+		#{textBox id:'itemSecurityClass', name:'item.securityClass.lookupCode', label:'Security Class', value: item?.securityClass?.lookupCode, class:'capitalize', readOnly:readOnly, width:'100px' /}
+		#{hidden id:'itemSecurityClassKey', name:'item.securityClass.lookupId', value:item?.securityClass?.lookupId /}
+		#{button id:'securityClassHelp', value:'?', class:'small', readOnly:readOnly  /}
+		#{textBox id:'itemSecurityClassDesc', name:'item.securityClass.lookupDescription', value:item?.securityClass?.lookupDescription,  readOnly:true, width:'250px'/}
+		#{hidden id:'hiddenSecurityClass', name:'hiddenSecurityClass', value:'hiddenSecurityClass' /}
+		#{checkBox id:'checkSecClass', name:'checkSecClass', readOnly:readOnly /} *ALL
+		<span id="errmsgSecClass" class="error"></span>
+	</p>
+	<p>
+		#{textBox id:'itemSecurityType', name:'item.securityType.securityType', label:'Security Type', value:item?.securityType?.securityType, class:'capitalize', readOnly:readOnly, width:'100px' /}
+		#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'itemSecurityTypeDesc', name:'item.securityType.description', value:item?.securityType?.description,  readOnly:true, width:'250px'/}
+		#{hidden id:'hiddenSecurityType', name:'hiddenSecurityType', value:'hiddenSecurityType' /}
+		#{checkBox id:'checkSecType', name:'checkSecType',readOnly:readOnly/} *ALL
+		<span id="errmsgSecType" class="error"></span>
+	</p>
+	<p>
+		#{textBox id:'itemSecurityId', name:'item.security.securityId', label:'Security Id', value:item?.security?.securityId, class:'capitalize', readOnly:readOnly, width:'100px' /}
+		#{hidden id:'itemSecurityIdKey', name:'item.security.securityKey', vallue:item?.security?.securityKey /}
+		#{button id:'securityHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'itemSecurityIdDesc', name:'item.security.description', value:item?.security?.description,  readOnly:true, width:'250px'/}
+		#{hidden id:'hiddenSecurity', name:'hiddenSecurity', value:'hiddenSecurity' /}
+		#{checkBox id:'checkSecId', name:'checkSecId', readOnly:readOnly /} *ALL
+		<span id="errmsgSecId" class="error"></span>
+	</p>
+	<p>
+		#{textBox id:'itemTransactionCode', name:'item.transactionTemplate.transactionCode', label:'Transaction Code', value:item?.transactionTemplate?.transactionCode, readOnly:readOnly, width:'100px' /}
+		#{hidden id:'itemTransactionCodeKey', name:'item.transactionTemplate.transactionTemplateKey', value:item?.transactionTemplate?.transactionTemplateKey /}
+		#{button id:'transactionHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'itemTransactionCodeDesc', name:'item.transactionTemplate.description', value:item?.transactionTemplate?.description, class:'capitalize', readOnly:true, width:'250px' /}
+		#{hidden id:'hiddenTemplate', name:'hiddenTemplate', value:'hiddenTemplate' /}
+		#{checkBox id:'checkTrans', name:'checkTrans' , readOnly:readOnly/} *ALL
+		<span id="errmsgTransCode" class="error"></span>
+	</p>
+	
+</form>

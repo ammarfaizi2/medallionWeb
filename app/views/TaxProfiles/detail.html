@@ -1,0 +1,75 @@
+#{extends 'templates/detail1.html' /}
+#{if mode == 'edit' || mode == 'entry' || mode == 'view'}
+	#{set pageTitle: 'Tax Profile Detail' /}
+#{/if}
+#{if taskId != null}
+	#{set pageTitle: 'Tax Profile Approval' /}
+#{/if}
+#{set id:taxProfile?.taxProfileCode /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+
+#{script 'date.format.js' /}
+#{script 'lookups.js' /}
+
+<script type="text/javascript">
+	$(function() {
+		$('.buttons button').button();
+		
+		$('.buttons #newRules').click(function() {
+			location.href='@{TaxProfileRules.list(taxProfile?.taxProfileCode)}';
+			return false;
+		});
+		
+		if (('${mode}'=='entry') || (('${mode}'=='edit') && (('${taxProfile?.recordStatus?.decodeStatus()}' == 'Reject') || ($("#status").val() == 'R' )))) {
+			$('input[name=isActive]').attr("disabled", "disabled");
+			$('.buttons #newRules').button("option","disabled",true);
+		}
+		
+		if (($('#isActive2').is(":checked"))||('${mode}'=='view')) $('.buttons #newRules').button("option","disabled",true);
+		
+		$('input[name=isActive]').change(function(){
+			$("input[name='taxProfile.active']").val($("input[name='isActive']:checked").val());
+		});
+		
+		if ('${confirming}'=='true'){
+			$('.buttons #newRules').button("option","disabled",true);
+		}
+		
+	});
+	
+	function doSave() {
+		submit('@{save()}?mode=${mode}&isNewRec=${isNewRec}#{if group}&group=${group}#{/}')
+		return false;
+	}
+	
+	function doConfirm() {
+		submit('@{confirm()}/?mode=${mode}&isNewRec=${isNewRec}#{if group}&group=${group}#{/}');
+		return false;
+	};
+	
+	function doBack() {
+		location.href='@{back()}?id=${id}&mode=${mode}#{if group}&group=${group}#{/if}#{if isNewRec}&isNewRec=${isNewRec}#{/if}#{if status}&status=${status}#{/if}';
+		return false;
+	};	
+	
+</script>
+<form>
+	#{hidden id:'status', name:'status', value:status /}
+	#{hidden id:'isNewRec', name:'isNewRec', value:isNewRec /}
+	<p>
+		#{textBox id:'taxProfileCode', name:'taxProfile.taxProfileCode', label:'Code', value:taxProfile?.taxProfileCode, class:'capitalize', required:true, readOnly:((mode=='entry') ? confirming : true ), maxLength:50 /}
+		<span id="taxProfileCodeError" class="error">#{error 'Code is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'taxProfileDesc', name:'taxProfile.description', label:'Description', value:taxProfile?.description,  class:'capitalize',required:true, readOnly:readOnly, width:'300px', maxLength:100 /}
+		<span class="error">#{error 'Description is' /}</span>
+	</p>	
+	<p>
+		#{radioButton id:'isActive', name:'isActive', value:((taxProfile?.active)?'true':'false'), label:'Active', options:operators, readOnly:readOnly /}
+		#{hidden id:'isActiveHidden', name:'taxProfile.active', value:((taxProfile?.active)?'true':'false') /}
+	</p>
+	
+	<div class="buttons">
+		<button id="newRules">Rules</button>
+	</div> 
+</form>

@@ -1,0 +1,76 @@
+#{set id:pledging?.transactionKey /}
+#{script 'lookuppaging.js' /}
+#{script 'lookups.js' /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'Pledgings/pledging.js' /}
+</script>
+
+<form id="masterPledgingForm" class="form" method="POST">
+#{hidden id:'currentDate', name:'currentDate', value:currentBusinessDate?.format(appProp.dateFormat), class:'calendar' /}
+	<p>
+		#{textBox id:'transactionNo', name:'pledging.transactionKey', label:'Transaction No', value:pledging?.transactionKey, required:true, readOnly:true, width:'85px' /}
+	</p>
+	<p>			
+		#{textBox id:'transactionDate', name:'pledging.transactionDate', label:'Transaction Date', value:pledging?.transactionDate?.format(appProp.dateFormat), class:'calendar', readOnly:readOnly, required:true/} (${appProp.displayDateFormat})
+		<span id="transactionDateError" class="error">#{error 'Date is' /}</span>
+	</p>
+	<p>      
+		#{textBox id:'cifCode', name:'pledging.customer.customerNo', label:'Customer Code', value:pledging?.customer?.customerNo, readOnly:readOnly, required:true, class:'capitalize', width:'100px' /}
+		#{hidden id:'cifKey', name:'pledging.customer.customerKey', value:pledging?.customer?.customerKey /}
+		#{button id:'cifHelp', value:'?', class:'small', readOnly:readOnly /}
+		#{textBox id:'cifDesc', name:'pledging.customer.customerName', value:pledging?.customer?.customerName, readOnly:true, width:'300px' /}
+		<span class="error">#{error 'Customer No is' /}</span>
+	</p>
+	<p>			
+		#{textBox id:'pledgingAmount', label:'Reference Amount', value:pledging?.amount, readOnly:readOnly, format:'#,##0.####',class:'numeric',width:'250px',required:true /}
+		#{hidden id:'pledgingAmountStripped', name:'pledging.amount', value:pledging?.amount /}
+		<span class="error">#{error 'Pledging Amount is' /}</span>
+	</p>
+	<p id="pAutoRelease">
+		#{checkBox id:'autoRelease', name:'pledging.autoRelease', label:'Auto Release Block', readOnly:true, value:pledging?.autoRelease /}
+	</p>
+	<p id="pReleaseDate">
+		<label>Release Date <span class="req"></span></label>
+		#{textBox id:'dueDate', name:'pledging.closeCancelDate', value:pledging?.closeCancelDate?.format(appProp.dateFormat), class:'calendar', readOnly:true /} (${appProp.displayDateFormat})
+		<span class="error">#{error 'Due Date is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'remarks', name:'pledging.remarks', label:'Remarks',value:pledging?.remarks, readOnly:readOnly, width:'430px', class:'capitalize',maxLength:100 /}
+	</p>		
+	<br/>
+	<b><span id="errPledgingDetail" class="error"></span></b>
+	<p></p>	
+<div id="tabsDetailPledging">
+	<ul>
+		<li><a href="#pledgingDetail">Pledging Transaction</a>
+	</ul>
+	<div class="pane" id="pledgingDetail">	
+		<div id="listPledging" style="overflow-y:scroll;height:120px">
+			#{include 'Pledgings/grid_pledging.html' /}
+		</div>
+		<div class="buttons">
+			<button id="newPledgingData" #{if readOnly}disabled="disabled"#{/if}>New Data</button>
+		</div>	
+	</div>	
+</div>
+</form>
+<form></form>
+<input type="hidden" id="dummy" />
+<div id="detailPledging" title="Pledging Transaction">
+		#{include 'Pledgings/detail_pledging.html' /}	
+	<div class="buttons">
+		#{if (mode=='entry' || mode == 'edit')&& (!(confirming))}
+			<!--  <button id="savePledging">Save</button> -->
+			<input id="savePledging" type="button" value="Save"/>
+			<button id="cancelPledging">Cancel</button>
+		#{/if}
+		#{else}
+			#{if confirming || mode=='view' }
+				<button id="cancelPledging">Close</button>
+			#{/if}
+		#{/else}	
+	</div>
+</div>

@@ -1,0 +1,447 @@
+#{set pageTitle: 'Switching' /}
+
+#{set id:swt?.switchingKey /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{script 'lookups.js' /}
+
+<style type="text/css">
+  .errmsg { color:red; }
+  #outPrice {margin-left:-0.1em;}
+  #outUnit {margin-left:-0.1em;}
+  #header {padding-top:8px;}
+</style>
+
+<!-- MAIN SCREEN -->
+<form id="registrySwitchForm" class="form" method="POST" name="switch">
+    #{hidden id:'dispatch', value:mode/}
+    #{hidden id:'switchingKey', name:'swt.switchingKey',  value:swt?.switchingKey/}
+    #{hidden id:'inTradeKey', name:'swt.inTradeKey',  value:swt?.inTradeKey/}
+    #{hidden id:'outTradeKey', name:'swt.outTradeKey',  value:swt?.outTradeKey/}
+    #{hidden id:'lookupSwiTierType' ,name:'swt.rgInvestmentaccountByOutAccountNumber.rgProduct.lookupBySwiTierType.lookupId', value:swt?.rgInvestmentaccountByOutAccountNumber?.rgProduct?.lookupBySwiTierType?.lookupId /}
+    #{hidden id:'customerKey', name:'swt.rgInvestmentaccountByOutAccountNumber.customer.customerKey', value:swt?.rgInvestmentaccountByOutAccountNumber?.customer?.customerKey /}
+    #{hidden id:'inAmountRoundValue', name:'swt.rgInvestmentaccountByInAccountNumber.rgProduct.amountRoundValue', value:swt?.rgInvestmentaccountByInAccountNumber?.rgProduct?.amountRoundValue /}
+    #{hidden id:'inAmountRoundType', name:'swt.rgInvestmentaccountByInAccountNumber.rgProduct.amountRoundType', value:swt?.rgInvestmentaccountByInAccountNumber?.rgProduct?.amountRoundType /}
+    #{hidden id:'inUnitRoundValue', name:'swt.rgInvestmentaccountByInAccountNumber.rgProduct.unitRoundValue', value:swt?.rgInvestmentaccountByInAccountNumber?.rgProduct?.unitRoundValue /}
+    #{hidden id:'inUnitRoundType', name:'swt.rgInvestmentaccountByInAccountNumber.rgProduct.unitRoundType', value:swt?.rgInvestmentaccountByInAccountNumber?.rgProduct?.unitRoundType /}
+    #{hidden id:'inPriceRoundValue', name:'swt.rgInvestmentaccountByInAccountNumber.rgProduct.priceRoundValue', value:swt?.rgInvestmentaccountByInAccountNumber?.rgProduct?.priceRoundValue /}
+    #{hidden id:'inPriceRoundType', name:'swt.rgInvestmentaccountByInAccountNumber.rgProduct.priceRoundType', value:swt?.rgInvestmentaccountByInAccountNumber?.rgProduct?.priceRoundType /}
+    
+    #{hidden id:'outAmountRoundValue', name:'swt.rgInvestmentaccountByOutAccountNumber.rgProduct.amountRoundValue', value:swt?.rgInvestmentaccountByOutAccountNumber?.rgProduct?.amountRoundValue /}
+    #{hidden id:'outAmountRoundType', name:'swt.rgInvestmentaccountByOutAccountNumber.rgProduct.amountRoundType', value:swt?.rgInvestmentaccountByOutAccountNumber?.rgProduct?.amountRoundType /}
+    #{hidden id:'outUnitRoundValue', name:'swt.rgInvestmentaccountByOutAccountNumber.rgProduct.unitRoundValue', value:swt?.rgInvestmentaccountByOutAccountNumber?.rgProduct?.unitRoundValue /}
+    #{hidden id:'outUnitRoundType', name:'swt.rgInvestmentaccountByOutAccountNumber.rgProduct.unitRoundType', value:swt?.rgInvestmentaccountByOutAccountNumber?.rgProduct?.unitRoundType /}
+    #{hidden id:'outPriceRoundValue', name:'swt.rgInvestmentaccountByOutAccountNumber.rgProduct.priceRoundValue', value:swt?.rgInvestmentaccountByOutAccountNumber?.rgProduct?.priceRoundValue /}
+    #{hidden id:'outPriceRoundType', name:'swt.rgInvestmentaccountByOutAccountNumber.rgProduct.priceRoundType', value:swt?.rgInvestmentaccountByOutAccountNumber?.rgProduct?.priceRoundType /}
+    #{hidden id:'effectiveDate' /}
+    
+    <!-- === FOR CANCEL === -->
+    #{hidden name:'swt.type', value:swt?.type/}
+    #{hidden id:'currentBusinessDate', name:'currentBusinessDate', value:currentBusinessDate?.format(appProp.dateFormat), class:'calendar' /}
+    <!-- ============== -->
+<table>
+<tr>
+<td>
+    <p>
+        #{textBox id:'fundCodeFrom', name:'swt.rgInvestmentaccountByOutAccountNumber.rgProduct.productCode', label:'Fund Code (From)', value:swt?.rgInvestmentaccountByOutAccountNumber?.rgProduct?.productCode, width:'120px', readOnly:true, class:'capitalize', required:true, dataold:swt?.rgInvestmentaccountByOutAccountNumber?.rgProduct?.productCode /}
+        #{hidden  id:'fundCodeFromKey', value:swt?.rgInvestmentaccountByOutAccountNumber?.rgProduct?.productCode /}
+        #{button  id:'fundCodeFromHelp', value:'?', class:'small', readOnly:true/}
+        #{textBox id:'fundCodeFromDesc',  name:'swt.rgInvestmentaccountByOutAccountNumber.rgProduct.name', value:swt?.rgInvestmentaccountByOutAccountNumber?.rgProduct?.name, readOnly:true, width:'240px' /}
+        <span class="error">#{error 'Fund Code (From) is' /}</span>
+    </p>
+    <p> 
+        <label>Investment Acc (From)<span class="req">*</span></label>  
+        #{textBox id:'investFrom', name:'swt.rgInvestmentaccountByOutAccountNumber.accountNumber', value:swt?.rgInvestmentaccountByOutAccountNumber?.accountNumber, width:'120px', readOnly:true, class:'capitalize',required:true, dataold:swt?.rgInvestmentaccountByOutAccountNumber?.accountNumber /}
+        #{hidden  id:'investFromKey', value:swt?.rgInvestmentaccountByOutAccountNumber?.accountNumber /}
+        #{button  id:'investFromHelp', value:'?', class:'small', readOnly:true /}
+        #{textBox id:'investFromDesc', name:'swt.rgInvestmentaccountByOutAccountNumber.name', value:swt?.rgInvestmentaccountByOutAccountNumber?.name, readOnly:true, width:'240px' /}
+        <span class="error">#{error 'Investment Acct (From) is' /}</span>
+    </p>
+    <p>
+        #{textBox id:'fundCodeTo', name:'swt.rgInvestmentaccountByInAccountNumber.rgProduct.productCode', label:'Fund Code (To)', value:swt?.rgInvestmentaccountByInAccountNumber?.rgProduct?.productCode, width:'120px', readOnly:true, class:'capitalize', required:true, dataold:swt?.rgInvestmentaccountByInAccountNumber?.rgProduct?.productCode /}
+        #{hidden  id:'fundCodeToKey', value:swt?.rgInvestmentaccountByInAccountNumber?.rgProduct?.productCode /}
+        #{button  id:'fundCodeToHelp', value:'?', class:'small', readOnly:true/}
+        #{textBox id:'fundCodeToDesc',  name:'swt.rgInvestmentaccountByInAccountNumber.rgProduct.name', value:swt?.rgInvestmentaccountByInAccountNumber?.rgProduct?.name, readOnly:true, width:'240px' /}
+        <span class="error">#{error 'Fund Code (To) is' /}</span>
+        <span id="errFundCodeTo" class="error"></span>
+    </p>
+    <p>     
+        #{textBox id:'investTo', name:'swt.rgInvestmentaccountByInAccountNumber.accountNumber', label:'Investment Acct (To)', value:swt?.rgInvestmentaccountByInAccountNumber?.accountNumber, width:'120px', readOnly:true, class:'capitalize', required:true, dataold:swt?.rgInvestmentaccountByInAccountNumber?.accountNumber /}
+        #{hidden  id:'investToKey', value:swt?.rgInvestmentaccountByInAccountNumber?.accountNumber /}
+        #{button  id:'investToHelp', value:'?', class:'small', readOnly:true /}
+        #{textBox id:'investToDesc', name:'swt.rgInvestmentaccountByInAccountNumber.name', value:swt?.rgInvestmentaccountByInAccountNumber?.name, readOnly:true, width:'240px' /}
+        <span class="error">#{error 'Investment Acct (To) is' /}</span>
+        <span id="errInvestTo" class="error"></span>
+    </p>
+    <p>         
+        #{textBox id:'fmgrCode', name:'swt.thirdPartyByFundManager.thirdPartyCode', label:'Fmgr Code', value:swt?.thirdPartyByFundManager?.thirdPartyCode, class:'capitalize', width:'120px', readOnly:true, required:true/}
+        <!-- span class="error">#{error 'Fmgr Code' /}</span-->
+    </p>
+    <p> 
+        #{textBox id:'saCode', name:'swt.saCode', label:'SA Code', value:swt?.saCode, class:'capitalize', width:'120px', readOnly:true/}
+        #{hidden  id:'saCodeId', name:'swt.saCodeKey', value:swt?.saCodeKey /}
+    </p>
+    <p>
+        #{textBox id:'trnSABranchCode', name:'swt.out.trnSABranch.thirdPartyCode', label:'Trn SA Branch', value:swt?.out?.trnSABranch?.thirdPartyCode, class:'capitalize', readOnly:true, width:'120px', required:true /}
+        #{hidden id:'trnSABranch', name:'swt.out.trnSABranch.thirdPartyKey', value:swt?.out?.trnSABranch?.thirdPartyKey /}
+        #{hidden id:'trnSABranchKey', name:'swt.out.trnSABranchKey', value:swt?.out?.trnSABranchKey /}
+        #{button id:'trnSABranchHelp', value:'?', class:'small', readOnly:true /}
+        #{textBox id:'trnSABranchDesc', name:'swt.out.trnSABranch.thirdPartyName', value:swt?.out?.trnSABranch?.thirdPartyName, readOnly:true, width:'240px' /}
+        <span class="error">#{error 'Trn SA Branch is' /}</span>
+    </p>
+    <p>         
+        #{textBox id:'tradeDate', name:'swt.switchDate', label:'Trade Date', value:swt?.switchDate?.format(appProp.dateFormat), class:'calendar', width:'120px', readOnly:true/}(${appProp.displayDateFormat})
+        <span id="tradeDateError" class="error"></span>
+    </p>
+    <p>         
+        #{textBox id:'goodFundDate', name:'swt.goodfundDate', label:'Good Fund Date', value:swt?.goodfundDate?.format(appProp.dateFormat), class:'calendar', width:'120px', readOnly:true/}(${appProp.displayDateFormat})
+    </p>
+    <p>         
+        #{textBox id:'navDate', name:'swt.navDate', label:'Nav Date', value:swt?.navDate?.format(appProp.dateFormat), class:'calendar', width:'120px', readOnly:true/}(${appProp.displayDateFormat})
+        <span id="navDateError" class="error"></span>
+    </p>
+    <p>         
+        #{textBox id:'postDate', name:'swt.postDate', label:'Post Date', value:swt?.postDate?.format(appProp.dateFormat), class:'calendar', width:'120px', readOnly:true/}(${appProp.displayDateFormat})
+        <span id="postDateError" class="error"></span>
+    </p>
+    <p>
+        #{textBox id:'remarks', name:'swt.remarks', label:'Remarks', value:swt?.remarks, class:'capitalize',  width:'390px', readOnly:true /}
+    </p>    
+    <br/>
+    </td>
+    
+    <td id="forCancelSwitching" valign="top">
+<!--         <p> -->
+            #{hidden id:'cancelDate', label:'Cancel Date', value:swt?.cancelTradeDate?.format(appProp.dateFormat), class:'calendar validateDateFormat',  width:'80px', readOnly:true , required:true /}
+            #{hidden id:'cancelDateHidden', name:'swt.cancelTradeDate', value:swt?.cancelTradeDate?.format(appProp.dateFormat) /}
+<!--             <br/><span id="cancelDateError" class="error"></span> -->
+<!--         </p> -->
+<!--         <p> -->
+            #{hidden id:'cancelPostDate', label:'Cancel Post Date', value:swt?.cancelPostDate?.format(appProp.dateFormat), class:'calendar validateDateFormat',  width:'80px', readOnly:true, required:true  /}
+            #{hidden id:'cancelPostDateHidden', name:'swt.cancelPostDate', value:swt?.cancelPostDate?.format(appProp.dateFormat) /}
+<!--             <br/><span id="cancelPostDateError" class="error"></span> -->
+<!--         </p> -->
+
+        <p>
+            #{textArea id:'remarkForCancel', label:'Remarks', name:'remark', value:swt?.cancelRemark, required:true, class:'capitalize', width:'200px', maxLength:200, readOnly:readOnly, rows:'5' /}
+            #{hidden id:'remarkForCancelHidden', name:'swt.cancelRemark', value:swt?.cancelRemark /}
+        </p>
+        
+        <p>
+            <span id="remarkForCancelError" class="error"></span>
+        </p>
+    </td>
+
+    </tr>
+    </table>
+    <!-- TAB SCREEN -->
+    <div id="switchTab">
+        <ul>
+            <li><a href="#tab-1">Transaction</a></li>
+            <li><a href="#tab-2">Bank Info</a></li>
+            <!-- <li><a href="#tab-3">Other</a></li>  -->
+        </ul>
+        <div class="pane" id="tab-1">
+            <table>
+                <tbody>
+                    <tr>
+                        <td width="50%"><label>Switch Out</label></td>
+                        <td>&nbsp;</td>
+                        <td width="50%"><label>Switch In</label></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <!-- p>         
+                                #{textBox id:'outProductCode', name:'swt.out.rgProduct.productCode', label:'Fund Code', value:swt?.out?.rgProduct?.productCode, class:'capitalize', width:'120px', readOnly:true/}
+                            </p-->
+                            <p>
+                                #{radioButton id:'switchall', name:'swt.switchAll', value:((swt?.switchAll)?'true':'false'), label:'Switch All', options:operators, readOnly:true /}
+                            </p>
+                            <p>
+                                #{dropDownList id:'outTradeBy', name:'outTradeBy', label:'Transaction By', options:transactionBy, value:swt?.out?.tradeBy?.lookupId, readOnly:true /}
+                                #{hidden id:'outTradeByHidden', name:'swt.out.tradeBy.lookupId', value:swt?.out?.tradeBy?.lookupId /}
+                            </p>
+                            <p>
+                                #{textBox id:'outAvailUnit', label:'   Available Unit', format:'#,##0.##########', class:'rgNumeric', value:swt?.out?.availabelUnit, width:'120px', readOnly:true, required:false /}
+                                #{hidden id:'outAvailUnitStripped', name:'swt.out.availabelUnit', value:swt?.out?.availabelUnit /}
+                                <span class="error">#{error 'Available Unit is' /}</span>
+                            </p>
+                            <p>
+                                #{textBox id:'outAvailBal', label:'   Available Balance', format:'#,##0.##########', class:'rgNumeric', value:swt?.out?.availabelBalance, width:'120px', readOnly:true, required:false /}
+                                #{hidden id:'outAvailBalStripped', name:'swt.out.availabelBalance', value:swt?.out?.availabelBalance /}
+                                <span class="error">#{error 'Available Balance is' /}</span>
+                            </p>
+                            <div id="BYUNIT"></div>
+                            <p id="grossAmount">    
+                                #{textBox id:'outNetAmt', label:'Gross Amount', format:'#,##0.##########', class:'rgNumeric', value:swt?.out?.netAmount, width:'120px', readOnly:true, required:true/}
+                                #{hidden id:'outNetAmtStripped', name:'swt.out.netAmount', value:swt?.out?.netAmount /}
+                                <span class="error">#{error 'Gross Amount is' /}</span>
+                            </p>
+                            <br />
+                            <p id="header">
+                                <label style="width:80px;margin-left:18em"><b>%</b></label>
+                                <label><b>Amount</b></label>
+                            </p>
+                            <p>
+                                #{textBox id:'outFeePct', label:'Fee', value:swt?.out?.feePct, format:'#,##0.##########', class:'numericMaxLength', width:'70px', readOnly:true, required:true/}
+                                #{hidden id:'outFeePctStripped', name:'swt.out.feePct', value:swt?.out?.feePct /}
+                                
+                                #{textBox id:'outFeeAmt', value:swt?.out?.feeAmt, format:'#,##0.##########', class:'rgNumeric', width:'120px', readOnly:true /}
+                                #{hidden id:'outFeeAmtStripped', name:'swt.out.feeAmt', value:swt?.out?.feeAmt /}
+                                <span class="error">#{error 'Fee (Switch out) is' /}</span>
+                            </p>
+                            <p>
+                                #{textBox id:'outDiscPct', label:'Discount', value:swt?.out?.discPct, format:'#,##0.##########', class:'numericMaxLength', width:'70px', readOnly:true, required:true/}
+                                #{hidden id:'outDiscPctStripped', name:'swt.out.discPct', value:swt?.out?.discPct /}
+                                
+                                #{textBox id:'outDiscAmt', value:swt?.out?.discAmt, format:'#,##0.##########', class:'rgNumeric', width:'120px', readOnly:true /}
+                                #{hidden id:'outDiscAmtStripped', name:'swt.out.discAmt', value:swt?.out?.discAmt /}
+                                <span class="error">#{error 'Discount (Switch out) is' /}</span>
+                            </p>
+                            <p>
+                                #{textBox id:'outTaxPct', label:'Tax Of Fee', value:swt?.out?.taxPct, format:'#,##0.##########', class:'numeric', width:'70px', readOnly:true/}
+                                #{hidden id:'outTaxPctStripped', name:'swt.out.taxPct', value:swt?.out?.taxPct /}
+                                
+                                #{textBox id:'outTaxAmt', value:swt?.out?.taxAmt, format:'#,##0.##########', class:'rgNumeric', width:'120px', readOnly:true/}
+                                #{hidden id:'outTaxAmtStripped', name:'swt.out.taxAmt', value:swt?.out?.taxAmt /}
+                                <span class="error">#{error 'Tax Of Fee (Switch out) is' /}</span>
+                            </p>
+                            <p>
+                                #{textBox id:'outOthrPct', label:'Other Fee', format:'#,##0.##########', class:'numericMaxLength', value:swt?.out?.otherPct, width:'70px', readOnly:true, required:true/}
+                                #{hidden id:'outOthrPctStripped', name:'swt.out.otherPct', value:swt?.out?.otherPct /}
+                                
+                                #{textBox id:'outOthrAmt', format:'#,##0.##########', class:'rgNumeric', value:swt?.out?.otherAmt, width:'120px', readOnly:true/}
+                                #{hidden id:'outOthrAmtStripped', name:'swt.out.otherAmt', value:swt?.out?.otherAmt /}
+                                <span class="error">#{error 'Other Fee (Switch out) is' /}</span>
+                            </p>
+                            <p> 
+                                #{textBox id:'outTotFeeAmt', label:'Total Fee Amt', format:'#,##0.##########', class:'rgNumeric', value:swt?.totFeeAmtOut, width:'120px', readOnly:true /}
+                                #{hidden id:'outTotFeeAmtStripped', name:'swt.totFeeAmtOut', value:swt?.totFeeAmtOut /}
+                            </p>            
+                            <p> 
+                                #{textBox id:'outAmt', label:'Net Amount', value:swt?.out?.amount, format:'#,##0.##########', class:'rgNumeric', width:'120px', readOnly:true /}
+                                #{hidden  id:'outAmtStripped', name:'swt.out.amount', value:swt?.out?.amount /}
+                            </p>
+                            <div id="BYAMOUNT">
+                                <p id="pPrice"> 
+                                    #{textBox id:'outPrice', label:'Price', format:'#,##0.##########', class:'rgNumeric', value:swt?.out?.price, width:'120px', readOnly:true /}
+                                    #{hidden id:'outPriceStripped', name:'swt.out.price', value:swt?.out?.price /}
+                                    <span id="outPriceErrorMessage" class="error"></span>
+                                </p>
+                                <p id="pUnit">  
+                                    #{textBox id:'outUnit', label:'Unit', format:'#,##0.##########', class:'rgNumeric', value:swt?.out?.unit, width:'120px', readOnly:true, required:true/}
+                                    #{hidden id:'outUnitStripped', name:'swt.out.unit', value:swt?.out?.unit /}
+                                    <span class="error">#{error 'Unit is' /}</span>
+                                </p>    
+                            </div>
+                                
+                        </td>
+                        
+                        <td>&nbsp;</td>
+                        
+                        <td valign="top">
+                            <p> 
+                                #{textBox id:'inAmt', label:'Gross Amount', value:swt?.in?.amount, format:'#,##0.##########', class:'rgNumeric', width:'120px', readOnly:true/}
+                                #{hidden  id:'inAmtStripped', name:'swt.in.amount', value:swt?.in?.amount /}
+                            </p>
+                            <p>
+                                #{textBox id:'inFeePct', label:'Fee', value:swt?.in?.feePct, format:'#,##0.##########', class:'numericMaxLength', width:'120px', readOnly:true, required:true/}
+                                #{hidden id:'inFeePctStripped', name:'swt.in.feePct', value:swt?.in?.feePct /}
+                                
+                                #{textBox id:'inFeeAmt', value:swt?.in?.feeAmt, format:'#,##0.##########', class:'rgNumeric', width:'120px', readOnly:true/}
+                                #{hidden id:'inFeeAmtStripped', name:'swt.in.feeAmt', value:swt?.in?.feeAmt /}
+                                <span class="error">#{error 'Fee (Switch in) is' /}</span>
+                            </p>
+                            <p>
+                                #{textBox id:'inDiscPct', label:'Discount', value:swt?.in?.discPct, format:'#,##0.##########', class:'numericMaxLength', width:'120px', readOnly:true, required:true/}
+                                #{hidden id:'inDiscPctStripped', name:'swt.in.discPct', value:swt?.in?.discPct /}
+                                
+                                #{textBox id:'inDiscAmt', value:swt?.in?.discAmt, format:'#,##0.##########', class:'rgNumeric', width:'120px', readOnly:true/}
+                                #{hidden id:'inDiscAmtStripped', name:'swt.in.discAmt', value:swt?.in?.discAmt /}
+                                <span class="error">#{error 'Discount (Switch in) is' /}</span>
+                            </p>
+                            <p>
+                                #{textBox id:'inTaxPct', label:'Tax Of Fee', value:swt?.in?.taxPct, format:'#,##0.##########', class:'numeric', width:'120px', readOnly:true/}
+                                #{hidden id:'inTaxPctStripped', name:'swt.in.taxPct', value:swt?.in?.taxPct /}
+                                
+                                #{textBox id:'inTaxAmt', value:swt?.in?.taxAmt, format:'#,##0.##########', class:'rgNumeric', width:'120px', readOnly:true/}
+                                #{hidden id:'inTaxAmtStripped', name:'swt.in.taxAmt', value:swt?.in?.taxAmt /}
+                                <span class="error">#{error 'Tax Of Fee (Switch in) is' /}</span>
+                            </p>
+                            <p>
+                                #{textBox id:'inOthrPct', label:'Other Fee', format:'#,##0.##########', class:'numericMaxLength', value:swt?.in?.otherPct, width:'120px', readOnly:true, required:true/}
+                                #{hidden id:'inOthrPctStripped', name:'swt.in.otherPct', value:swt?.in?.otherPct /}
+                                
+                                #{textBox id:'inOthrAmt', format:'#,##0.##########', class:'rgNumeric', value:swt?.in?.otherAmt, width:'120px', readOnly:true/}
+                                #{hidden id:'inOthrAmtStripped', name:'swt.in.otherAmt', value:swt?.in?.otherAmt /}
+                                <span class="error">#{error 'Other Fee (Switch in) is' /}</span>
+                            </p>
+                            <p> 
+                                #{textBox id:'inTotFeeAmt', label:'Total Fee Amt', format:'#,##0.##########', class:'rgNumeric', value:swt?.totFeeAmtIn, width:'120px', readOnly:true/}
+                                #{hidden id:'inTotFeeAmtStripped', name:'swt.totFeeAmtIn', value:swt?.totFeeAmtIn /}
+                            </p>                                
+                            <p> 
+                                #{textBox id:'inNetAmt', label:'Net Amount', format:'#,##0.##########', class:'rgNumeric', value:swt?.in?.netAmount, width:'120px', readOnly:true/}
+                                #{hidden id:'inNetAmtStripped', name:'swt.in.netAmount', value:swt?.in?.netAmount /}
+                            </p>
+                            <p> 
+                                #{textBox id:'inPrice', label:'Price', format:'#,##0.##########', class:'rgNumeric', value:swt?.in?.price, width:'120px', readOnly:true /}
+                                #{hidden id:'inPriceStripped', name:'swt.in.price', value:swt?.in?.price /}
+                                <span id="inPriceErrorMessage" class="error"></span>
+                            </p>
+                            <p> 
+                                #{textBox id:'inUnit', label:'Unit', format:'#,##0.##########', class:'rgNumeric', value:swt?.in?.unit, width:'120px', readOnly:true/}
+                                #{hidden id:'inUnitStripped', name:'swt.in.unit', value:swt?.in?.unit /}
+                            </p>
+                        </td>
+                    </tr>                   
+                </tbody>
+            </table>
+            <!-- di pisah supaya text bisa memanjang, hati2 ubah atas krn ada pemindahan tag di div id=??? -->
+            <table>
+                <tbody>
+                    <tr>
+                        <td>
+                        <p>
+                            #{textBox id:'outTax', name:'swt.out.taxMaster.taxCode', label:'Cap Gain Tax', value:swt?.out?.taxMaster?.taxCode, width:'120px', readOnly:true, class:'capitalize', required:true/}
+                            #{hidden  id:'outTaxKey', name:'swt.out.taxMaster.taxKey', value:swt?.out?.taxMaster?.taxKey/}
+                            #{button  id:'outTaxHelp',  value:'?', class:'small', readOnly:true /}
+                            #{textBox id:'outTaxDesc', name:'swt.out.taxMaster.description', value:swt?.out?.taxMaster?.description, readOnly:true, width:'340px' /}
+                            <span class="error">#{error 'Cap Gain Tax is' /}</span>
+                        </p>
+                        <p> 
+                            #{textBox id:'outCapGainTaxAmount', name:'outCapGainTaxAmount', label:'Cap Gain Tax Amount', format:'#,##0.##########', class:'rgNumeric', value:outCapitalGainTaxAmount, width:'120px', readOnly:true/}
+                        </p>
+                        <p> 
+                            #{textBox id:'outPayAmt', label:'Payment Amount', format:'#,##0.##########', class:'rgNumeric', value:swt?.out?.paymentAmount, width:'120px', readOnly:true/}
+                            #{hidden id:'outPayAmtStripped', name:'swt.out.paymentAmount', value:swt?.out?.paymentAmount /}
+                        </p>
+                        </td>
+                    </tr>           
+                
+                </tbody>
+            </table>
+        </div>
+        <div class="pane" id="tab-2">
+            <table>
+                <tbody>
+                    <tr>
+                        <td><label>Switch Out</label></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <fieldset style="border-color:#A6C9E2;width: 400px">
+                                <legend style="color: black;"><b>Fund Account</b></legend>
+                                <div>
+                                    <p>
+                                    #{textBox id:'outFundCd', label:'Fund Code', name:'swt.out.rgProduct.productCode', value:swt?.out?.rgProduct?.productCode, width:'120px', readOnly:true/}
+                                    <span class="error">#{error 'Fund Code is' /}</span>
+                                </p>
+                                <p>
+                                    #{textBox id:'outFund',  name:'swt.out.rgProductBnAccount.accountNo', label:'Bank Account', value:swt?.out?.rgProductBnAccount?.accountNo, width:'120px', readOnly:true, class:'capitalize'/}
+                                    #{hidden  id:'outFundKey', name:'swt.out.rgProductBnAccount.bankAccountKey', value:swt?.out?.rgProductBnAccount?.bankAccountKey /}
+                                    #{button  id:'outFundHelp', value:'?', class:'small', readOnly:true /}
+                                    <!--  #{textBox id:'investDesc', name:'sub.bankAccount.name', value:sub?.bankAccount?.name, readOnly:true, width:'340px' /} -->
+                                    <span class="error">#{error 'Bank Account is' /}</span>
+                                </p>
+                                <p>
+                                    #{textBox id:'outFundBank', name:'swt.out.rgProductBnAccount.bankCode.thirdPartyCode', label:'Bank Code', value:swt?.out?.rgProductBnAccount?.bankCode?.thirdPartyCode, width:'120px', readOnly:true/}
+                                    
+                                    <span class="error">#{error 'Bank Code is' /}</span>
+                                </p>
+                                <p>
+                                    #{textBox id:'outFundBankName', name:'swt.out.rgProductBnAccount.bankCode.thirdPartyName', label:'Bank Acc. Num.', value:swt?.out?.rgProductBnAccount?.bankCode?.thirdPartyName, width:'120px', readOnly:true/}
+                                </p>
+                                </div>
+                            </fieldset>
+                        </td>
+                        <td>
+                            <fieldset style="border-color:#A6C9E2;width: 400px">
+                                <legend style="color: black;"><b>Investment Account</b></legend>
+                                <div>
+                                    <p>
+                                        #{textBox id:'outAccNo', label:'Investment Acc', name:'swt.out.rgInvestmentaccount.accountNumber', value:swt?.out?.rgInvestmentaccount?.accountNumber, width:'120px', readOnly:true/}
+                                    </p>
+                                    <p>
+                                        #{textBox id:'outInvest',  name:'swt.out.bankAccount.accountNo', label:'Bank Account', value:swt?.out?.bankAccount?.accountNo, width:'120px', readOnly:true, class:'capitalize'/}
+                                        #{hidden  id:'outInvestKey', name:'swt.out.bankAccount.bankAccountKey', value:swt?.out?.bankAccount?.bankAccountKey /}
+                                        #{button  id:'outInvestHelp', value:'?', class:'small', readOnly:true /}
+                                    </p>
+                                    <p>
+                                        #{textBox id:'outInvestBank', name:'swt.out.bankAccount.bankCode.thirdPartyCode', label:'Bank Code', value:swt?.out?.bankAccount?.bankCode?.thirdPartyCode, width:'120px', readOnly:true/}
+                                    <p>
+                                        #{textBox id:'outInvestBankName', name:'swt.out.bankAccount.bankCode.thirdPartyName', label:'Bank Acc. Num.', value:swt?.out?.bankAccount?.bankCode?.thirdPartyName, width:'120px', readOnly:true/}
+                                    </p>
+                                    
+                                </div>
+                            </fieldset> 
+                        <td>
+                    </tr>
+                    
+                    <tr><td>&nbsp;</td></tr>
+                    
+                    <tr>
+                        <td><label>Switch In</label></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <fieldset style="border-color:#A6C9E2;width: 400px">
+                                <legend style="color: black;"><b>Fund Account</b></legend>
+                                <div>
+                                    <p>
+                                    #{textBox id:'inFundCd', label:'Fund Code', name:'swt.in.rgProduct.productCode', value:swt?.in?.rgProduct?.productCode, width:'120px', readOnly:true/}
+                                    <span class="error">#{error 'Fund Code is' /}</span>
+                                </p>
+                                <p>
+                                    #{textBox id:'inFund',  name:'swt.in.rgProductBnAccount.accountNo', label:'Bank Account', value:swt?.in?.rgProductBnAccount?.accountNo, width:'120px', readOnly:true, class:'capitalize'/}
+                                    #{hidden  id:'inFundKey', name:'swt.in.rgProductBnAccount.bankAccountKey', value:swt?.in?.rgProductBnAccount?.bankAccountKey /}
+                                    #{button  id:'inFundHelp', value:'?', class:'small', readOnly:true /}
+                                    <span class="error">#{error 'Bank Account is' /}</span>
+                                </p>
+                                <p>
+                                    #{textBox id:'inFundBank', name:'swt.in.rgProductBnAccount.bankCode.thirdPartyCode', label:'Bank Code', value:swt?.in?.rgProductBnAccount?.bankCode?.thirdPartyCode, width:'120px', readOnly:true /}
+                                    
+                                    <span class="error">#{error 'Bank Code is' /}</span>
+                                </p>
+                                <p>
+                                    #{textBox id:'inFundBankName', name:'swt.in.rgProductBnAccount.bankCode.thirdPartyName', label:'Bank Acc. Num.', value:swt?.in?.rgProductBnAccount?.bankCode?.thirdPartyName, width:'120px', readOnly:true/}
+                                </p>
+                                </div>
+                            </fieldset>
+                        </td>
+                        <td>
+                            <fieldset style="border-color:#A6C9E2;width: 400px">
+                                <legend style="color: black;"><b>Investment Account</b></legend>
+                                <div>
+                                    <p>
+                                        #{textBox id:'inAccNo', label:'Investment Acc', name:'swt.in.rgInvestmentaccount.accountNumber', value:swt?.in?.rgInvestmentaccount?.accountNumber, width:'120px', readOnly:true/}
+                                    </p>
+                                    <p>
+                                        #{textBox id:'inInvest',  name:'swt.in.bankAccount.accountNo', label:'Bank Account', value:swt?.in?.bankAccount?.accountNo, width:'120px', readOnly:true, class:'capitalize'/}
+                                        #{hidden  id:'inInvestKey', name:'swt.in.bankAccount.bankAccountKey', value:swt?.in?.bankAccount?.bankAccountKey /}
+                                        #{button  id:'inInvestHelp', value:'?', class:'small', readOnly:true /}
+                                    </p>
+                                    <p>
+                                        #{textBox id:'inInvestBank', name:'swt.in.bankAccount.bankCode.thirdPartyCode', label:'Bank Code', value:swt?.in?.bankAccount?.bankCode?.thirdPartyCode, width:'120px', readOnly:true/}
+                                    </p>
+                                    <p>
+                                        #{textBox id:'inInvestBankName', name:'swt.in.bankAccount.bankCode.thirdPartyName', label:'Bank Acc. Num.', value:swt?.in?.bankAccount?.bankCode?.thirdPartyName, width:'120px', readOnly:true/}
+                                    </p>
+                                </div>
+                            </fieldset> 
+                        <td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="pane" id="tab-3"></div>
+    </div>          
+</form>
+
+<script type="text/javascript">
+    #{include 'RegistrySubscription/Util.js' /}
+    #{include 'RegistrySubscription/Calculation.js' /}
+    #{include 'RegistrySwitch/Switch.js' /}
+    $(document).ready(function() {
+        Switch($("#main"));
+    });
+</script>

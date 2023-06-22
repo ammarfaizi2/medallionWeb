@@ -1,0 +1,105 @@
+#{extends 'templates/main.html' /} 
+#{set pageTitle: 'Journal Template Approval' /}
+
+<script type="text/javascript">
+	$(function() {
+		$(".btn").button();
+		$(".btn").css("width", "100px");
+		//$(".buttons").css("display","none");
+		
+		function validateRemarkCorrection() {
+			if ($('#needCorrection').is(':checked')) {
+				if (($('#remarksCorrection').val() == '') || ($('#remarksCorrection').val() == null)) {
+					$('#remarksCorrectionError').html('Required');
+				} else {
+					$('#remarksCorrectionError').html('');
+					return true;
+				}
+				return false;
+			}
+			return true;
+		}
+		
+		var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Processing...</div>').appendTo('body');
+		loading.dialog({
+			closeOnEscape: false,
+			draggable: false,
+			modal: true,
+			resizable: false,
+			open:function() {
+				$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+			} 
+		});
+		loading.dialog('close');
+		
+		var backToWorkList = function() {
+			loading.dialog('open');
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			};
+		}
+		
+		$('#approve').click(function() {
+			var action = "@{approve()}?taskId=${taskId}&maintenanceLogKey=${maintenanceLogKey}&operation=${operation}";
+			loading.dialog('open');
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+				if (data.status == 'success') {
+					//alert(data.message);
+					loading.dialog('close');
+					messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+				} else {
+					//alert(data.error);					
+					loading.dialog('close');
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+				}
+			});			
+		});
+		$('#reject').click(function() {
+			var resultValidateCorrection = validateRemarkCorrection();
+			if (!resultValidateCorrection) {
+				return;
+			}
+			
+			var action = "@{reject()}?taskId=${taskId}&maintenanceLogKey=${maintenanceLogKey}&operation=${operation}";
+			var postData = {
+				"correction": $('#remarksCorrection').val(),
+				"fakey": $('#journalMasterKey').val()
+			};
+			loading.dialog('open');
+			$.post(action, postData, function(data, status, xhr) {
+	    		checkRedirect(data);
+				if (data.status == 'success') {
+					//alert(data.message);
+					loading.dialog('close');
+					messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+				} else {
+					//alert(data.error);
+					loading.dialog('close');
+					messageAlertOk(data.message, "ui-icon1 ui-icon-circle-close", "Error Message", backToWorkList);
+				}
+			});
+		});
+		
+		$('#closeWorkflow').click(function() {
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			}
+		});
+		
+	});
+</script>
+<h2>Journal Template Approval</h2>
+<div id="detail">
+	#{include 'JournalTemplate/detail.html' /}
+</div>
+	#{hidden id:'from', name:'from', value:from /}	
+<div>
+	<input type="button" id="approve" value="Approve"  class="btn"/>
+	<input type="button" id="reject" value="Reject" style="margin:5px;" class="btn"/>	
+	<input type="button" id="closeWorkflow" value="Cancel" class="btn" />
+</div>

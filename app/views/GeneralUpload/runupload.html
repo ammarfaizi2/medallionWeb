@@ -1,0 +1,131 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle : "Run Upload" /}
+#{script 'lookuppaging.js' /}
+#{script 'jquery.form.js' /}
+
+<form id="searchForm" class="form" class="form" method="POST" novalidate enctype="application/x-www-form-urlencoded">
+	<div id="runUpload">
+		<p>
+			#{hidden id:'updProcessId', label:'Process ID', name:'param.processId', value:param?.processId/}
+			
+			#{textBox id:'updProfile', label:'Profile ID', name:'param.updProfile.name', value:param?.updProfile?.name, class:'capitalize', readOnly:param.readOnly, width:'100px', required: true /}
+			#{hidden  id:'updProfileKey', name:'param.updProfile.profileKey', value:param?.updProfile?.profileKey /}
+			#{button  id:'updProfileHelp', value:'?', class:'small' , readOnly:param.readOnly /}
+			#{textBox id:'updProfileDesc', name:'param.updProfile.description', value:param?.updProfile?.description, readOnly:true, width:'200px' /}
+			<span id="updProfileError" class="error"></span>
+		</p>
+		<p>
+			#{hidden  id:'fileprefix', name:'param.fileprefix', value:param?.fileprefix /}
+			#{dropDownList id:'filetype', name:'param.filetype', label:'File Type', value:param?.filetype, options:outputTypes, required:true, readOnly:true /}
+		</p>
+		<p>
+			#{fileUpload id:'file', name:'param.file', value:param?.file, label:'File', required:true /}
+			<span id="fileError" class="error"></span>
+		</p>
+		
+		</br>
+	
+		<p>
+			<input type="button" id="btnPopulate" value="Populate" />
+			<input type="button" id="btnReset" value="Reset" />
+		</p>
+		
+		</br>
+		
+		<p>
+			<table id="tablePopulate" width="100%" style="display: none;">
+				<thead><tr></tr></thead>
+			</table>
+		</p>
+		
+		<div id="accordionValidation">
+			<h3><a href="#">Validation Result</a></h3>
+			<div>
+				<p>
+					<table>
+						<thead></thead>
+						<tbody>
+							<tr>
+								<td valign="bottom">
+									<table border="1">
+										<tr>
+											<td><label>Total Row</label></td>
+											<td><input type="text" id="totalValidateRow" value="0" class="smalldisabledtext" disabled="disabled" /></td>
+										</tr>
+										<tr>
+											<td><label>Passed</label></td>
+											<td><input type="text" id="totalValidatePassed" value="0" class="smalldisabledtext" disabled="disabled" /></td>
+										</tr>
+										<tr>
+											<td><label>Error</label></td>
+											<td><input type="text" id="totalValidateError" value="0" class="smalldisabledtext" disabled="disabled" /></td>
+										</tr>
+									</table>
+								<td>
+								<td valign="bottom">
+									<a id="linkSaveValidationError" href="/generalupload/saveValidationError" style="display: none;">Save To CSV</a>
+								<td>
+								<td valign="bottom">&nbsp;</td>
+							</tr>
+						</tbody>
+					</table>
+				</p>
+			</div>	
+		</div>
+		
+		<br>
+		
+		<p>
+			<table>
+				<thead></thead>
+				<tbody>
+					<tr>
+						<td><input type="button" id="btnProcess" value="Process" /></td>
+						<td align="center" width="10px"><label>Batch No :</label></td>
+						<td><input type="text" id="batchNo" value="0" class="smalldisabledtext" disabled="disabled" /></td>
+					</tr>
+				</tbody>
+			</table>
+		</p>
+		
+		<br>
+		
+		<div id="accordionResult" style="display: none;">
+			<h3><a href="#">Validation Result</a></h3>
+			<div>
+				<p id="pProcess">
+					<table>
+						<thead></thead>
+						<tbody>
+							<tr>
+								<td>
+									<table border="1">
+										<tr>
+											<td><label>Success</label></td>
+											<td><input type="text" id="totalProcessSuccess" value="0" class="smalldisabledtext" disabled="disabled" /></td>
+										</tr>
+										<tr>
+											<td><label>Failed</label></td>
+											<td><input type="text" id="totalProcessFail" value="0" class="smalldisabledtext" disabled="disabled" /></td>
+										</tr>
+									</table>				
+								</td>
+								<td valign="bottom">
+									<a id="linkSaveProcessError" href="/generalupload/saveProcessError" style="display: none;">Save To CSV</a>
+								<td>
+							</tr>
+						</tbody>
+					</table>
+				</p>
+			</div>
+		</div>		
+	</div>	
+</form>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'GeneralUpload/RunUpload.js' /}
+	$(document).ready(function() {
+		new RunUpload($("#searchForm"));
+	});
+</script>

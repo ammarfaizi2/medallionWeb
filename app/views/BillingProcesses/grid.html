@@ -1,0 +1,73 @@
+<script type="text/javascript">	
+	$(function() {		
+		$("#byCustomerCust").lookup({
+			list:'@{Pick.lookups()}?group=COUNTRY',
+			get:'@{Pick.lookup()}?group=COUNTRY',
+			key:$('#byCustomerCustKey'),
+			description:$('#byCustomerCustDesc'),
+			help:$('#byCustomerCustHelp')
+		});
+	});
+</script>
+
+<div id="accordion">
+	<h3><a href="#">Billing Process</a></h3>
+		<form id="searchForm" class="form">
+			<input id="param" name="params.param" type="hidden" value="${param}"/> 
+			<div class="tabs">
+				<br />
+				<p>
+					<input type='radio' name='customerOption' value='' />
+					<label>ALL CUSTOMER</label>
+				</p>
+				<p>
+					<input type='radio' name='customerOption' value='' />
+					<label>BY GROUP CUSTOMER</label>
+					#{textBox id:'byGroupCustomer', name:'byGroupCustomer', value:'', readOnly:readOnly, width:'85px' /}
+					#{hidden id:'byGroupCustomerKey', name:'byGroupCustomerKey', value:'' /}
+					#{button id:'byGroupCustomerHelp', value:'?', class:'small', readOnly:readOnly /}
+					#{textBox id:'byGroupCustomerDesc', name:'byGroupCustomerDesc', value:'', readOnly:true, width:'222px' /}			
+				</p>
+				<p>
+					<input type='radio' name='customerOption' value='' />
+					<label>BY CUSTOMER</label>
+					#{textBox id:'byCustomer', name:'byCustomer', value:'', readOnly:readOnly, width:'85px' /}
+					#{hidden id:'byCustomerKey', name:'byCustomerKey', value:'' /}
+					#{button id:'byCustomerHelp', value:'?', class:'small', readOnly:readOnly /}
+					#{textBox id:'byCustomerDesc', name:'byCustomerDesc', value:'', readOnly:true, width:'222px' /}			
+				</p>
+				<p>
+					<input type='radio' name='customerOption' value='' />
+					<label>BY CUSTOMER CUSTODY</label>
+					#{textBox id:'byCustomerCust', name:'byCustomerCust', value:'', readOnly:readOnly, width:'85px' /}
+					#{hidden id:'byCustomerCustKey', name:'byCustomerCustKey', value:'' /}
+					#{button id:'byCustomerCustHelp', value:'?', class:'small', readOnly:readOnly /}
+					#{textBox id:'byCustomerCustDesc', name:'byCustomerCustDesc', value:'', readOnly:true, width:'222px' /}			
+				</p>
+				<br />
+			</div>
+			<br />
+			<p>
+				#{textBox id:'billingMonth', name:'billingMonth', value:'', label:'Billing Month', class:'numeric', readOnly:readOnly, width:'85px' /}
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<label style="width:50px">Year</label>
+				#{textBox id:'year', name:'year', value:'', class:'numeric', readOnly:readOnly, width:'85px' /}
+			</p>
+			<p>
+				#{textBox id:'dueDate', name:'dueDate', label:'Due Date', value:customer?.birthDate?.format('MM/dd/yyyy'), class:'calendar', readOnly:readOnly /}
+			</p>	
+			<p>	
+				#{radioButton id:'consolidateInvoice', name:'consolidateInvoice', value:((consolidateInvoice)?'false':'true'), label:'Consolidate Invoice', options:yesNo /}
+			</p>			
+			<p>
+				<div class="buttons">
+					<input type="button" id="search" value="Process" />				
+				</div>
+			</p>
+	</form>
+</div>	
+
+<div id="result" style="display:none">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<div class="response"></div>
+</div>

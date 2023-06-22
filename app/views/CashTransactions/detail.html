@@ -1,0 +1,197 @@
+#{set readOnly:((mode !='edit' && mode !='entry') || confirming) /}
+#{set id: transaction?.transactionKey /}
+
+#{script 'lookups.js', characterset:'utf-8' /}
+
+<script type="text/javascript">
+
+$(function(){
+	
+	/*$('#accountNo').lookup({
+		list:'@{Pick.accounts()}',
+		get:'@{Pick.account()}',
+		key:$('#accountKey'),
+		description:$('#accountName'),
+		help:$('#accountHelp'),
+		nextControl:$('#bankAccount')
+	});
+*/	
+	$('#accountNo').lookup({
+		list:'@{Pick.accounts()}',
+		get:{
+			url:'@{Pick.account()}',
+			success: function(data){
+				$('#accountNo').removeClass('fieldError');
+				$('#accountKey').val(data.code);
+				$('#accountNo').val(data.accountNo);
+				$('#accountName').val(data.description);
+				$('#h_accountName').val(data.description);
+				$('#customerKey').val(data.customerKey);
+				
+				$('#bankAccount').removeClass('fieldError');
+				$('#settlementAccountKey').val('');
+				$('#bankAccount').val('');
+				$('#settlementAccountName').val('');
+				$('#h_settlementAccountName').val('');
+				
+			},
+			error: function(data){
+				$('#accountNo').addClass('fieldError');
+				$('#accountKey').val('');
+				$('#accountNo').val('');
+				$('#accountName').val('NOT FOUND');
+				$('#h_accountName').val('');
+				$('#customerKey').val('');
+			}
+		},
+		description:$('#accountName'),
+		help:$('#accountHelp')
+	});
+	
+	$('#accountNo').change(function(){
+		$('#bankAccount').val('');
+		$('#settlementAccountName').val('');
+	});
+	
+	if (jQuery.trim($('#accountNo').val()).length > 0) {
+		var vAccount = $('#accountNo').val();
+		$.get("@{Pick.account()}", {'code':vAccount}, function(data) {
+			$('#customerKey').val(data.customerKey);
+		});
+	}
+	
+/*	$('#bankAccount').lookup({
+		list:'@{Pick.bankAccounts()}',
+		get:'@{Pick.bankAccount()}',
+		filter:$('#accountKey'),
+		key:$('#settlementAccountKey'),
+		description:$('#settlementAccountName'),
+		help:$('#settlementAccountHelp'),
+		nextControl:$('#transactionCode')
+	});		
+	*/
+	
+	$('#bankAccount').change(function(){
+		var el = $(this);
+		var length = el.val().length;
+		var word = el.val();
+		el.removeClass('fieldError');
+		if (!(word.indexOf("|") >= 0)) {
+			el.addClass('fieldError');
+			$('#settlementAccountKey').val('');
+			$('#settlementAccountName').val('NOT FOUND');
+			$('#h_settlementAccountName').val('');
+		}
+	});
+	
+	$('#bankAccount').lookup({
+		list:'@{Pick.bankAccountsByAcctNo()}?domain=CUSTOMER',
+		get:{
+			url:'@{Pick.bankAccountByAccountNoAndCustomerKey()}?domain=CUSTOMER',
+			success: function(data){
+				$('#bankAccount').removeClass('fieldError');
+				$('#settlementAccountKey').val(data.code);
+				$('#bankAccount').val(data.bankAccountNo);
+				$('#settlementAccountName').val(data.description);
+				$('#h_settlementAccountName').val(data.description);
+			},
+			error: function(data){
+				$('#bankAccount').addClass('fieldError');
+				$('#settlementAccountKey').val('');
+				$('#bankAccount').val('');
+				$('#settlementAccountName').val('NOT FOUND');
+				$('#h_settlementAccountName').val('');
+			}
+		},
+		filter:[$('#accountKey'), $('#customerKey')],
+		description:$('#settlementAccountName'),
+		help:$('#settlementAccountHelp')
+	});
+	
+/*	$('#transactionCode').lookup({
+		list:'@{Pick.transactionTemplates()}',
+		get:'@{Pick.transactionTemplate()}',
+		filter:'$cash',
+		key:$('#transactionTemplateKey'),
+		description:$('#transactionCodeDesc'),
+		help:$('#transactionHelp')
+	});
+*/
+	$('#transactionCode').lookup({
+		list:'@{Pick.transactionTemplates()}',
+		get:{
+			url:'@{Pick.transactionTemplate()}',
+			success: function(data){
+				$('#transactionCode').removeClass('fieldError');
+				$('#transactionTemplateKey').val(data.code);
+				$('#transactionCode').val(data.transactionCode);
+				$('#transactionCodeDesc').val(data.description);
+				$('#h_transactionCodeDesc').val(data.description);
+				},
+			error: function(data){
+				$('#transactionCode').addClass('fieldError');
+				$('#transactionTemplateKey').val('');
+				$('#transactionCode').val('');
+				$('#transactionCodeDesc').val('NOT FOUND');
+				$('#h_transactionCodeDesc').val('');
+			}
+		},
+		//filter:'$cash',
+		filter:'USED_BY-2',
+		description:$('#transactionCodeDesc'),
+		help:$('#transactionHelp')
+	});
+	
+	$('#settlementDate').datepicker();
+	$('.calendar').datepicker();
+
+}); 
+</script>
+
+#{hidden id:'transactionKey', name:'transaction.transactionKey', value:transaction?.transactionKey /}
+#{hidden id:'customerKey' /}
+<form id="cashTransactionForm" class="form" method="POST">
+<p>
+	#{textBox id:'transactionNo', name:'transaction.transactionNumber', label:'Transaction No', value:transaction?.transactionNumber, class:'capitalize', readOnly:true, width:'85' /}
+</p>
+<p>
+	#{textBox id:'settlementDate', name:'transaction.settlementDate', label:'Transaction Date', value:transaction?.settlementDate?.format(appProp.dateFormat), class:'calendar', required:true, readOnly:readOnly /} (${appProp.displayDateFormat})
+	<span class="error">#{error 'transaction.settlementDate' /}</span>
+</p>
+<p>
+	#{textBox id:'accountNo', name:'transaction.account.accountNo', label:'Account No', value:transaction?.account?.accountNo, required:true,class:'capitalize', readOnly:readOnly, width:'120px' /}
+	#{hidden id:'accountKey', name:'transaction.account.custodyAccountKey', value:transaction?.account?.custodyAccountKey /}
+	#{button id:'accountHelp', value:'?', class:'small', readOnly:readOnly /}
+	#{textBox id:'accountName', name:'transaction.account.name', value:transaction?.account?.name, readOnly:true, width:'340px' /}
+	<span class="error">#{error 'transaction.account.accountNo' /}</span>
+</p>
+<p>
+	#{textBox id:'bankAccount', name:'transaction.settlementAccount.accountNo', label:'Bank Account', value:transaction?.settlementAccount?.accountNo, required:true, class:'capitalize', readOnly:readOnly, width:'120px'/}
+	#{hidden id:'settlementAccountKey', name:'transaction.settlementAccount.bankAccountKey', value:transaction?.settlementAccount?.bankAccountKey /}
+	#{button id:'settlementAccountHelp', value:'?', class:'small', readOnly:readOnly /}
+	#{textBox id:'settlementAccountName', name:'transaction.settlementAccount.name', value:transaction?.settlementAccount?.name, readOnly:true, width:'340px' /}
+	<span class="error">#{error 'transaction.settlementAccount.accountNo' /}</span>
+</p>
+<p>
+	#{textBox id:'transactionCode', name:'transaction.transactionTemplate.transactionCode', label:'Transaction Code', value:transaction?.transactionTemplate?.transactionCode, required:true, readOnly:readOnly, class:'capitalize',width:'120px' /}
+	#{hidden id:'transactionTemplateKey', name:'transaction.transactionTemplate.transactionTemplateKey', value:transaction?.transactionTemplate?.transactionTemplateKey /}
+	#{button id:'transactionHelp', value:'?', class:'small', readOnly:readOnly /}
+	#{textBox id:'transactionCodeDesc', name:'transaction.transactionTemplate.description', value:transaction?.transactionTemplate?.description, readOnly:true, width:'340px' /}
+	<span class="error">#{error 'transaction.transactionTemplate.transactionCode' /}</span>
+</p>
+<!-- <p>
+	#{dropDownList id:'paymentType', name:'transaction.paymentType.lookupId', label:'Payment Type', value:transaction?.paymentType?.lookupId, required:true, readOnly:readOnly, options:paymentType, width:'85' /}
+	<span class="error">#{error 'transaction.paymentType.lookupId' /}</span>
+</p> -->
+<p>
+	#{textBox id:'amount', label:'Amount', value:transaction?.amount, class:'numeric', required:true, format:'#,##0.####', readOnly:readOnly, width:'120px' /}
+	#{hidden id:'amountStripped', name:'transaction.amount', value:transaction?.amount /}
+	<span class="error">#{error 'transaction.amount' /}</span>
+</p>
+<p>
+	#{textBox id:'refNo', name:'transaction.reference', label:'Ref No', value:transaction?.reference, class:'capitalize', readOnly:readOnly, width:'120px' /}
+</p>
+<p>
+	#{textBox id:'remarks', name:'transaction.description', label:'Remarks', value:transaction?.description, class:'capitalize', readOnly:readOnly, width:'488px' /}
+</p>
+</form>

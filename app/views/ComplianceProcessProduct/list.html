@@ -1,0 +1,54 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Compliance Process (Product)' /}
+
+#{script 'lookups.js' /}
+
+<script type="text/javascript">
+	function doEdit(data) {
+		if ((data[9] == "New") || (data[9] == "Updated")) {
+			view(data[0]);
+			return false;
+		} else {
+			return true;
+		}
+	}
+</script>
+
+<form id="processForm" class="form" name="process">
+#{hidden name:'PROCESSMARK', value:params?.PROCESSMARK/}
+#{hidden name:'item.sessionTag', value:item?.sessionTag/}
+#{hidden name:'item.processMark', value:item?.processMark/}
+
+	<span id="globalErr" class="error">#{error 'Fund Code is' /}</span>
+	<p>
+		#{textBox id:'productCode', name:'item.product.productCode', label:'Fund Code', value:item?.product?.productCode, width:'120px', readOnly:false, class:'capitalize', required:true, maxLength:50/}
+		#{hidden  id:'productCodeKey', value:item?.product?.productCode /}
+		#{button  id:'productCodeHelp', value:'?', class:'small', readOnly:false/}
+		#{textBox id:'productCodeDesc', name:'item.product.name', value:item?.product?.name, readOnly:true, width:'340px' /}
+		<span id="productCodeErr" class="error">#{error 'Fund Code is' /}</span> 
+	</p>
+	<p>			
+		#{textBox id:'processDate', name:'item.processDate', label:'Date', value:item?.processDate?.format(appProp.dateFormat), class:'calendar', readOnly:false, required:true /} (${appProp.displayDateFormat})
+		<span id="dateErr" class="error">#{error 'Date is' /}</span>
+	</p>
+	<div class="buttons">
+		#{button  id:'process', value:'Process', readOnly:false/} 
+		#{button  id:'reset', value:'Reset', readOnly:false/}
+	</div>
+	<p>
+		<textarea id='log' rows="10" cols="125" readonly="readonly">
+#{list logs, as:'log'}${log}
+#{/list}
+		</textarea>
+	</p>	
+</form>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'ComplianceProcessProduct/CpProcessRg.js' /}
+	$(document).ready(function() {
+		$('#new').remove();
+		$('.buttons input:button').button();
+		CpProcessRg($("#processForm"));
+	});	
+</script>

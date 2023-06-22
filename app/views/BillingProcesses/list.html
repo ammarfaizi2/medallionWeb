@@ -1,0 +1,79 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: ' ' /}
+#{set fixData: true /}
+#{set mode: mode /}
+#{script 'lookuppaging.js' /}
+#{script 'lookups.js' /}
+
+<div id="accordion">
+	<h3><a href="#">Billing Process</a></h3>
+	<form id="billingForm" class="form">
+		<div id="tabs">
+			#{hidden name:'PROCESSMARK', value:params?.PROCESSMARK/}
+			#{hidden name:'param.sessionTag', value:param?.sessionTag/}
+			#{hidden name:'param.processMark', value:param?.processMark/}
+			
+			#{hidden id:'billingMessage', name:'param.message', value:param?.message/}
+			#{hidden id:'filter', name:'param.filter', value:param?.filter/}
+			<p>
+				<input id="filterAll" type="radio" name="filterGroup" value='ALL'/>
+				<label>ALL</label>
+			</p>
+			<p>
+				<input id="filterCustomerNumber" type="radio" name="filterGroup" value='CustomerNumber'/>
+				<label>Customer No</label>
+				#{textBox id:'customer', name:'param.customer', value:param?.customer, class:'capitalize' /}
+				#{hidden id:'customerKey', name:'param.customerKey', value:param?.customerKey/}
+				#{button id:'customerHelp', value:'?', class:'small' /}
+				#{textBox id:'customerDesc', name:'param.customerDesc', value:param?.customerDesc, readOnly:true, width:'222px' /}
+				<span id="customerErr" class="error">#{error 'Customer' /}</span>			
+			</p>
+		</div>
+		
+		<br/>
+		
+		<p>
+			#{textBox id:'invMonth', name:'param.invMonth', value:param?.invMonth, label:'Invoice Month / Year', width:'85px', maxLength:2, size:2, class:'numberOnly', required:'true' /}
+			<span id="invMonthErr" class="error">#{error 'Invoice Month' /}</span>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<label style="width:10px">/</label>
+			#{textBox id:'invYear', name:'param.invYear', value:param?.invYear, width:'85px', maxLength:4, size:4, class:'numberOnly', required:'true' /}
+			<span id="invYearErr" class="error">#{error 'Invoice Year' /}</span>
+		</p>
+		<p>
+			#{textBox id:'invDate', name:'param.invDate', label:'Invoice Date', value:param?.invDate?.format(appProp.dateFormat), class:'calendar', required:'false'/}&nbsp;/&nbsp;(${appProp.displayDateFormat})
+			<span id="invDateErr" class="error">#{error 'Invoice Date' /}</span>
+		</p>			
+		<p>
+			#{textBox id:'invDueDate', name:'param.invDueDate', label:'Invoice Due Date', value:param?.invDueDate?.format(appProp.dateFormat), class:'calendar', required:'false'/}&nbsp;/&nbsp;(${appProp.displayDateFormat})
+			<span id="invDueDateErr" class="error">#{error 'Invoice Due Date' /}</span>
+		</p>
+		<p>
+			<div class="buttons">
+				<input id='btnProcess' type="button" id="process" value="Process" ></input>
+				<input id='btnProcessAjax' type="button" id="process" value="Process" ></input>
+				<input id='btnReset' type="button" id="reset" value="Reset" ></input>			
+			</div>
+		</p>
+		<p>
+<textarea id='log' rows="10" cols="115" readonly="readonly">
+#{list logs, as:'log'}${log}
+#{/list}
+</textarea>
+		</p>
+	</form>
+</div>	
+
+<div id="result" style="display:none">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<div class="response"></div>
+</div>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'BillingProcesses/BillingProcess.js' /}
+	$(document).ready(function() {
+		$('.buttons input:button').button();
+		BillingProcess($("#main"));
+	});
+</script>

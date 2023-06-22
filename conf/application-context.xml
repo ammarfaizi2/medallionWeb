@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+       
+	<bean id="authenticationManager" class="org.springframework.security.authentication.ProviderManager">
+    	<property name="providers" ref="remoteAuthenticationProvider" />
+    </bean>
+    
+    <bean id="remoteAuthenticationProvider" class="org.springframework.security.authentication.rcp.RemoteAuthenticationProvider">
+		<property name="remoteAuthenticationManager"><ref bean="remoteAuthenticationManager"/></property>
+	</bean>
+	
+	<bean id="remoteAuthenticationManager" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/AuthenticationService" />
+		<property name="serviceInterface" value="org.springframework.security.authentication.rcp.RemoteAuthenticationManager" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>
+	
+	<bean id="sessionTimeout" class="java.lang.String" factory-method="valueOf">
+	 	<constructor-arg value="${session.timeout}" />
+	</bean>
+	       
+	<bean id="generalService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/GeneralService" />
+		<property name="serviceInterface" value="com.simian.medallion.service.GeneralService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>
+	
+	<bean id="swiftService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/SwiftService" />
+		<property name="serviceInterface" value="com.simian.medallion.service.SwiftService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>	
+	
+	<bean id="webserviceBridgeService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/WebserviceBridgeService" />
+		<property name="serviceInterface" value="com.simian.medallion.service.WebserviceBridgeService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>
+	
+	<bean id="monitoringService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/MonitoringService" />
+		<property name="serviceInterface" value="com.simian.medallion.service.MonitoringService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>	
+	
+	<bean id="bpjsService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/BpjsService" />
+		<property name="serviceInterface" value="com.simian.medallion.service.BpjsService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>	
+<!-- 	<bean id="generalService" class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean"> -->
+<!-- 		<property name="serviceUrl" value="http://localhost:8080/medallionServer/remoting/GeneralService"/> -->
+<!-- 		<property name="serviceInterface" value="com.simian.medallion.service.GeneralService"/> -->
+<!-- 	</bean> -->
+
+	<bean id="sftpService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/SftpService" />
+		<property name="serviceInterface" value="com.simian.medallion.service.SftpService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>
+
+	<bean id="taService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/TaService" />
+		<property name="serviceInterface" value="com.simian.medallion.service.TaService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>
+	
+<!-- 	<bean id="taService" class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean"> -->
+<!-- 		<property name="serviceUrl" value="http://localhost:8080/medallionServer/remoting/TaService"/> -->
+<!-- 		<property name="serviceInterface" value="com.simian.medallion.service.TaService"/> -->
+<!-- 	</bean> -->
+	
+	<bean id="customerService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/CustomerService" />
+		<property name="serviceInterface" value="com.simian.medallion.service.CustomerService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>
+	
+	<bean id="amlCustomerService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/AmlCustomerService" />
+		<property name="serviceInterface" value="com.simian.medallion.service.AmlCustomerService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>
+	
+<!-- 	<bean id="customerService" class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean"> -->
+<!-- 		<property name="serviceUrl" value="http://localhost:8080/medallionServer/remoting/CustomerService"/> -->
+<!-- 		<property name="serviceInterface" value="com.simian.medallion.service.CustomerService"/> -->
+<!-- 	</bean> -->
+	
+	<bean id="securityService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/SecurityService" />
+		<property name="serviceInterface" value="com.simian.medallion.service.SecurityService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>
+	
+<!-- 	<bean id="securityService" class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean"> -->
+<!-- 		<property name="serviceUrl" value="http://localhost:8080/medallionServer/SecurityService"/> -->
+<!-- 		<property name="serviceInterface" value="com.simian.medallion.service.SecurityService"/> -->
+<!-- 	</bean> -->
+	
+	<bean id="accountService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/AccountService" />
+		<property name="serviceInterface" value="com.simian.medallion.service.AccountService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>
+		
+<!-- 	<bean id="accountService" class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean"> -->
+<!-- 		<property name="serviceUrl" value="http://localhost:8080/medallionServer/remoting/AccountService"/> -->
+<!-- 		<property name="serviceInterface" value="com.simian.medallion.service.AccountService"/> -->
+<!-- 	</bean> -->
+	
+	<bean id="bankAccountService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/BankAccountService" />
+		<property name="serviceInterface" value="com.simian.medallion.service.BankAccountService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>
+	
+<!-- 	<bean id="bankAccountService" class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean"> -->
+<!-- 		<property name="serviceUrl" value="http://localhost:8080/medallionServer/remoting/BankAccountService"/> -->
+<!-- 		<property name="serviceInterface" value="com.simian.medallion.service.BankAccountService"/> -->
+<!-- 	</bean> -->
+	
+	<bean id="approvalService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/ApprovalService" />
+		<property name="serviceInterface" value="com.simian.medallion.service.ApprovalService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>
+	
+<!-- 	<bean id="approvalService" class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean"> -->
+<!-- 		<property name="serviceUrl" value="http://localhost:8080/medallionServer/remoting/ApprovalService"/> -->
+<!-- 		<property name="serviceInterface" value="com.simian.medallion.service.ApprovalService"/> -->
+<!-- 	</bean> -->
+	
+	<bean id="fundService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/FundService" />
+		<property name="serviceInterface" value="com.simian.medallion.service.FundService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>
+	
+<!-- 	<bean id="fundService" class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean"> -->
+<!-- 		<property name="serviceUrl" value="http://localhost:8080/medallionServer/remoting/FundService"/> -->
+<!-- 		<property name="serviceInterface" value="com.simian.medallion.service.FundService"/> -->
+<!-- 	</bean> -->
+	
+	<bean id="workflowService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/WorkflowService" />
+		<property name="serviceInterface" value="com.simian.medallion.service.WorkflowService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>
+	
+<!-- 	<bean id="workflowService" class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean"> -->
+<!-- 		<property name="serviceUrl" value="http://localhost:8080/medallionServer/remoting/WorkflowService"/> -->
+<!-- 		<property name="serviceInterface" value="com.simian.medallion.service.WorkflowService"/> -->
+<!-- 	</bean> -->
+	
+	<bean id="serializerService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/SerializerService" />
+		<property name="serviceInterface" value="com.simian.medallion.service.SerializerService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>
+		
+<!-- 	<bean id="serializerService" class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean"> -->
+<!-- 		<property name="serviceUrl" value="http://localhost:8080/medallionServer/remoting/SerializerService"/> -->
+<!-- 		<property name="serviceInterface" value="com.simian.medallion.service.SerializerService"/> -->
+<!-- 	</bean> -->
+
+	<bean id="applicationService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/ApplicationService" />
+		<property name="serviceInterface" value="com.simian.medallion.service.ApplicationService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>
+		
+<!-- 	<bean id="applicationService" class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean"> -->
+<!-- 		<property name="serviceUrl" value="http://localhost:8080/medallionServer/remoting/ApplicationService"/> -->
+<!-- 		<property name="serviceInterface" value="com.simian.medallion.service.ApplicationService"/> -->
+<!-- 	</bean> -->
+
+	<bean id="transactionService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/TransactionService" />
+		<property name="serviceInterface" value="com.simian.medallion.service.TransactionService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>
+	
+<!-- 	<bean id="transactionService" class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean"> -->
+<!-- 		<property name="serviceUrl" value="http://localhost:8080/medallionServer/remoting/TransactionService"/> -->
+<!-- 		<property name="serviceInterface" value="com.simian.medallion.service.TransactionService"/> -->
+<!-- 	</bean> -->
+	
+	<bean id="maintenanceService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/MaintenanceService" />
+		<property name="serviceInterface" value="com.simian.medallion.service.MaintenanceService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>
+	
+<!-- 	<bean id="maintenanceService" class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean"> -->
+<!-- 		<property name="serviceUrl" value="http://localhost:8080/medallionServer/remoting/MaintenanceService"/> -->
+<!-- 		<property name="serviceInterface" value="com.simian.medallion.service.MaintenanceService"/> -->
+<!-- 	</bean> -->
+	
+	<bean id="cbestInterface" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/CBestInterface" />
+		<property name="serviceInterface" value="com.simian.medallion.service.CBestInterface" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>
+
+	<!-- <bean id="remoteInvocationFactory" class="org.springframework.security.context.rmi.ContextPropagatingRemoteInvocationFactory" 
+		/> -->	
+	
+	<bean id="uploadInvestorService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/UploadInvestorService" />
+		<property name="serviceInterface" value="com.simian.medallion.plugin.service.UploadInvestorService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>
+	
+	<bean id="uploadSubscriberService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/UploadSubscriberService" />
+		<property name="serviceInterface" value="com.simian.medallion.plugin.service.UploadSubscriberService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>
+	
+	<bean id="uploadRedeemService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/UploadRedeemService" />
+		<property name="serviceInterface" value="com.simian.medallion.plugin.service.UploadRedeemService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>
+	
+	<bean id="uploadSwitchingService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/UploadSwitchingService" />
+		<property name="serviceInterface" value="com.simian.medallion.plugin.service.UploadSwitchingService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>
+	
+	<bean id="uploadMarketPriceService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/UploadMarketPriceService" />
+		<property name="serviceInterface" value="com.simian.medallion.plugin.service.UploadMarketPriceService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>
+		
+	<bean id="mailService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/MailService" />
+		<property name="serviceInterface" value="com.simian.medallion.plugin.service.MailService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>
+	       
+	<bean id="cBestService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/CBestService" />
+		<property name="serviceInterface" value="com.simian.medallion.ctplugin.service.CBestService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>
+	       
+	<bean id="shareHolderService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/ShareHolderService" />
+		<property name="serviceInterface" value="com.simian.medallion.service.ShareHolderService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>
+
+	<!-- end Simple File Service using RMI -->
+	
+	<!-- Bean for date format, get the format from application.conf -->
+	<bean id="appProp" name="appProp" class="helpers.ApplicationProperties" init-method="init"></bean>
+	<!-- end Bean for date format, get the format from application.conf -->
+	<!-- for download helper implementation -->
+	<!-- <bean id="downloadHelper" name="downloadHelper" class="com.simian.medallion.helper.DownloadHelperImpl" /> -->
+	
+	<!-- start Simple File Service -->
+	<bean id="simpleFileService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/SimpleFileService" />
+		<property name="serviceInterface" value="com.simian.medallion.service.SimpleFileService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>
+	<!-- end Simple File Service -->
+	
+	<!--  Client File Service  -->
+	<bean id="clientFileService" name="clientFileService" class="com.simian.medallion.helper.ClientFileService">
+	</bean>
+
+	<!-- start Report Generator Service -->
+	<bean id="reportGeneratorService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/ReportGeneratorService" />
+		<property name="serviceInterface" value="com.simian.medallion.pre.ReportGeneratorService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>
+	<!-- end Report Generator Service -->
+	
+	<!-- Rport Generator Wrapper -->
+<!-- 	<bean id="reportGeneratorWrapper" class="org.springframework.remoting.rmi.RmiProxyFactoryBean"> -->
+<!-- 		<property name="serviceUrl" value="${rmi.address}/ReportGeneratorWrapper" /> -->
+<!-- 		<property name="serviceInterface" value="com.simian.medallion.pre.ReportGeneratorWrapper" /> -->
+<!-- 		<property name="refreshStubOnConnectFailure" value="true" /> -->
+<!-- 		<property name="lookupStubOnStartup" value="false" /> -->
+<!-- 	</bean> -->
+	<!-- Rport Generator Wrapper -->
+
+	<!-- CAReport Service-->
+	<bean id="caReportService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/CAReportService" />
+		<property name="serviceInterface" value="com.simian.medallion.service.CAReportService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>
+	<!-- CAReport Service-->
+
+	<!-- Report Queue Service-->
+	<bean id="reportQueueService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/ReportQueueService" />
+		<property name="serviceInterface" value="com.simian.medallion.service.ReportQueueService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>
+	<!-- Report Queue Service-->
+
+
+	<!-- KycService -->
+	<bean id="kycService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/KycService" />
+		<property name="serviceInterface" value="com.simian.medallion.service.KycService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>
+	<!-- KycService -->
+	
+	<bean id="depositoService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/DepositoService" />
+		<property name="serviceInterface" value="com.simian.medallion.service.DepositoService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>	
+	
+	<bean id="downloadUtilityService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/DownloadUtilityService" />
+		<property name="serviceInterface" value="com.simian.medallion.service.DownloadUtilityService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>
+	
+	<bean id="uploadUtilityService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/UploadUtilityService" />
+		<property name="serviceInterface" value="com.simian.medallion.service.UploadUtilityService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>		
+	
+	<bean id="uploadMonitorService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+		<property name="serviceUrl" value="${rmi.address}/UploadMonitorService" />
+		<property name="serviceInterface" value="com.simian.medallion.service.UploadMonitorService" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="lookupStubOnStartup" value="false" />
+	</bean>
+</beans>

@@ -1,0 +1,44 @@
+<style type="text/css">
+  .errmsg { color:red; }
+</style>
+
+<form></form>
+<form id="inputThirdParty" class="form">
+<span id="errmsgNull" class="errmsg" ></span>
+	#{hidden id:'oldMaxRange' /} 
+	#{hidden id:'newMaxRange' /} 
+	#{hidden id:'rowPosition' /} 
+	#{hidden id:'isNewRec', name:'isNewRec', value:isNewRec /}
+	#{hidden id:'thirdPartyAccountKey', name:'thirdPartyAccount?.thirdPartyAccountKey', value:thirdPartyAccount?.thirdPartyAccountKey /}
+
+	<p> 
+		#{dropDownList id:'accountCat', name:'ThirdPartyAccounts?.accountCategory?.lookupId', label:'Depository', value:ThirdPartyAccounts?.accountCategory?.lookupId, options:accountCategory, required:true, width:'150px', readOnly:readOnly/}
+		#{hidden id:'lookupDescription', name:'ThirdPartyAccounts?.accountCategory?.lookupDescription', value:'ThirdPartyAccounts?.accountCategory?.lookupDescription' /}
+		&nbsp; <span id="accountCategoryError" class="error"></span>
+	</p>
+	
+	<p>      
+		#{textBox id:'accountCode', name:'ThirdPartyAccounts?.accountCode', label:'Member Code', value:ThirdPartyAccounts?.accountCode, width:'150px', class:'capitalize', required:true, readOnly:readOnly, maxLength:50 /}
+		&nbsp; <span id="accountCodeError" class="error"></span>
+	</p>
+	
+	<p>      
+		#{textBox id:'accountAgentCode', name:'ThirdPartyAccounts?.accountAgentCode', label:'Agent Code', value:ThirdPartyAccounts?.accountAgentCode, width:'150px', class:'capitalize', required:true, readOnly:readOnly, maxLength:50 /}
+		&nbsp; <span id="accountAgentCodeError" class="error"></span>
+	</p>
+	
+	<p>      
+		#{textBox id:'investorCode', name:'ThirdPartyAccounts?.investorCode', label:'Investor Code', value:ThirdPartyAccounts?.investorCode, width:'150px', class:'capitalize', required:true, readOnly:readOnly, maxLength:50 /}
+		&nbsp; <span id="investorCodeError" class="error"></span>
+	</p>
+	
+	<p>      
+		#{textBox id:'subAccountCode', name:'ThirdPartyAccounts?.subAccountCode', label:'Sub Account', value:ThirdPartyAccounts?.subAccountCode, width:'150px', class:'capitalize', required:true, readOnly:readOnly, maxLength:50 /}
+		&nbsp; <span id="subAccountCodeError" class="error"></span>
+	</p>
+	
+	<p>      
+		#{textBox id:'cashAccount', name:'ThirdPartyAccounts?.cashAccount', label:'Cash Account', value:ThirdPartyAccounts?.cashAccount, width:'150px', class:'capitalize', required:true, readOnly:readOnly, maxLength:50 /}
+		&nbsp; <span id="cashAccountError" class="error"></span>
+	</p>
+</form>

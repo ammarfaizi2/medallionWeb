@@ -1,0 +1,35 @@
+<h3>Search results</h3>
+
+#{if faRecurrings}
+	<table id="FaRecurringTable" class="display">
+		<thead>
+			<tr>
+				<th>Recurring Key</th>
+				<th>Recurring No</th>
+				<th>Name</th>
+				<th>Effective Date From</th>
+				<th>Effective Date To</th>
+				<th>Total Amount</th>
+				
+			</tr>
+		</thead>
+		<tbody>
+		#{list faRecurrings, as:'faRecurring'}
+			<tr>
+				<td>${faRecurring?.recurringKey}</td>
+				<td>${faRecurring?.recurringKey}</td>
+				<td>${faRecurring?.recurringName}</td>
+				<td>${faRecurring?.effectiveDateFrom.format(appProp.dateFormat)}</td>
+				<td>${faRecurring?.effectiveDateTo.format(appProp.dateFormat)}</td>
+				<td align="right" name="navAmtCell">${faRecurring?.totalAmount?.format('#,##0.##########')}</td>
+				
+			</tr>
+		#{/list}
+		</tbody>
+	</table>
+#{/if}
+#{else}
+	<div>No record found</div>
+#{/else}	
+
+

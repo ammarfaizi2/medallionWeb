@@ -1,0 +1,2203 @@
+#{extends 'templates/main.html' /}
+
+#{set id: account?.custodyAccountKey /}
+#{set id: account?.customer?.customerKey /}
+
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming))/}
+#{script 'lookups.js' /}
+#{script 'validation/numericOnly.js' /}
+#{script 'jquery.rc4.js' /}
+
+<script type="text/javascript">	
+#{include 'Accounts/overrideCharge.js' /}
+	$(function() {
+		$('#save').button();
+		$('#cancel').button();
+		$('#close').button();
+		$('#back').button();
+		$('#confirm').button();
+		$('#cancelSubAccount').button();
+		$('#saveSubAccount').button();
+		$('#cancelSpecSecType').button();
+		$('#closeSubAccount').button();
+		$('#saveSpecSecType').button();
+		$('#closeSpecSecType').button();
+		
+		//loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Processing...</div>').appendTo('body');
+		//loadingDialog(loading);
+		//loading.dialog('close');
+		
+		if (('${mode}'=='entry')||('${id}'=='')||(('${mode}'=='edit')&&(('${account?.recordStatus?.decodeStatus()}'=='Reject') || ($("#status").val() == 'R' )))){
+			$('input[name=isActive]').attr("disabled", "disabled");
+		}
+		
+		if (('${confirming}' != 'true')&&('${mode}' == 'entry')){
+			var	account = new Object();
+			account.securityTypes = new Array();
+			account.bankAccounts = new Array();
+			account.accountCharges = new Array();
+			account.subAccounts = new Array();
+			//var securityTypes = (account.securityTypes);
+			var priceGroupSetups = (account.priceGroupSetups);
+			var bankAccounts = (account.bankAccounts);
+			var accountCharges = (account.accountCharges);
+			var subAccounts = (account.subAccounts);
+			$('input[name=isActive]').attr("disabled", "disabled");
+			
+			if ('${dataEntry}'!='true') {
+				$("#portfolioReport").removeClass('fieldError');
+				$("#portfolioReport").val("PORTFOLIO_REPORT-1");
+				$('#portfolioReporteCode').val('${portfolioReport1.lookupCode}');
+				$('#portfolioReportDescription').val('${portfolioReport1.lookupDescription}');
+			}
+		}
+
+		if (('${mode}' == 'edit')||('${dataEntry}'=='true')||('${confirming}' == 'true')||('${mode}'=='view')) {
+			var account = ${accounts.raw()};
+			
+			if (account != null) {
+				
+		//		var securityTypes = (account.securityTypes);
+				var priceGroupSetups = (account.priceGroupSetups);
+				var bankAccounts = (account.bankAccounts);
+				var accountCharges = (account.accountCharges);
+				var subAccounts = (account.subAccounts);
+				$('#organizationId').val(account.organization.organizationId);
+				//$('#lookupBySecurityPriceType').val(account.lookupBySecurityPriceType.lookupId);
+	
+				$('#clientNo').val(account.custodyAccountKey);
+				$('#accountNo').val(account.accountNo);
+				$('#accountHolderName').val(account.name);
+				$('#cif').val(account.customer.customerKey);
+				$('#fullNo').val(account.customer.customerNo);
+				$('#fullName').val(account.customer.customerName);
+				$('#branchNo').val(account.branch.branchNo);
+				$('#branchKey').val(account.branch.branchKey);
+				$('#branchName').val(account.branch.name);
+				
+				if(account.currency == null){
+					$('#currency').val("");
+					$('#currencyDesc').val("");
+				}else{
+					$('#currency').val(account.currency.currencyCode);
+					$('#currencyDesc').val(account.currency.description);
+				}
+				
+				
+				if(account.txProfile == null){
+					$('#txProfile').val("");
+					$('#txProfileDesc').val("");
+				}else{
+					$('#txProfile').val(account.txProfile.taxProfileCode);
+					$('#txProfileDesc').val(account.txProfile.description);
+				}
+				
+				if (account.chargeProfile == null) {
+					
+					$('#chargeProfile').val("");
+					$('#chargeProfileKey').val("");
+					$('#chargeProfileDesc').val("");
+					$('#lChargeProf').val("");
+					$('#tabs').tabs('disable', 4);
+				} else {
+					
+					$('#chargeProfile').val(account.chargeProfile.name);
+					$('#chargeProfileKey').val(account.chargeProfile.chargeProfileKey);
+					$('#chargeProfileDesc').val(account.chargeProfile.description);
+					$('#lChargeProf').val(account.chargeProfile.name);
+					$('#tabs').tabs('enable', 4);
+				}
+				if (account.costMethod == null) {
+					$('#costMethod').val("");
+				} else {
+					$('#costMethod').val(account.costMethod.lookupId);
+				}
+				if (account.custodianBank == null) {
+					$('#custBank').val("");
+					$('#custBankKey').val("");
+					$('#custBankDesc').val("");
+				} else {
+					$('#custBank').val(account.custodianBank.thirdPartyCode);
+					$('#custBankKey').val(account.custodianBank.thirdPartyKey);
+					$('#custBankDesc').val(account.custodianBank.thirdPartyName);
+				}
+				$('#securityAccNo').val(account.securityAccNo);
+				
+	//			$('input[name=account.settlementAccount.bankAccountKey]').val(account.settlementAccount.bankAccountKey);
+	//			$('input[name=account.settlementAccount.bankAccountKey]').val('${valueSettlement}');
+				if (account.billingAddress != null)
+					$('#billingAddress').val(account.billingAddress.contactKey);
+				if (account.isSendToEmail == true){
+					$('#sendOption1').val(false);
+					$('#sendOption2').val(true);
+					$('#sendOption2').attr('checked', true); 
+					
+				} else {
+					$('#sendOption1').val(false);
+					$('#sendOption2').val(true);
+					$('#sendOption1').attr('checked', true);
+				}
+				
+				if (($("input[name='account.isSendToEmail']:checked").val()=="true") || ($("input[name='account.isSendToEmail']").val()=="true")) {
+					$('#email').css("display","");
+				}
+				
+				$('#email').val(account.customer.email);
+	
+	//			if (account.settlementAccount.bankAccountKey =='${valueBankAccKey}'){
+	//				alert($('#radio'+'${valueSettlement}'));
+	//				alert('${account?.settlementAccount?.bankAccountKey}');
+	//				$('#radio${valueSettlement}').attr('checked', 'checked');
+	//			}
+			}
+			
+		}
+		
+		var closeDialog = function() {
+			$("#dialog-message").dialog('close');	
+		}
+		
+		//var invoiceCharges;
+		
+		$('#lookupSettlementAccount').css('display', 'none');
+		
+		$( "#dialog-message-1" ).css("display","none");
+		$( "#dialog-message-2" ).css("display","none");
+		var chargeGroupDescription;
+		
+		$("#detailChargeInvoice").css("display","none");
+		
+		/* if ($('#lookupBySecurityPriceType').val()=='SECURITY_PRICE_TYPE-3'){
+				$("#addSpecPrice").css("display","");
+			} else {
+				$("#addSpecPrice").css("display","none");
+		} */
+		
+/* 		$('#lookupBySecurityPriceType').change(function(){
+	//		alert($('#lookupBySecurityPriceType').val());
+			$('#lookupBySecurityPriceType').val($('#lookupBySecurityPriceType').val());
+			$('#errSecPrice').html('');
+			if ($('#lookupBySecurityPriceType').val()=='SECURITY_PRICE_TYPE-3'){
+				$("#addSpecPrice").css("display","");
+			} else {
+				$("#addSpecPrice").css("display","none");
+				$('#securityType').val('');
+				tableSecurityPrice.fnClearTable();
+				
+			}
+		}); */
+		$('#tabs').tabs();
+		$('.pane').css('height','400' );
+		//$('.pane #tabs-6').css('height','700' );
+		//$('#tabs-1').css('height','300' );
+		//$('#tabs-2').css('height','430' );
+		//$('#tabs-3').css('height','300' );
+
+		if ('${mode}' == 'view'){
+			$('#addSpecPrice').attr("disabled", "disabled");
+			$('#addBank').attr("disabled", "disabled");
+		}
+
+		$('.button').button();
+		$('.buttons input:button').button();
+
+		
+
+		//COUNTRY LOOKUP
+		$('#address1CountryCode').lookup({
+			list:'@{Pick.lookups()}?group=COUNTRY',
+			get:{
+				url:'@{Pick.lookup()}?group=COUNTRY',
+				success: function(data){
+					$('#address1CountryCode').removeClass('fieldError');
+					$('#address1Country').val(data.code);
+					$('#address1CountryDesc').val(data.description);
+					$('#h_ddress1CountryDesc').val(data.description);
+				},
+				error: function(data){
+					$('#address1CountryCode').addClass('fieldError');
+					$('#address1Country').val('');
+					$('#address1CountryCode').val('');
+					$('#address1CountryDesc').val('NOT FOUND');
+					$('#h_address1CountryDesc').val('');
+				}
+			},
+			description:$('#address1CountryDesc'),
+			help:$('#address1CountryHelp')
+		});
+		
+		//===============
+			
+		// STATE LOOKUP
+		$('#address1StateCode').lookup({
+			list:'@{Pick.lookups()}?group=STATE',
+			get:{
+				url:'@{Pick.lookup()}?group=STATE',
+				success: function(data){
+					if ($('#address1CountryCode').val() == "" || $('#address1CountryCode').val() == null) {
+						$('#address1StateCode').addClass('fieldError');
+						$('#address1StateDesc').val('NOT FOUND');
+						$('#address1StateCode').val('');
+						$('#address1State').val('');
+						$('#h_address1StateDesc').val('');
+						return false;
+					}
+					$('#address1StateCode').removeClass('fieldError');
+					$('#address1State').val(data.code);
+					$('#address1StateDesc').val(data.description);
+					$('#h_address1StateDesc').val(data.description);
+				},
+				error: function(data){
+					$('#address1StateCode').addClass('fieldError');
+					$('#address1State').val('');
+					$('#address1StateCode').val('');
+					$('#address1StateDesc').val('NOT FOUND');
+					$('#h_address1StateDesc').val('');
+				}
+			},
+			filter: {'key':'1','value':$('#address1Country')},
+			description:$('#address1StateDesc'),
+			help:$('#address1StateHelp')
+		});
+		
+		//===============
+			
+		// AREA LOOKUP
+		$('#address1AreaCode').lookup({
+			list:'@{Pick.lookups()}?group=AREA',
+			get:{
+				url:'@{Pick.lookup()}?group=AREA',
+				success: function(data){
+					if ($('#address1StateCode').val() == "" || $('#address1StateCode').val() == null) {
+						$('#address1AreaCode').addClass('fieldError');
+						$('#address1AreaDesc').val('NOT FOUND');
+						$('#address1AreaCode').val('');
+						$('#address1Area').val('');
+						$('#h_address1AreaDesc').val('');
+						return false;
+					}
+					$('#address1AreaCode').removeClass('fieldError');
+					$('#address1Area').val(data.code);
+					$('#address1AreaDesc').val(data.description);
+					$('#h_address1AreaDesc').val(data.description);
+				},
+				error: function(data){
+					$('#address1AreaCode').addClass('fieldError');
+					$('#address1Area').val('');
+					$('#address1AreaCode').val('');
+					$('#address1AreaDesc').val('NOT FOUND');
+					$('#h_address1AreaDesc').val('');
+				}
+			},
+			filter:{'key':'2','value':$('#address1State')},
+			description:$('#address1AreaDesc'),
+			help:$('#address1AreaHelp')
+		});
+		//===============
+			
+		$('#address1CountryCode').change(function(){
+			$('#address1StateCode').val('');
+			$('#address1StateDesc').val('');
+			$('#address1AreaCode').val('');
+			$('#address1AreaDesc').val('');
+			if ($('#address1CountryCode').val() == "") {
+				$('#address1CountryCode').val("");
+				$('#address1Country').val("");
+				$('#address1CountryDesc').val("");
+				$('#h_address1CountryDesc').val("");
+			}
+		});
+		
+		$('#address1StateCode').change(function(){
+			$('#address1AreaCode').val('');
+			$('#address1AreaDesc').val('');
+			if ($('#address1StateCode').val() == "") {
+				$('#address1StateCode').val("");
+				$('#address1State').val("");
+				$('#address1StateDesc').val("");
+				$('#h_address1StateDesc').val("");
+			}
+		});
+		
+		$('#address1AreaCode').change(function(){
+			if ($('#address1AreaCode').val() == "") {
+				$('#address1AreaCode').val("");
+				$('#address1Area').val("");
+				$('#address1AreaDesc').val("");
+				$('#h_address1AreaDesc').val("");
+			}
+		});
+		
+		// ============ SECTION TAB SECURITY PRICE ============= //
+		
+		$('#defaultPriceGroup').change(function(){
+			if ($('#defaultPriceGroup').val() == "") {
+				$('#defaultPriceGroup').val('');
+				$('#defaultPriceGroupId').val('');
+				$('#defaultPriceGroupName').val('');
+				$('#h_defaultPriceGroupName').val('');
+			}
+		});
+		
+		$('#defaultPriceGroup').lookup({
+			list:'@{Pick.lookups()}?group=SECURITY_PRICE_GROUP',
+			get:{
+				url:'@{Pick.lookup()}?group=SECURITY_PRICE_GROUP',
+				success: function(data){
+					$('#defaultPriceGroup').removeClass('fieldError');
+					$('#defaultPriceGroupId').val(data.code);
+					$('#defaultPriceGroupName').val(data.description);
+					$('#h_defaultPriceGroupName').val(data.description);
+				},
+				error: function(data){
+					$('#defaultPriceGroup').addClass('fieldError');
+					$('#defaultPriceGroupId').val('');
+					$('#defaultPriceGroup').val('');
+					$('#defaultPriceGroupName').val('NOT FOUND');
+					$('#h_defaultPriceGroupName').val('');
+				}
+			},
+			description:$('#defaultPriceGroupName'),
+			help:$('#defaultPriceGroupHelp')
+		});
+		
+		var tableSecurityPrice = $('#gridSecurityPrice').dataTable({
+//			aaData:securityTypes,
+			aaData:priceGroupSetups,
+			aoColumns:[
+			           /* {
+			        	   bVisible: false,
+			        	  fnRender: function(obj){
+			        		  var controls;
+			        		  if (obj.aData.id != null){
+			        			  ccontrols = obj.aData.id.securityType;
+			        		  } else {
+			        			  controls = '';
+			        		  }
+			        		  return controls;
+			        	  }
+						}, */
+						{
+							fnRender: function(obj) {
+								var controls;
+								controls = obj.aData.securityType.securityType;
+								controls += '<input type="hidden" name="priceGroupSetups[' + obj.iDataRow + '].securityType.securityType" value="' + obj.aData.securityType.securityType + '" />';
+								controls += '<input type="hidden" name="priceGroupSetups[' + obj.iDataRow + '].securityType.description" value="' + obj.aData.securityType.description + '" />';
+								return controls;
+							}
+						},
+						{
+							fnRender: function(obj) {
+								var controls;
+								controls = obj.aData.lookupSecurityPriceGroup.lookupCode;
+								controls += '<input type="hidden" name="priceGroupSetups[' + obj.iDataRow + '].lookupSecurityPriceGroup.lookupCode" value="' + obj.aData.lookupSecurityPriceGroup.lookupCode + '" />';
+								controls += '<input type="hidden" name="priceGroupSetups[' + obj.iDataRow + '].lookupSecurityPriceGroup.lookupId" value="' + obj.aData.lookupSecurityPriceGroup.lookupId + '" />';
+								controls += '<input type="hidden" name="priceGroupSetups[' + obj.iDataRow + '].lookupSecurityPriceGroup.lookupDescription" value="' + obj.aData.lookupSecurityPriceGroup.lookupDescription + '" />';
+								return controls;
+							}
+						},
+						{
+							fnRender: function(obj) {
+				            	   var controls;
+				            	   controls = '<center><input id="deleteButton" type="button" value="Delete" #{if readOnly}disabled="disabled"#{/if} /></center>';
+				            	   controls += '<input type="hidden" name="priceGroupSetups[' + obj.iDataRow + '].id.custodyAccountKey" value="' + obj.aData.id.custodyAccountKey + '" />';
+								   controls += '<input type="hidden" name="priceGroupSetups[' + obj.iDataRow + '].id.securityType" value="' + obj.aData.id.securityType + '" />';
+								   controls += '<input type="hidden" name="priceGroupSetups[' + obj.iDataRow + '].id.securityPriceGroup" value="' + obj.aData.id.securityPriceGroup + '" />';
+				            	   return controls;
+				               }
+						}
+	               	   ],
+	        aaSorting: [[1, 'asc']],
+	        bAutoWidth: false,
+	        bDestroy: true,
+	        bJQueryUI: true,
+	        bLengthChange: false,
+	        sPaginationType: 'full_numbers',
+	        bInfo: true,
+	        bPaginate: true,
+	        iDisplayLength:10
+		});
+		
+		$('#detailSpecSecTypeForm #closeSpecSecType').click(function() {
+			$('#detailSpecSecTypeForm').dialog('close');
+		});
+		
+		$('#detailSpecSecTypeForm #cancelSpecSecType').click(function() {
+			$('#detailSpecSecTypeForm').dialog('close');
+		});
+		
+		$( "#detailSpecSecTypeForm" ).dialog({
+			autoOpen:false,
+			heigth:'250px',
+			width:'550px',
+			resizable:false,
+			modal:true			
+		});
+		
+		$('#addSpecPrice').click(function(){
+			$('#securityTypeCode').val('');
+			$('#securityTypeDesc').val('');
+			$('#groupCode').val('');
+			$('#groupCodeId').val('');
+			$('#groupCodeName').val('');
+			$('.error').html('');
+			$('#rowPosition').val('');
+			$('#securityTypeCode').removeClass('fieldError');
+			$('#groupCode').removeClass('fieldError');
+			$('#detailSpecSecTypeForm').dialog('open');
+			$('.ui-widget-overlay').css('height',$('body').height());
+		});
+		
+		/* $('#securityType').lookup({
+			list:'@{Pick.securityTypes()}',
+			get: {
+				url:'@{Pick.securityType()}',
+				success: function(data) {
+					$('#errmsgLookupSecPrice').html('')
+					var rows = tableSecurityPrice.fnGetNodes().length;
+					var found = false;
+					// Checked Duplicate Row
+					for (i = 0; i < rows; i++) {
+						var cell = tableSecurityPrice.fnGetData(i);
+						if (data.code == cell.securityType) {
+							$('#errmsgLookupSecPrice').html('*Error Found! Security type "'+(data.code)+'" is already exist');
+							found = true;
+							break;
+						} else {
+							$('#errmsgLookupSecPrice').html("");
+						}
+					}
+					// If No Duplicate, Then Add New Row
+					if (!found) {
+						var dataSecurityPrice = new Object();
+						dataSecurityPrice.securityType = data.code;
+						dataSecurityPrice.description = data.description;
+						tableSecurityPrice.fnAddData(dataSecurityPrice);	
+					}
+					$('#securityType').val('');
+				},
+				error: function() {
+					console.debug( '>>>> masuk error');
+					$('#securityType').val('');
+				}						
+			},
+			help:$('#addSpecPrice')
+		}); */
+		
+		// ------ Delete Row For Security Price ----- //
+ 		$('#gridSecurityPrice tbody tr #deleteButton').live('click', function() {
+			var row = $(this).parents('tr');
+			var rowNumber = tableSecurityPrice.fnGetPosition(row[0]);
+			var deleteSecurityPrice = function(){
+				tableSecurityPrice.fnDeleteRow(rowNumber);
+				var idTable = $("#gridSecurityPrice");
+				var trs = $("tr", idTable);
+				$.each(trs, function(idx, data){
+					var hiddens = $("[type=hidden]", $(this));
+						$(hiddens).eq(0).attr("name", "priceGroupSetups["+(idx-2)+"].securityType.securityType");
+						$(hiddens).eq(1).attr("name", "priceGroupSetups["+(idx-2)+"].securityType.description");
+						$(hiddens).eq(2).attr("name", "priceGroupSetups["+(idx-2)+"].lookupSecurityPriceGroup.lookupCode");
+						$(hiddens).eq(3).attr("name", "priceGroupSetups["+(idx-2)+"].lookupSecurityPriceGroup.lookupId");
+						$(hiddens).eq(4).attr("name", "priceGroupSetups["+(idx-2)+"].lookupSecurityPriceGroup.lookupDescription");
+						$(hiddens).eq(5).attr("name", "priceGroupSetups["+(idx-2)+"].id.custodyAccountKey");
+						$(hiddens).eq(6).attr("name", "priceGroupSetups["+(idx-2)+"].id.securityType");
+						$(hiddens).eq(7).attr("name", "priceGroupSetups["+(idx-2)+"].id.securityPriceGroup");
+						
+				});
+				$("#dialog-message").dialog("close");
+			}
+			/* $("#dialog-message-2").dialog({
+				autoOpen:false,
+				height:120,
+				width:250,
+				modal:true,
+				resizable : false,
+				buttons: {
+					"Yes": function() {
+						tableSecurityPrice.fnDeleteRow(rowNumber);
+						var idTable = $("#gridSecurityPrice");
+						var trs = $("tr", idTable);
+						$.each(trs, function(idx, data){
+							var hiddens = $("[type=hidden]", $(this));
+								$(hiddens).eq(0).attr("name", "priceGroupSetups["+(idx-2)+"].securityType.securityType");
+								$(hiddens).eq(1).attr("name", "priceGroupSetups["+(idx-2)+"].securityType.description");
+								$(hiddens).eq(2).attr("name", "priceGroupSetups["+(idx-2)+"].lookupSecurityPriceGroup.lookupCode");
+								$(hiddens).eq(3).attr("name", "priceGroupSetups["+(idx-2)+"].lookupSecurityPriceGroup.lookupId");
+								$(hiddens).eq(4).attr("name", "priceGroupSetups["+(idx-2)+"].lookupSecurityPriceGroup.lookupDescription");
+								$(hiddens).eq(5).attr("name", "priceGroupSetups["+(idx-2)+"].id.custodyAccountKey");
+								$(hiddens).eq(6).attr("name", "priceGroupSetups["+(idx-2)+"].id.securityType");
+								$(hiddens).eq(7).attr("name", "priceGroupSetups["+(idx-2)+"].id.securityPriceGroup");
+								
+						});
+						$("#dialog-message-2").dialog("close");
+						
+					},
+					"No ": function() {
+						$("#dialog-message-2").dialog("close");
+					}	
+				}
+			});
+			$('#dialog-message-2').css('overflow','hidden');
+			$("#dialog-message-2").dialog('open'); */
+			
+			messageAlertYesNo("Are you sure to delete data ?", "ui-icon ui-icon-notice", "Confirmation Message", deleteSecurityPrice, closeDialog);
+		});
+		
+		//$('#gridSecurityPrice tbody tr').die('click');
+		
+		
+		// ADD SPECIFIC SECURITY TYPE INTO GRID
+		$('#saveSpecSecType').die("click");
+		$('#saveSpecSecType').live("click", function(){
+			var securityType = $('#detailSpecSecTypeForm #specSecTypeForm #securityTypeCode').val();
+			var groupCode = $('#detailSpecSecTypeForm #specSecTypeForm #groupCode').val();
+			var rowPosition = $('#detailSpecSecTypeForm #specSecTypeForm #rowPosition').val();
+			
+			var oldSecurityType = $('#detailSpecSecTypeForm #specSecTypeForm #oldSecurityTypeCode').val();
+			var newSecurityType = $('#detailSpecSecTypeForm #specSecTypeForm #newSecurityTypeCode').val();
+			var oldGroupCode = $('#detailSpecSecTypeForm #specSecTypeForm #oldGroupCode').val();
+			var newGroupCode = $('#detailSpecSecTypeForm #specSecTypeForm #newGroupCode').val();
+		
+			//validate
+			if (($('#detailSpecSecTypeForm #specSecTypeForm #securityTypeCode').hasClass('fieldError'))||
+				($('#detailSpecSecTypeForm #specSecTypeForm #groupCode').hasClass('fieldError'))) {
+				return false;
+			}
+			
+			if (($('#detailSpecSecTypeForm #specSecTypeForm #securityTypeCode').val()=='') ||
+				($('#detailSpecSecTypeForm #specSecTypeForm #groupCode').val()=='')) {
+				if ($('#detailSpecSecTypeForm #specSecTypeForm #securityTypeCode').val()==''){
+					$('#errSecTypeCode').html('Required');
+				} else {
+					$('#errSecTypeCode').html('');
+				}
+				
+				if ($('#detailSpecSecTypeForm #specSecTypeForm #groupCode').val()==''){
+					$('#errGroupCode').html('Required');
+				} else {
+					$('#errGroupCode').html('');
+				}
+				
+				return false;
+			}
+			// ADD FOR EDIT
+			var dataSecType = tableSecurityPrice.fnGetData(parseFloat(rowPosition));
+			if (rowPosition != "") {
+				var found = false;
+				var rows = tableSecurityPrice.fnGetNodes().length;
+				for (i=0; i<rows; i++) {
+					 var cells = tableSecurityPrice.fnGetData(i);
+						if((cells.securityType.securityType == securityType)&&
+							(rowPosition != i)){
+							//alert("Data Already Exist");
+							$('#detailSpecSecTypeForm #specSecTypeForm #securityTypeCode').addClass('fieldError');
+							//$('#detailSpecSecTypeForm #specSecTypeForm #groupCode').addClass('fieldError');
+							$('#errDupSecType').html('Data already exist!');
+							found = true;
+							return false;
+							break;
+						} else {
+							$('#detailSpecSecTypeForm #specSecTypeForm #securityTypeCode').removeClass('fieldError');
+							//$('#detailSpecSecTypeForm #specSecTypeForm #groupCode').removeClass('fieldError');
+							$('#errDupSecType').html('');
+						}
+				} 
+				
+				if (!found){
+					
+					tableSecurityPrice.fnUpdate(((dataSecType.securityType.securityType = $('#detailSpecSecTypeForm #specSecTypeForm #securityTypeCode').val())
+							&& (dataSecType.securityType.description = $('#detailSpecSecTypeForm #specSecTypeForm #securityTypeDesc').val())),
+							parseFloat(rowPosition), 0);
+					tableSecurityPrice.fnUpdate(((dataSecType.lookupSecurityPriceGroup.lookupCode = $('#detailSpecSecTypeForm #specSecTypeForm #groupCode').val())
+							&& (dataSecType.lookupSecurityPriceGroup.lookupId = $('#detailSpecSecTypeForm #specSecTypeForm #groupCodeId').val())
+							&& (dataSecType.lookupSecurityPriceGroup.lookupDescription = $('#detailSpecSecTypeForm #specSecTypeForm #groupCodeName').val()))
+							, parseFloat(rowPosition), 1);
+					
+					dataSecType.id.custodyAccountKey = $('#detailSpecSecTypeForm #specSecTypeForm #accountKey').val();
+					dataSecType.id.securityType = $('#detailSpecSecTypeForm #specSecTypeForm #secType').val();
+					dataSecType.id.securityPriceGroup = $('#detailSpecSecTypeForm #specSecTypeForm #secPriceGroup').val();
+					$('#detailSpecSecTypeForm').dialog('close');
+				}
+			} else {
+				var found = false;
+				var rows = tableSecurityPrice.fnGetNodes().length;
+				for (i=0; i<rows; i++) {
+					 var cells = tableSecurityPrice.fnGetData(i);
+						if((cells.securityType.securityType == securityType)){
+							$('#detailSpecSecTypeForm #specSecTypeForm #securityTypeCode').addClass('fieldError');
+							//$('#detailSpecSecTypeForm #specSecTypeForm #groupCode').addClass('fieldError');
+							$('#errDupSecType').html('Data already exist!');
+							found = true;
+							return false;
+							break;
+						} else {
+							$('#detailSpecSecTypeForm #specSecTypeForm #securityTypeCode').removeClass('fieldError');
+							//$('#detailSpecSecTypeForm #specSecTypeForm #groupCode').removeClass('fieldError');
+							$('#errDupSecType').html('');
+						}
+				} 
+				
+				// ADD FOR NEW DATA
+				if (!found){
+					var dataSecType = new Object();
+					dataSecType.id = new Object();
+					dataSecType.securityType = new Object();
+					dataSecType.lookupSecurityPriceGroup = new Object();
+					dataSecType.id.custodyAccountKey = $('#detailSpecSecTypeForm #specSecTypeForm #accountKey').val();
+					dataSecType.id.securityType = $('#detailSpecSecTypeForm #specSecTypeForm #secType').val();
+					dataSecType.id.securityPriceGroup = $('#detailSpecSecTypeForm #specSecTypeForm #secPriceGroup').val();
+					dataSecType.securityType.securityType = $('#detailSpecSecTypeForm #specSecTypeForm #securityTypeCode').val();
+					dataSecType.securityType.description = $('#detailSpecSecTypeForm #specSecTypeForm #securityTypeDesc').val();
+					dataSecType.lookupSecurityPriceGroup.lookupCode = $('#detailSpecSecTypeForm #specSecTypeForm #groupCode').val();
+					dataSecType.lookupSecurityPriceGroup.lookupId = $('#detailSpecSecTypeForm #specSecTypeForm #groupCodeId').val();
+					dataSecType.lookupSecurityPriceGroup.lookupDescription = $('#detailSpecSecTypeForm #specSecTypeForm #groupCodeName').val();
+					tableSecurityPrice.fnAddData(dataSecType);
+					$('#detailSpecSecTypeForm').dialog('close');
+				}
+			}
+			
+			return false;
+		});
+				
+		
+		// EDIT FOR DETAIL SPECIFIC SECURITY TYPE
+		$('#listSecPrice #gridSecurityPrice').removeAttr('style');
+		$('#listSecPrice #gridSecurityPrice tbody tr td').die('click');
+		$('#listSecPrice #gridSecurityPrice tbody tr td').live('click', function(){
+			var rowPos = $(this).parents('tr');
+			var rowPosNumber = tableSecurityPrice.fnGetPosition(rowPos[0]);
+			// if empty table
+			if( rowPosNumber == null ){
+				return;
+			}
+			var pos = tableSecurityPrice.fnGetPosition(this);
+			cell = tableSecurityPrice.fnGetData(this.parentNode);
+			if (pos[1] != 2) {
+				dataSecType = tableSecurityPrice.fnGetData(this.parentNode);
+				$('#detailSpecSecTypeForm #specSecTypeForm #rowPosition').val(rowPosNumber);
+				$('#detailSpecSecTypeForm #specSecTypeForm #accountKey').val(dataSecType.id.custodyAccountKey);
+				$('#detailSpecSecTypeForm #specSecTypeForm #secType').val(dataSecType.id.securityType);
+				$('#detailSpecSecTypeForm #specSecTypeForm #secPriceGroup').val(dataSecType.id.securityPriceGroup);
+				$('#detailSpecSecTypeForm #specSecTypeForm #securityTypeCode').val(dataSecType.securityType.securityType);
+				$('#detailSpecSecTypeForm #specSecTypeForm #securityTypeDesc').val(dataSecType.securityType.description);
+				$('#detailSpecSecTypeForm #specSecTypeForm #groupCode').val(dataSecType.lookupSecurityPriceGroup.lookupCode);
+				$('#detailSpecSecTypeForm #specSecTypeForm #groupCodeId').val(dataSecType.lookupSecurityPriceGroup.lookupId);
+				$('#detailSpecSecTypeForm #specSecTypeForm #groupCodeName').val(dataSecType.lookupSecurityPriceGroup.lookupDescription);
+				$('#detailSpecSecTypeForm #specSecTypeForm #oldSecurityTypeCode').val($('#detailSpecSecTypeForm #specSecTypeForm #securityTypeCode'));
+				$('#detailSpecSecTypeForm #specSecTypeForm #newSecurityTypeCode').val($('#detailSpecSecTypeForm #specSecTypeForm #oldSecurityTypeCode'));
+				$('#detailSpecSecTypeForm #specSecTypeForm #oldGroupCode').val($('#detailSpecSecTypeForm #specSecTypeForm #groupCode'));
+				$('#detailSpecSecTypeForm #specSecTypeForm #newGroupCode').val($('#detailSpecSecTypeForm #specSecTypeForm #oldGroupCode'));
+				
+				$('#detailSpecSecTypeForm').dialog('open');
+				$('.ui-widget-overlay').css('height',$('body').height());
+			}
+		});
+		
+		
+		// ========== END OF SECTION TAB SECURITY PRICE ========= //
+		
+		
+		// =========== SECTION TAB SETTLEMENT ACCOUNT ========== //
+		var tableSettlement = 
+			$('#gridSettlementAccount').dataTable({
+				aaData:bankAccounts,
+				aoColumns:[ 
+				               {
+				            	   bVisible:false,
+				            	   mDataProp:'bankAccountKey'
+					
+								},
+								{
+									 fnRender: function(obj) {
+										  var controls;
+										  controls = obj.aData.accountNo;
+										  controls += '<input type="hidden" name="bankAccounts[' + obj.iDataRow + '].accountNo" value="' + obj.aData.accountNo + '" />';
+										  return controls;
+									  }
+								},
+								{
+									fnRender: function(obj) {
+										  var controls;
+										  if (obj.aData.bankCode != null) {
+											  controls = obj.aData.bankCode.thirdPartyName;
+											  controls += '<input type="hidden" name="bankAccounts[' + obj.iDataRow + '].bankCode.thirdPartyCode" value="' + obj.aData.bankCode.thirdPartyCode + '" />';
+										  } else {
+											  controls = "";
+											  controls += '<input type="hidden" name="bankAccounts[' + obj.iDataRow + '].bankCode.thirdPartyCode" value="" />';
+										  }
+										  return controls;
+									  }
+								},
+								{
+									fnRender: function(obj) {
+										  var controls;
+										  controls = obj.aData.name;
+										  controls += '<input type="hidden" name="bankAccounts[' + obj.iDataRow + '].name" value="' + obj.aData.accountNo + '" />';
+										  return controls;
+									  }
+								},
+								{
+									 fnRender: function(obj) {
+										  var controls;
+										  var waive = "Yes";
+										  if(obj.aData.paymentCharge<0||obj.aData.paymentCharge==null) waive = "No";
+										  controls = waive;
+										  controls += '<input type="hidden" name="bankAccounts[' + obj.iDataRow + '].paymentCharge" value="' + obj.aData.paymentCharge + '" />';
+										  return controls;
+									  }
+								},
+								{
+									fnRender: function(obj) {
+						            	   var controls;
+						            	   var radios = $("[type=radio]", $('#gridSettlementAccount tbody'));
+						            	   if (radios.html() == null) {
+						            		   $('#settlementAcc').val(obj.aData.bankAccountKey);
+						            		   controls = '<center><input type="radio" id="radio'+obj.aData.bankAccountKey+'" name="account.settlementAccount" value="'+obj.aData.bankAccountKey+'" checked="checked" #{if readOnly}disabled="disabled"#{/if}/></center>';
+						            	   } else {
+							            		/* if (obj.aData.bankAccountKey == '${account?.settlementAccount?.bankAccountKey}') {
+							            		   controls = '<center><input type="radio" id="radio'+obj.aData.bankAccountKey+'" name="account.settlementAccount" value="'+obj.aData.bankAccountKey+'" checked="checked" #{if readOnly}disabled="disabled"#{/if}/></center>';
+							            	   } else {
+							            	   	   controls = '<center><input type="radio" id="radio'+obj.aData.bankAccountKey+'" name="account.settlementAccount" value="'+obj.aData.bankAccountKey+'" #{if readOnly}disabled="disabled"#{/if}/></center>';
+							            	   } */
+							            	   
+							            	   if (obj.aData.bankAccountKey == $('#settlementAcc').val()) {
+							            		   controls = '<center><input type="radio" id="radio'+obj.aData.bankAccountKey+'" name="account.settlementAccount" value="'+obj.aData.bankAccountKey+'" checked="checked" #{if readOnly}disabled="disabled"#{/if}/></center>';
+							            	   } else {
+							            	   	   controls = '<center><input type="radio" id="radio'+obj.aData.bankAccountKey+'" name="account.settlementAccount" value="'+obj.aData.bankAccountKey+'" #{if readOnly}disabled="disabled"#{/if}/></center>';
+							            	   }
+						            	   }
+						            	   return controls;
+						               }
+								},
+								{
+									fnRender: function(obj) {
+						            	   var controls;
+						            	   controls = '<center><input id="deleteButton" type="button" value="Delete" #{if readOnly}disabled="disabled"#{/if} /></center>';
+						            	   controls += '<input type="hidden" name="bankAccounts[' + obj.iDataRow + '].bankAccountKey" value="' + obj.aData.bankAccountKey + '" />';
+						            	   return controls;
+						               }
+								}
+							 ],
+				aaSorting: [[1, 'asc']],
+				bAutoWidth: false,
+				bDestroy: true,
+				bJQueryUI: true,
+				bLengthChange: false,
+				sPaginationType: 'full_numbers',
+				bInfo: true,
+				bPaginate: true,
+				iDisplayLength:10                						
+		});
+		
+		
+		
+		// ----- Process Add Settlement Account with Lookup ----- //
+		$('#bankAccountKey').lookup({
+			list:'@{Pick.bankAccounts()}?by=customer2&domain=CUSTOMER',
+			get:{
+				url:'@{Pick.bankAccountForSettlementAccountPickByCustomerKey()}?domain=CUSTOMER',
+				//url:'@{Pick.bankAccountForSettlementAccountPick()}',
+				success: function(data) {
+					console.debug( ' >>>> masuk success, code = ' + data.code + '; desc = ' + data.description + ' ; bankCode = ' +data.thirdPartyCode);
+					var rows = tableSettlement.fnGetNodes().length;
+					var found = false;
+
+					// Checked Duplicate Row
+					for (i = 0; i < rows; i++) {
+						var cell = tableSettlement.fnGetData(i);
+						if (data.code == cell.bankAccountKey) {
+							$('#errmsgSettleAcc').html('*Error Found! Bank Account No "'+(data.bankAccountNo)+'" is already exist');
+							found = true;
+							break;
+						} else {
+							$('#errmsgSettleAcc').html('');
+						}
+					}
+
+					// If No Duplicate, Then Add New Row
+					if (!found) {
+						var dataBankAccount = new Object();
+						dataBankAccount.bankCode = new Object();
+						dataBankAccount.bankAccountKey = data.code;
+						dataBankAccount.accountNo = data.bankAccountNo;
+						dataBankAccount.name = data.description;
+						dataBankAccount.bankCode.thirdPartyCode = data.thirdPartyCode;
+						dataBankAccount.bankCode.thirdPartyName = data.thirdPartyName;
+						dataBankAccount.paymentCharge = data.paymentCharge;
+						tableSettlement.fnAddData(dataBankAccount);
+						$("#errmsgDelSettleAcc").html('');
+					}
+
+					$('#bankAccountKey').val('');
+				},
+				error: function() {
+					$('#bankAccountKey').val('');
+				}	
+			},
+			help:$('#addBank'),
+			filter:'${custKey}'					
+		});		
+		
+
+		$('input[name=account.settlementAccount]').live('change',function(){
+			$('#errmsgDelSettleAcc').html('');
+			var radios = $("[type=radio]", $(this).parents('tr td'));
+			$('#settlementAcc').val($(radios).val());
+		});
+		
+		$('input[name=account?.isFundGuarantee]').live('change',function(){
+			if ($(this).val() == "true") {
+				$("#danaJaminanYNHidden").val(true);
+				$("#danaJaminanTypeId label span").html(" *");
+				$("#danaJaminanType").addClass('fieldError');
+				$("#danaJaminanTypeError").html("Required");
+				$("#danaJaminanType").attr("disabled","");
+			}else {
+				$("#danaJaminanYNHidden").val(false);
+				$("#danaJaminanTypeId label span").html(" ");
+				$("#danaJaminanType").removeClass('fieldError');
+				$("#danaJaminanTypeError").html("");
+				$("#danaJaminanType").val("");
+				$("#danaJaminanType").attr("disabled","disabled");
+			}
+		});
+		
+		
+		if ($('#danaJaminanYNHidden').val() == "true") {
+			$("#danaJaminanTypeId label span").html(" *");
+		}else {
+			$("#danaJaminanTypeId label span").html(" ");
+			$("#danaJaminanTypeError").html("");
+			$("#danaJaminanType").attr("disabled","disabled");
+		}
+		
+		$("#danaJaminanType").blur(function(){
+			if ($(this).val() != "") {
+				$("#danaJaminanType").removeClass('fieldError');
+				$("#danaJaminanTypeError").html(' ');
+				if ($(this).val() == "FUND_GUARANTEE_TYPE-1") {
+					$('#danaJaminanTypeCode').val('${fundGuaranteeType1.lookupCode}');
+					$('#danaJaminanTypeDescription').val('${fundGuaranteeType1.lookupDescription}');
+				}
+				
+				if ($(this).val() == "FUND_GUARANTEE_TYPE-2") {
+					$('#danaJaminanTypeCode').val('${fundGuaranteeType2.lookupCode}');
+					$('#danaJaminanTypeDescription').val('${fundGuaranteeType2.lookupDescription}');
+				}
+			}
+		});
+		
+		$("#portfolioReport").blur(function(){
+			if ($(this).val() != "") {
+				$("#portfolioReport").removeClass('fieldError');
+				$("#portfolioReportError").html(' *');  
+				if ($(this).val() == "PORTFOLIO_REPORT-1") {
+					$('#portfolioReporteCode').val('${portfolioReport1.lookupCode}');
+					$('#portfolioReportDescription').val('${portfolioReport1.lookupDescription}');
+				}
+				
+				if ($(this).val() == "PORTFOLIO_REPORT-2") {
+					$('#portfolioReporteCode').val('${portfolioReport2.lookupCode}');
+					$('#portfolioReportDescription').val('${portfolioReport2.lookupDescription}');
+				}
+				
+			}else {
+				$("#portfolioReport").addClass('fieldError');
+				$("#portfolioReportError").html("Required");
+			}
+		});
+		
+		// -----Delete Row For Bank Account Settlement Account ---- //
+		$('#gridSettlementAccount tbody tr #deleteButton').live('click', function() {
+			var row = $(this).parents('tr');
+			var rowNumber = tableSettlement.fnGetPosition(row[0]);
+			var data = tableSettlement.fnGetData(row[0]);
+			var deleteSettlementAccount = function() {
+				if (data.bankAccountKey == $('#settlementAcc').val()){
+					$('#errmsgDelSettleAcc').html("Cannot Delete Default Bank Account");
+					$("#dialog-message").dialog("close");
+					return false;
+				} else {
+					$('#errmsgDelSettleAcc').html("");
+				}
+				tableSettlement.fnDeleteRow(rowNumber);
+				var idTable = $("#tabs-3 #gridSettlementAccount");
+				var trs = $("tr", idTable);
+				$.each(trs, function(idx, data){
+					var hiddens = $("[type=hidden]", $(this));
+						$(hiddens).eq(0).attr("name", "bankAccounts["+(idx-2)+"].accountNo");
+						$(hiddens).eq(1).attr("name", "bankAccounts["+(idx-2)+"].name");
+						$(hiddens).eq(2).attr("name", "bankAccounts["+(idx-2)+"].bankCode.thirdPartyCode");
+						$(hiddens).eq(3).attr("name", "bankAccounts["+(idx-2)+"].bankAccountKey");
+				});
+				$("#dialog-message").dialog("close");
+			}
+			/* $("#dialog-message-2").dialog({
+				autoOpen:false,
+				height:120,
+				width:250,
+				modal:true,
+				resizable : false,
+				buttons: {
+					"Yes": function() {
+						if (data.bankAccountKey == $('#settlementAcc').val()){
+							$('#errmsgDelSettleAcc').html("Cannot Delete Default Bank Account");
+							$("#dialog-message-2").dialog("close");
+							return false;
+						} else {
+							$('#errmsgDelSettleAcc').html("");
+						}
+						tableSettlement.fnDeleteRow(rowNumber);
+						var idTable = $("#tabs-3 #gridSettlementAccount");
+						var trs = $("tr", idTable);
+						$.each(trs, function(idx, data){
+							var hiddens = $("[type=hidden]", $(this));
+								$(hiddens).eq(0).attr("name", "bankAccounts["+(idx-2)+"].accountNo");
+								$(hiddens).eq(1).attr("name", "bankAccounts["+(idx-2)+"].name");
+								$(hiddens).eq(2).attr("name", "bankAccounts["+(idx-2)+"].bankCode.thirdPartyCode");
+								$(hiddens).eq(3).attr("name", "bankAccounts["+(idx-2)+"].bankAccountKey");
+						});
+						$("#dialog-message-2").dialog("close");
+						
+					},
+					"No ": function() {
+						$("#dialog-message-2").dialog("close");
+					}	
+				}
+			});
+			$('#dialog-message-2').css('overflow','hidden');
+			$("#dialog-message-2").dialog('open'); */
+			messageAlertYesNo("Are you sure to delete data ?", "ui-icon ui-icon-notice", "Confirmation Message", deleteSettlementAccount, closeDialog);
+		});
+		
+		var lookupSettlementAccount =
+			$('#forLookupSettlementAccount').dataTable({
+				aoColumnDefs:[ {bVisible:false,aTargets:[0]},
+							   {bSortable:false,aTargets:[1,2,3]}
+							 ],
+								aaSorting: [[1, 'asc']],
+								bAutoWidth: false,
+								bDestroy: true,
+								bJQueryUI: true,
+								bLengthChange: false,
+								sPaginationType: 'full_numbers',
+								bInfo: true,
+								bPaginate: true,
+								iDisplayLength:7 
+		});
+		
+		// ===== END OF SECTION TAB SETTLEMENT ACCOUNT ===== //
+		
+		// ============ SECTION TAB CHARGE INVOICE ============ //
+		var tableChargeInvoice = 
+			$('#gridChargeInvoice').dataTable({
+				aaData: accountCharges,
+				aoColumns: [ 
+				             {
+					             fnRender: function(obj) {
+									  	var controls;
+											controls = obj.aData.invoiceCharge.lookupDescription;
+											controls += '<input type="hidden" name="accountCharges[' + obj.iDataRow + '].invoiceCharge.lookupDescription" value="' + obj.aData.invoiceCharge.lookupDescription + '" />';
+											controls += '<input type="hidden" name="accountCharges[' + obj.iDataRow + '].invoiceCharge.lookupId" value="' + obj.aData.invoiceCharge.lookupId + '" />';
+											return controls;
+								 }
+				             },
+				             {
+					             fnRender: function(obj) {
+									  	var controls;
+											controls = obj.aData.taxMaster.taxCode;
+											controls += '<input type="hidden" name="accountCharges[' + obj.iDataRow + '].taxMaster.taxCode" value="' + obj.aData.taxMaster.taxCode + '" />';
+											controls += '<input type="hidden" name="accountCharges[' + obj.iDataRow + '].taxMaster.taxKey" value="' + obj.aData.taxMaster.taxKey + '" />';
+											controls += '<input type="hidden" name="accountCharges[' + obj.iDataRow + '].taxMaster.description" value="' + obj.aData.taxMaster.description + '" />';
+									  	return controls;
+								 }
+				             },
+							 {
+				            	 sClass: 'numeric',
+								 fnRender: function(obj) {
+									  	var controls;
+											//controls = obj.aData.minimumValue;
+											controls = $('#dummy').autoNumericSet( obj.aData.minimumValue, {aPad:true,mDec:2}).val();
+											controls += '<input type="hidden" name="accountCharges[' + obj.iDataRow + '].minimumValue" value="' + obj.aData.minimumValue + '" />';
+									  	return controls;
+								 }
+							 },
+							 {
+				                	sClass: 'numeric',
+					            	fnRender: function(obj) {
+					            		var controls;
+					            		if ((obj.aData.maximumValue == null) || (obj.aData.maximumValue == "")|| (obj.aData.maximumValue == "MAX")){
+					            			controls = "MAX";
+					            		} else {
+					            			controls = $('#dummy').autoNumericSet(obj.aData.maximumValue, {aPad:true,mDec:2}).val();
+					            			controls += '<input type="hidden" name="accountCharges[' + obj.iDataRow + '].maximumValue" value="' + obj.aData.maximumValue + '" />';
+					            			
+					            		}
+					            		
+					            		return controls;
+					            	}
+							},
+							{
+								fnRender: function(obj) {
+							 	var controls;
+							 	controls = '<center><input id="deleteButton" type="button" value="delete" #{if readOnly}disabled="disabled"#{/if} /></center>';
+							 	controls += '<input type="hidden" name="accountCharges[' + obj.iDataRow + '].accountChargeKey" value="' + obj.aData.accountChargeKey + '" />';
+							// 	controls += '<input type="hidden" name="accountCharges[' + obj.iDataRow + '].account.custodyAccountKey" value="' + obj.aData.account.custodyAccountKey + '" />';
+							 	return controls;
+							 				
+							 	}
+							  }
+							],
+							aaSorting: [[1, 'asc']],
+							bAutoWidth: false,
+							bDestroy: true,
+							bJQueryUI: true,
+							bLengthChange: false,
+							sPaginationType: 'full_numbers',
+							bInfo: true,
+							bPaginate: true,
+							iDisplayLength:7               						
+		});
+		
+		// ---- Process when click in grid data ---- //
+		$('#listChargeInvoice #gridChargeInvoice').removeAttr('style');
+		$('#listChargeInvoice #gridChargeInvoice tbody tr td').die('click');
+		$('#listChargeInvoice #gridChargeInvoice tbody tr td').live('click', function(){
+			var rowPos= $(this).parents('tr');
+			var rowPosNumber = tableChargeInvoice.fnGetPosition(rowPos[0]);
+			if( rowPosNumber == null ){
+				return;
+			}
+			var pos = tableChargeInvoice.fnGetPosition(this);
+			if (pos[1] != 4) {
+				dataChargeInvoice = tableChargeInvoice.fnGetData(this.parentNode);
+				$("#detailChargeInvoice #chargeInvoiceForm #chargeGroup").attr("disabled","disabled");
+				$("#detailChargeInvoice #chargeInvoiceForm #rowPosition").val(rowPosNumber);
+				$("#detailChargeInvoice #chargeInvoiceForm #accountChargeKey").val(dataChargeInvoice.accountChargeKey);
+				//$("#detailChargeInvoice #chargeInvoiceForm #custodyAccountKey").val(dataChargeInvoice.account.custodyAccountKey);
+				$("#detailChargeInvoice #chargeInvoiceForm #chargeGroup").val(dataChargeInvoice.invoiceCharge.lookupId);
+				$("#detailChargeInvoice #chargeInvoiceForm #chargeGroupDesc").val(dataChargeInvoice.invoiceCharge.lookupDescription);
+				$("#detailChargeInvoice #chargeInvoiceForm #minCharge").autoNumericSet( dataChargeInvoice.minimumValue, {aPad:true,mDec:2}).val();
+				if((dataChargeInvoice.maximumValue==null) || (dataChargeInvoice.maximumValue=="")) {
+					$("#detailChargeInvoice #chargeInvoiceForm #maxCharge").val("");
+					#{if confirming}
+						$("#detailChargeInvoice #chargeInvoiceForm #maxCharge").val("MAX");
+					#{/if}
+				} else {
+					$("#detailChargeInvoice #chargeInvoiceForm #maxCharge").autoNumericSet( dataChargeInvoice.maximumValue, {aPad:true,mDec:2}).val();
+				} 
+				
+				$("#detailChargeInvoice #chargeInvoiceForm #minChargeStripped").val(dataChargeInvoice.minimumValue);
+				$("#detailChargeInvoice #chargeInvoiceForm #maxChargeStripped").val(dataChargeInvoice.maximumValue);
+				$("#detailChargeInvoice #chargeInvoiceForm #taxCode").val(dataChargeInvoice.taxMaster.taxCode);
+				$("#detailChargeInvoice #chargeInvoiceForm #taxKey").val(dataChargeInvoice.taxMaster.taxKey);
+				$("#detailChargeInvoice #chargeInvoiceForm #taxName").val(dataChargeInvoice.taxMaster.description);
+				//editChargeInvoice(pos[0]);
+				$("#detailChargeInvoice").dialog('open');
+				$('.ui-widget-overlay').css('height',$('body').height());
+			}
+		});
+		
+		// ----- Declare dialog box for input data Charge Invoice ---- //
+		$( "#detailChargeInvoice" ).dialog({
+			autoOpen:false,
+			heigth:'230px',
+			width:'580px',
+			resizable:false,
+			modal:true			
+		});
+		
+		// ------- Process When click button add charge invoice ---- //				
+		$('#addChargeInvoice').live('click', function() {
+			selectedRow = null;
+			$('#detailChargeInvoice #chargeInvoiceForm #chargeGroup').val("");
+			$('#chargeInvoiceForm #chargeGroup').attr('disabled', false);
+			$("#detailChargeInvoice").dialog('open');
+			$('.ui-widget-overlay').css('height',$('body').height());
+			$("#detailChargeInvoice input:text").val(""); 
+			$("#detailChargeInvoice input:hidden").val("");
+			$("#errmsgChargeGroup").html('');
+			$("#errmsgTaxCode").html('');
+			$("#errmsgMinCharge").html('');
+
+			return false;
+		});
+		
+		
+		// ---- Process Delete Charge Invoice in grid data --- //
+		$('#listChargeInvoice #gridChargeInvoice tbody tr #deleteButton').live('click', function() {
+			var row = $(this).parents('tr');
+			var rowNumber = tableChargeInvoice.fnGetPosition(row[0]);
+			var deleteChargeInvoice = function() {
+				tableChargeInvoice.fnDeleteRow(rowNumber);
+				var idTable = $("#listChargeInvoice #gridChargeInvoice");
+				var trs = $("tr", idTable);
+				$.each(trs, function(idx, data){
+					var hiddens = $("[type=hidden]", $(this));
+						$(hiddens).eq(0).attr("name", "accountCharges["+(idx-1)+"].invoiceCharge.lookupDescription");
+						$(hiddens).eq(1).attr("name", "accountCharges["+(idx-1)+"].invoiceCharge.lookupId");
+						$(hiddens).eq(2).attr("name", "accountCharges["+(idx-1)+"].taxMaster.taxCode");
+						$(hiddens).eq(3).attr("name", "accountCharges["+(idx-1)+"].taxMaster.taxKey");
+						$(hiddens).eq(4).attr("name", "accountCharges["+(idx-1)+"].taxMaster.description");
+						$(hiddens).eq(5).attr("name", "accountCharges["+(idx-1)+"].minimumValue");
+						$(hiddens).eq(6).attr("name", "accountCharges["+(idx-1)+"].maximumValue");
+						$(hiddens).eq(7).attr("name", "accountCharges["+(idx-1)+"].accountChargeKey");
+				});
+				$("#dialog-message").dialog("close");
+			}
+			/* $("#dialog-message-2").dialog({
+				autoOpen:false,
+				height:120,
+				width:250,
+				modal:true,
+				resizable : false,
+				buttons: {
+					"Yes": function() {
+						tableChargeInvoice.fnDeleteRow(rowNumber);
+						var idTable = $("#listChargeInvoice #gridChargeInvoice");
+						var trs = $("tr", idTable);
+						$.each(trs, function(idx, data){
+							var hiddens = $("[type=hidden]", $(this));
+								$(hiddens).eq(0).attr("name", "accountCharges["+(idx-1)+"].invoiceCharge.lookupDescription");
+								$(hiddens).eq(1).attr("name", "accountCharges["+(idx-1)+"].invoiceCharge.lookupId");
+								$(hiddens).eq(2).attr("name", "accountCharges["+(idx-1)+"].taxMaster.taxCode");
+								$(hiddens).eq(3).attr("name", "accountCharges["+(idx-1)+"].taxMaster.taxKey");
+								$(hiddens).eq(4).attr("name", "accountCharges["+(idx-1)+"].taxMaster.description");
+								$(hiddens).eq(5).attr("name", "accountCharges["+(idx-1)+"].minimumValue");
+								$(hiddens).eq(6).attr("name", "accountCharges["+(idx-1)+"].maximumValue");
+								$(hiddens).eq(7).attr("name", "accountCharges["+(idx-1)+"].accountChargeKey");
+						});
+						$("#dialog-message-2").dialog("close");
+						
+					},
+					"No ": function() {
+						$("#dialog-message-2").dialog("close");
+					}	
+				}
+			});
+			$('#dialog-message-2').css('overflow','hidden');
+			$("#dialog-message-2").dialog('open'); */
+			messageAlertYesNo("Are you sure to delete data ?", "ui-icon ui-icon-notice", "Confirmation Message", deleteChargeInvoice, closeDialog);
+		});
+		
+		// ----- All Adding Process in Charge Invoice in Dialog Box ---- //
+		$("#chargeInvoiceForm #chargeGroup").change(function() {
+			// SUBSTRING WHEN LOOKUPDESCRIPTION/OPTION FROM DROPDOWN SHOW ON DATATABLES SCREEN
+			var selected = $('#chargeInvoiceForm #chargeGroup').val();
+			var selectedText = $("#chargeInvoiceForm #chargeGroup option[value=" + selected + "]").text();
+			if (selectedText != '') {
+					selectedText = jQuery.trim(selectedText);
+					selectedText = selectedText.substring(jQuery.trim(selectedText).indexOf('-') + 1);
+			}
+			$("#contactForm #chargeGroupDesc").val(selectedText);
+			// END OF SUBSTRING
+			chargeGroupDescription = selectedText;
+			$('#chargeInvoiceForm #chargeGroupDesc').val(chargeGroupDescription);
+		});
+
+		// ------- Process When click button save charge invoice in dialog box ---- //			
+		$('#saveCharge').die("click");
+		$('#saveCharge').live("click", function(){
+			if ( ($("#detailChargeInvoice #chargeInvoiceForm #chargeGroup").val() == "")||($("#detailChargeInvoice #chargeInvoiceForm #taxCode").val()=="")
+					||( $("#detailChargeInvoice #chargeInvoiceForm #minCharge").val()=="")) {
+				
+				 if ( $("#detailChargeInvoice #chargeInvoiceForm #chargeGroup").val() == "") {
+					//alert("Max Range, Tax Code or Value can not be Empty! ")
+					$("#errmsgChargeGroup").html('Required');
+					
+				 } else {
+					 $("#errmsgChargeGroup").html('');
+				 }
+				 
+				
+				 if ($("#detailChargeInvoice #chargeInvoiceForm #taxCode").val()==""){
+					$("#errmsgTaxCode").html('Required');
+					
+				 } else {
+					 $("#errmsgTaxCode").html('');
+				 }
+				
+				 if ( $("#detailChargeInvoice #chargeInvoiceForm #minCharge").val()=="") {
+					$("#errmsgMinCharge").html('Required');
+					
+				 } else {
+					 $("#errmsgMinCharge").html('');
+				 }
+			
+				if ($("#detailChargeInvoice #chargeInvoiceForm #maxCharge").hasClass('fieldError')){
+					$("#detailChargeInvoice #chargeInvoiceForm #maxCharge").focus();
+					
+				} 
+				
+				return false;
+			} else {
+				$("#errmsgChargeGroup").html('');
+				$("#errmsgTaxCode").html('');
+				$("#errmsgMinCharge").html('');
+				var tableChargeInvoice = $('#listChargeInvoice #gridChargeInvoice').dataTable();
+				var rowPosition = $("#detailChargeInvoice #chargeInvoiceForm #rowPosition").val();
+				var rows = tableChargeInvoice.fnGetNodes().length;
+				var found = false;
+				for (i = 0; i < rows; i++) {
+					var cell = tableChargeInvoice.fnGetData(i);
+					if ((chargeGroupDescription == $(cell[0]).val() && rowPosition == "") ) {					
+						$("#detailChargeInvoice #chargeInvoiceForm #chargeGroup").addClass('fieldError');
+						$("#errmsgChargeGroup").html('Data already exist ');
+						found = true;
+						break;
+					} else {
+						$("#detailChargeInvoice #chargeInvoiceForm #chargeGroup").removeClass('fieldError');
+						$("#errmsgChargeGroup").html('');
+					}
+				}
+				
+				
+				
+				if (!found) {
+					if (rowPosition != "") {
+						var dataChargeInvoice = tableChargeInvoice.fnGetData(parseFloat(rowPosition));
+						tableChargeInvoice.fnUpdate(((dataChargeInvoice.invoiceCharge.lookupId = $("#detailChargeInvoice #chargeInvoiceForm #chargeGroup").val()) && (dataChargeInvoice.invoiceCharge.lookupDescription = $("#detailChargeInvoice #chargeInvoiceForm #chargeGroupDesc").val())) ,parseFloat(rowPosition),0);	
+						tableChargeInvoice.fnUpdate(((dataChargeInvoice.taxMaster.taxCode = $("#detailChargeInvoice #chargeInvoiceForm #taxCode").val()) && (dataChargeInvoice.taxMaster.taxKey = $("#detailChargeInvoice #chargeInvoiceForm #taxKey").val()) && (dataChargeInvoice.taxMaster.description = $("#detailChargeInvoice #chargeInvoiceForm #taxName").val())) ,parseFloat(rowPosition),1);
+						tableChargeInvoice.fnUpdate(dataChargeInvoice.minimumValue = $("#detailChargeInvoice #chargeInvoiceForm #minChargeStripped").val(),parseFloat(rowPosition),2);
+						tableChargeInvoice.fnUpdate(dataChargeInvoice.maximumValue = $("#detailChargeInvoice #chargeInvoiceForm #maxChargeStripped").val(),parseFloat(rowPosition),3);
+						dataChargeInvoice.accountChargeKey = $("#detailChargeInvoice #chargeInvoiceForm #accountChargeKey").val();
+						//dataChargeInvoice.account.custodyAccountKey = $("#detailChargeInvoice #chargeInvoiceForm #custodyAccountKey").val();
+					} else {
+						
+						var dataChargeInvoice = new Object();
+						dataChargeInvoice.account = new Object();
+						dataChargeInvoice.invoiceCharge = new Object();
+						dataChargeInvoice.taxMaster = new Object();
+						
+						dataChargeInvoice.accountChargeKey = $("#detailChargeInvoice #chargeInvoiceForm #accountChargeKey").val();
+						dataChargeInvoice.account.custodyAccountKey = $("#detailChargeInvoice #chargeInvoiceForm #custodyAccountKey").val();
+						dataChargeInvoice.invoiceCharge.lookupId = $("#detailChargeInvoice #chargeInvoiceForm #chargeGroup").val();
+						dataChargeInvoice.invoiceCharge.lookupDescription = $("#detailChargeInvoice #chargeInvoiceForm #chargeGroupDesc").val();
+						dataChargeInvoice.minimumValue = $("#detailChargeInvoice #chargeInvoiceForm #minChargeStripped").val();
+						dataChargeInvoice.maximumValue = $("#detailChargeInvoice #chargeInvoiceForm #maxChargeStripped").val();					
+						dataChargeInvoice.taxMaster.taxCode = $("#detailChargeInvoice #chargeInvoiceForm #taxCode").val();
+						dataChargeInvoice.taxMaster.taxKey = $("#detailChargeInvoice #chargeInvoiceForm #taxKey").val();
+						dataChargeInvoice.taxMaster.description = $("#detailChargeInvoice #chargeInvoiceForm #taxName").val();
+						tableChargeInvoice.fnAddData(dataChargeInvoice);
+					}
+					
+					$('#detailChargeInvoice').dialog('close');		
+					return false;
+				}
+				
+			}
+		});
+		
+		// ============ END OF SECTION TAB CHARGE INVOICE ============ //
+		
+		// ============ START OF SECTION TAB SUB ACCOUNT ============ //
+		
+		// ----- Declare dialog box for input Sub Account---- //
+		$( "#detailSubAccount" ).dialog({
+			autoOpen:false,
+			autoFocus:false,
+			heigth:'230px',
+			width:'580px',
+			resizable:false,
+			modal:true,
+		});
+		
+		var tableSubAccount = 
+			$('#listSubAccount #gridSubAccount').dataTable({
+				aaData: subAccounts,
+				aoColumns: [ 
+				             {
+					             fnRender: function(obj) {
+									  	var controls;
+											controls = obj.aData.depository.lookupDescription;
+											return controls;
+								 }
+				             },
+				             {
+					             fnRender: function(obj) {
+									  	var controls;
+											controls = obj.aData.code;
+											
+									  	return controls;
+								 }
+				             },
+							 
+							{
+								fnRender: function(obj) {
+							 	var controls;
+							 	controls = '<input type="hidden" name="subAccounts[' + obj.iDataRow + '].subAccountKey" value="' + obj.aData.subAccountKey + '" />';
+							 	
+							 	controls += '<input type="hidden" name="subAccounts[' + obj.iDataRow + '].depository.lookupId" value="' + obj.aData.depository.lookupId + '" />';
+							 	controls += '<input type="hidden" name="subAccounts[' + obj.iDataRow + '].depository.lookupCode" value="' + obj.aData.depository.lookupCode + '" />';
+							 	controls += '<input type="hidden" name="subAccounts[' + obj.iDataRow + '].depository.lookupDescription" value="' + obj.aData.depository.lookupDescription + '" />';
+							 	controls += '<input type="hidden" name="subAccounts[' + obj.iDataRow + '].code" value="' + obj.aData.code + '" />';
+							 	if(obj.aData.accountCashUsed!=null)
+							 		controls += '<input type="hidden" name="subAccounts[' + obj.iDataRow + '].accountCashUsed.lookupId" value="' + obj.aData.accountCashUsed.lookupId + '" />';
+							 	else
+							 		controls += '<input type="hidden" name="subAccounts[' + obj.iDataRow + '].accountCashUsed.lookupId" value="" />';
+							 	controls += '<center><input id="deleteButton" type="button" value="delete" #{if readOnly}disabled="disabled"#{/if} /></center>';
+							 	
+							 	return controls;
+							 				
+							 	}
+							  }
+							],
+							aaSorting: [[1, 'asc']],
+							bAutoWidth: false,
+							bDestroy: true,
+							bJQueryUI: true,
+							bLengthChange: false,
+							sPaginationType: 'full_numbers',
+							bInfo: true,
+							bPaginate: true,
+							iDisplayLength:7               						
+		});
+		
+		// ---- Process when click in grid data ---- //
+		$('#listSubAccount #gridSubAccount').removeAttr('style');
+		$('#listSubAccount #gridSubAccount tbody tr td').die('click');
+		$('#listSubAccount #gridSubAccount tbody tr td').live('click', function(){
+			$("#codeDummy").show();
+			var const_Custody_KSEI_code = '${defaultkseidepositorycode}';
+			
+			var rowPos= $(this).parents('tr');
+		
+			var rowPosNumber = tableSubAccount.fnGetPosition(rowPos[0]);
+			
+			// if empty table
+			if( rowPosNumber == null ){
+				return;
+			}
+			var pos = tableSubAccount.fnGetPosition(this);
+			
+			if (pos[1] != 2) {
+				var dataSubAccount = tableSubAccount.fnGetData(this.parentNode);
+				$("#errmsgDepository").html('');
+				$("#errmsgSubCodeDefault").html('');
+				$("#errmsgSubCodeNoDefault").html('');
+				$("#errMsgAcctCashUsed").html('');
+				
+				$("#detailSubAccount #subAccountForm #rowPositionSubAccount").val(rowPosNumber);
+				$("#detailSubAccount #subAccountForm #subAccountKey").val(dataSubAccount.subAccountKey);
+				
+				$("#detailSubAccount #subAccountForm #depKey").val(dataSubAccount.depository.lookupId);
+				$("#detailSubAccount #subAccountForm #depCode").val(dataSubAccount.depository.lookupCode).change();
+				$("#detailSubAccount #subAccountForm #depName").val(dataSubAccount.depository.lookupDescription);
+				
+				if(dataSubAccount.accountCashUsed!=null){
+					$('#acctCashUsed').val(dataSubAccount.accountCashUsed.lookupId);
+					$("#acctCashUsed option[value='"+dataSubAccount.accountCashUsed.lookupId+"']").attr('selected',true);
+				}
+				
+				if ($('#detailSubAccount #subAccountForm #depCode').val() === const_Custody_KSEI_code) {
+					$("#detailSubAccount #subAccountForm #codeDefHidden").val(dataSubAccount.code);
+				} else {
+					$("#detailSubAccount #subAccountForm #codeNoDef").val(dataSubAccount.code);
+				}
+				var subAccountCode = dataSubAccount.code;
+				
+				$("#detailSubAccount #subAccountForm #depCode").attr('readOnly', 'readOnly');
+				$("#detailSubAccount #subAccountForm #depCodeHelp").attr('disabled', 'disabled');
+				
+				if ($('#detailSubAccount #subAccountForm #depCode').val() === const_Custody_KSEI_code) {
+					$('#detailSubAccount #subAccountForm #idCodeNoDefault').css("display","none");
+					$('#detailSubAccount #subAccountForm #idCodeDefault').css("display","");
+					if ((subAccountCode != '') || (subAccountCode != undefined)) {
+						$("#detailSubAccount #subAccountForm #code1").val(subAccountCode.substring(0, 5));
+						$("#detailSubAccount #subAccountForm #code2").val(subAccountCode.substring(5, 9));
+						$("#detailSubAccount #subAccountForm #code3").val(subAccountCode.substring(9, 12));
+						$("#detailSubAccount #subAccountForm #code4").val(subAccountCode.substring(12, 14));
+						
+						if (('${mode}'!='view') && ('${confirming}' != 'true')) {
+							$("#detailSubAccount #subAccountForm #code1").attr('disabled', 'disabled');
+							var c = $("#detailSubAccount #subAccountForm #code2").val();
+							if(c=='RXXX'){
+								$("#detailSubAccount #subAccountForm #code2").attr('disabled', 'disabled');	
+							}else{
+								$("#detailSubAccount #subAccountForm #code2").removeAttr('disabled');								
+							}
+							$("#detailSubAccount #subAccountForm #code3").attr('disabled', 'disabled');
+							$("#detailSubAccount #subAccountForm #code4").removeAttr('disabled');
+							$("#detailSubAccount #subAccountForm #code4").removeAttr('readOnly');
+						}
+						
+						$('p[id=idCodeDefault] label span').html(' *');
+					} else {
+						$("#detailSubAccount #subAccountForm #code1").val('');
+						$("#detailSubAccount #subAccountForm #code2").val('');
+						$("#detailSubAccount #subAccountForm #code3").val('');
+						$("#detailSubAccount #subAccountForm #code4").val('');
+					}
+					
+				} else {
+					$('#detailSubAccount #subAccountForm #idCodeDefault').css("display","none");
+					$('#detailSubAccount #subAccountForm #idCodeNoDefault').css("display","");
+					
+					$("#detailSubAccount #subAccountForm #codeNoDef").val(subAccountCode);
+					
+				}
+				
+				$("#detailSubAccount").dialog('open');
+				$("#codeDummy").hide();
+				$('.ui-widget-overlay').css('height',$('body').height());
+			}
+		});
+		
+		
+		// ------- Process When click button add Sub Account---- //		
+		$("#acctCashUsed").change(function(){
+			$("#acctCashUsed").val($("#acctCashUsed").find(':selected').val());
+		});
+		
+		//jangan pake .live('click',function ) ntar di disabled tetep jalan di IE8
+		$('#addSubAccount').click(function() {
+			selectedRow = null;
+			$("#acctCashUsed").hide();
+			
+			$("#codeDummy").show();
+			$("#detailSubAccount").dialog('open');
+			$("#codeDummy").hide();
+			$("#depCode").focus();
+			$("#detailSubAccount input:text").val(""); 
+			$("#detailSubAccount input:hidden").val("");
+			$("#errmsgDepository").html('');
+			$("#errmsgSubCodeDefault").html('');
+			$("#errmsgSubCodeNoDefault").html('');
+			$("#errMsgAcctCashUsed").html('');
+			
+			$("#detailSubAccount #subAccountForm #depCode").removeAttr('disabled');
+			$("#detailSubAccount #subAccountForm #depCodeHelp").removeAttr('disabled');
+			$("#detailSubAccount #subAccountForm #codeNoDef").removeAttr('disabled');
+			
+			$("#detailSubAccount #subAccountForm #depCode").removeAttr('readOnly');
+			$("#detailSubAccount #subAccountForm #depCodeHelp").removeAttr('readOnly');
+			$("#detailSubAccount #subAccountForm #codeNoDef").removeAttr('readOnly');
+			
+			$("#acctCashUsed").val('');
+			$("#acctCashUsed option:eq(0)").attr('selected',true);
+			
+			$('#idCodeDefault').css("display","none");
+			$('#idCodeNoDefault').css("display","");
+			$('.ui-widget-overlay').css('height',$('body').height());
+			
+			return false;
+		});
+		
+		// ---- Process Delete Charge Invoice in grid data --- //
+		$('#listSubAccount #gridSubAccount tbody tr #deleteButton').live('click', function() {
+			var row = $(this).parents('tr');
+			var rowNumber = tableSubAccount.fnGetPosition(row[0]);
+			var deleteSubAccount = function() {
+				tableSubAccount.fnDeleteRow(rowNumber);
+				var idTable = $("#listSubAccount #gridSubAccount");
+				var trs = $("tr", idTable);
+				$.each(trs, function(idx, data){
+					var hiddens = $("[type=hidden]", $(this));
+						$(hiddens).eq(0).attr("name", "subAccounts["+(idx-1)+"].subAccountKey");
+						$(hiddens).eq(1).attr("name", "subAccounts["+(idx-1)+"].depository.lookupId");
+						$(hiddens).eq(2).attr("name", "subAccounts["+(idx-1)+"].depository.lookupCode");
+						$(hiddens).eq(3).attr("name", "subAccounts["+(idx-1)+"].depository.lookupDescription");
+						$(hiddens).eq(4).attr("name", "subAccounts["+(idx-1)+"].code");
+						$(hiddens).eq(5).attr("name", "subAccounts["+(idx-1)+"].accountCashUsed.lookupId");
+				});
+				$("#dialog-message").dialog("close");
+			}
+			
+			messageAlertYesNo("Are you sure to delete data ?", "ui-icon ui-icon-notice", "Confirmation Message", deleteSubAccount, closeDialog);
+		});
+		
+		// ------- Process When click button save sub account in dialog box ---- //			
+		$('#saveSubAccount').die("click");
+		$('#saveSubAccount').live("click", function(){
+			var const_Custody_KSEI_code = '${defaultkseidepositorycode}';
+			var defaultKSEICodeLastSubAccountLength = 2;
+			var defaultKSEICode2Length = 4;
+			
+			var isNotComplete = false;
+			
+			$("#errmsgSubCodeDefault").html('');
+			$("#errmsgSubCodeNoDefault").html('');
+			$("#errmsgDepository").html('');
+			$("#errMsgAcctCashUsed").html('');
+			
+			var rowPositionSubAccount = $("#detailSubAccount #subAccountForm #rowPositionSubAccount").val();
+			
+			if((jQuery.trim($("#detailSubAccount #subAccountForm #code4").val()).length < defaultKSEICodeLastSubAccountLength) && (rowPositionSubAccount != "") && ($('#detailSubAccount #subAccountForm #depCode').val() === const_Custody_KSEI_code)){
+				isNotComplete = true;
+			}
+			if((jQuery.trim($("#detailSubAccount #subAccountForm #code2").val()).length < defaultKSEICode2Length) && ($('#detailSubAccount #subAccountForm #depCode').val() === const_Custody_KSEI_code)){
+				isNotComplete = true;
+			}
+			if(((jQuery.trim($("#detailSubAccount #subAccountForm #code4").val()) === '')) && (rowPositionSubAccount != "") && ($('#detailSubAccount #subAccountForm #depCode').val() === const_Custody_KSEI_code)){
+				isNotComplete = true;
+			}
+			if(((jQuery.trim($("#detailSubAccount #subAccountForm #code2").val()) === '')) && ($('#detailSubAccount #subAccountForm #depCode').val() === const_Custody_KSEI_code)){
+				isNotComplete = true;
+			}
+			
+			if ( ($("#detailSubAccount #subAccountForm #depCode").val() == "") ) {
+				$("#errmsgDepository").html('Required');
+				
+				return false;
+			} else if(($("#detailSubAccount #subAccountForm #codeDefHidden").val()==="") && ($('#detailSubAccount #subAccountForm #depCode').val() === const_Custody_KSEI_code)){
+				$("#errmsgSubCodeDefault").html('Required');
+				return false;
+			} else if((($("#detailSubAccount #subAccountForm #code4").val() === 'XX')) && (rowPositionSubAccount != "") && ($('#detailSubAccount #subAccountForm #depCode').val() === const_Custody_KSEI_code)){
+				$("#errmsgSubCodeDefault").html('Please change or fill the last two Alphanumerics in Sub Account Code');
+				return false;
+			} else if(isNotComplete){
+				$("#errmsgSubCodeDefault").html('Code is not complete');
+				return false;
+			} else if((($("#detailSubAccount #subAccountForm #codeNoDef").val()==="")) && ($('#detailSubAccount #subAccountForm #depCode').val() !== const_Custody_KSEI_code)){
+				$("#errmsgSubCodeNoDefault").html('Required');
+				return false;
+			} else if($("#depCode").val()=='1' && $("#acctCashUsed").find(':selected').val()===""){
+				$("#errMsgAcctCashUsed").html('Required');
+				return false;
+			}else {
+				var tableSubAccount = $('#gridSubAccount').dataTable();
+				
+				var rows = tableSubAccount.fnGetNodes().length;
+				
+				var found = false;
+				for (i = 0; i < rows; i++) {
+					var cell = tableSubAccount.fnGetData(i);
+					if (($("#detailSubAccount #subAccountForm #depCode").val() == cell.depository.lookupCode && rowPositionSubAccount == "") ) {
+						$("#detailSubAccount #subAccountForm #depCode").addClass('fieldError');
+						$("#errmsgDepository").html('Data already exist ');
+						found = true;
+						break;
+					} else if (($("#detailSubAccount #subAccountForm #depCode").val() == cell.depository.lookupCode && rowPositionSubAccount != i) ) {
+						$("#detailSubAccount #subAccountForm #depCode").addClass('fieldError');
+						$("#errmsgDepository").html('Data already exist ');
+						found = true;
+						break;
+					}else {
+						$("#detailSubAccount #subAccountForm #depCode").removeClass('fieldError');
+						$("#errmsgDepository").html('');
+					}
+				}
+				
+				if (!found) {
+					if ((rowPositionSubAccount != "") && (rowPositionSubAccount != undefined)) {
+						var dataSubAccount = tableSubAccount.fnGetData(parseFloat(rowPositionSubAccount));
+						if(dataSubAccount.accountCashUsed==null) dataSubAccount.accountCashUsed = new Object();
+						tableSubAccount.fnUpdate(dataSubAccount.depository.lookupDescription = $("#detailSubAccount #subAccountForm #depName").val(),parseFloat(rowPositionSubAccount),0);
+						if ($('#detailSubAccount #subAccountForm #depCode').val() === const_Custody_KSEI_code) {
+							tableSubAccount.fnUpdate(dataSubAccount.code = $("#detailSubAccount #subAccountForm #codeDefHidden").val(),parseFloat(rowPositionSubAccount),1);
+						} else {
+							tableSubAccount.fnUpdate(dataSubAccount.code = $("#detailSubAccount #subAccountForm #codeNoDef").val(),parseFloat(rowPositionSubAccount),1);
+						}
+						dataSubAccount.subAccountKey = $("#detailSubAccount #subAccountForm #subAccountKey").val();
+						dataSubAccount.depository.lookupId = $("#detailSubAccount #subAccountForm #depKey").val();
+						dataSubAccount.depository.lookupCode = $("#detailSubAccount #subAccountForm #depCode").val();
+						dataSubAccount.depository.lookupDescription = $("#detailSubAccount #subAccountForm #depName").val();
+						dataSubAccount.accountCashUsed.lookupId = $("#acctCashUsed").find(':selected').val();
+						if ($('#detailSubAccount #subAccountForm #depCode').val() === const_Custody_KSEI_code) {
+							dataSubAccount.code = $("#detailSubAccount #subAccountForm #codeDefHidden").val();
+						} else {
+							dataSubAccount.code = $("#detailSubAccount #subAccountForm #codeNoDef").val();
+						}
+						tableSubAccount.fnUpdate(dataSubAccount, parseFloat(rowPositionSubAccount), 2);
+					} else {
+						var dataSubAccount = new Object();
+						dataSubAccount.account = new Object();
+						dataSubAccount.depository = new Object();
+						dataSubAccount.accountCashUsed = new Object();
+						
+						dataSubAccount.subAccountKey = $("#detailSubAccount #subAccountForm #subAccountKey").val();
+						
+						dataSubAccount.depository.lookupId = $("#detailSubAccount #subAccountForm #depKey").val();
+						dataSubAccount.depository.lookupCode = $("#detailSubAccount #subAccountForm #depCode").val();
+						dataSubAccount.depository.lookupDescription = $("#detailSubAccount #subAccountForm #depName").val();
+						dataSubAccount.accountCashUsed.lookupId = $("#acctCashUsed").find(':selected').val();
+						
+						if ($('#detailSubAccount #subAccountForm #depCode').val() === const_Custody_KSEI_code) {
+							dataSubAccount.code = $("#detailSubAccount #subAccountForm #codeDefHidden").val();
+						} else {
+							dataSubAccount.code = $("#detailSubAccount #subAccountForm #codeNoDef").val();
+						}
+						
+						tableSubAccount.fnAddData(dataSubAccount);
+					}
+					
+					$('#detailSubAccount').dialog('close');		
+					return false;
+				}
+			}
+		});
+		
+		// ============ END OF SECTION TAB SUB ACCOUNT ============ //
+		
+		// ============ START OF SECTION TAB CORRESPONDENCE ============ //
+		if ('${addressType.size()}' == 0) {
+			$('#billingAddress').attr('style', 'width: 120');
+			$('#billingAddress').attr("disabled","disabled");
+		} 
+		
+		isEmail();
+		if ('${account?.customer?.email}' == ""){
+			$("input[name='account.isSendToEmail']").val("false");
+			$("input[name='account.isSendToEmail']").attr("disabled","disabled");
+		}
+		
+		$("input[name='account.isSendToEmail']").change(function() {
+			isEmail();
+		});
+		// ============ END OF SECTION TAB CORRESPONDENCE ============ //
+		
+		//alert(tableSettlement.fnGetNodes().length);		
+		
+		// =============== BUTTON FUNCTION ======== //
+		
+		// --- Save --- //
+		$('#save').click(function(){
+			
+			// validate in tab account detail
+			
+			 if (($('#accountNo').val()=='') || ($('#accountHolderName').val()=='') || ($('#branchNo').val()=='') || 
+				($('#currency').val()=='') || ($('#txProfile').val()=='') 
+				|| ($('#chargeProfile').val()=='') || ($('#defaultPriceGroupId').val()=='') ) {
+				
+				if ($('#accountNo').val()=='') $('#errAccountNo').html('Required'); 
+				else $('#errAccountNo').html('');
+				
+				
+				if ($('#accountHolderName').val()=='') $('#errAccountName').html('Required');
+				else $('#errAccountName').html('');
+				
+				if ($('#accountHolderName').val()=='') $('#errAccountName').html('Required');
+				else $('#errAccountName').html('');
+				
+				if ($('#branchNo').val()=='') $('#errBranch').html('Required');
+				else $('#errBranch').html('');
+				
+				if ($('#currency').val()=='') $('#errCurrency').html('Required');
+				else $('#errCurrency').html('');
+				
+				if ($('#custBank').val()=='') $('#errCustBank').html('Required');
+				else $('#errCustBank').html('');
+				
+				if ($('#txProfile').val()=='') $('#errTaxProfile').html('Required');
+				else $('#errTaxProfile').html('');
+				
+				if ($('#chargeProfile').val()=='') $('#errChargeProfile').html('Required');
+				else $('#errChargeProfile').html('');
+				
+				if ($('#defaultPriceGroupId').val()=='') {
+					$('#errSecPrice').html('Required');
+					$("#tabs").tabs("select", "#tabs-2");
+				} else {
+					$('#errSecPrice').html('');
+				}
+				
+				return false;
+				
+			}
+			
+		 	if (($("#danaJaminanType").val() == "") && ($('input[name=account?.isFundGuarantee]:checked').val() == "true")) {
+				$("#danaJaminanTypeError").html("Required");
+				return false;
+			}
+		 	
+		 	if ($("#portfolioReport").val() == "")  {
+				$("#portfolioReportError").html("Required");
+				return false;
+			}
+			
+			if(($('#blockedHidden').val()==true) || $('#blockedHidden').val() == 'true'){
+				if(($('#reason').val()==null) || ($('#reason').val()=='')){
+					$('#errBlocked').html('Required');
+					return false;
+				}
+			}else{
+				$('#errBlocked').html('');
+			}
+			
+			// validate in tab security price
+			/* var lengthSecPrice = $('#gridSecurityPrice').dataTable().fnGetNodes().length;
+			if ($('#lookupBySecurityPriceType').val() == ""){
+				$('#errSecPrice').html('Required');
+				$('#tabs').tabs("select",1);
+				return false;
+			} else {
+				if ($('#lookupBySecurityPriceType').val() == "SECURITY_PRICE_TYPE-3"){
+					if (lengthSecPrice == 0) {
+						$('#errmsgLookupSecPrice').html('Custom type at least must have a security type');
+						$('#tabs').tabs("select",1);
+						return false;		
+					} 
+				}
+			} */
+			
+			var lengthOveride = $('#gridOverwriteCharge').dataTable().fnGetNodes().length;
+			if($('#isCharge').is(':checked')){
+				if(lengthOveride == 0){
+					$('#errmsgChargeOver').html('At Least one charge should be overrided');
+					$('#tabs').tabs("select",4);
+					return false;
+				}else{
+					$('#errmsgChargeOver').html('');
+				}
+			}
+			
+			//validate id tab sub account
+			$("#errSubAccount").html('');
+			var dep = $("#hasDepository:checked").length;
+			//kalo gk dicentang
+			if(dep<1){
+				//kalo gk ada data yang terisi
+				if($("#gridSubAccount tbody tr td").html()=='No data available in table' || $("#gridSubAccount tbody tr").length < 1){
+					$("#errSubAccount").html('Input Depository or Tick the checkbox');
+					return false;
+				}
+			}
+			
+			// validate id tab settlement account
+			if (!($('input[name=account.settlementAccount]').is(":checked"))){
+				$('#errmsgSettleAcc').html('Bank Account as Default Value is empty!');
+				$('#tabs').tabs("select",2);
+				return false;
+			}
+			
+			// validate in tab charge invoice
+			var overrideStatus = false;
+			if('${account?.overrideStatus}'=="U ") {
+				overrideStatus = true;
+				$("#overrideStatusError").html("* Approval Charge Overwrite needed for Charge Profile ${account?.chargeProfile?.name} ").show();
+			}
+			
+			if(!(overrideStatus)) {
+				$("#overrideStatusError").html("");
+				/* if ($('#lookupBySecurityPriceType').val()=='SECURITY_PRICE_TYPE-3'){
+					var row = $('#gridSecurityPrice').dataTable().fnGetNodes().length;
+					if (row == 0){
+						$('#tabs').tabs("select",1);
+						$('#errmsgLookupSecPrice').html('Error Saving! Please add a security type in grid if security price type "CUSTOM"')
+						return false;
+					}
+				}  */
+				//alert($("#size").val());
+				
+				// kata mr shu dikoment karna sudah kebanyakan message box
+				
+				/* if(($('#chargeProfileKey').val() != $('#key').val()) && (parseFloat($("#size").val()) > 0 ) ){
+					
+					var message = "you have been override Account : '${account?.name}'  with Charge Profile : '${account?.chargeProfile?.name}' before , if you change this profile then the old override will be erased!";
+					var saveAccountObject = function() {
+						saveAccount();
+						$("#dialog-message").dialog("close");
+					}
+					/* $( "#dialog-message-1" ).dialog({
+						autoOpen:false,
+						height:200,
+						width:300,
+						modal:true,
+						resizable : false,
+						buttons: {
+							"  Ok  ": function() {
+								$( "#dialog-message-1" ).dialog('close');
+								//submit('@{save()}?mode=${mode}&custKey=${custKey}&key=${key}&size=${size}#{if group}&group=${group}#{/}');
+								//submit('@{save()}?mode=${mode}#{if group}&group=${group}#{/}');
+								saveAccount();
+								
+							},
+							"Cancel": function() {
+								$( "#dialog-message-1" ).dialog('close')
+								
+							}
+						}			
+					});
+					$( "#dialog-message-1" ).dialog('open');
+					return false;
+					messageAlertYesNo(message, "ui-icon ui-icon-notice", "Confirmation Message", saveAccountObject, closeDialog);
+					return false;
+				} */
+				
+				
+				saveAccount();
+				return false;
+				//submit('@{save()}?mode=${mode}&custKey=${custKey}&key=${key}&size=${size}#{if group}&group=${group}#{/}');
+				//return false;
+			}
+			saveAccount();
+		});
+		
+		// --- Confirm --- //
+		$('#confirm').click(function(){
+			
+			//loadingDialog();
+			loading.dialog('open');
+			
+			$.ajax({
+				url: '@{Accounts.confirm()}/' + $('#clientNo').val()+'?mode=${mode}'+ '&param=register-cust-acct',
+				success: function(data) {
+					checkRedirect(data);
+					if (data == "error") {
+						location.href='@{Accounts.confirming()}/'+$('#clientNo').val()+'?mode=${mode}&custKey=${custKey}&key=${key}&size=${size}';
+					} else {
+						if ('${mode}' == 'entry') {
+							location.href='@{Customers.list()}?mode=view&param=register-cust-acct&group=CUSTOMER';
+						} else {
+							location.href='@{list()}?mode=edit&param=edit';
+						}
+					}
+					
+					return data;
+				}
+			});
+		});
+		
+		// --- Cancel --- //
+		$('#cancel').click(function(){
+			#{if param == null && mode == 'entry'}
+				location.href='@{Customers.list()}?mode=view'+ '&param=register-cust-acct&group=CUSTOMER';
+				return false;
+			#{/if}			
+			#{else}
+				#{if mode == 'edit'}
+					location.href='@{Accounts.list()}?mode=edit' + '&param=edit';
+				#{/if}
+				#{else}
+					location.href='@{Accounts.list()}';
+				#{/else}
+			#{/else}
+		});
+		
+		// --- Back --- //
+		$('#back').click(function(){
+			location.href='@{Accounts.back()}?id=${account?.custodyAccountKey}&mode=${mode}&custKey=${custKey}&key=${key}&size=${size}#{if group}&group=${group}#{/}&dataEntry='+$('#dataEntry').val();
+			return false;
+		});
+		
+		// ---- Close --- //
+		$('#close').click(function(){
+			history.back();
+		});
+		
+	});
+	
+	// ===== ALL FUNCTION ====== //
+	
+	/* function loadingDialog(){
+		var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Sending data to server ...</div>').appendTo('body');
+		loading.dialog({
+			closeOnEscape: false,
+			draggable: false,
+			modal: true,
+			resizable: false,
+			open:function() {
+				$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+			} 
+		});
+	} */
+	
+	function saveAccount(){
+		var account = new Object();
+		account.customer = new Object();
+		account.customer.customerType = new Object();
+		account.branch = new Object();
+		account.currency = new Object();
+		account.chargeProfile = new Object();
+		account.costMethod = new Object();
+		account.currencyProfile = new Object();
+		account.custodianBank = new Object();
+		account.settlementAccount = new Object();
+		account.organization = new Object();
+		account.defaultPriceGroup = new Object();
+		//account.lookupBySecurityPriceType = new Object();
+		account.billingAddress = new Object();
+		account.txProfile = new Object();
+		account.fundGuaranteeType = new Object();
+		account.portfolioReport = new Object();
+		
+		// id detail
+		account.organization.organizationId = $('#organizationId').val();
+//		account.lookupBySecurityPriceType.lookupId = $('#lookupBySecurityPriceType').val();
+		
+		// in tab account
+		account.custodyAccountKey = $('#clientNo').val();
+		account.accountNo = $('#accountNo').val();
+		if ('${account?.customer?.customerType?.lookupId}'=='CUSTOMER_TYPE-I'){
+			account.principal = '';
+		}else{
+			account.principal = $('#principalHidden').val();
+		}
+		account.isKPD = $('#isKPDHidden').val();
+		account.name = $('#accountHolderName').val();
+		account.dcProfil = $('#dcProfilHidden').val();
+		account.isCharge = $('#isChargeHidden').val();
+		account.blocked = $('#blockedHidden').val();
+		account.blockedRemark = $('#reason').val();
+		account.customer.customerKey = $('input[name=account.customer.customerKey]').val();
+		account.customer.customerNo = $('input[name=account.customer.customerNo]').val();
+		account.customer.customerName = $('input[name=account.customer.customerName]').val();
+		account.customer.customerType.lookupId = $('#customerType').val();	
+		account.branch.branchNo = $('#branchNo').val();
+		account.branch.branchKey = $('#branchKey').val();
+		account.branch.name = $('#branchName').val();
+		account.currency.currencyCode = $('#currency').val();
+		account.currency.description = $('#currencyDesc').val();
+		account.chargeProfile.name = $('#chargeProfile').val();
+		account.chargeProfile.chargeProfileKey = $('#chargeProfileKey').val();
+		account.chargeProfile.description = $('#chargeProfileDesc').val();
+		account.costMethod.lookupId = $('#costMethod').val();
+		account.currencyProfile.lookupId = $('#currencyProfile').val();
+		account.custodianBank.thirdPartyCode = $('#custBank').val();
+		account.custodianBank.thirdPartyKey = $('#custBankKey').val();
+		account.custodianBank.thirdPartyName = $('#custBankDesc').val();
+		account.securityAccNo = $('#securityAccNo').val();
+		account.isActive = $('input[name=account.isActive]').val();
+		account.txProfile.taxProfileCode = $('#txProfile').val();
+		account.txProfile.description = $('#txProfileDesc').val();
+		account.isFundGuarantee = $('#danaJaminanYNHidden').val();
+		account.fundGuaranteeType.lookupId = $('#danaJaminanType').val();
+		account.fundGuaranteeType.lookupCode = $('#danaJaminanTypeCode').val();
+		account.fundGuaranteeType.lookupDescription = $('#danaJaminanTypeDescription').val();
+		account.portfolioReport.lookupId = $('#portfolioReport').val();
+		account.portfolioReport.lookupCode = $('#portfolioReportCode').val();
+		account.portfolioReport.lookupDescription = $('#portfolioReportDescription').val();
+		
+		// in tab security price
+		//account.securityTypes = $('#gridSecurityPrice').dataTable().fnGetData();
+		account.defaultPriceGroup.lookupCode = $('#defaultPriceGroup').val();
+		account.defaultPriceGroup.lookupId = $('#defaultPriceGroupId').val();
+		account.defaultPriceGroup.lookupDescription = $('#defaultPriceGroupName').val();
+		account.priceGroupSetups = $('#gridSecurityPrice').dataTable().fnGetData();
+		
+		// in tab settlement account
+		account.bankAccounts = $('#gridSettlementAccount').dataTable().fnGetData();
+		account.settlementAccount.bankAccountKey = $('input[name=account.settlementAccount.bankAccountKey]').val();
+		
+		//in tab charge override
+		account.chargeOverrides = $('#gridOverwriteCharge').dataTable().fnGetData();
+		//in tab correspondence
+
+		if ($('#billingAddress').val() == '') {
+			account.billingAddress.contactKey = null;
+		} else {
+			account.billingAddress.contactKey = $('#billingAddress').val();
+		}
+		
+		//account.isSendToEmail = $('#sendOption').val();
+		//alert("isEMAIL = " +$("input[name='account.isSendToEmail']").val());
+		account.isSendToEmail = $("input[name='account.isSendToEmail']").val();
+		//account.customer.email = $('#email').val();
+		
+		// in tab sub account
+		account.subAccounts = $('#gridSubAccount').dataTable().fnGetData();
+		
+		// in tab bank account
+		account.netting = $("#nettingHidden").val();
+		
+		$('#dataEntry').val(true);
+		
+		//loadingDialog();
+		loading.dialog('open');
+		$.ajax({
+			type: 'POST',
+			url: '@{Accounts.save()}?id='+$('#clientNo').val()+'?mode=${mode}&custKey=${custKey}&key=${key}&size=${size}&dataEntry='+$('#dataEntry').val(),
+			data: JSON.stringify(account),
+			contentType: 'application/json; charset=utf-8',
+			dataType: 'json',
+			success: function() {
+				location.href='@{Accounts.confirming()}/'+$('#clientNo').val()+'?mode=${mode}&custKey=${custKey}&key=${key}&size=${size}&dataEntry='+$('#dataEntry').val();
+			}
+		});
+	}
+	
+	var selectedRow;
+	function editSecurityPriceAction(actionDetail) {
+			selectedRow = actionDetail;
+			//alert(selectedRow);			
+			$('#securityPriceActionForm #securityType').val($(selectedRow).find('#securityType').val());
+			$('#securityPriceActionForm #description').val($(selectedRow).find('#description').val());
+	}
+	
+	function isEmail() {
+		$('#email').css("display","none");
+		if ($('#sendOption2').is(":checked")){
+			$('#email').css("display","");
+			$("input[name='account.isSendToEmail']").val(true);
+		}
+		/* if (($("input[name='account.isSendToEmail']:checked").val()=="true") || ($("input[name='account.isSendToEmail']").val()=="true")) {
+			$('#email').css("display","");
+		} */
+	}
+	
+	function doConfirm(){
+		if ('${mode}' == 'entry') {
+			$.ajax({
+				url: submit('@{Accounts.confirm()}/' + $('#clientNo').val()+'?mode=entry'+ '&param=register-cust-acct&group=CUSTOMER'),
+				success: function() {
+					location.href='@{Customers.list()}?mode=view&param=register-cust-acct&group=CUSTOMER';
+				}
+			});
+		} else {
+			return true;
+		}
+//		submit('@{confirm()}?mode=${mode}&custKey=${custKey}&key=${key}&size=${size}#{if group}&group=${group}#{/}');
+//		return false;
+	}
+	
+	
+</script>
+<style type="text/css">
+ #errmsgChargeGroup {color: red;}
+ #errmsgTaxCode {color: red;}
+ #errmsgMinCharge {color: red;}
+ #errmsgMaxCharge {color: red;}
+ </style>
+<!-- <form></form> -->
+<form id="accountForm" class="form">
+#{hidden id:'param', name:'param', value:param /}
+#{hidden id:'bankAccountKey' /}
+#{hidden id:'securityType' /}
+#{hidden id:'organizationId', name:'account.organization.organizationId', value:account?.organization?.organizationId /}
+#{hidden id:'key', value:key /}
+#{hidden id:'size', value:size /}
+#{hidden id:'valueSettlement' , name:'valueSettlement', value:valueSettlement /}
+#{hidden id:'settlementAcc', name:'account.settlementAccount.bankAccountKey' , value:account?.settlementAccount?.bankAccountKey /}
+#{hidden id:'dataEntry', value:dataEntry /}
+#{hidden id:'recordStatus', name:'account.recordStatus' , value:account?.recordStatus /}
+
+<h2>Account: ${account?.accountNo} - ${account?.name}</h2>
+#{if flash.error || errors}
+    <div class="error">
+    	Error when saving data!<br/>
+		<li>${flash.error}</li>
+		#{ifErrors}
+			#{errors}
+				 <li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}
+
+<!-- <form> -->
+<div id="tabs" >
+	<ul>
+		<li><a href="#tabs-1">Account Detail</a></li>
+		<li><a href="#tabs-2">Price Reference</a></li>
+		<li><a href="#tabs-3">Bank Account</a></li>
+		<li><a href="#tabs-5">Sub Account</a></li>
+		<li><a href="#tabs-6">Overwrite Charges</a></li>
+	</ul>
+	<br>
+	&nbsp;<span id ="overrideStatusError" class="error"></span>
+	<div class="pane" id="tabs-1">
+		#{include 'Accounts/tab_account.html' /}
+	</div>
+	<div class="pane" id="tabs-2">
+			<p>
+				#{textBox id:'defaultPriceGroup', name:'account.defaultPriceGroup.lookupCode', label:'Default Price Reference', value:account?.defaultPriceGroup?.lookupCode, required:true, readOnly:readOnly, class:"capitalize", width:'100px' /}
+				#{hidden id:'defaultPriceGroupId', name:'account.defaultPriceGroup.lookupId', value:account?.defaultPriceGroup?.lookupId /}
+				#{button id:'defaultPriceGroupHelp', value:'?', class:'small', readOnly:readOnly /}
+				#{textBox id:'defaultPriceGroupName', name:'account.defaultPriceGroup.lookupDescription', value:account?.defaultPriceGroup?.lookupDescription, readOnly:true, width:'222px' /}
+				<span id="errSecPrice" class="error"></span>
+			</p>
+			<br />
+			<span id="errmsgLookupSecPrice" class="error"></span>
+			<fieldset>
+			<legend><b>Specific for this security type</b></legend>
+			<div id="listSecPrice">
+				#{include 'Accounts/grid_security_price.html' /}
+				<div class="buttons">
+					#{button id:'addSpecPrice',name:'addSpecPrice', value:'New Data', readOnly:readOnly /} 			
+				</div>
+			</div>
+			</fieldset>
+	</div>
+	<div class="pane" id="tabs-3">
+		<span id="errmsgSettleAcc" class="error"></span>
+		<span id="errmsgDelSettleAcc" class="error"></span>
+		#{include 'Accounts/grid_settlement_account.html' /}
+		<div class="buttons">
+				#{button id:'addBank',name:'addBank', value:'Add', readOnly:readOnly /}<span id="reqSetAcc" class="req"> *</span><span id="errAddBank" class="error"></span> 		
+		</div>	
+	</div>
+	
+	<div class="pane" id="tabs-5">
+		
+		<div id="listSubAccount">
+			#{include 'Accounts/grid_sub_account.html' /}
+		</div>
+		<div class="buttons">
+				#{button id:'addSubAccount',name:'addSubAccount', value:'Add', readOnly:readOnly   /} 		
+		</div>
+	</div>
+	<div class="pane" id="tabs-6" >
+		#{include 'Accounts/overrideCharge.html' /}
+		
+	</div>
+</div>
+<!-- </form> -->
+
+<div id='detailSpecSecTypeForm' title="Specific for Security Type">
+	#{include 'Accounts/detail_spesific_security_type.html' /}
+	<div >
+		#{if (mode=='entry' || mode == 'edit')&& (!(confirming))}
+			<button id="saveSpecSecType">Save</button>
+			<button id="cancelSpecSecType">Cancel</button>
+		#{/if}
+		#{else}
+			#{if confirming || mode=='view' }
+			<button id="closeSpecSecType">Close</button>
+			#{/if}
+		#{/else}	
+</div>
+</div>
+	
+<div id="detailSubAccount" title="Sub Account">
+	#{include 'Accounts/detail_sub_account.html' /}
+	<div >
+		
+		#{if ((mode=='view')||(confirming)) }
+			<button id="closeSubAccount" name="closeSubAccount">Close</button>
+							
+		#{/if}
+		#{else}
+			
+			<button id="saveSubAccount" name="saveSubAccount">Save</button>
+			<button id="cancelSubAccount" name="cancelSubAccount">Cancel</button>
+		#{/else}
+	</div>
+</div>
+<div class="buttons">
+		#{if mode == 'view'}
+		<button id="close">Close</button>
+		#{/if}
+		#{else}
+			#{if (!confirming) }
+				<button id="save">Save</button>
+				<button id="cancel">Cancel</button>
+			#{/if}
+			#{if confirming}
+				<button id="confirm">Confirm</button>
+				<button id="back">Back</button>
+			#{/if}
+		#{/else}
+</div>
+<div id="dialog-message-1" title="Message Confirmation">
+	<p>
+		<span class="ui-icon ui-icon-notice" style="float:left; margin:0 7px 50px 0;"></span>
+		you have been override Account : <b>${account?.name}</b>  with charge profile : <b>${account?.chargeProfile?.name}</b> before ,  
+		if you change this profile then the old override will be erased!  
+	<br>
+	</p>
+	<p>
+		&nbsp;&nbsp;&nbsp; Do you want to continue ?
+	</p>
+</div>	
+<div id="dialog-message-2" title="Message Confirmation">
+	<p>
+	<span class="ui-icon ui-icon-notice" style="float:left; margin:0 7px 50px 0;"></span>
+	Are you sure to delete data ? </p>
+</div>
+
+<input type="hidden" id="dummy" />
+</form>
+
+
+
+

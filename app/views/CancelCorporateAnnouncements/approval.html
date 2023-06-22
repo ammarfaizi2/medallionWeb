@@ -1,0 +1,81 @@
+#{extends 'templates/main.html' /}
+
+<script type="text/javascript">
+	$(function() {
+		
+		var backToWorkList = function() {
+			loading.dialog('open');
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			};
+		}
+		
+		var closeDialogMessage = function() {
+			$("#dialog-message").dialog('close');
+			return false;
+		}
+		
+		$('#approve').click(function() {
+			var action = "@{approve()}?taskId=${taskId}&maintenanceLogKey=${maintenanceLogKey}&operation=${operation}"+"";
+			
+			loading.dialog('open');
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				
+				if (data.status == 'success') {
+					messageAlertOk("Cancel For Announcement No : '${corporateAnnouncement?.corporateAnnouncementCode}' is Approved", "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+				} else {
+					loading.dialog('close');
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+					
+				}
+			});			
+		});
+		
+		$('#reject').click(function() {
+			
+			var action = "@{reject()}?taskId=${taskId}&maintenanceLogKey=${maintenanceLogKey}&operation=${operation}"+"";
+			
+			loading.dialog('open');
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					messageAlertOk("Cancel For Announcement No : '${corporateAnnouncement?.corporateAnnouncementCode}' is Rejected", "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+				}else{
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", function(){ $("#btnCloseWf").click(); });
+				} 
+			});
+		});
+		$('#back').click(function() {
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			}
+		});
+		
+		$("#approval-actions").css("display","block");
+		
+	});
+	
+</script>
+
+<h2>Cancel Corporate Action Announcement Approval</h2>
+<div id="detail">
+	<form id="form" class="form">
+		#{include 'CorporateAnnouncements/detail.html' /}
+	</form>
+</div>	
+<div id="approval-actions" class="buttons">
+	#{hidden id:'taskId', name:'taskId', value:taskId /}
+	#{hidden id:'from', name:'from', value:from /}
+	
+	<input type="button" id="approve" value="Approve" />
+	<input type="button" id="reject" value="Reject" />
+	<input type="button" id="back" value="Cancel" />			
+	<br/>
+</div>

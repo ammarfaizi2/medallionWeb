@@ -1,0 +1,61 @@
+<table id="gridInterest" class="display">
+	<thead>
+		<tr>
+			<th>Effect Date From</th>
+			<th>Effect Date To</th>
+			<th>Capital Gain Tax (%)</th>
+			<th>Interest Tax (%)</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list txProfRuleGrids, as:'txProfRuleGrid'}
+		<tr>
+			<td>
+				${txProfRuleGrid?.effectiveDateFrom?.format(appProp.dateFormat)}
+			</td>
+			<td>
+				${txProfRuleGrid?.effectiveDateTo?.format(appProp.dateFormat)}
+			</td>
+			<td>
+				${txProfRuleGrid?.taxObjectCapitalGain?.rate}
+			</td>
+			<td>
+				${txProfRuleGrid?.taxObjectAccruedInterest?.rate}
+			</td>
+			<td>
+				<center><input type="button" value="Delete" id="deleteButton" #{if readOnly}disabled="disabled"#{/if}/></center>
+				#{hidden id:'effectiveDateFrom', name:'txProfRuleGrid[' + (txProfRuleGrid_index-1) + '].effectiveDateFrom', value:txProfRuleGrid?.effectiveDateFrom /}
+				#{hidden id:'effectiveDateFromLong', name:'txProfRuleGrid[' + (txProfRuleGrid_index-1) + '].effectiveDateFromLong' /}
+				#{hidden id:'effectiveDateTo', name:'txProfRuleGrid[' + (txProfRuleGrid_index-1) + '].effectiveDateTo', value:txProfRuleGrid?.effectiveDateTo /}
+				#{hidden id:'effectiveDateToLong', name:'txProfRuleGrid[' + (txProfRuleGrid_index-1) + '].effectiveDateToLong' /}
+				#{hidden id:'taxObjectCapitalGainTaxProfile', name:'profRuleGrid[' + (txProfRuleGrid_index-1) + '].taxObjectCapitalGain.id.taxProfileCode', value:profRuleGrid?.taxObjectCapitalGain?.id?.taxProfileCode /}
+				#{hidden id:'taxObjectCapitalGainSecurityType', name:'profRuleGrid[' + (txProfRuleGrid_index-1) + '].taxObjectCapitalGain.id.securityTypeCode', value:profRuleGrid?.taxObjectCapitalGain?.id?.securityTypeCode /}
+				#{hidden id:'taxObjectCapitalGainTaxKey', name:'profRuleGrid[' + (txProfRuleGrid_index-1) + '].taxObjectCapitalGain.taxMaster.taxKey', value:profRuleGrid?.taxObjectCapitalGain?.taxMaster?.taxKey /}
+				#{hidden id:'taxObjectCapitalGainTaxCode', name:'profRuleGrid[' + (txProfRuleGrid_index-1) + '].taxObjectCapitalGain.taxMaster.taxCode', value:profRuleGrid?.taxObjectCapitalGain?.taxMaster?.taxCode /}
+				#{hidden id:'taxObjectCapitalGainTaxDesc', name:'profRuleGrid[' + (txProfRuleGrid_index-1) + '].taxObjectCapitalGain.taxMaster.description', value:profRuleGrid?.taxObjectCapitalGain?.taxMaster?.description /}
+				#{hidden id:'taxObjectCapitalGainTaxRate', name:'profRuleGrid[' + (txProfRuleGrid_index-1) + '].taxObjectCapitalGain.taxMaster.taxRate', value:profRuleGrid?.taxObjectCapitalGain?.taxMaster?.taxRate /}
+				#{hidden id:'taxObjectCapitalGainTaxCompensation', name:'profRuleGrid[' + (txProfRuleGrid_index-1) + '].taxObjectCapitalGain.taxCompensation', value:profRuleGrid?.taxObjectCapitalGain?.taxCompensation /}
+				#{hidden id:'taxObjectAccruedInterestTaxProfile', name:'profRuleGrid[' + (txProfRuleGrid_index-1) + '].taxObjectAccruedInterest.id.taxProfileCode', value:profRuleGrid?.taxObjectAccruedInterest?.id?.taxProfileCode /}
+				#{hidden id:'taxObjectAccruedInterestSecurityType', name:'profRuleGrid[' + (txProfRuleGrid_index-1) + '].taxObjectAccruedInterest.id.securityTypeCode', value:profRuleGrid?.taxObjectAccruedInterest?.id?.securityTypeCode /}
+				#{hidden id:'taxObjectAccruedInterestTaxKey', name:'profRuleGrid[' + (txProfRuleGrid_index-1) + '].taxObjectAccruedInterest.taxMaster.taxKey', value:profRuleGrid?.taxObjectAccruedInterest?.taxMaster?.taxKey /}
+				#{hidden id:'taxObjectAccruedInterestTaxCode', name:'profRuleGrid[' + (txProfRuleGrid_index-1) + '].taxObjectAccruedInterest.taxMaster.taxCode', value:profRuleGrid?.taxObjectAccruedInterest?.taxMaster?.taxCode /}
+				#{hidden id:'taxObjectAccruedInterestTaxDesc', name:'profRuleGrid[' + (txProfRuleGrid_index-1) + '].taxObjectAccruedInterest.taxMaster.description', value:profRuleGrid?.taxObjectAccruedInterest?.taxMaster?.description /}
+				#{hidden id:'taxObjectAccruedInterestTaxRate', name:'profRuleGrid[' + (txProfRuleGrid_index-1) + '].taxObjectAccruedInterest.taxMaster.taxRate', value:profRuleGrid?.taxObjectAccruedInterest?.taxMaster?.taxRate /}
+				#{hidden id:'taxObjectDiscountTaxProfile', name:'profRuleGrid[' + (txProfRuleGrid_index-1) + '].taxObjectDiscount.id.taxProfileCode', value:profRuleGrid?.taxObjectDiscount?.id?.taxProfileCode /}
+				#{hidden id:'taxObjectDiscountSecurityType', name:'profRuleGrid[' + (txProfRuleGrid_index-1) + '].taxObjectDiscount.id.securityTypeCode', value:profRuleGrid?.taxObjectDiscount?.id?.securityTypeCode /}
+				#{hidden id:'taxObjectDiscountTaxKey', name:'profRuleGrid[' + (txProfRuleGrid_index-1) + '].taxObjectDiscount.taxMaster.taxKey', value:profRuleGrid?.taxObjectDiscount?.taxMaster?.taxKey /}
+				#{hidden id:'taxObjectDiscountTaxCode', name:'profRuleGrid[' + (txProfRuleGrid_index-1) + '].taxObjectDiscount.taxMaster.taxCode', value:profRuleGrid?.taxObjectDiscount?.taxMaster?.taxCode /}
+				#{hidden id:'taxObjectDiscountTaxDesc', name:'profRuleGrid[' + (txProfRuleGrid_index-1) + '].taxObjectDiscount.taxMaster.description', value:profRuleGrid?.taxObjectDiscount?.taxMaster?.description /}
+				#{hidden id:'taxObjectDiscountTaxRate', name:'profRuleGrid[' + (txProfRuleGrid_index-1) + '].taxObjectDiscount.taxMaster.taxRate', value:profRuleGrid?.taxObjectDiscount?.taxMaster?.taxRate /}
+				#{hidden id:'taxObjectDividendTaxProfile', name:'profRuleGrid[' + (txProfRuleGrid_index-1) + '].taxObjectDividend.id.taxProfileCode', value:profRuleGrid?.taxObjectDividend?.id?.taxProfileCode /}
+				#{hidden id:'taxObjectDividendSecurityType', name:'profRuleGrid[' + (txProfRuleGrid_index-1) + '].taxObjectDividend.id.securityTypeCode', value:profRuleGrid?.taxObjectDividend?.id?.securityTypeCode /}
+				#{hidden id:'taxObjectDividendTaxKey', name:'profRuleGrid[' + (txProfRuleGrid_index-1) + '].taxObjectDividend.taxMaster.taxKey', value:profRuleGrid?.taxObjectDividend?.taxMaster?.taxKey /}
+				#{hidden id:'taxObjectDividendTaxCode', name:'profRuleGrid[' + (txProfRuleGrid_index-1) + '].taxObjectDividend.taxMaster.taxCode', value:profRuleGrid?.taxObjectDividend?.taxMaster?.taxCode /}
+				#{hidden id:'taxObjectDividendTaxDesc', name:'profRuleGrid[' + (txProfRuleGrid_index-1) + '].taxObjectDividend.taxMaster.description', value:profRuleGrid?.taxObjectDividend?.taxMaster?.description /}
+				#{hidden id:'taxObjectDividendTaxRate', name:'profRuleGrid[' + (txProfRuleGrid_index-1) + '].taxObjectDividend.taxMaster.taxRate', value:profRuleGrid?.taxObjectDividend?.taxMaster?.taxRate /}
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>

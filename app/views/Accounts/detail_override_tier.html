@@ -1,0 +1,91 @@
+<script type="text/javascript">
+	$(function(){
+		
+		$('#cancelOverrideTier').click(function() {
+			$("#detailChargeOverrideTier").dialog('close');
+			return false;
+		});
+
+		$('#tierChargeOverrideForm #taxCode').lookup({
+			list:'@{Pick.taxMasters()}',
+			get:{
+				url:'@{Pick.taxMaster()}',
+				success: function(data) {
+							$('#tierChargeOverrideForm #taxCode').removeClass('fieldError');
+							$('#tierChargeOverrideForm #taxKey').val(data.code);
+							$('#tierChargeOverrideForm input#taxCode').val(data.taxCode);
+							$('#tierChargeOverrideForm #taxName').val(data.description);
+							$('#h_taxName').val(data.description);
+						},
+				error: function() {
+						$('#tierChargeOverrideForm #taxCode').addClass('fieldError');
+						$('#tierChargeOverrideForm #taxKey').val('');
+						$('#tierChargeOverrideForm #taxCode').val('');
+						$('#tierChargeOverrideForm #taxName').val('NOT FOUND');
+						$('#h_taxName').val('');
+					}
+			},
+			key:$('#tierChargeOverrideForm #taxKey'),
+			help:$('#tierChargeOverrideForm #taxCodeHelp'),
+			nextControl:$('#tierChargeOverrideForm #tierValue')
+		});
+		
+		
+		$('#tierMaximumRange').blur(function(){
+			$('#newMaxRange').val($('#tierMaximumRangeStripped').val());
+		})
+		
+		
+//		$("#tierValue").blur(function(){
+//			var el = $(this);
+//			var tierValue = parseFloat($("#tierValueStripped").val());
+//			var maxValue = parseFloat($("#tierMaximumRangeStripped").val());
+
+//			el.removeClass('fieldError');
+//			$("#errmsgTier").html("");
+//			if (maxValue > tierValue){
+//				el.addClass('fieldError');
+//				$("#errmsgTier").html("* Tier Value must be greater than or equal Max Range Value !").show();
+//			} 
+//		});
+		
+				
+	});
+	
+</script>
+<style type="text/css">
+  #errmsgTier { color:red; }
+</style>
+<form></form>
+<form id="tierChargeOverrideForm" class="form">
+	&nbsp;<span id="existError" class="error"></span>
+	<p>
+		#{hidden id:'oldMaxRange' /}
+		#{hidden id:'newMaxRange' /}
+		#{hidden id:'rowPosition' /}
+		#{hidden id:'tieringType' /}
+		#{hidden id:'valueType' /}
+		#{hidden id:'rowNumber', name:'tier.id.rowNumber', value:tier?.id?.rowNumber /}
+		#{hidden id:'chargeOverrideKey', name:'tier.id.chargeOverrideKey', value:tier?.id?.chargeOverrideKey /}
+		#{textBox id:'tierMaximumRange', name:'tierMaximumRange', label:'Max Range', value:tier?.tierMaximumRange, format:'#,##0.####', class:'numeric', required:true, readOnly:readOnly, width:'86'/}
+		#{hidden id:'tierMaximumRangeStripped', name:'tier.tierMaximumRange', value:tier?.tierMaximumRange /}
+		&nbsp;<span id="tierMaximumRangeError" class="error"></span>
+	</p>
+	<p>			
+		#{textBox id:'taxCode', name:'tier.taxMaster.taxCode', label:'Tax Code', value:tier?.taxMaster?.taxCode, class:'capitalize', required:true, readOnly:true, width:'86' /}
+		#{hidden id:'taxKey', name:'tier.taxMaster.taxKey', value:tier?.taxMaster?.taxKey  /}
+		#{button id:'taxCodeHelp', value:'?', class:'small', readOnly:true /}
+		#{textBox id:'taxName', name:'taxName', value:tier?.taxMaster?.description, readOnly:true, width:'150' /}
+	</p>
+	<p>
+		#{textBox id:'tierValue', name:'tierValue', label:'Value', value:tier?.tierValue, format:'#,##0.####', class:'numeric', required:true, readOnly:readOnly, width:'86'/}
+		#{hidden id:'tierValueStripped', name:'tier.tierValue', value:tier?.tierValue /} 
+		<span id="percentage">%</span>
+		&nbsp;<span id="tierValueError" class="error"></span>
+	</p>
+	<p>
+		&nbsp;<span id="errmsgTier"></span>
+	</p>
+	<p>
+	</p>
+</form>

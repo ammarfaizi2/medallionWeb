@@ -1,0 +1,39 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle:'PDI Maintenance' /}
+
+<script type="text/javascript">
+
+</script>
+
+<table class="display">
+	<thead>
+		<tr>
+			<th>key</th>
+			<th>Group Name</th>
+			<th>Report Name</th>
+			<th>File Name</th>
+			<th>Active</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:reports, as:'report'}
+		<tr>
+			<td>
+				${report?.reportKey}
+			</td>
+			<td>
+				${report?.reportGroup?.lookupDescription}
+			</td>
+			<td>
+				${report?.reportName}
+			</td>
+			<td>
+				${report?.reportFile}
+			</td>
+			<td>
+				${report?.isActive ? "Yes" : "No"}
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>

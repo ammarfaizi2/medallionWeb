@@ -1,0 +1,50 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle:'Bank Transaction Master Maintenance' /}
+
+<script type="text/javascript">
+	function doEdit(data) {
+		if ((data[3] == "New") || (data[3] == "Updated")) {
+			view(data[0]);
+			return false;
+		} else {
+			return true;
+		}
+	}
+</script>
+
+<table class="display">
+	<thead>
+		<tr>
+			<th width="100px">Key</th>
+			<th width="100px">Transaction Code</th>
+			<th width="300px">Description</th>
+			<th width="50px">Status</th>
+			<th width="50px">Active</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:bankTransactionMasters, as:'bankTransactionMaster'}
+		<tr>
+			<td>
+				${bankTransactionMaster.transactionMasterKey}
+			</td>
+			<td class="capitalize">
+				${bankTransactionMaster.bankTransactionCode}
+			</td>
+			<td>
+				${bankTransactionMaster.transactionDescription}
+			</td>
+			<td>
+				${bankTransactionMaster?.recordStatus?.decodeStatus() }
+			</td>
+			<td>
+				${(bankTransactionMaster?.isActive) ? 'Yes' : 'No'}
+			</td>	
+		</tr>
+	#{/list}
+	</tbody>
+</table>
+
+	
+
+

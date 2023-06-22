@@ -1,0 +1,118 @@
+#{if mode == 'edit' || mode == 'entry' || profile?.status == 'O ' || profile?.status == 'N ' || profile?.status == 'U '}
+	#{set pageTitle: 'Compliance Rule Profile' /}
+#{/if}
+
+#{else}
+	#{set pageTitle: 'Compliance Rule Profile Approval' /}
+#{/else}
+
+#{set id:profile?.complianceProfCode /}
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{script 'lookups.js' /}
+
+<style type="text/css">
+  .errmsg { color:red; }
+  #header {padding-top:8px;}
+</style>
+
+<script type="text/javascript">
+	function doEdit(data) {
+		if ((data[9] == "New") || (data[9] == "Updated")) {
+			view(data[0]);
+			return false;
+		} else {
+			return true;
+		}
+	}
+</script>
+
+<form id="ruleProfileForm" class="form" method="POST" name="ruleProfile">
+	#{hidden id:'dispatch', value:mode /}
+	#{hidden id:'isReadOnly', name:'isReadOnly', value:readOnly /}
+	
+	#{hidden id:'rulekeys', name:'profile.rulekeys', value:profile?.rulekeys /}
+	#{hidden id:'status', name:'profile.status', value:profile?.status /}
+
+	<p>
+		#{textBox id:'profileCode', name:'profile.complianceProfCode', label:'Code', value:profile?.complianceProfCode, width:'120px', readOnly:((mode=='entry') ? confirming : true ),class:'capitalize', required:true, maxLength:20/}
+		<span class="error">#{error 'Compliance Rule Code is' /}</span>
+	</p>
+	<p>
+		#{textBox id:'description', name:'profile.description', label:'Description', value:profile?.description, width:'120px', readOnly:((mode=='entry') ? confirming : true ),class:'capitalize', required:true, maxLength:200/}
+		<span class="error">#{error 'Description is' /}</span>
+	</p>
+	<p>
+		#{radioButton id:'isActive', name:'isActive', value:((profile?.active)?'true':'false'), label:'Active', options:operators, readOnly:readOnly /}
+		#{hidden id:'active', name:'profile.active', value:((profile?.active)?'true':'false') /} 
+	</p>
+	<table id="ruleTable" class="display" >
+		<thead>
+			<tr>
+				<th width="30%" align="left">Rule Code</th>
+				<th width="30%" align="left">Rule Type</th>
+				<th width="10%"align="center">Operator</th>
+				<th width="10%"align="center">Value (%)</th>
+				<th width="20%"align="center">Action</th>
+			</tr>
+		</thead>
+		<tbody>
+		#{list profile.rules, as:'dtl'}
+			<tr>
+				<td align="left">${dtl?.ruleCode}</td>
+				<td align="left">${dtl?.ruleType.lookupDescription}</td>
+				<td align="center">${dtl?.operator}</td>
+				<td align="center">${dtl?.value}</td>
+				<td align="center"><input id="btn${dtl?.ruleId}" code="${dtl?.ruleCode}" key="${dtl?.ruleId}" type=button value='Delete'></td> 
+			</tr>
+		#{/list}
+		</tbody>
+	</table>
+	<div class="buttons">
+		#{button  id:'btnNewRule', value:'New Data', readOnly:readOnly/} 
+	</div>
+	<div id="dialogRule" title="Choose Rule" class="form">
+		<p>
+			#{textBox id:'rule', name:'profile.rule.ruleCode', label:'Rule Code', value:profile?.rule?.ruleCode, width:'90px', readOnly:readOnly, class:'capitalize', required:true, maxLength:50/}
+			#{hidden  id:'ruleKey', name:'profile.rule.ruleId', value:profile?.rule?.ruleId /}
+			#{button  id:'ruleHelp', value:'?', class:'small', readOnly:readOnly/}
+			<span id="ruleError" class="error">#{error 'Rule Code is' /}</span> 
+		</p>
+		<p>
+			#{textArea id:'ruleDesc', name:'profile.rule.description', label:'Description', value:profile?.rule?.description, readOnly:true, width:'318px', maxLength:'255' /}
+		</p>
+		<p>
+			#{textBox id:'ruleType', label:'Rule Type', readOnly:true, width:'100px' /}
+			#{textBox id:'ruleTypeDesc', readOnly:true, width:'215px' /}
+		</p>
+		<p>
+			#{textBox id:'operator', label:'Operator', readOnly:true, width:'50px' /}
+			#{textBox id:'operatorVal', readOnly:true, width:'50px' /}%
+		</p>
+		<p>
+			#{textBox id:'comparisonVal', label:'Comparison Value', readOnly:true, width:'320px' /}
+		</p>
+		<p>&nbsp;</p>
+		#{if readOnly}
+			<div class="buttons">
+				#{button  id:'btnCloseRule', value:'Close', readOnly:false/} 
+			</div>
+		#{/if}
+		#{else}
+			<div class="buttons">
+				#{button  id:'btnSaveRule', value:'Save', readOnly:false/} 
+				#{button  id:'btnCancelRule', value:'Cancel', readOnly:false/}
+			</div>
+		#{/else}	
+	</div>	
+</form>	
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'ComplianceRuleProfile/CpRuleProfile.js' /}
+	$(document).ready(function() {
+		$('.buttons input:button').button();
+		CpRuleProfile($("#main"));
+	});
+</script>
+
+

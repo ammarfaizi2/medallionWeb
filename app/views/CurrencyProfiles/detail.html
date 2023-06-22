@@ -1,0 +1,88 @@
+#{extends 'templates/detail1.html' /}
+#{if mode == 'edit' || mode == 'entry' || currencyProfile?.recordStatus == 'O ' || currencyProfile?.recordStatus == 'N ' || currencyProfile?.recordStatus == 'U '}
+	#{set pageTitle: 'Exchange Rate Maintenance' /}
+#{/if}
+#{else}
+	#{set pageTitle: 'Exchange Rate Approval' /}
+#{/else}
+#{set id:currencyProfile?.currencyProfileKey /}
+
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+
+#{script 'lookups.js' /}
+#{script 'validation/numericOnly.js' /}
+#{script 'external/Util.js' /}
+
+<style type="text/css">
+  .errmsg { color:red; }
+  textarea{resize: none;}
+</style>
+
+<form id="mainSecurityLimitForm" class="form" method="POST">
+#{hidden id:'currencyProfileKey', name:'currencyProfile.currencyProfileKey', value:currencyProfile?.currencyProfileKey /}
+<p>
+	#{textBox id:'profileDate', name:'currencyProfile.profileDate', label:'Date', value:currencyProfile?.profileDate?.format(appProp.dateFormat), required:true, class:'calendar', readOnly:((mode=='entry') ? confirming : true ) /}
+	(${appProp.displayDateFormat})
+	<span id="profileDateError" class="error">#{error 'Date' /}</span>
+</p>
+<p>
+	#{textBox id:'exchangeRateRefCode', name:'currencyProfile.currencyProfile.lookupCode', label:'Exchange Rate Ref.', value:currencyProfile?.currencyProfile?.lookupCode, required:true, class:'capitalize', readOnly:readOnly, width:'50px' /}
+	#{hidden id:'exchangeRateRef', name:'currencyProfile.currencyProfile.lookupId', value:currencyProfile?.currencyProfile?.lookupId /}
+	#{button id:'exchangeRateRefHelp', value:'?', class:'small', readOnly:readOnly /}
+	#{textBox id:'exchangeRateRefDesc', name:'currencyProfile.currencyProfile.lookupDescription', value:currencyProfile?.currencyProfile?.lookupDescription, readOnly:true, width:'222px' /}
+</p>
+<p>
+	#{textBox id:'baseCurrency', name:'currencyProfile.baseCurrency.currencyCode', label:'Base Currency', value:currencyProfile?.baseCurrency?.currencyCode, class:'capitalize', required:true, readOnly:readOnly, width:'50px', maxLength:'10' /}
+	#{button id:'baseCurrencyHelp', value:'?', class:'small', readOnly:readOnly /}
+	#{textBox id:'baseCurrencyDesc', name:'currencyProfile.baseCurrency.description', value:currencyProfile?.baseCurrency?.description, readOnly:true, width:'222px' /}		
+	<span id="currencyError" class="error">#{error 'Base Currency' /}</span>
+</p>
+<p>
+	<label>Input Method</label>
+	<input type='radio' id='inputMethod1' name='inputMethod' value='${inputothertobaseval}' #{if readOnly}disabled="disabled"#{/if} />
+	${inputothertobasedesc}
+	<input type='radio' id='inputMethod2' name='inputMethod' value='${inputbasetootherval}' #{if readOnly}disabled="disabled"#{/if} />
+	${inputbasetootherdesc}
+	#{hidden id:'inputMethodHidden', name:'currencyProfile.inputMethod.lookupId' , value:currencyProfile?.inputMethod?.lookupId /}
+</p>
+<p>
+	#{radioButton id:'active', name:'active', value:((currencyProfile?.active)?'true':'false'), label:'Active', options:operators, readOnly:readOnly /}
+	#{hidden id:'activeHidden', name:'currencyProfile.active', value:((currencyProfile?.active)?'true':'false') /}
+	<span id="activeError" class="error">#{error 'Active' /}</span>
+</p>		
+<br/>
+<b><span id="errCurrencyExchangeDetail" class="error"></span></b>
+<p></p>	
+<div id="tabsDetailCurrencyExchange">
+	<ul>
+		<li><a href="#currencyExchangeDetail">Fill Exchange Rate</a>
+	</ul>
+	<div class="pane" id="currencyExchangeDetail">	
+		<div id="listCurrencyExchangeDetail" style="overflow-y:scroll;height:120px">
+			#{include 'CurrencyProfiles/grid_currencyprofile.html' /}
+		</div>
+		<div class="buttons">
+			<button id="newCurrencyExchangeDetailData" #{if readOnly}disabled="disabled"#{/if}>Add</button>
+		</div>	
+	</div>	
+</div>
+</form>
+<form></form>
+<input type="hidden" id="dummy" />
+<div id="detailCurrencyExchange" title="Exchange Rate">
+		#{include 'CurrencyProfiles/detail_currencyprofile.html' /}	
+	<div class="buttons">
+		#{if (mode=='entry' || mode == 'edit')&& (!(confirming))}
+			<button id="saveCurrencyExchangeDetail">Save</button>
+			<button id="cancelCurrencyExchangeDetail">Cancel</button>
+		#{/if}
+		#{else}
+			#{if confirming || mode=='view' }
+				<button id="cancelCurrencyExchangeDetail">Close</button>
+			#{/if}
+		#{/else}	
+	</div>
+</div>
+<script type="text/javascript">
+	#{include 'CurrencyProfiles/currencyprofile.js' /}
+</script>

@@ -1,0 +1,146 @@
+#{extends 'templates/main.html' /}
+
+<script type="text/javascript">
+	$(function() {
+		$('.buttons input:button').button();
+		
+		/* function validateRemarkCorrection() {
+			if ($("input[name='deposito.needCorrection']:checked").val() == 'true') {
+				if (($('#remarkCorrection').val() == '') || ($('#remarkCorrection').val() == null)) {
+					$('#remarkCorrection').focus();
+					$('#remarkCorrectionError').html('Required');
+				} else {
+					$('#remarkCorrectionError').html('');
+					return true;
+				}
+				return false;
+			}
+			return true;
+		} */
+		
+		/* function validateSoldQuantity() {
+			var quantity = parseFloat($('#quantityStripped').val());
+			var avaiQuantity = parseFloat($('#holdingQuantity').val());
+			console.log("Quantity = "+quantity);
+			console.log("avaiQuantity = "+avaiQuantity);
+ 			if ($('#holdingQuantity').val() !== '') {
+				if (avaiQuantity >= quantity) {
+					$('#errQuantity').html('Sold Quantity cannot be more than Available Trx Quantity');
+				} else {
+					$('#errQuantity').html('');
+					return true;
+				}
+				return false;
+			}
+			return true;
+		} */
+		
+		var backToWorkList = function() {
+			loading.dialog('open');
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			};
+		}
+		
+		var closeDialogMessage = function() {
+			$("#dialog-message").dialog('close');
+			return false;
+		}
+		$('#approve').click(function() {
+			/* var resultValidateSoldQuantity = validateSoldQuantity();
+			if (!resultValidateSoldQuantity) {
+				return;
+			} */
+			
+			var action = "@{approve()}?taskId=${taskId}&maintenanceLogKey=${maintenanceLogKey}&operation=${operation}"+"";
+			var postData = {
+				"correction": $('#remarkCorrection').val()
+			};
+			loading.dialog('open');
+			$.post(action, postData, function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+					//alert(data.message);
+				} else {
+					loading.dialog('close');
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+					//alert(data.error);
+				}
+			});			
+		});
+		
+
+		// ACTION BUTTON REJECT
+		$('#reject').click(function() {
+			/* var resultValidateCorrection = validateRemarkCorrection();
+			if (!resultValidateCorrection) {
+				return;
+			} */
+			
+			var action = "@{reject()}?taskId=${taskId}&maintenanceLogKey=${maintenanceLogKey}&operation=${operation}"+"";
+			loading.dialog('open');
+			$.post(action, function(data, status, xhr) {
+	    		checkRedirect(data);
+				loading.dialog('close');
+				if (data.status == 'success') {
+					messageAlertOk(data.message, "ui-icon ui-icon-circle-check", "Approval Message", backToWorkList);
+					//alert("Transaction No : '${transaction?.transactionNumber}' is " + data);
+				} else {
+					loading.dialog('close');
+					messageAlertOk(data.error, "ui-icon1 ui-icon-circle-close", "Error Message", closeDialogMessage);
+					//alert(data.error);
+				}
+			});
+		});
+		//===============
+
+		
+
+		$('#closeWorkflow').click(function() {
+			if ($("#from").val() == 'listBatch') {
+				location = "@{Approvals.listbatch()}";
+			} else {
+				location = "@{Approvals.list()}";
+			}
+		});
+		
+		if ($("input[name='deposito.needCorrection']:checked").val() == 'true') {
+			$('#approve').button({disabled: true});
+			$('p[id=pRemarkCorrection] label span').html(" *");
+		} else {
+			$('#approve').button({disabled: false});
+			$('p[id=pRemarkCorrection] label span').html("");
+		}
+		$('#needCorrection').removeAttr('disabled');
+		$('#remarkCorrection').removeAttr('disabled');
+		
+		$('input[name=deposito.needCorrection]').change(function(){
+			if ($("input[name='deposito.needCorrection']:checked").val() == 'true') {
+				$('#approve').button({disabled: true});
+				$('p[id=pRemarkCorrection] label span').html(" *");
+			} else {
+				$('#approve').button({disabled: false});
+				$('p[id=pRemarkCorrection] label span').html("");
+			}
+			
+			$('#needCorrection').removeAttr('disabled');
+			$('#remarkCorrection').removeAttr('disabled');
+		});
+	});
+</script>
+<div id="detail">
+	#{include 'DepositoUpdates/detail.html' /}
+</div>
+
+#{hidden id:'taskId', name:'taskId', value:taskId /}
+#{hidden id:'from', name:'from', value:from /}	
+
+<div id="actions" class="buttons">
+	<input type="button" id="approve" value="Approve" />
+	<input type="button" id="reject" value="Reject" />
+	<input type="button" id="closeWorkflow" value="Cancel" />			
+</div>

@@ -1,0 +1,65 @@
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	
+	var sMonth = "sMonth";
+	var sYear = "sYear";
+
+	$("input.isNumber").keypress(function (e) { 
+		if ( e.which!=8 && e.which!=0 && (e.which<48 || e.which>57)) {
+		    return false;
+		}
+	});
+	
+	if('${elementCode}' == 'year'){
+		$("#${elementCode}").addClass(sYear);
+		$('input[name=year]').attr("maxLength", 4);
+	} else if('${elementCode}' == 'month') {
+		$("#${elementCode}").addClass(sMonth);
+		$('input[name=month]').attr("maxLength", 2);
+	}
+	
+	$('.'+sMonth).change(function() {
+		var el = $(this);
+		var id = this.id;
+		var errorId= "#" + id + "Error";
+		el.removeClass("fieldError");
+		$(errorId).html("");
+		
+		var idVal = el.val();
+		$(this).val($(this).val().leadingZero(2));
+		
+		if(Number(idVal) > 12 || Number(idVal) < 1){
+			el.addClass("fieldError");
+	    	$(errorId).html("Month out of range").show();
+		}
+	});
+	
+	$('.'+sYear).change(function() {
+		var el = $(this);
+		var id = this.id;
+		var errorId= "#" + id + "Error";
+		el.removeClass("fieldError");
+		$(errorId).html("");
+		
+		var idVal = el.val();
+		if(Number(idVal) > 2900 || Number(idVal) < 1900){
+			el.addClass("fieldError");
+	    	$(errorId).html("Year out of range").show();
+		}
+	});
+	
+</script>
+
+<p id="p_">		
+	#{textBox id:elementCode, name:elementCode, label:elementLabel, value:"${defaultValue}", width:'60px', readOnly:readOnly, class:'isNumber', maxLength:2 /}
+	<span id="${elementCode}Error" class="error"></span>
+</p>
+<script>
+$(document).ready(function(){	
+	var paramHtml = $("#${formId}");
+	
+	if( paramHtml.find("#${elementCode}").val() != "" ){
+		paramHtml.find("#${elementCode}").blur();		
+	}
+});	
+</script>

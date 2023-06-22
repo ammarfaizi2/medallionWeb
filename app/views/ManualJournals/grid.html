@@ -1,0 +1,33 @@
+<h3>Search results</h3>
+
+#{if faTransactions}
+	<table id="FaTransactionTable" class="display">
+		<thead>
+			<tr>
+				<th>Transaction Key</th>
+				<th>Transaction No</th>
+				<th>Name</th>
+				<th>Date</th>
+				<th>Total Amount</th>
+				
+			</tr>
+		</thead>
+		<tbody>
+		#{list faTransactions, as:'faTransaction'}
+			<tr>
+				<td>${faTransaction?.transactionKey}</td>
+				<td>${faTransaction?.transactionKey}</td>
+				<td>${faTransaction?.name}</td>
+				<td>${faTransaction?.transactionDate.format(appProp.dateFormat)}</td>
+				<td align="right" name="navAmtCell">${faTransaction?.totalAmount?.format('#,##0.##########')}</td>
+				
+			</tr>
+		#{/list}
+		</tbody>
+	</table>
+#{/if}
+#{else}
+	<div>No record found</div>
+#{/else}	
+
+

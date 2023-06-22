@@ -1,0 +1,43 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Adjustment Maintenance' /}
+
+<script type="text/javascript">
+$(document).ready(function(){
+	$("#new").hide();
+});
+</script>
+
+<div id="result" style="display:block;">
+	<table id="table" class="display">
+		<thead>
+			<tr>
+				<th width="80px" field="code|string|none|left|sort">code</th>
+				<th width="50px" field="code|string|none|left|sort">Adjustment Code</th>
+				<th width="80px" field="name|string|none|left|sort">Name</th>
+				<th width="80px" field="recordStatus|string|decode|left|sort">Status</th>
+				<th width="50px" field="isActive|boolean|yesno|center|sort">Active</th>
+			</tr>
+		</thead>
+		<tbody>
+			#{list listAdjustment, as:'listAdj'}
+				<tr>
+					<td>
+						${listAdj.code} 
+					</td>
+					<td>
+						${listAdj.code} 
+					</td>
+					<td>
+						${listAdj.name}
+					</td>
+					<td>
+						${listAdj.recordStatus}
+					</td>
+					<td>
+						${listAdj?.isActive ? 'Yes':'No'}
+					</td>		
+				</tr>
+			#{/list}
+		</tbody>
+	</table>
+</div>

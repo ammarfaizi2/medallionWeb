@@ -1,0 +1,20 @@
+<table id="gridPick" class="display">
+	<thead>
+		<tr>
+			<th width="30%">
+				Code
+			</th>
+			<th width="70%">
+				Description
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:items, as:'item'}
+		<tr>
+			<td>${item.value}</td>
+			<td>${item.text}</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>

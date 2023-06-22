@@ -1,0 +1,330 @@
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming) || (origin==cancelDepositoBreakOriginated)) /}
+#{set editBreak:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+#{script 'transaction.js' /}
+#{script 'date.js', characterset:'utf-8' /}
+
+#{if taskId==''}
+	#{if (origin==depositoBreakOriginated)}
+		#{if (from==depositoInquiryFullRedeem)}
+			<h2>Deposito Maturity</h2>
+		#{/if}
+		#{else}
+			<h2>Deposito Break</h2>
+		#{/else}
+		
+	#{/if}
+	#{elseif (origin==cancelDepositoBreakOriginated)}
+		#{if (from==depositoInquiryFullRedeem)}
+			<h2>Rollback Deposito Maturity</h2>
+		#{/if}
+		#{else}
+			<h2>Cancel Deposito Break</h2>
+		#{/else}
+	#{/elseif}
+#{/if}
+#{else}
+	#{if (origin==depositoBreakOriginated)}
+		<h2>Deposito Break Approval</h2>
+	#{/if}
+	#{elseif (origin==cancelDepositoBreakOriginated)}
+		<h2>Cancel Deposito Break Approval</h2>
+	#{/elseif}
+#{/else}
+#{if flash.error || errors}
+    <div class="error">
+    	<b>Error when saving data!</b><br/><br/>
+    	#{if flash.error}
+<li>${flash.error}</li>
+		#{/if}
+		#{ifErrors}
+			#{errors}
+<li>${error.key} ${error}</li>
+			#{/errors}
+		#{/ifErrors}
+    </div>
+#{/if}
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'DepositoBreaks/depositoBreak.js' /}
+</script>
+
+
+<form id="depositoBreakForm" class="form" method="POST">
+#{hidden id:'accountBlocked', name:'deposito.account.blocked', value:deposito?.account?.blocked /}
+#{hidden id:'classification', name:'deposito.classification.lookupId', value:deposito?.classification?.lookupId /}
+
+#{hidden id:'depositoTemplate', name:'deposito.depositoTemplate.lookupId', value:deposito?.depositoTemplate?.lookupId /}
+#{hidden id:'depositoTemplateKey', name:'deposito.depositoTemplateKey', value:deposito?.depositoTemplateKey /}
+#{hidden id:'frequency', name:'deposito.security.frequency.lookupCode', value:deposito?.security?.frequency?.lookupCode /}
+#{hidden id:'frequencyId', name:'deposito.security.frequency.lookupId', value:deposito?.security?.frequency?.lookupId /}
+#{hidden id:'minTrxQuantity', name:'deposito.security.minTrxQuantity', value:deposito?.security?.minTrxQuantity /}
+#{hidden id:'securityClass', name:'deposito.security.securityType.securityClass.lookupId', value:deposito?.security?.securityType?.securityClass?.lookupId /}
+#{hidden id:'transactionTemplateKey', name:'deposito.transactionTemplate.transactionTemplateKey', value:deposito?.transactionTemplate?.transactionTemplateKey /}
+#{hidden id:'transactionKey', name:'deposito.transactionKey', value:deposito?.transactionKey /}
+#{hidden id:'isreload', name:'isreload', value:isreload /}
+#{hidden id:'customerKey' /}
+#{hidden id:'hasInterest', name:'deposito.security.securityType.hasInterest', value:deposito?.security?.securityType?.hasInterest /}
+#{hidden id:'isFraction', name:'deposito.security.isFraction', value:deposito?.security?.isFraction /}
+	#{hidden id:'fractionRatioSource', name:'deposito.security.fractionRatioSource', value:deposito?.security?.fractionRatioSource /}
+	#{hidden id:'fractionRatioTarget', name:'deposito.security.fractionRatioTarget', value:deposito?.security?.fractionRatioTarget /}
+<table>
+	<tr>
+		<td>
+			<p id="dtDeposito">
+				#{textBox id:'depositoDate', name:'deposito.depositoBreak', label:'Break Date', value:deposito?.depositoBreak?.format(appProp.dateFormat), required:true, class:'calendar', readOnly:readOnly, width:'100px' /}(${appProp.displayDateFormat})
+				<span id="depositoDateError" class="error">#{error 'Break Date is' /}</span> 
+			</p>
+			
+			<p>
+				#{textBox id:'accountNo', name:'deposito.account.accountNo', label:'Account No', value:deposito?.account?.accountNo, required:true, class:'capitalize', readOnly:((mode=='entry') ? confirming : true ), width:'100px' /}
+				#{hidden id:"accountKey", name:'deposito.account.custodyAccountKey', value:deposito?.account?.custodyAccountKey /}
+				#{button id:'accountHelp', value:'?', class:'small', readOnly:((mode=='entry') ? confirming : true ) /}
+				#{textBox id:'accountName', name:'deposito.account.name', value:deposito?.account?.name, readOnly:true, width:'250px' /}
+				<span id="accountNoError" class="error">#{error 'Account No is' /}</span> 
+			</p>
+			<p>
+				#{textBox id:'securityType', name:'deposito.security.securityType.securityType', label:'Security Type', value:deposito?.security?.securityType?.securityType, readOnly:((mode=='entry') ? confirming : true ), required:true, class:'capitalize', width:'100px' /}
+				#{button id:'securityTypeHelp', value:'?', class:'small', readOnly:((mode=='entry') ? confirming : true ) /}
+				#{textBox id:'securityTypeDesc', name:'deposito.security.securityType.description', value:deposito?.security?.securityType?.description, readOnly:true, width:'250px' /}
+				<span class="error">#{error 'Security Type is' /}</span>
+			</p>
+			<p>
+				#{textBox id:'securityId', name:'deposito.security.securityId', label:'Security Code', value:deposito?.security?.securityId, required:true, class:'capitalize', readOnly:((mode=='entry') ? confirming : true ), width:'100px' /}
+				#{hidden id:'securityKey', name:'deposito.security.securityKey', value:deposito?.security?.securityKey /}
+				#{button id:'securityHelp', value:'?', class:'small', readOnly:((mode=='entry') ? confirming : true ) /}
+				#{textBox id:'securityDesc', name:'deposito.security.description', value:deposito?.security?.description, readOnly:true, width:'250px' /}
+				<span class="error">#{error 'Security Code is' /}</span>
+			</p>
+			<p>
+				#{textBox id:'currencyCode', name:'currencyCode', label:'Currency', value:deposito?.security?.currency?.currencyCode, class:'capitalize', readOnly:true, width:'100px' /}
+				#{hidden id:'currencyCodeHidden', name:'deposito.security.currency.currencyCode', value:deposito?.security?.currency?.currencyCode /}
+			</p>
+			<p>
+				#{textBox id:'issuerCode', name:'issuerCode', label:'Issuer Bank', value:deposito?.security?.issuer?.thirdPartyCode,  class:'capitalize', readOnly:true, width:'102px' /}
+				#{hidden id:'issuerCodeHide', name:'deposito.security.issuer.thirdPartyCode', value:deposito?.security?.issuer?.thirdPartyCode /}
+				#{hidden id:'issuerCodeKey', name:'deposito.security.issuer.thirdPartyKey', value:deposito?.security?.issuer?.thirdPartyKey /}
+				#{textBox id:'issuerCodeDesc', name:'issuerCodeDesc', value:deposito?.security?.issuer?.thirdPartyName, class:'capitalize',readOnly:true, width:'272px' /}
+				#{hidden id:'issuerCodeDescHide', name:'deposito.security.issuer.thirdPartyName', value:deposito?.security?.issuer?.thirdPartyName /}
+			</p>
+			<p>
+				#{textBox id:'depositoNo', name:'deposito.depositoNo', label:'Deposito No.', value:deposito?.depositoNo, required:true, class:'capitalize', readOnly:((mode=='entry') ? confirming : true ), width:'100px' /}
+				#{hidden id:'depositoKey', name:'deposito.depositoKey', value:deposito?.depositoKey /}
+				#{hidden id:'depositoKeyAdd', value:deposito?.depositoKey /}
+				#{button id:'depositoHelp', value:'?', class:'small', readOnly:((mode=='entry') ? confirming : true ) /}
+				#{textBox id:'depositoNominal', name:'amount', value:deposito?.amount, format:'#,##0.####', class:'numeric', readOnly:true, width:'250px' /}
+				<span id="accountNoError" class="error">#{error 'Deposito No is' /}</span>
+			</p>
+			<p>
+				#{textBox id:'branchCode', name:'deposito.branchCode', label:'Branch', value:deposito?.branchCode,class:'capitalize', readOnly:true, width:'378px', maxLength:100/}
+				<span class="error">#{error 'Branch is' /}</span>
+			</p>
+			<p>
+				#{textBox id:'externalReference', name:'deposito.externalReference', label:'External Reference', value:deposito?.externalReference, maxLength:50, class:'capitalize', readOnly:readOnly, width:'378px' /}
+			</p>
+			<p>
+				#{textArea id:'remaks', name:'deposito.remarks', label:'Remarks', value:deposito?.remarks, class:'capitalize', width:'373px', readOnly:readOnly, maxLength:200 /}
+			</p>
+		</td>
+		<td valign="top">
+		#{if from == depositoInquiryOriginated || from == depositoInquiryFullRedeem}
+			<p> 
+				#{textBox id:'status', name:'depositostatus', width:'100px',value:deposito?.status?.decodeDataStatus(), readOnly:true, label:'Status' /}
+				#{hidden id:'statusHidden', name:'deposito.status', value:deposito?.status /}
+			</p>
+		#{/if}
+		<div id="cancelDepositoBreak">
+			<p>
+				#{textBox id:'cancelDate', name:'deposito.cancelDate', label:'Cancel Date', value:deposito?.depositoBreak?.format(appProp.dateFormat), required:true, class:'calendar', readOnly:readOnly, width:'72px' /}(${appProp.displayDateFormat})
+				<span id="cancelDateError" class="error">#{error 'Cancel Date is' /}</span> 
+			</p>
+			<p>
+				#{textArea id:'remarksCancel', name:'deposito.remarksCancel', label:'Remarks Cancellation', value:deposito?.remarksCancel, class:'capitalize', width:'202px', readOnly:editBreak, maxLength:200 /}
+			</p>
+		</div>
+		<div id="correction" style="width:285px; display: none;" >
+			<p>
+				#{checkBox id:'needCorrection', name:'deposito.needCorrection', label:'Need Correction', value:deposito?.needCorrection, width:'100px' /}
+			</p>
+			<p id="pRemarkCorrection">
+				<label>Remarks Correction <span class="req">*</span></label>
+			</p>
+			<p>
+				#{textArea id:'remarkCorrection', name:'remarkCorrection', value:deposito?.remarksCorrection, class:'capitalize', width:'263px', maxLength:200 /}
+				#{hidden id:'remarkCorrectionHide', name:'deposito.remarksCorrection', value:deposito?.remarksCorrection /}
+				<span id="remarkCorrectionError" class="error">#{error 'Remarks Correction is' /}</span>
+			</p>
+
+		</div>
+		</td>
+	</tr>
+</table>				
+<p><b><span id="errGlobal" class="error"></span></b></p>
+
+	<div id="tabs" style="height:auto;width:850px">
+		<ul>
+			<li><a href="#tab1">Detail</a></li>
+			<li><a href="#tab2">Charges</a></li>
+			<li><a href="#tab4">Bank Info</a></li>
+			<li><a href="#tab5">Additional</a></li>
+		</ul>
+		<div id="tab1">
+			<div style="height:320px">
+				<div style="float:left;height:100%">
+					<p id="pNetAmount">
+						#{textBox id:'nominal', label:'Nominal', value:deposito?.amount, format:'#,##0.####', class:'numeric', required:true, readOnly:true /}
+						#{hidden id:'nominalStripped', name:'deposito.amount', value:deposito?.amount /}
+					</p>
+					<p>
+						<span class="error" id="errNominal">#{error 'Nominal is' /}</span>
+					</p>
+					<p id='pInterestRate'>
+						#{textBox id:'interestRate', label:'Interest Rate (gross)', value:deposito?.interestRate, format:'#,##0.####', class:'numeric', required:true, readOnly:readOnly, width: '85px' /} %
+						#{hidden id:'interestRateStripped', name:'deposito.interestRate', value:deposito?.interestRate /}
+						<span class="error">#{error 'Interest Rate (gross) is' /}</span>
+					</p>
+					<p id='pAccruedInterest'>
+						#{textBox id:'accruedInterest', label:'Gross Interest', value:deposito?.accruedInterest, format:'#,##0.####', class:'numeric', required:true, readOnly:readOnly /}
+						#{hidden id:'accruedInterestStripped', name:'deposito.accruedInterest', value:deposito?.accruedInterest /}
+					</p>
+					<p >
+						
+						#{textBox id:'taxCode', name:'deposito.taxMaster.taxCode', label:'&nbsp;&nbsp;&nbsp;Tax Code', value:deposito?.taxMaster?.taxCode, class:'capitalize calculate', readOnly:readOnly, width:'60px', required:true /}
+						#{hidden id:'taxKey', name:'deposito.taxMaster.taxKey', value:deposito?.taxMaster?.taxKey /}
+						#{button id:'discountTaxHelp', value:'?', class:'small', readOnly:readOnly /}
+						#{textBox id:'taxRate', name:'taxRate', value:deposito?.taxMaster?.taxRate, format:'#,##0.####', class:'numeric calculate', readOnly:true, width:'66px' /} %
+						#{hidden id:'taxRateHidden', name:'deposito.taxMaster.taxRate', value:deposito?.taxMaster?.taxRate /}
+						<span class="error">#{error 'Tax Code (left) is' /}</span>
+					</p>
+					<p id="pDiscountTax">
+						#{textBox id:'taxAmount', label:'&nbsp;&nbsp;&nbsp;Tax Amount', value:deposito?.taxAmount, format:'#,##0.####', class:'numeric calculate netAmount', readOnly:readOnly, required:true /}
+						#{hidden id:'taxAmountStripped', name:'deposito.taxAmount', value:deposito?.taxAmount /}
+						<span class="error">#{error 'Tax Amount (left) is' /}</span>
+					</p>
+					<p>
+						#{textBox id:'discountNet', label:'&nbsp;&nbsp;&nbsp;Net Interest', value:deposito?.taxOnInterestNet, format:'#,##0.####', class:'numeric numericminus', readOnly:true /}
+						#{hidden id:'discountNetStripped',  name:'deposito.taxOnInterestNet',value:deposito?.taxOnInterestNet /}
+					</p>
+					
+					<p>
+						#{textBox id:'totalCharges', label:'<i>Total Charges</i>', value:deposito?.totalFee, format:'#,##0.####', class:'rgNumeric', readOnly:true /}
+						#{hidden id:'totalChargesStripped',  name:'deposito.totalFee', value:deposito?.totalFee /}
+						<input type="button" id="showCharges" value="&#187;" #{if readOnly}disabled="disabled"#{/if} />
+					</p>
+					<p>
+						#{textBox id:'settlementAmount', label:'Settlement Amount', value:deposito?.settlementAmount, format:'#,##0.####', class:'numeric', readOnly:true /}
+						#{hidden id:'settlementAmountStripped', name:'deposito.settlementAmount', value:deposito?.settlementAmount /}
+					</p>
+					
+				</div>
+				<div class="right">
+					<p>
+						#{textBox id:'accrualBase', label:'Accrual Type', name:'accrualBase', value:deposito?.security?.accrualBase?.lookupCode, readOnly:true, class:'capitalized', width: '85px' /}
+						#{hidden id:'accrualBaseCodeHidden', name:'deposito.security.accrualBase.lookupCode' , value:deposito?.security?.accrualBase?.lookupCode /}
+						#{hidden id:'accrualBaseHidden', name:'deposito.security.accrualBase.lookupId' , value:deposito?.security?.accrualBase?.lookupId /}
+						<b>/</b>
+						#{textBox id:'yearBase', name:'yearBase', value:deposito?.security?.yearBase?.lookupCode, readOnly:true, class:'capitalized', width: '84px' /}
+						#{hidden id:'yearBaseCodeHidden', name:'deposito.security.yearBase.lookupCode' , value:deposito?.security?.yearBase?.lookupCode /}
+						#{hidden id:'yearBaseHidden', name:'deposito.security.yearBase.lookupId' , value:deposito?.security?.yearBase?.lookupId /}
+					</p>
+					<p id='pAccruedDays'>
+						#{textBox id:'accruedDays', label:'Days', value:deposito?.accruedDays, readOnly:true, class:'numeric', width: '85px' /}
+						#{hidden id:'accruedDaysStripped', name:'deposito.accruedDays', value:deposito?.accruedDays /}
+						<span class="error">#{error 'Days is' /}</span>						
+					</p>
+					
+					<p>
+						#{textBox id:'effectiveDate', name:'effectiveDate', label:'Effective Date', value:deposito?.effectiveDate?.format(appProp.dateFormat), required:false, class:'calendar', readOnly:true /}(${appProp.displayDateFormat})
+						#{hidden id:'effectiveDateHidden', name:'deposito.effectiveDate', class:'calendar', value:deposito?.effectiveDate?.format(appProp.dateFormat) /}
+						
+					</p>
+					<p id='pMaturityDate'>
+						#{textBox id:'maturityDate', name:'maturityDate', label:'Maturity Date', value:deposito?.maturityDate?.format(appProp.dateFormat), class:'calendar', readOnly:true /}
+						#{hidden id:'maturityDateHidden', name:'deposito.maturityDate', class:'calendar', value:deposito?.maturityDate?.format(appProp.dateFormat) /}
+						<span id="maturityDateError" class="error">#{error 'Maturity Date is' /}</span>
+						(${appProp.displayDateFormat})
+					</p>
+					<p>
+						#{textBox id:'interestFrequencyDesc', name:'deposito.interestFrequency.lookupDescription', label:'Int. Payment Freq', value:deposito?.interestFrequency?.lookupDescription, class:'capitalize', readOnly:true, width:'185px', maxLength:100/}
+						#{hidden id:'interestFrequencyId', name:'deposito.interestFrequency.lookupId', value:deposito?.interestFrequency?.lookupId /}
+					</p>
+					<p >
+						#{textBox id:'lastPaymentDate', name:'lastPaymentDate', label:'Start Date', value:deposito?.lastPaymentDate?.format(appProp.dateFormat), class:'calendar', readOnly:true /}
+						#{hidden id:'lastPaymentDateHidden', name:'deposito.lastPaymentDate', class:'calendar', value:deposito?.lastPaymentDate?.format(appProp.dateFormat) /}
+						(${appProp.displayDateFormat})
+					</p>
+					<p >
+						#{textBox id:'nextPaymentDate', name:'nextPaymentDate', label:'End Date', value:deposito?.nextPaymentDate?.format(appProp.dateFormat), class:'calendar', readOnly:true /}
+						#{hidden id:'nextPaymentDateHidden', name:'deposito.nextPaymentDate', class:'calendar', value:deposito?.nextPaymentDate?.format(appProp.dateFormat) /}
+						(${appProp.displayDateFormat})
+					</p>
+					<p>
+						#{dropDownList id:'maturityIns', name:'maturityIns', value:deposito?.maturityInstruction?.lookupId, label:'Maturity Instruction', options:maturityIns, width:'185px', readOnly:true /}
+						#{hidden id:'maturityInsHidden', name:'deposito.maturityInstruction.lookupId', value:deposito?.maturityInstruction?.lookupId /}
+					</p>
+					
+				</div>
+			</div>
+			<div class="buttons" style="position:relative;top:-30px">
+				<input type="button" id="prev1" value="&lt; Previous" disabled="disabled" />
+				<input type="button" id="next1" value="Next &gt;" />
+			</div>
+		</div>
+		<div id="tab2">
+			<div style="height:290px">
+				<div id="chargeDiv" style="overflow-y:scroll;max-height:170px;width:100%">
+					#{include 'DepositoBreaks/chargeList.html' /}
+				</div>
+				<div class="buttons" style="padding-top:5px;">
+					#{ifnot ((confirming) || (mode=='view')) }
+						<input type="button" value="Add" id="addCharge" />				
+						<input type="button" value="Reload" id="resetCharge" />
+						<input type="button" value="Done" id="chargeDone" style="display:none" />
+					#{/ifnot}
+					#{hidden id:'chargeKey', name:'chargeKey', value:''  /}
+				</div>
+			</div>
+			<div class="buttons">
+				<input type="button" id="prev2" value="&lt; Previous" />
+				<input type="button" id="next2" value="Next &gt;" />
+			</div>
+		</div>
+		
+		<div id="tab4">
+			<div style="height:290px">
+				<p>
+					#{textBox id:'bankAccount', name:'deposito.bankAccount.accountNo', label:'Account No', value:deposito?.bankAccount?.accountNo, class:'capitalize', required:true, readOnly:readOnly, width:'100px' /}
+					#{hidden id:'bankAccountKey', name:'deposito.bankAccount.bankAccountKey', value:deposito?.bankAccount?.bankAccountKey /}
+					#{button id:'bankAccountHelp', value:'?', class:'small', readOnly:readOnly /}
+					<span id="bankAccountError" class="error">#{error 'Settlement Account is' /}</span>
+				</p>
+				<p>
+					#{textBox id:'bankCode', name:'deposito.bankAccount.bankCode.thirdPartyCode', label:'Bank Code', value:deposito?.bankAccount?.bankCode?.thirdPartyCode, width:'100px', maxLength:'25', class:'capitalize', readOnly:true /}
+					#{hidden id:'bankCodeKey', name:'deposito.bankAccount.bankCode.thirdPartyKey', value:deposito?.bankAccount?.bankCode?.thirdPartyKey /}
+					#{textBox id:'bankCodeName', name:'deposito.bankAccount.bankCode.thirdPartyName', value:deposito?.bankAccount?.bankCode?.thirdPartyName, readOnly:true, class:'capitalize', width:'170px' /}
+				</p>
+				<p>
+					#{textBox id:'bankAccountBeneficiary', name:'deposito.bankAccount.name', label:'Beneficiary Name', value:deposito?.bankAccount?.name, class:'capitalize', readOnly:true, width:'270px' /}
+				</p>
+				<p>
+					#{textBox id:'bankAccountCurrency', name:'deposito.bankAccount.currency.currencyCode', label:'Currency', value:deposito?.bankAccount?.currency?.currencyCode, class:'capitalize', readOnly:true, width:'150px' /}
+				</p>
+				</div>
+			<div class="buttons">
+				<input type="button" id="prev4" value="&lt; Previous" />
+				<input type="button" id="next4" value="Next &gt;" />
+			</div>
+		</div>
+		<div id="tab5">
+			<div style="height:285px">
+				#{include 'templates/udf.html' /}
+			</div>
+			<div class="buttons">
+				<input type="button" id="prev5" value="&lt; Previous" />
+				<input type="button" id="next5" value="Next &gt;" disabled="disabled" />
+			</div>
+		</div>
+	</div>
+</form>
+<input type="hidden" id="dummy" />

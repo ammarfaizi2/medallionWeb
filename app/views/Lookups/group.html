@@ -1,0 +1,136 @@
+#{extends 'templates/main.html' /}
+#{set pageTitle: 'Lookup Maintenance' /}
+#{set fixData: true /}
+#{set subList: true /}
+#{script 'lookups.js' /}
+
+
+<script type="text/javascript">
+	$(function() {
+		$('#newGroups').button();
+		
+		$('#addGroup').button();
+		$('#cancelgroup').button();
+		$('.buttons button').button();	
+		
+		$( "#detailGroup" ).dialog({
+			autoOpen:false,
+			modal:true,
+			heigth:'1000px',
+			width:'400px',
+			resizable:false
+		});
+		
+		$('#newGroups').click(function() {
+			$("#detailGroup").dialog('open');
+			$("#detailGroup :text").val(""); 
+			$("#detailGroup :hidden").val("");
+			$('.ui-widget-overlay').css('height',$('body').height());
+		});
+		
+		$('#addGroup').click(function(){
+			if ($('#lookupGroup').val()==''){
+				$('#errmsgGroup').html("Required");
+				return false;
+			} else {
+				var resume = true;
+				if (typeof doSave == 'function') { 
+					resume = doSave();
+				}
+				if (resume) {
+					var action = "@{saveGroup()}?mode=${mode}#{if group}&group=${group}#{/}";
+					var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+					loading.dialog({
+						closeOnEscape: false,
+						draggable: false,
+						modal: true,
+						resizable: false,
+						open:function() {
+							$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+						} 
+					});
+					$.post(action, $('#groupForm').serialize(), function(data, status) {
+			    		checkRedirect(data);
+						loading.dialog('close');
+						if (data.status == 'success') {
+							$("#detailGroup").dialog('close');
+							location = "@{group()}";
+						} else {
+							alert(data.error);
+						}
+					});
+					//$('#groupForm').attr('action', action);
+					//$('#groupForm').submit();
+				}
+				$('errmsgGroup').html("");
+			}
+		});
+		
+		$('#cancelGroup').click(function(){
+			$("#detailGroup").dialog('close');
+			return false;
+		});
+		
+	});
+	
+	function submit(action, id){
+		var loading = $('<div id="loading" class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin:10px" align="middle" /> Saving...</div>').appendTo('body');
+		loading.dialog({
+			closeOnEscape: false,
+			draggable: false,
+			modal: true,
+			resizable: false,
+			open:function() {
+				$(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+			} 
+		});
+		$('#groupForm').attr('action', action);
+		$('#groupForm').submit();
+	}
+
+</script>
+<style type="text/css">
+  #errmsgGroup { color:red; }
+
+</style>
+
+<div id="result" style="display:block">
+    <table id="tableLookupGroup" class="display">
+        <thead>
+            <tr>
+                <th width="80px" field="lookupGroup|string|none|left|sort">Group</th>
+                <th width="50px" field="systemLookup|boolean|yesno|center|sort">System Lookup</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<div class="buttons">
+<input type="button" id="newGroups" value="New Group" />
+</div>
+
+<div id="detailGroup" title="Lookup Group">
+<br />
+	<form id="groupForm" class="form">
+		<p>
+			#{textBox id:'lookupGroup', name:'group.lookupGroup', value:group?.lookupGroup, class:'capitalize', label:'Lookup Group', required:true,maxLength:30 /}
+			<span id="errmsgGroup"></span>
+		</p>
+	<br />
+		<div class="buttons">
+			<button id="addGroup">Save</button>
+			<button id="cancelGroup">Cancel</button>
+		</div>
+	</form>
+	
+</div>
+
+<script type="text/javascript">
+#{include 'RegistrySubscription/Util.js' /}
+#{include 'Lookups/lookupGroupPaging.js' /}
+$(document).ready(function() {
+	Paging($("#main"));
+});
+</script>

@@ -1,0 +1,21 @@
+<table id="gridLogWeb" class="display">
+	<thead>
+		<tr>
+			<th width="150px">Last Modified</th>
+			<th width="100px">File Name</th>
+			<th width="100px">Size</th>
+			<th width="100px">Download</th>
+		</tr>
+	</thead>
+	<tbody>
+	 	#{list webLogList, as:'list'}
+		<tr>			
+			<td>${list?.lastModified().asdate('dd MMMM yyyy hh:mm:ss')}</td>
+			<td>${list?.getName()}</td>
+			<td>${list?.length()}  bytes</td>
+			<td><a href="@{downloadGeneratedFileWeb()}?downloadfile=/${list?.getName()}">Download</a>	</td>
+		</tr>
+		#{/list}
+	</tbody>
+</table>
+

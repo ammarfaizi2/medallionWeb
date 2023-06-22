@@ -1,0 +1,200 @@
+#{extends 'templates/detail1.html' /}
+#{set pageTitle: ' ' /}
+#{set id: bankAccount?.bankAccountKey /}
+#{set id: bankAccount?.customer?.customerKey /}
+
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{script 'lookups.js' /}
+#{script 'lookuppaging.js' /}
+
+<script type="text/javascript">	
+	$(function() {
+		#{include 'RegistrySubscription/Util.js' /}
+	});
+</script>
+
+<script type="text/javascript">	
+	$(function() {
+		
+		$('#tabs').tabs();
+		
+		if ('${mode}' == 'view'){
+			$('#setup').attr("disabled", "disabled");
+			$('#addBank').attr("disabled", "disabled");
+		}
+		/* $('#save').button();
+		$('#cancel').button();
+		$('#close').button();
+		$('#back').button();
+		$('#confirm').button(); */
+		$('.buttons input:button').button();
+		
+		
+	});
+	
+	function doCancel() {
+		#{if param == null && mode == 'entry'}
+			location.href='@{Customers.list()}?mode=view&param=register-bank-acct&group=CUSTOMER';
+			return false;
+		#{/if}			
+		#{else}
+			#{if mode == 'edit'}
+				location.href='@{list()}?mode=edit&param=edit';
+			#{/if}
+			#{elseif mode == 'entry'}
+				location.href='@{Customers.list()}?mode=view&param=register-bank-acct&group=CUSTOMER';
+			#{/elseif}
+			#{else}
+				return true;
+			#{/else}
+		#{/else}
+	};
+	
+	var closeDialogMessage = function() {
+		$("#dialog-message").dialog('close');
+		loading.dialog('close');
+	};
+	
+	accountOk = false;
+	function doSave() {		
+		if("${coreIntegrated}" == "1" && ($("#bankAccountNo").val() != "" && $("#bankCode").val() == '${defaultbankcode}')){
+			if($('#bankAccountNo').val() != ""){
+				var action = "@{accountInquiry()}?acctNo="+$('#bankAccountNo').val();
+				loading.dialog('open');
+				$.post(action, function(data, status, xhr) {
+		    		checkRedirect(data);
+					console.log(data)
+					if(data.accountStatus){
+						accountOk = true;
+					}else{
+						var div = $("<div title='Confirmation'><p><span class='ui-icon ui-icon-alert' style='float:left; margin:12px 12px 20px 0;'></span>"+data.errorMessage+", do you want to continue ?</p></div>")
+
+						 $(div).dialog({
+							resizable: false,
+							height: "auto",
+							width: 600,
+							modal: true,
+							buttons: {
+								"Yes": function() { 
+										$(this).dialog("close");
+										$('#bankCode').removeAttr("disabled");
+										submit('@{save()}?mode=${mode}#{if group}&group=${group}#{/}#{if isPartial}&isPartial=${isPartial}#{/}');
+									},
+						        "No": function() {
+						        	$(this).dialog("close"); 
+						        	loading.dialog('close');
+						        }
+						    }
+						});
+					}
+				});
+				if(accountOk){
+					$('#bankCode').removeAttr("disabled");
+					return true;
+				}
+			}
+		}else{
+			$('#bankCode').removeAttr("disabled");
+			return true;
+		}		
+	}
+	
+	/*
+	function doSave() {
+		var checkInterestRate = $("#interestRateStripped").val();
+		if (checkInterestRate > 100){
+			$("#interestRate").addClass('fieldError');
+			$("#errmsgInterest").html("Maximum 100 %").show();
+			//alert(" Error Found ! Please Check your 'Interest Rate' ");
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	function doConfirm() {
+		//alert("mode ? " + ${mode});
+		if ('${mode}' == 'entry') {
+			$.ajax({
+			  	url: submit('@{BankAccounts.confirm()}/'+ $('#bankAccountKey').val()+'?mode=entry'+ '&param=register-bank-acct'),
+			 	success: function() {
+					location.href='@{Customers.list()}?mode=view&param=register-bank-acct'; 
+			  	}
+			});
+		} else {
+			return true;
+		}		
+	};
+	*/
+	
+	function doClose() {
+		history.back();
+	};
+	
+</script>
+
+#{hidden id:'param', name:'param', value:param /}
+#{hidden id:'organizationId', name:'bankAccount.organization.organizationId', value:bankAccount?.organization?.organizationId /}
+
+<h2>Bank Account: ${bankAccount?.accountNo}-${bankAccount?.name}</h2>
+
+<form id="accountForm" class="form">
+	<div id="tabs">
+		<ul>
+			<li><a href="#tabs-1">Bank Account Detail</a></li>
+		</ul>
+		
+		<div class="pane" id="tabs-1">
+			#{include 'BankAccounts/tab_account.html' /}
+		</div>
+	</div>
+</form>
+<div class="buttons">
+#{if mode == 'entry'}
+#{if (param=='')&&(!confirming) }
+				<!-- <button id="save">Save</button>
+				<button id="cancel">Cancel</button> -->
+				<input type="button" id="save" value="Save" />
+				<input type="button" id="cancel" value="Cancel" />
+			#{/if}
+	#{if confirming}
+		<!-- <button id="confirm">Confirm</button>
+		<button id="back">Back</button> -->
+		<input type="button" id="confirm" value="Confirm" />
+		<input type="button" id="back" value="Back" />
+	#{/if}
+#{/if}
+#{if mode == 'edit'}
+		#{if mode == 'view'}
+			<button id="close">Close</button>
+		#{/if}
+		#{else}
+			#{if (!confirming) }
+				<!-- <button id="save">Save</button>
+				<button id="cancel">Cancel</button> -->
+				<input type="button" id="save" value="Save" />
+				<input type="button" id="cancel" value="Cancel" />
+			#{/if}
+			#{if confirming}
+				<!-- <button id="confirm">Confirm</button>
+				<button id="back">Back</button> -->
+				<input type="button" id="confirm" value="Confirm" />
+				<input type="button" id="back" value="Back" />
+			#{/if}
+		#{/else}
+	
+#{/if}
+#{if mode == 'view'}
+	#{if param == 'edit'}
+			<button id="close">Close</button>
+		#{/if}
+#{/if}
+</div>
+
+
+
+	
+	
+	
+
+

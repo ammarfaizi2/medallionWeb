@@ -1,0 +1,135 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle: 'Liquidation Process Fund' /}
+#{set fixData: true /}
+#{script 'lookups.js', characterset:'utf-8' /}
+
+<script type="text/javascript">
+
+	$(function() {
+		
+		$('.calendar').datepicker();
+		
+			// Search section
+			
+		$('#accordion').accordion({
+			collapsible: true
+		});
+		
+		
+		$('.buttons button:first').button({
+			icons: {
+				primary: 'ui-icon-search'
+			}
+		}).next().button();
+		
+		
+		
+		$('#search').click(function() {
+			search();
+			return false;
+		});
+		// end of Search
+		
+		
+		$('#reset').click(function() {
+			location.href='@{list()}#{if group}/${group}#{/}';
+			return false;
+		});
+		
+		
+		$('.buttons input:button').button();
+		
+	});
+	
+	var search = function() {
+
+		$('#result .loading').show();
+		$('#result .response').hide();
+		
+		if (($('#liqDateFrom').val()=='') || ($('#liqDateTo').val()=='')) {
+			if ($('#liqDateFrom').val()=='') {
+				$("#liqDateFromError").html("Required");
+			}
+			
+			if ($('#liqDateTo').val()==''){
+				$("#liqDateToError").html("Required");
+			} 
+			
+			return false;
+
+		} else {
+			validateDate();
+		}
+		
+		
+		
+		if (($('#liqDateFrom').hasClass('fieldError')) || ($('#liqDateTo').hasClass('fieldError'))){
+			return false;
+		}
+		
+		$('#result').show();	
+		
+		$.get('@{search()}', $('#searchForm').serialize(), function(data) {
+			checkRedirect(data);
+			$("#liqDateFromError").html("");
+			$("#liqDateToError").html("");
+			$('#result .response').html(data);
+			$('#result .loading').hide();
+			
+			
+		
+			$('#result .response').show();
+			setupTable();
+		});	
+		
+	};
+	
+	var validateDate = function(){
+		var liqDateFrom = new Date($('#liqDateFrom').datepicker('getDate'));
+		var liqDateTo = new Date($('#liqDateTo').datepicker('getDate'));
+			if (liqDateTo.getTime() < liqDateFrom.getTime()) {
+				$('#liqDateTo').addClass('fieldError');
+				$("#liqDateToError").html("Liquidation Date To must be greather than Liquidation Date From");
+			} else {
+				$('#liqDateTo').removeClass('fieldError');
+				$("#liqDateToError").html("");
+			}
+	} 
+	
+</script>
+
+<div id="accordion">
+	<h3><a href="#">Search Fund By Liquidation Date</a></h3>
+		<form id="searchForm" class="form">
+
+				<input id="param" name="params.param" type="hidden" value="${param}"/> 
+			<p>
+				#{textBox id:'liqDateFrom', name:'params.liquidationSearchLiquidationDateFrom', label:'Liquidation Date From', value:params?.liquidationSearchLiquidationDateFrom?.format(appProp.dateFormat), required:true,width:'85px', class:'calendar' /} (${appProp.displayDateFormat})
+				<span id="liqDateFromError" class="error"></span>
+			</p>
+			<p>
+				#{textBox id:'liqDateTo', name:'params.liquidationSearchLiquidationDateTo', label:'Liquidation Date To', value:params?.liquidationSearchLiquidationDateTo?.format(appProp.dateFormat), required:true,width:'85px', class:'calendar' /} (${appProp.displayDateFormat})
+				<span id="liqDateToError" class="error"></span>
+			</p>	
+			<br />
+			<div class="buttons">
+				<button id="search">Show</button>
+				<button id="reset">Reset</button>
+			</div>
+			
+	</form>
+</div>
+
+<div id="result" style="display:none">
+	<div class="loading"><img src="@@{'/public/images/loading2.gif'}" style="margin: 10px" /></div>
+	<div class="response"></div>
+</div>
+<!-- div class="buttons">
+	<!-- 		<label><input type="checkbox" id="notInList"/> Not in the list</label>&nbsp; >
+			<input type="button" id="new" value="New Data" />	
+		</div-->	
+
+
+
+
+

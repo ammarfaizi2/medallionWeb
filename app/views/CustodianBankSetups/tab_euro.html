@@ -1,0 +1,81 @@
+<p>
+	#{textBox id:'memberCode', name:'cust.euroAccount.accountCode', label:'Member Code', value:cust?.euroAccount?.accountCode, class:'capitalize', width:'200px',required:true,readOnly:readOnly, maxLength:50 /}
+	#{hidden id:'euroAccountKey', name:'cust.euroAccount.custodianAccountKey', value:cust?.euroAccount?.custodianAccountKey /}
+	#{hidden id:'categoryEuro', name:'cust.euroAccount.accountCategory.lookupId', value:cust?.euroAccount?.accountCategory?.lookupId /}
+	<span class="error">#{error 'Member Code in tab EUROCLEAR is' /}</span>		
+</p>
+<p>
+	#{textBox id:'terminalCode', name:'cust.euroAccount.accountTerminalCode', label:'Terminal Code', value:cust?.euroAccount?.accountTerminalCode, class:'capitalize', width:'200px',required:true,readOnly:readOnly, maxLength:50 /}
+	<span class="error">#{error 'Terminal Code in tab EUROCLEAR is' /}</span>
+</p>
+<br />
+<fieldSet>
+	<legend><b>For Debet Purpose</b></legend>
+	<div style="overflow-y:scroll;height:130px">
+	<table id="gridBankAccountDebetEuro" class="display">
+		<thead>
+			<tr>
+				<th>Account No</th>
+				<th>Bank Name</th>
+				<th>Beneficiary Name</th>
+				<th>Currency</th>
+				<th>Branch</th>
+				<th>Used By</th>
+				<th>Action</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+		</tbody>
+	</table>
+	</div>
+	<div class="buttons">
+		<input type="button" id="newDebetEuro"  value="Add" # class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" #{if readOnly}disabled="disabled"#{/if}/>
+	</div>
+	#{hidden id:'debetTypeDe', name:'cust.euroAccount.coaDebetEuro.processType' , value:cust?.euroAccount?.coaDebetEuro?.processType /}
+</fieldSet>
+
+<br />
+
+<fieldSet>
+	<legend><b>For Credit Purpose</b></legend>
+	<div style="overflow-y:scroll;height:130px">
+	<table id="gridBankAccountCreditEuro" class="display">
+		<thead>
+			<tr>
+				<th>Account No</th>
+				<th>Bank Name</th>
+				<th>Beneficiary Name</th>
+				<th>Currency</th>
+				<th>Branch</th>
+				<th>Used By</th>
+				<th>Action</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+		</tbody>
+	</table>
+	</div>
+	<div class="buttons">
+		<input type="button"  id="newCreditEuro" value="Add" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" #{if readOnly}disabled="disabled"#{/if}/>
+	</div>
+	#{hidden id:'debetTypeCe', name:'cust.euroAccount.coaCreditEuro.processType' , value:cust?.euroAccount?.coaCreditEuro?.processType /}
+</fieldSet>
+

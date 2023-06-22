@@ -1,0 +1,358 @@
+#{set readOnly:(((mode!='edit')&&(mode!='entry'))||(confirming)) /}
+#{set readOnlyFundCode:(mode=='edit'||mode=='view'||confirming) /}
+#{set readOnlyProductAccount:(mode=='edit'||mode=='view'||confirming) /}
+#{script 'lookuppaging.js' /}
+#{script 'lookups.js' /}
+
+<style type="text/css">
+  .errmsg { color:red; }
+  #price {margin-left:-0.1em;}
+  #unit {margin-left:-0.1em;}
+  #header {padding-top:8px;}
+  
+</style>
+
+<!-- MAIN SCREEN -->
+<form id="registryRedemptionForm" class="form" method="POST" name="redemption">
+	#{hidden  id:'dispatch', value:mode/}
+	#{hidden  id:'tradeKey', name:'red.tradeKey',  value:red?.tradeKey /}
+	#{hidden id:'amountRoundValue', name:'sub.rgProduct.amountRoundValue', value:sub?.rgProduct?.amountRoundValue /}
+	#{hidden id:'amountRoundType', name:'sub.rgProduct.amountRoundType', value:sub?.rgProduct?.amountRoundType /}
+	#{hidden id:'unitRoundValue', name:'sub.rgProduct.unitRoundValue', value:sub?.rgProduct?.unitRoundValue /}
+	#{hidden id:'unitRoundType', name:'sub.rgProduct.unitRoundType', value:sub?.rgProduct?.unitRoundType /}
+	#{hidden id:'priceRoundValue', name:'sub.rgProduct.priceRoundValue', value:sub?.rgProduct?.priceRoundValue /}
+	#{hidden id:'priceRoundType', name:'sub.rgProduct.priceRoundType', value:sub?.rgProduct?.priceRoundType /}
+	#{hidden id:'effectiveDate' /}
+	#{hidden id:'redLock', name:'red.rgProduct.redLock', value:red?.rgProduct?.redLock /}
+	
+	<!-- === FOR CANCEL === -->
+	#{hidden name:'rg.tradeKey', value:rg?.tradeKey/}
+	#{hidden name:'rg.rgProduct.productCode', value:rg?.rgProduct?.productCode /}
+	#{hidden name:'rg.type', value:rg?.type/}
+	#{hidden name:'rg.redemRefKey', value:rg?.redemRefKey/}
+	#{hidden id:'currentBusinessDate', name:'currentBusinessDate', value:currentBusinessDate?.format(appProp.dateFormat), class:'calendar' /}
+	#{hidden id:'goodFundDate', name:'red.goodfundDate', label:'Good Fund Date', value:red?.goodfundDate?.format(appProp.dateFormat), class:'calendar', readOnly:true/}
+	#{hidden id:'trnSABranch', name:'red.trnSABranch.thirdPartyKey', value:"" /}
+	#{hidden id:'availBalStripped', name:'red.availabelBalance', value:red?.availabelBalance /}
+	#{hidden id:'discPct', value:red?.discPct, format:'#,##0.######', class:'numeric' /}
+	#{hidden id:'discPctStripped', name:'red.discPct', value:red?.discPct /}
+	#{hidden id:'discAmt', name:'red.discAmt', value:0 /}
+	#{hidden id:'taxPct', value:red?.taxPct, format:'#,##0.######', class:'numeric' /}
+	#{hidden id:'taxPctStripped', name:'red.taxPct', value:red?.taxPct /}
+	#{hidden id:'taxAmt', value:red?.taxAmt , format:'#,##0.######', class:'numeric'/}
+	#{hidden  id:'taxAmtStripped', name:'red.taxAmt', value:red?.amount /}
+	#{hidden  id:'amount', value:red?.amount, format:'#,##0.######', class:'numeric' /}
+	#{hidden  id:'amountStripped', name:'red.amount', value:red?.amount /}
+					
+	#{hidden id:'tax', name:'red.taxMaster.taxCode', value:red?.taxMaster?.taxCode/}
+	#{hidden id:'h_tax', name:'red.taxMaster.taxKey', value:red?.taxMaster?.taxKey/}
+	#{hidden id:'capGainTaxAmount', name:'capGainTaxAmount', value:0/}	
+	#{hidden id:'otherPct', value:red?.otherPct/}
+	#{hidden id:'availBal', value:red?.availabelBalance/}
+	#{hidden id:'trnSABranchKey', name:'red.trnSABranchKey', value:red?.trnSABranchKey /}
+	#{hidden id:'trnSABranchCode', name:'red.trnSABranch.thirdPartyCode', value:red?.trnSABranch?.thirdPartyCode /}
+	#{hidden id:'trnSABranchDesc', name:'red.trnSABranch.thirdPartyName', value:red?.trnSABranch?.thirdPartyName /}
+	#{hidden id:'defaultPostDate', name:'red.defaultPostDate', value:red?.defaultPostDate?.format(appProp.dateFormat) /}
+	
+	<!-- ============== -->
+	
+<table>
+	<tr>
+		<td>	
+			<p>
+				#{textBox id:'transactionNo', name:'red.tradeKey', label:'Transaction No', value:red?.tradeKey, readOnly:true/}	
+				
+				#{if from == 'unitRegistry'}
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				&nbsp;&nbsp;#{textBox id:'statusTrans', label:'Status', value:red?.tradeStatus, width:'120px', readOnly:true /}
+				#{/if}		
+			</p>
+			<p>			
+				#{textBox id:'fundCode', name:'red.rgProduct.productCode', label:'Fund Code', value:red?.rgProduct?.productCode, width:'120px', readOnly:readOnlyFundCode, class:'capitalize', required:true, dataold:red?.rgProduct?.productCode /}
+				#{hidden  id:'fundCodeKey', value:red?.rgProduct?.productCode /}
+				#{button  id:'fundCodeHelp', value:'?', class:'small', readOnly:readOnlyFundCode /}
+				#{textBox id:'fundCodeDesc',  name:'red.rgProduct.name', value:red?.rgProduct?.name, readOnly:true, width:'245px' /}
+				<span class="error">#{error 'Fund Code is' /}</span>
+			</p>
+			<p>
+				#{textBox id:'currencyFund', name:'red.rgProduct.currency.currencyCode', label:'Currency', value:red?.rgProduct?.currency?.currencyCode, readOnly:true/}			
+			</p>
+			<p>		
+				#{textBox id:'invtAcct', name:'red.rgInvestmentaccount.accountNumber', label:'Product Account', value:red?.rgInvestmentaccount?.accountNumber, width:'120px', readOnly:readOnlyProductAccount, class:'capitalize', required:true, dataold:red?.rgInvestmentaccount?.accountNumber /}
+				#{hidden  id:'invtAcctKey', value:red?.rgInvestmentaccount?.accountNumber /}
+				#{button  id:'invtAcctHelp', value:'?', class:'small', readOnly:readOnlyProductAccount /}
+				#{textBox id:'invtAcctDesc', name:'red.rgInvestmentaccount.name', value:red?.rgInvestmentaccount?.name, readOnly:true, width:'245px' /}
+				<span class="error">#{error 'Investment Acct is' /}</span>
+			</p>
+			<p>			
+				#{textBox id:'tradeDate', name:'red.tradeDate', label:'Transaction Date', value:red?.tradeDate?.format(appProp.dateFormat), class:'calendar', readOnly:readOnly, required:true /} (${appProp.displayDateFormat})
+				<span id="tradeDateError" class="error">#{error 'Transaction Date is' /}</span>
+			</p>
+			<p>			
+				#{textBox id:'navDate', name:'red.navDate', label:'NAV Date', value:red?.navDate?.format(appProp.dateFormat), class:'calendar', readOnly:readOnly, required:true /} (${appProp.displayDateFormat})
+				<span id="navDateError" class="error">#{error 'NAV Date is' /}</span>
+			</p>
+			<p>			
+				#{textBox id:'postDate', name:'red.postDate', label:'Posting Date', value:red?.postDate?.format(appProp.dateFormat), class:'calendar', readOnly:readOnly, required:true /} (${appProp.displayDateFormat})
+				<span id="postDateError" class="error">#{error 'Post Date is' /}</span>
+			</p>
+			<p>			
+				#{textBox id:'paymentDate', name:'red.paymentDate', label:'Payment Date', value:red?.paymentDate?.format(appProp.dateFormat), class:'calendar', readOnly:readOnly, required:true /} (${appProp.displayDateFormat})
+				<span id="paymentDateError" class="error">#{error 'Payment Date is' /}</span>
+			</p>	
+			<p>			
+				#{hidden  id:'saCodeId', name:'red.rgInvestmentaccount.thirdPartyBySaCode.thirdPartyKey', value:red?.rgInvestmentaccount?.thirdPartyBySaCode?.thirdPartyKey /}
+				#{textBox id:'saCode', name:'red.rgInvestmentaccount.thirdPartyBySaCode.thirdPartyCode', label:'Selling Agent', value:red?.rgInvestmentaccount?.thirdPartyBySaCode?.thirdPartyCode, class:'capitalize', width:'120px', readOnly:true, required:false /}
+				#{textBox id:'saCodeDesc', name:'red.rgInvestmentaccount.thirdPartyBySaCode.thirdPartyName', value:red?.rgInvestmentaccount?.thirdPartyBySaCode?.thirdPartyName, readOnly:true, width:'245px' /}
+				<span class="error">#{error 'SA Code is' /}</span>
+			</p>
+			<p>
+				#{textBox id:'externalReference', name:'red.externalReference', label:'External Reference', value:red?.externalReference, class:'capitalize', width:'120px', maxLength:20, readOnly:readOnly/}			
+			</p>
+			<p>
+				#{textArea id:'remark', name:'red.remark', label:'Remarks', value:red?.remark, class:'capitalize',  width:'399px', readOnly:readOnly, maxLength:100 /}
+			</p>
+			<p>
+				#{radioButton id:'liquidation', name:'red.liquidation', value:((red?.liquidation)?'true':'false'), label:'Redemption Type', options:redemptionOperators, readOnly:readOnly/}
+			</p>
+			</td>
+		<td id="forCancelTrade" style="display: none;" valign="top">
+			
+				#{hidden id:'cancelDate', label:'Cancel Date', value:rg?.cancelTradeDate?.format(appProp.dateFormat), class:'calendar validateDateFormat',  width:'80px', readOnly:readOnly , required:true /}
+				#{hidden id:'cancelDateHidden', name:'rg.cancelTradeDate', value:rg?.cancelTradeDate?.format(appProp.dateFormat), class:'calendar'/}
+<!-- 				<br/><span id="cancelDateError" class="error"></span> -->
+<!-- 			</p> -->
+<!-- 			<p> -->
+				#{hidden id:'cancelPostDate', label:'Cancel Post Date', value:rg?.cancelPostDate?.format(appProp.dateFormat), class:'calendar validateDateFormat',  width:'80px', readOnly:readOnly,required:true  /}
+				#{hidden id:'cancelPostDateHidden', name:'rg.cancelPostDate', value:rg?.cancelPostDate?.format(appProp.dateFormat), class:'calendar' /}
+<!-- 				<br/><span id="cancelPostDateError" class="error"></span> -->
+<!-- 			</p> -->
+			<p>
+				#{textArea id:'remarkForCancel', label:'Remarks Cancellation', value:rg?.cancelRemark, class:'capitalize',  width:'200px', readOnly:readOnly, required:true, rows:'5' /}
+				#{hidden id:'remarkForCancelHidden', name:'rg.cancelRemark', value:rg?.cancelRemark /}
+				<span id="remarkForCancelError" class="error"></span>
+			</p>
+			
+		</td>
+		<!-- form approval -->	
+		#{if isApproval}
+		<td style="vertical-align:top">
+				<div id="correction" >
+				<p>
+					#{checkBox id:'needCorrection', name:'needCorrection', label:'Need Correction', value:needCorrection, readOnly:editOnly, width:'100px' /}
+				</p>
+				<p id="pRemarksCorrection">
+					#{textArea id:'remarksCorrection', label:"Correction Remarks", name:'red.remarksCorrection', value:red?.remarksCorrection, class:'capitalize', width:'165px', maxLength:200, readOnly:editOnly /}
+					<span id="remarksCorrectionError" class="error">#{error 'Remarks Correction is' /}</span>
+				</p>
+				</div>
+		</td>
+		#{/if}
+		<!-- end form approval -->			
+	</tr>
+</table>	
+	<br/>
+	
+	<!-- TAB SCREEN -->
+	<div id="redemptionTab">
+		<ul>
+			<li><a href="#tab-1">Transaction</a></li>
+			<li><a href="#tab-2">Bank Info</a></li>
+			<!-- <li><a href="#tab-3">Other</a></li>  -->
+		</ul>
+		<div class="pane" id="tab-1">
+			<p id="pTradeBy">
+				#{dropDownList id:'tradeBy', name:'tradeBy', label:'Redeem By', options:transactionBy, value:red?.tradeBy?.lookupId, readOnly:readOnly, required:true, width:'120px' /}
+				#{hidden id:'tradeByHidden', name:'red.tradeBy.lookupId', value:red?.tradeBy?.lookupId /}
+				<span class="error">#{error 'Transaction By is' /}</span>
+			</p>
+			<p>
+				#{textBox id:'availUnit', label:'   Available Unit', format:'#,##0.########', class:'numeric', value:red?.availabelUnit, width:'120px', readOnly:true /}
+				#{hidden id:'availUnitStripped', name:'red.availabelUnit', value:red?.availabelUnit /}
+				<span class="error">#{error 'Available Unit is' /}</span>
+			</p>
+			<div id="BYUNIT">
+			</div>
+			<p id="grossAmount">	
+				#{textBox id:'netAmt', label:'Amount', format:'#,##0.######', class:'rgNumeric', value:red?.netAmount, width:'120px', readOnly:readOnly, required:true /}
+				#{hidden id:'netAmtStripped', name:'red.netAmount', value:red?.netAmount /}
+				<span class="error">#{error 'Amount is' /}</span>
+			</p>
+			<p>
+				<label>Redemption Fee<span class="req">*</span></label>
+				<input type="radio" name="feeby" value="feeby1" id="feeby1" ${ ( ( feeby.equals("feeby1") || red?.feePct >= 0 ) ? "checked" : "" ) } ${(readOnly ? "disabled" : "")}/>
+				#{textBox id:'feePct', value:red?.feePct, format:'#,##0.####', class:'numericMaxLength', width:'70px', readOnly:readOnly /}%
+				#{hidden id:'feePctStripped', name:'red.feePct', value:red?.feePct /}
+				#{hidden name:'red.feePercent', value:red?.feePercent /}
+				<span class="error">#{error 'Fee Percent is' /}</span>
+			</p>
+			<p>
+				<label></label>
+				<input type="radio" name="feeby" value="feeby2" id="feeby2" ${ ( ( feeby.equals("feeby2") || red?.feePct < 0) ? "checked" : "" ) } ${(readOnly ? "disabled" : "")}/>
+				#{textBox id:'feeAmt', value:red?.feeAmt, format:'#,##0.######', class:'rgNumeric', width:'120px', readOnly:(readOnly || (red?.feePct > 0) || mode=='entry') /}
+				#{hidden id:'feeAmtStripped', name:'red.feeAmt', value:red?.feeAmt /}
+				<span class="error">#{error 'Fee is' /}</span>
+			</p>
+<!-- 			<p> -->
+<!-- 				#{textBox id:'feePct', label:'Fee', value:red?.feePct, format:'#,##0.####', class:'numericMaxLength', width:'70px', readOnly:readOnly, required:true /} -->
+<!-- 				#{hidden id:'feePctStripped', name:'red.feePct', value:red?.feePct /} -->
+				
+<!-- 				#{textBox id:'feeAmt', value:red?.feeAmt, format:'#,##0.######', class:'rgNumeric', width:'120px', readOnly:readOnly /} -->
+<!-- 				#{hidden id:'feeAmtStripped', name:'red.feeAmt', value:red?.feeAmt /} -->
+<!-- 				<span class="error">#{error 'Fee is' /}</span> -->
+<!-- 			</p> -->
+			<p>
+				#{textBox id:'otherAmt', format:'#,##0.######', label:"Other Fee Amount", class:'rgNumeric', value:red?.otherAmt, width:'120px', readOnly:readOnly/}
+				#{hidden id:'otherAmtStripped', name:"red.otherAmt", value:red?.otherAmt /}
+				<span class="error">#{error 'Other Fee is' /}</span>
+			</p>			
+			<p>	
+				#{textBox id:'totFeeAmt', label:'Total Fee Amt', format:'#,##0.######', class:'numeric', value:red?.totFeeAmt, width:'120px', readOnly:true /}
+				#{hidden id:'totFeeAmtStripped', name:'red.totFeeAmt', value:red?.totFeeAmt /}
+				<span class="error">#{error 'Total Fee Amt is' /}</span>
+			</p>
+			<div id="BYAMOUNT">
+				<p id="pPrice">	
+					#{textBox id:'price', label:'Price', format:'#,##0.##########', class:'rgNumeric', value:red?.price, width:'120px', readOnly:true/}
+					#{hidden id:'priceStripped', name:'red.price', value:red?.price /}
+					<span class="error">#{error 'Price is' /}</span>
+					<span id="priceErrorMessage" class="error"></span>
+				</p>
+				<p id="pUnit">	
+					#{textBox id:'unit', label:'Unit', format:'#,##0.########', class:'rgNumeric', value:red?.unit, width:'120px', readOnly:true , required:true /}
+					#{hidden id:'unitStripped', name:'red.unit', value:red?.unit /}
+					<span class="error">#{error 'Unit is' /}</span>
+				</p>	
+			</div>
+			<p>	
+				#{textBox id:'payAmt', label:'Payment Amount', format:'#,##0.######', class:'rgNumeric', value:red?.paymentAmount, width:'120px', readOnly:true /}
+				#{hidden id:'payAmtStripped', name:'red.paymentAmount', value:red?.paymentAmount /}
+				<span class="error">#{error 'Payment Amount is' /}</span>
+			</p>	
+		</div>
+		<div class="pane" id="tab-2">
+			<Table>
+			<tr>
+				<td>
+					<fieldset style="border-color:#A6C9E2;width: 400px">
+						<legend style="color: black;"><b>Fund Account - <span id="fundAccountName">${red?.rgProduct?.name}</span></b></legend>
+						<div>
+							<p>
+								#{textBox id:'fund',  name:'red.rgProductBnAccount.accountNo', label:'Account No', value:red?.rgProductBnAccount?.accountNo, width:'120px', readOnly:readOnly, class:'capitalize', required:true /}
+								#{hidden  id:'fundKey', name:'red.rgProductBnAccount.bankAccountKey', value:red?.rgProductBnAccount?.bankAccountKey /}
+								#{button  id:'fundHelp', value:'?', class:'small', readOnly:readOnly/}
+								<span class="error">#{error 'Fund Bank Account is' /}</span>
+							</p>
+							<p>
+								#{textBox id:'fundBankCode', name:'red.rgProductBnAccount.bankCode.thirdPartyCode', label:'Bank Code', value:red?.rgProductBnAccount?.bankCode?.thirdPartyCode, width:'120px', readOnly:true /}
+								<span class="error">#{error 'Fund Bank Code is' /}</span>
+							</p>
+							<p>
+								#{textBox id:'fundBankName', name:'red.rgProductBnAccount.name', label:'Beneficiary Name', value:red?.rgProductBnAccount?.name, width:'120px', readOnly:true /}
+							</p>
+							<p>
+								#{textBox id:'fundCurrency', name:'red.rgProductBnAccount.currency.currencyCode', label:'Currency', value:red?.rgProductBnAccount?.currency?.currencyCode, width:'120px', readOnly:true /}
+							</p>
+						</div>
+					</fieldset>
+				</td>
+				<td>
+					<fieldset style="border-color:#A6C9E2;width: 400px">
+						<legend style="color: black;"><b>Investor - <span id="investorName">${red?.rgInvestmentaccount?.name}</span></b></legend>
+						<div>
+							<p>
+								#{textBox id:'investor',  name:'red.bankAccount.accountNo', label:'Account No', value:red?.bankAccount?.accountNo, width:'120px', readOnly:readOnly, class:'capitalize', required:true /}
+								#{hidden  id:'investorKey', name:'red.bankAccount.bankAccountKey', value:red?.bankAccount?.bankAccountKey /}
+								#{button  id:'investorHelp', value:'?', class:'small', readOnly:readOnly/}
+								<span class="error">#{error 'Investor Bank Account is' /}</span>
+							</p>
+							<p>
+								#{textBox id:'investorBankCode', name:'red.bankAccount.bankCode.thirdPartyCode', label:'Bank Code', value:red?.bankAccount?.bankCode?.thirdPartyCode, width:'120px', readOnly:true /}
+								<span class="error">#{error 'Fund Bank Code is' /}</span>
+							</p>
+							<p>
+								#{textBox id:'investorBankName', name:'red.bankAccount.name', label:'Beneficiary Name', value:red?.bankAccount?.name, width:'120px', readOnly:true /}
+							</p>
+							<p>
+								#{textBox id:'investorCurrency', name:'red.bankAccount.currency.currencyCode', label:'Currency', value:red?.bankAccount?.currency?.currencyCode, width:'120px', readOnly:true /}
+							</p>
+						</div>
+				</fieldset>
+			</td>
+			</tr>
+		</Table>
+		
+		<!-- 
+			<p>
+				<label>Investment Account</label>
+			</p>
+			<p>
+				#{textBox id:'accNo', label:'Investment Acc', value:red?.rgInvestmentaccount?.accountNumber, width:'120px', readOnly:true, required:true /}
+				<span class="error">#{error 'Investment Acc is' /}</span>
+			</p>
+			<p>
+				#{textBox id:'invest',  name:'red.bankAccount.accountNo', label:'Bank Account', value:red?.bankAccount?.accountNo, width:'120px', readOnly:readOnly, class:'capitalize', required:true /}
+				#{hidden  id:'investKey', name:'red.bankAccount.bankAccountKey', value:red?.bankAccount?.bankAccountKey /}
+				#{button  id:'investHelp', value:'?', class:'small', readOnly:readOnly/}
+				#{textBox id:'investDesc', name:'red.bankAccount.name', value:red?.bankAccount?.name, readOnly:true, width:'316px' /}
+				<span class="error">#{error 'Bank Account is' /}</span>
+			</p>
+			<p>
+				#{textBox id:'investBank', name:'red.bankAccount.bankCode.thirdPartyCode', label:'Bank Code', value:red?.bankAccount?.bankCode?.thirdPartyCode, width:'120px', readOnly:true, required:true /}
+				#{textBox id:'investBankName', name:'red.bankAccount.bankCode.thirdPartyName',  value:red?.bankAccount?.bankCode?.thirdPartyName, width:'340px', readOnly:true/}
+				<span class="error">#{error 'Bank Code is' /}</span>
+			</p>
+		 -->
+		</div>
+		<div class="pane" id="tab-3">
+		</div>		
+	</div>
+	
+</form>
+
+<script type="text/javascript">
+	#{include 'RegistrySubscription/Util.js' /}
+	#{include 'RegistrySubscription/Calculation.js' /}
+	#{include 'RegistryRedemption/Redemption.js' /}
+	$(document).ready(function() {
+		Redemption($("#main"));
+		
+		if ('${from}'=='cancelTrade'){
+			$('#forCancelTrade').css('display','');
+			$('#cancelDate').removeAttr("disabled");
+			$('#cancelPostDate').removeAttr("disabled");
+			if ('${confirming}'!='true')
+				$('#remarkForCancel').removeAttr("disabled");
+		}
+		
+		if ('${from}'=='listBatch' || '${from}'=='singleList'){
+			if ('${isCancel}'=='isCancel'){
+				$('#forCancelTrade').css('display','');
+				$('#cancelDate').attr("disabled", "disabled");
+				$('#cancelPostDate').attr("disabled", "disabled");
+				$('#remarkForCancel').attr("disabled", "disabled");
+			}
+		}
+		
+		if ($.browser.msie){
+			$("#remarksCorrection[maxlength]").bind('input propertychange', function() {
+		        var maxLength = $(this).attr('maxlength');  
+		        if ($(this).val().length > maxLength) {  
+		            $(this).val($(this).val().substring(0, maxLength));  
+		        }  
+		    });
+			
+			$("#remark[maxlength]").bind('input propertychange', function() {
+		        var maxLength = $(this).attr('maxlength');  
+		        if ($(this).val().length > maxLength) {  
+		            $(this).val($(this).val().substring(0, maxLength));  
+		        }  
+		    });
+			
+		}
+		
+	});
+</script>

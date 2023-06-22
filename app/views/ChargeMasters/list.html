@@ -1,0 +1,50 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle:'Charge Master Maintenance' /}
+
+
+<script type="text/javascript">
+
+	function doEdit(data) {
+		if ((data[3] == "New") || (data[3] == "Updated")) {
+			view(data[0]);
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+</script>
+
+<table id="grid" class="display">
+	<thead>
+		<tr>
+			<th>Key</th>
+			<th width="250">Charge Code</th>
+			<th>Description</th>
+			<th>Status</th>
+			<th>Active</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:masters, as:'master'}
+		<tr> 
+				
+			<td>
+				${master?.chargeKey}
+			</td>
+			<td class="capitalize">
+				${master?.chargeCode}
+			</td>
+			<td class="capitalize">
+				${master?.description}
+			</td>
+			<td>
+				${master?.recordStatus?.decodeStatus()}
+			</td>
+			<td>
+				${(master?.isActive)? 'Yes':'No'}
+			</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>

@@ -1,0 +1,34 @@
+<script type="text/javascript">
+
+</script>
+<div style="height:250px">
+<div>
+	<p>
+		#{textBox id:'currentHolding', name:'currentHolding', label:'Current Holding', value:certificate?.currentHolding, format:'#,##0.####',class:'numeric',readOnly:readOnly, required:true, width:'120px' /}
+		#{hidden id:'currentHoldingStripped', name:'certificate.currentHolding', value:certificate?.currentHolding /}	
+		
+	</p>
+	<p>&nbsp;</p>
+</div>
+<div id="listCertificateTrans" style="overflow-y:scroll;height:80px;width:800px">
+	#{include 'Certificates/grid_certificate_trans.html' /}
+</div>
+<div class="buttons">
+	#{ifnot confirming}
+		<button id="newCertificateTransDetail" #{if readOnly}disabled="disabled"#{/if}>Add</button>
+	#{/ifnot}
+</div>	
+<div id="detailForCertificateTransDetails" title="Certificate Management">
+	#{include 'Certificates/detail_certificate_trans.html' /}
+	<div class="buttons">
+		#{if (((mode == "view"))||(confirming)) }
+			<button id="cancelCertificateTransDetail">Close</button>				
+		#{/if}
+		#{else}
+			<button id="addCertificateTransDetail">Save</button>
+			<button id="cancelCertificateTransDetail">Cancel</button>
+		#{/else}
+		
+	</div>
+</div>
+</div>

@@ -1,0 +1,510 @@
+#{extends 'templates/main.html' /}
+#{set param: param /}
+#{script 'lookups.js' /}
+#{script 'date.js', characterset:'utf-8' /}
+
+<style>
+	.container-div{padding:1em 2em 2em 2em; width:85em;}
+	.helper { display: inline-block; height: 100%; vertical-align: middle; }
+	.img-logo {vertical-align:middle;}
+	.clear-float {clear:both;}
+	.header-left {float:left; padding-left:10em !important; height:12em; max-height:12em;}
+	.header-right {float:left; padding-left:12.3em !important; height:12em; max-height:12em;}/*start end  yusuf 6075 menyesuaikan dok*/
+	.float-left{float:left;}
+	.float-right{float:right;}
+	.title-center {align:center; text-align:center; width:40em!important;}
+	.text-center {align:center; text-align:center}
+	.area{height:4.3em; resize:none; outline:none;}
+	.area-big{width:40em!important; height:10em;}
+	.area-instruction{width:100%!important; height:5em;}
+	.no-display{color:#ffffff}
+	.paragraph-div {padding: 1em 0em 1em 3em !important;}
+	form p label{width:6em !important;}
+	.rekening-span{display:inline-block; width:15em;}
+	.rekening-spannew{display:inline-block; width:7em;}
+	.footer-center{text-align:center; align:center; width:100%; display:inline-block;}
+	.textbox-center{display:block; margin:0 auto; text-align:center;}
+	.ttd input{margin:0em 0em 0.3em 0em;}
+	
+	/* Footer CSS */
+	.footer-div{clear:both; width:100%; margin-top:7em; padding: 1em 0em 1em 6em !important; text-align:center;}
+	.footer-div input{text-align:center;}
+	.footer-wrapper-right{width:40%; float:left;}
+	.footer-wrapper-left{width:45%; float:left; margin-right:2em;}
+	
+	/* CSS TABLE */
+	.tbl-data {table-layout:fixed; width:100%;}
+	
+	/* THEAD CSS */
+	.tbl-data thead {border-bottom : 1px solid black; border-top: 1px solid black; display:table; width: 100%;}
+	.tbl-data thead tr{width:100%;}
+	.tbl-data thead tr th{padding: 0.3em 0em 0.3em 0em; text-align:left;}
+	
+	/* TBODY CSS */
+	.tbl-data tbody{display:table; width:100%;}
+	.tbl-data tbody tr td{padding: 0em 0em 0.3em 0em;}
+	.tbl-data tbody tr:first-child td{padding: 0.3em 0em 0.3em 0em !important;}
+	.tbl-data tbody tr:last-child td{padding: 0em 0em 0.3em 0em !important;}
+	
+	
+	.tbl-data tfoot {border-left : 1px solid black; border-right : 1px solid black; border-bottom : 1px solid black; border-top: 1px solid black; display:table; width: 100%;}
+	.tbl-data tfoot tr{width:100%;}
+	.tbl-data tfoot tr th{padding: 0.3em 0em 0.3em 0em; text-align:left;}
+	
+	
+	.header-leftnew {float:left; padding-left:0em !important; height:12em; max-height:12em;}
+	
+	.form p label {      width: 10em !important;}
+	
+	.title-centernew {  align: center;   text-align: center;   width: 23em!important;}
+	
+	#iddeliver{background: #77c9d2;}
+	#idrecever{background: #77c9d2;}
+	
+	#idfoot1{border-bottom : 1px solid black;}
+	#idfoot2{border-bottom : 1px solid black;}
+	.textAlignEdit{
+	text-align: left;
+	}
+	
+	
+	
+</style>
+<script type="text/javascript">
+	#{include 'DepositoLetter/detail.js' /}
+</script>
+
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/0.9.0rc1/jspdf.min.js"></script> -->
+
+<div id="detail" class="container-div">
+	<form id="printDepositoForm" class="form">
+		<div  id="headerDiv1" class="clear-float" style=" height:8em;">
+					<div id="rightHeaderDiv1" style="float:right; text-align: right;">	
+						<p style="text-align: center;">
+							<span ></span><img src="/public/images/logo_bsm.png" class="img-logo" style=" width: 150px; height: 70.422; margin-right: 40px;" />
+							#{hidden id:'depositoNoHidden', value:depositoVo?.depositoNo, name:'tmpDepInst.depositoNo' /}
+							#{hidden id:'custInfoName', name:'tmpDepInst.col2', label:'', value:custInfo?.custodianName, class:'capitalize title-center', maxLength:50, readOnly:true /}
+							#{hidden id:'custInfoAddress', name:'tmpDepInst.col3', label:'', value:custInfo?.address, class:'capitalize title-center area', maxLength:50, readOnly:true /}
+							#{hidden id:'custInfoPhone', name:'tmpDepInst.col4', label:'', value:custInfo?.addressPhone1, class:'capitalize title-center', maxLength:50, readOnly:true /}
+							#{hidden id:'custInfoFaxNum', name:'tmpDepInst.col5', label:'', value:custInfo?.addressPhone3, class:'capitalize title-center', maxLength:50, readOnly:true /}
+<!-- 							#{hidden id:'nomor', name:'tmpDepInst.col6', label:'', value:'', class:'capitalize', width:'20em', maxLength:50, readOnly:false /} -->
+							#{hidden id:'headerTransType', name:'tmpDepInst.col7', label:'', value:'', class:'capitalize', width:'20em', maxLength:50, readOnly:true /}
+							#{hidden id:'appDate', name:'tmpDepInst.col9', label:'', value:strAppDate, class:'', maxLength:20, readOnly:false /}
+							#{hidden id:'secName', name:'tmpDepInst.col10', label:'', value:tdMaster?.security?.issuer?.thirdPartyName, class:'', width:'20em', maxLength:50, readOnly:true /}
+							#{hidden id:'secAddr', name:'tmpDepInst.col11', label:'', value:tdMaster?.branchCode, class:'', width:'20em', maxLength:50, readOnly:true /}
+							#{hidden id:'up', name:'tmpDepInst.col12', label:'', value:'UP :', class:'', width:'20em', maxLength:30, readOnly:false /}
+							#{hidden id:'telp', name:'tmpDepInst.col13', label:'', value:'Telp :', class:'', width:'20em', maxLength:30, readOnly:false /}
+							#{hidden id:'fax', name:'tmpDepInst.col14', label:'', value:'Fax :', class:'', width:'20em', maxLength:30, readOnly:false /}
+							#{hidden id:'externalRef', name:'tmpDepInst.col15', label:'', value:tdTrans?.externalReference, class:'', width:'15em', maxLength:20, readOnly:true /}
+							#{hidden id:'cTransType', name:'tmpDepInst.col17', label:'', value:'', class:'capitalize', width:'20em', maxLength:50, readOnly:true /} 
+							#{hidden id:'transType', name:'tmpDepInst.col18', label:'', value:'', class:'capitalize', width:'15em', maxLength:50, readOnly:false /}
+							#{hidden id:'nominal', name:'tmpDepInst.col19', label:'', value:depositoVo?.nominal, class:'', width:'15em', readOnly:true /} 
+							#{hidden id:'bungaBerjalan', name:'tmpDepInst.col24', label:'', value:'', class:'', width:'21em', readOnly:true /}
+							#{hidden id:'netInterest', name:'tmpDepInst.col49', label:'', value:netInterest, format:'#,##0.####', class:'', width:'21em', readOnly:true /}
+							#{hidden id:'accruedDays', name:'tmpDepInst.col20', label:'', value:tdMaster?.accruedDays, class:'', width:'15em', readOnly:true /} 
+							#{hidden id:'jkWaktu', name:'tmpDepInst.col25', label:'', value:'', class:'', width:'21em', readOnly:true /}
+							#{hidden id:'jkWaktuDiff', name:'tmpDepInst.col29', label:'', value:tdTrans?.accruedDays, class:'', width:'21em', readOnly:true /}
+							#{hidden id:'placeDate', name:'tmpDepInst.col21', label:'', value:depositoVo?.effectiveDateDt?.format('dd MMMM yyyy'), class:'', width:'15em', maxLength:20, readOnly:true /} 
+							#{hidden id:'tglPenempatan', name:'tmpDepInst.col26', label:'', value:depositoVo?.maturityDateDt?.format('dd MMMM yyyy'), class:'', width:'21em', maxLength:20, readOnly:true /}
+							#{hidden id:'tglPenempatanDiff', name:'tmpDepInst.col30', label:'', value:depositoVo?.nextPaymentDateDt?.format('dd MMMM yyyy'), class:'', width:'21em', readOnly:true /}
+							#{hidden id:'maturityDate', name:'tmpDepInst.col22', label:'', value:depositoVo?.maturityDateDt?.format('dd MMMM yyyy'), class:'', width:'15em', maxLength:20, readOnly:true /} 
+							#{hidden id:'tglPencairan', name:'tmpDepInst.col27', label:'', value:depositoVo?.nextPaymentDateDt?.format('dd MMMM yyyy'), class:'', width:'21em', maxLength:20, readOnly:true /}
+							#{hidden id:'tglPencairanDiff', name:'tmpDepInst.col31', label:'', value:'', class:'', width:'21em', readOnly:true /}
+							#{hidden id:'interestRate', name:'tmpDepInst.col23', label:'', value:depositoVo?.interestRateNum, class:'', width:'15em', readOnly:true /} 
+<!-- 							#{hidden id:'interestRateGross', name:'tmpDepInst.col28', label:'', value:depositoVo?.newIntRateNum, class:'', width:'21em', readOnly:true /} -->
+<!-- 							#{hidden id:'interestRateDiff', name:'tmpDepInst.col32', label:'', value:'', class:'', width:'21em', readOnly:true /} -->
+							#{hidden id:'nasabahBankName', name:'tmpDepInst.col33', label:'', value:deposito?.pbaBankCode?.thirdPartyName, class:'', width:'25em', maxLength:30, readOnly:false /}
+							#{hidden id:'nasabahNoRek', name:'tmpDepInst.col34', label:'', value:tdMaster?.bankAccount?.accountNo, class:'', width:'25em', maxLength:50, readOnly:false /}
+<!-- 							#{hidden id:'nasabahNamaRek', name:'tmpDepInst.col35', label:'', value:tdMaster?.account?.settlementAccount?.name, class:'', width:'25em', maxLength:30, readOnly:false /} -->
+							#{hidden id:'penempatanBank', name:'tmpDepInst.col36', label:'', value:'Rekening Bank Penempatan', class:'', width:'25em', maxLength:30, readOnly:true /}
+							#{hidden id:'penempatanBankName', name:'tmpDepInst.col40', label:'', value:deposito?.pbaBeneficiaryName, class:'', width:'25em', maxLength:30, readOnly:false /}
+							#{hidden id:'penempatanNoRek', name:'tmpDepInst.col41', label:'', value:tdMaster?.pbaAccountNo, class:'', width:'25em', maxLength:50, readOnly:false /}
+							#{hidden id:'penempatanNamaRek', name:'tmpDepInst.col42', label:'', value:tdMaster?.pbaBeneficiaryName, class:'', width:'25em', maxLength:350, readOnly:false /}
+<!-- 							#{textArea id:'instruction', name:'tmpDepInst.col43', label:'', value:'Instruction', class:'area-instruction', maxLength:350, readOnly:false /}   -->
+							#{hidden id:'instruction', name:'tmpDepInst.col43', label:'', value:'', class:'', width:'25em', maxLength:350, readOnly:false /}
+							#{hidden id:'keterangan', name:'tmpDepInst.col44', label:'', value:'', class:'area-big', width:'25em', maxLength:200, readOnly:false /}
+							#{hidden id:'custodianName', name:'tmpDepInst.col45', label:'', value:custInfo?.custodianName, class:'hidden-center', width:'30em', maxLength:30, readOnly:true /}
+<!-- 							#{hidden id:'leftSignName', name:'tmpDepInst.col46', label:'', value:'', class:'', width:'15em', maxLength:30, readOnly:false /} -->
+							#{hidden id:'leftSignRole', name:'tmpDepInst.col47', label:'', value:'SUPERVISOR', class:'', width:'15em', maxLength:30, readOnly:false /}
+<!-- 							#{hidden id:'rightSignName', name:'tmpDepInst.col48', label:'', value:userName, class:'', width:'15em', maxLength:30, readOnly:false /} -->
+						    #{hidden id:'pDate', name:'tmpDepInst.col16', label:'', value:strAppDate, class:'', width:'10em', maxLength:20, readOnly:false /}
+						    #{hidden id:'headerTransTypeVal', name:'headerTransTypeVal', label:'', value:'', class:'capitalize', width:'20em',  readOnly:true /} 
+						    
+						<p>			
+					</div>
+		</div>
+		<div id="headerDiv" class="clear-float" style=" height:15em;">
+				<div id="leftHeaderDiv" class="header-leftnew" style="padding-top: 4em !important;">
+								<p>
+									<label>To</label><span>:</span>  #{textBox id:'secNameVal', name:'secNameVal', label:'', value:tdMaster?.security?.issuer?.thirdPartyName, class:'', width:'30em', maxLength:50, readOnly:true /}
+								</p>
+								<p>
+									<label>Contact Person</label><span>:</span>  #{textBox id:'contactpersonval', name:'contactpersonval', label:'', value:contactperson, class:'capitalize', width:'30em', maxLength:50, readOnly:true /}
+								</p>
+								<p>
+									<label>Telp / Hp No</label><span>:</span> #{textBox id:'tlpnval', name:'tlpnval', label:'', value:tlpn, class:'capitalize', width:'30em', maxLength:50, readOnly:true /}
+								</p>
+								<p>
+									<label>Fax</label><span>:</span> #{textBox id:'faxval', name:'faxval', label:'', value:fax, class:'capitalize', width:'30em', maxLength:50, readOnly:true /}
+								</p>						
+				</div>
+				<div id="rightHeaderDiv" class="header-right" style="text-align: right;">	
+						<p>
+							#{textBox id:'custInfoNameVal', name:'custInfoNameVal', label:'', value:custInfo?.custodianName, class:'capitalize title-centernew textAlignEdit', maxLength:50, readOnly:true /}
+						</p>
+						<p style="text-align: left;">
+							<label class="title-centernew">KANTOR PUSAT</label>
+						</p>
+						<p>
+							#{textArea id:'custInfoAddressVal', name:'custInfoAddressVal', label:'', value:custInfo?.address, class:'capitalize title-centernew area textAlignEdit', maxLength:50, readOnly:true /}
+						</p>
+						<p>
+							#{textBox id:'custInfoPhoneVal', name:'custInfoPhoneVal', label:'', value:custInfo?.addressPhone1, class:'capitalize title-centernew textAlignEdit', maxLength:50, readOnly:true /}
+						</p>
+						<p>
+							#{textBox id:'custInfoFaxNumVal', name:'custInfoFaxNumVal', label:'', value:custInfo?.addressPhone3, class:'capitalize title-centernew textAlignEdit', maxLength:50, readOnly:true /}
+						</p>						
+				</div>
+		</div>
+		<div id="contentDiv" class="clear-float">
+			<div id="contentDivLeft" class="float-left">
+			<!-- start  yusuf 6075 melebarkan field-->
+<!-- 				<p> -->
+<!-- 					<label>Company Name</label><span>:</span>  #{textBox id:'headerTransTypeVal', name:'headerTransTypeVal', label:'', value:'', class:'capitalize', width:'20em', maxLength:50, readOnly:true /} -->
+<!-- 				</p> -->
+				<p>
+					<label>Customer Name</label><span style="position: relative;bottom: 17px;">:</span>  #{textArea id:'accNameVAl', name:'accNameVAl', label:'', value:'', class:'capitalize', width:'30em', maxLength:100, readOnly:true /}
+				</p>
+				<p>
+					<label>Account Code</label><span>:</span> #{textBox id:'tdMasteraccountaccountNo', name:'tdMaster.account.accountNo', label:'', value:tdMaster?.account?.accountNo, class:'capitalize', width:'30em', maxLength:50, readOnly:true /}
+				</p>
+				<p>
+					<label>Date</label><span>:</span> #{textBox id:'appDateVal', name:'appDateVal', label:'', value:strAppDate, class:'capitalize', maxLength:20,  width:'30em',readOnly:true /}
+				</p>	
+				<p>
+					<label>Ref No</label><span>:</span> #{textBox id:'externalRefVal', name:'externalRefVal', label:'', value:tdTrans?.externalReference, class:'capitalize', width:'30em', maxLength:20, readOnly:true /}
+				</p>	
+			</div>
+			
+			<div id="contentDiv" class="float-right">
+				<p>
+					<label>From</label><span>:</span>  #{textBox id:'custInfoNameVal2', name:'custInfoNameVal2', label:'', value:custInfo?.custodianName, class:'capitalize',width:'20em', maxLength:50, readOnly:true /}
+				</p>
+				<p>
+				<br>
+				</p>
+				<p>
+					<label>Contact Person</label><span>:</span>  #{textBox id:'custInfocontact1NameVal', name:'custInfocontact1NameVal', label:'', value:custInfo?.contact1Name, class:'capitalize', width:'20em', maxLength:50, readOnly:true /}
+				</p>
+				<p>
+					<label>Tlp No</label><span>:</span> #{textBox id:'custInfoaddressPhone1', name:'custInfo.addressPhone1', label:'', value:custInfo?.addressPhone1, class:'capitalize', width:'20em', maxLength:50, readOnly:true /}
+				</p>
+				<p>
+					<label>Fax</label><span>:</span> #{textBox id:'custInfoaddressPhone3', name:'custInfo.addressPhone3', label:'', value:custInfo?.addressPhone3, class:'capitalize', width:'20em', maxLength:50, readOnly:true /}
+				</p>	
+				<p>
+					<label>Ref No Custody</label><span>:</span>
+					 #{textBox id:'nomor', name:'tmpDepInst.col6', label:'', class:'capitalize', width:'20em', maxLength:50, readOnly:false /}
+				</p>	
+			</div>
+		</div>
+		<!--  end yusuf 6075 melebarkan field-->
+		<div id="paragraphDiv" class="clear-float paragraph-div>
+			<p class="ttd" style="padding-top: 2em;">
+				Assalaamu'alaikum Wr. Wb<br/>				<br/>	
+				Kindly excecute following instruction:<br/>					
+			</p>
+			
+			<p style="margin-top:2em;">
+				<table id="tblData" class="tbl-data">
+					<thead style="border-left : 1px solid black; border-right: 1px solid black;">
+						<tr>
+							<th width="15%" rowspan="4">#{textBox id:'transTypeVal', name:'transTypeVal', label:'',  value:headerdetailval, class:'capitalize', width:'40em', readOnly:true /}</th>
+							
+						</tr>
+					</thead>
+					<tbody style="border-left : 1px solid black; border-right: 1px solid black;">
+						<tr style="border-bottom : 1px solid black;">
+							<td width="15%" style="border-right : 1px solid black; " >Placement Bank Name</td>
+							<td width="25%" style="border-right : 1px solid black; text-align: center;">#{textBox id:'nasabahBankNameVal', name:'nasabahBankNameVal', label:'', value:deposito?.pbaBankCode?.thirdPartyName, class:'', width:'20em', maxLength:30, readOnly:true /}
+							</td>
+							<td width="30%" style="border-right : 1px solid black; ">Customer Name</td>
+							<td width="30%" style="border-right : 1px solid black; text-align: center;">#{textBox id:'accNameTabelVal', name:'accNameTabelVal', label:'', value:'', class:'capitalize', width:'20em', maxLength:50, readOnly:true /}</td>
+						</tr>
+						<tr style="border-bottom : 1px solid black;">
+							<td width="15%" style="border-right : 1px solid black; ">Branch Name</td>
+							<td width="25%" style="border-right : 1px solid black; text-align: center;">#{textBox id:'secAddrVal', name:'secAddrVal', label:'', value:tdMaster?.branchCode, class:'', width:'20em', maxLength:50, readOnly:true /}
+							</td>
+							<td width="30%" style="border-right : 1px solid black; ">Principle</td>
+							<td width="30%" style="border-right : 1px solid black; text-align: center;">#{textBox id:'nominalVal', name:'nominalVal', label:'', value:depositoVo?.nominal, class:'', width:'20em', readOnly:true /} 
+							#{textBox id:'tempMoney', label:'', value:tdTrans?.amount, format:'#,##0.####', class:'numeric' /}</td>
+						</tr>
+						<tr style="border-bottom : 1px solid black;">
+							<td width="15%" style="border-right : 1px solid black; ">Placement Bank Cash A/C Name</td>
+							<td width="25%" style="border-right : 1px solid black; text-align: center;">#{textBox id:'penempatanNamaRekVal', name:'penempatanNamaRekVal', label:'', value:deposito?.pbaBeneficiaryName, class:'', width:'20em', maxLength:350, readOnly:true /}
+							</td>
+							<td width="30%" style="border-right : 1px solid black; ">Placement Date</td>
+							<td width="30%" style="border-right : 1px solid black; text-align: center;">
+							#{textBox id:'datePlacementVal', name:'datePlacementVal', label:'',  value:effdateStr,  class:'', width:'20em', readOnly:true /}
+<!-- 							#{textBox id:'pDate', name:'tmpDepInst.col16', label:'', value:strAppDate, class:'', width:'10em', maxLength:20, readOnly:false /} -->
+							</td>
+						</tr>
+						<tr style="border-bottom : 1px solid black;">
+							<td width="15%" style="border-right : 1px solid black; ">Placement Bank Cash A/C No</td>
+							<td width="25%" style="border-right : 1px solid black; text-align: center;">#{textBox id:'penempatanNoRekVal', name:'penempatanNoRekVal', label:'', value:tdMaster?.pbaAccountNo, class:'', width:'20em', maxLength:50, readOnly:true /} 
+							</td>
+							<td width="30%" style="border-right : 1px solid black; " >Maturity Date</td>
+							<td width="30%" style="border-right : 1px solid black; text-align: center;">#{textBox id:'maturityDateVal', name:'tmpDepInst.col22', label:'', value:depositoVo?.maturityDateDt?.format('dd MMMM yyyy'), class:'', width:'20em', maxLength:20, readOnly:true /}</td>
+						</tr>
+						<tr style="border-bottom : 1px solid black;">
+							<td width="15%" style="border-right : 1px solid black; ">Currency</td>
+							<td width="25%" style="border-right : 1px solid black; text-align: center;">#{textBox id:'depositosecuritycurrencycurrencyCode', name:'depositosecurity.currencycurrencyCode', label:'', value:deposito?.security?.currency?.currencyCode, class:'', width:'20em', readOnly:true /} 
+							</td>
+							<td width="30%" style="border-right : 1px solid black; ">Profit Sharing</td>
+							<td width="30%" style="border-right : 1px solid black; text-align: center;">#{textBox id:'interestRateVal', name:'interestRateVal', label:'', value:depositoVo?.interestRateNum, class:'', width:'20em', readOnly:true /}</td>
+						</tr>
+						<tr style="border-bottom : 1px solid black;">
+							<td width="15%" style="border-right : 1px solid black; ">Amount to be transferred (withdrawn)</td>
+							<td width="25%" style="border-right : 1px solid black; text-align: center;">
+							#{textBox id:'netAmountVal',  value:deposito?.settlementAmount, format:'#,##0.####', class:'numeric'  , width:'20em'/}
+							#{hidden id:'netAmountStrippedVal', name:'netAmountStrippedVal', value:deposito?.settlementAmount /}
+							</td>
+							<td width="30%" style="border-right : 1px solid black; ">Tenor</td>
+							<td width="30%" style="border-right : 1px solid black; text-align: center;">#{textBox id:'accruedDaysVal', name:'accruedDaysVal', label:'', value:tdMaster?.accruedDays, class:'', width:'20em', readOnly:true /} </td>
+						</tr>	
+						
+						
+						
+						<tr id="validasiRollover1">
+							<td width="15%"></td>
+							<td width="25%"></td>
+							<td width="30%"  style=" border-left : 1px solid black; border-bottom : 1px solid black; border-right : 1px solid black;" >#{textBox id:'tglPencairanVal', name:'tglPencairanVal', label:'', value:depositoVo?.nextPaymentDateDt?.format('dd MMMM yyyy'), class:'', width:'20em', maxLength:20, readOnly:true /}</td>
+							<td width="30%"  style="text-align: center; border-bottom : 1px solid black; border-right : 1px solid black;">#{textBox id:'tglPencairanDiffVal', name:'tglPencairanDiffVal', label:'', value:'', class:'', width:'20em', readOnly:true /}</td>
+						</tr>	
+						<tr style="border-bottom : 1px solid black;" id="validasiRollover2">
+							<td width="15%"></td>
+							<td width="25%"></td>
+							<td width="30%" style=" border-left : 1px solid black; border-bottom : 1px solid black; border-right : 1px solid black;" >#{textBox id:'interestRateGross', name:'tmpDepInst.col28', label:'', value:depositoVo?.newIntRateNum, class:'', width:'20em', readOnly:true /}</td>
+							<td width="30%" style="text-align: center; border-bottom : 1px solid black; border-right : 1px solid black;">#{textBox id:'interestRateDiff', name:'tmpDepInst.col32', label:'', value:'', class:'', width:'20em', readOnly:true /}</td>
+						</tr>	
+							
+						<tr id="validasiRollover3" >
+							<td width="15%"></td>
+							<td width="25%"></td>
+							<td width="30%" style=" border-left : 1px solid black; border-right : 1px solid black;">#{textBox id:'val25c', name:'val25c', label:'', value:val25c, class:'', width:'20em', readOnly:true /}</td>
+							<td width="30%" style="text-align: center; border-right : 1px solid black;" >#{textBox id:'jkWaktuDiffVal', name:'jkWaktuDiffVal', label:'', value:tdTrans?.accruedDays, class:'', width:'20em', readOnly:true /} </td>
+						</tr>	
+					</tbody>
+					 <tfoot>
+				        <tr>
+<!-- 				            <th scope="row">Description :  #{textArea id:'val26c', name:'val26c', label:'', value:val26c, class:'area-instruction', maxLength:350, readOnly:true /}</th> -->
+  								<th scope="row">Description :  #{textArea id:'val26c', name:'val26c', label:'', value:val26c, class:'area-instruction', maxLength:350 /}</th>
+				            <td>
+				            </td>
+				        </tr>
+    				</tfoot>
+				</table>
+			</p>
+			
+			<p>
+			    <label style="width:100% !important;"> #{checkBox id:'nopajak', name:'tdMaster.nopajak', value:tdMaster?.nopajak, readOnly:readOnly/}  No Tax </label>
+				#{hidden id:'nopajakhidden', name:'tdMaster.nopajak', value:tdMaster?.nopajak /}
+			</p>
+			<!--  start yusuf 6075 menambahkan spasi kebawah-->
+			<p>
+			<br>
+			</p>
+			<!--  end yusuf-->
+		     <p style="padding-top:1em;">
+				#{textArea id:'instructionview', name:'instructionview', label:'', class:'area-instruction', maxLength:350 /}  
+			</p>
+			
+			<p>
+				<span class="rekening-span">Bank </span>
+				<span> : </span>
+				#{textBox id:'nasabahBankName2', name:'nasabahBankName2', label:'', value:tdMaster?.bankAccount?.bankCode?.thirdPartyName, class:'', width:'25em', maxLength:30, readOnly:true /}
+			</p>
+			<p>
+				<span class="rekening-span">Account Name </span>
+				<span> : </span>
+				#{textBox id:'nasabahNamaRek', name:'tmpDepInst.col35', label:'', value:tdMaster?.bankAccount?.name, class:'', width:'25em', maxLength:30, readOnly:true /}
+			</p>
+			<p>
+				<span class="rekening-span">Account Number </span>
+				<span> : </span>
+				#{textBox id:'nasabahNoRekVal', name:'nasabahNoRekVal', label:'', value:tdMaster?.bankAccount?.accountNo, class:'', width:'25em', maxLength:50, readOnly:true /}
+			</p>
+			<p class="ttd" style="padding-top: 2em;">
+				Thank you for your attention and cooperation.<br/>				<br/>	
+				Wassalaamu'alaikum Wr. Wb<br/>					
+			</p>
+			
+		</div>
+		<div class="footer-div">
+			<div class="footer-wrapper-left">
+				<div class="float-right">
+					<p>
+							<table id="tblData2" class="tbl-data2">
+									<thead style="border-bottom : none; border-top : 1px solid black; border-left : 1px solid black; border-right: 1px solid black;">
+										<tr>
+											<th width="100%" >#{textBox id:'custInfoNameCol2', name:'custInfoNameCol2', label:'', value:custInfo?.custodianName, class:'capitalize title-center', maxLength:50, readOnly:true /}</th>		
+											<th width="100%" ></th>								
+										</tr>
+									</thead>
+									<thead style=" border-top : none;border-left : 1px solid black; border-right: 1px solid black;">
+										<tr>
+											<th width="100%" >#{textBox id:'iddetailfoot',  label:'', class:'', value:custInfo?.contact1Position ,width:'100%', maxLength:80, readOnly:true /}</th>		
+											<th width="100%" ></th>								
+										</tr>
+									</thead>
+									<thead style=" border-top : 1px solid black;border-left : 1px solid black; border-right: 1px solid black;">
+										<tr>
+											<th width="100%" >Authorized Signatures</th>		
+											<th width="100%" ></th>								
+										</tr>
+									</thead>
+									<tbody style=" border-top : 1px solid black; border-left : 1px solid black; border-right: 1px solid black;">
+										<tr >
+											<td ><br/><br/><br/><br/></td>
+											<td><br/><br/><br/><br/></td>
+										</tr>
+										<tr >
+											<td >
+												<p style="text-align: center;">
+													<span></span>
+													<span >#{textBox id:'leftSignName', name:'tmpDepInst.col46', label:'', value:'', class:'', width:'15em', maxLength:30, readOnly:false /}</span>
+													<span>#{textBox id:'userName', name:'tmpDepInst.col48', label:'', value:userName, class:'', width:'15em', maxLength:30, readOnly:false /}</span>
+												</p>
+											</td>
+											<td >
+												<p style="text-align: center;">
+												
+												</p>
+											</td>
+											
+										</tr>
+<!-- 										<tr style="border-right : 1px solid black;"> -->
+<!-- 											<td> -->
+<!-- 												<p style="text-align: center;"> -->
+<!-- 														<label style="text-align: center; border-bottom: 1px solid black; width: 25em;"></label> -->
+<!-- 												</p> -->
+<!-- 											</td> -->
+<!-- 										</tr> -->
+										<tr style="border-bottom : 1px solid black;">
+											<td style="height: 50.600;"> 
+												<p style="text-align: center;">
+													<span></span>
+													<span>#{textBox id:'f13',  label:'', class:'',value:'CAPITAL MARKET', width:'15em', maxLength:80 /}</span>
+													<span>#{textBox id:'f14',  label:'', class:'', value:'CAPITAL MARKET' , width:'15em', maxLength:80 /}</span>
+											    </p>
+											    <p style="text-align: center;">
+													<span></span>
+													<span>#{textBox id:'f13Detail',  label:'', class:'',value:'DEPARTEMENT HEAD', width:'15em', maxLength:80 /}</span>
+													<span>#{textBox id:'f14Detail',  label:'', class:'', value:'OPS. SECTION HEAD' , width:'15em', maxLength:80  /}</span>
+													<br/>
+											    </p>
+											</td>
+											<td></td>
+										</tr>
+									</tbody>
+								</table>
+					
+					</p>
+				</div>
+			</div>
+			<div class="footer-wrapper-right">
+				<div class="float-left">
+					<p>
+						      <table id="tblData2" class="tbl-data2">
+									<thead style="border-top : 1px solid black; border-left : 1px solid black; border-right: 1px solid black;">
+										<tr>
+											<th width="100%" style="text-align: left;">Filled by internal custody</th>		
+											<th width="100%" ></th>								
+										</tr>
+									</thead>
+									<tbody style="  border-left : 1px solid black; border-right: 1px solid black;border-bottom: 1px solid black;">
+										<tr>
+											<td>
+												<p>
+													<span class="rekening-spannew">No Bilyet </span>
+													<span> : </span>
+													<span class="rekening-span"> </span>
+											    </p>
+											</td>
+											<td></td>
+										</tr>
+										<tr>
+											<td>
+												<p>
+													<span class="rekening-spannew">Name </span>
+													<span> : </span>
+													<span class="rekening-span"> </span>
+											    </p>
+											</td>
+											<td></td>
+										</tr>
+										<tr>
+											<td>
+												<p>
+													<span class="rekening-spannew">Date </span>
+													<span> : </span>
+													<span class="rekening-span"> </span>
+											    </p>
+											</td>
+											<td></td>
+										</tr>
+										<tr>
+											<td>
+												<p>
+													<span class="rekening-spannew">Time </span>
+													<span> : </span>
+													<span class="rekening-span"> </span>
+											    </p>
+											</td>
+											<td></td>
+										</tr>
+										<tr >
+											<td><br/><br/></td>
+											<td><br/><br/></td>
+										</tr>
+										<tr >
+											<td><br/><br/></td>
+											<td><br/><br/></td>
+										</tr>
+										<tr>
+											<td>
+												<p>
+												<br/>
+												   <span class="rekening-span" style="text-align: right;">												   		
+														#{textBox id:'iddeliver',  label:'', class:'', width:'2em', maxLength:30, readOnly:true /}
+														<label style="text-align: left;">  Receipt</label>
+													</span>
+													<span> </span>
+													<span class="rekening-span" style="text-align: left;">
+														#{textBox id:'idrecever',  label:'', class:'', width:'2em', maxLength:30, readOnly:true /}
+														<label >  Delivery</label>
+													</span>
+											    </p>
+											</td>
+											<td></td>
+										</tr>
+									</tbody>
+									
+								</table>
+					</p>
+				</div>
+			</div>
+		</div>
+	</form>	
+</div>
+
+<div id="downloadDiv">
+	<span id="downloadSpan"></span>
+	<a id="downloadLink">Download Here</a>
+</div>
+
+<div id="actions" class="buttons clear-float"><br/><br/><br/>
+	<input type="button" id="printPreview" value="Print" />
+	<input type="button" id="reset" value="Reset" />
+	<input type="button" id="back" value="Back" />
+</div>

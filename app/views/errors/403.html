@@ -1,0 +1,15 @@
+#{extends 'templates/main.html' /}
+   	  
+<script type="text/javascript">
+	$(function() {
+		$('#back').button();
+		$('#back').click(function(){
+			//location = "@{Secure.logout}";
+			location = "@{Application.index}";
+		});
+	});
+</script>
+
+<p style="text-align:center;"><IMG SRC="@{'/public/images/not-authorized.png'}" /></p>
+<p><h3 style="text-align:center;">You are not authorized</h3></p>
+<p style="text-align:center;"><button id="back">Back</button></p>

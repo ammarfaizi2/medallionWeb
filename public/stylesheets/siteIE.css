@@ -1,0 +1,559 @@
+/* General HTML TAG */
+body {
+	background: url(../images/background.png) top left repeat-x #4265AA;
+	font-family: Verdana;
+	font-size: 8pt;
+	margin: 0;
+	overflow: scroll;
+	/* text-align: center; for IE */ 	
+}
+#container {            
+	margin: 0 auto;   /* align for good browsers */                 
+	text-align: left; /* counter the body center */              
+    width: 80%;     
+}
+
+#topmenu{
+	width:100%;
+}
+
+th {
+	font-size: 8pt;
+	font-weight: bold;
+}
+
+td {
+	font-size: 8pt;
+}
+
+input[type=text],input[type=password] {
+	border: 1px solid grey;
+	font-family: Verdana;
+	font-size: 8pt;
+}
+
+textarea {
+	border: 1px solid grey;
+	font-family: Verdana;
+	font-size: 8pt;
+}
+
+button,input[type=submit],input[type=reset],input[type=button] {
+	font-family: Verdana;
+	font-size: 8pt;
+}
+
+.buttons button,.buttons input[type=submit],.buttons input[type=reset],.buttons input[type=button]
+	{
+	width: 100px;
+}
+
+button.small,input[type=button].small {
+	width: 20px;
+}
+
+h2 {
+	font-size: 9pt;
+	font-weight: bold;
+}
+
+select {
+	border: 1px solid grey;
+	font-family: Verdana;
+	font-size: 8pt;
+}
+
+option {
+	min-height: 15px;
+}
+/* End HTML */
+
+/* Forms */
+.form ul {
+	list-style: none;
+	padding-left: 5px;
+}
+
+.form li {
+	padding: 2px;
+}
+
+.form li div.group {
+	background-color: #f7f7f7;
+	display: inline-block !important;
+	width: auto;
+}
+
+.form li div.group div {
+	padding: 5px;
+}
+
+.form li div.group p {
+	color: #444;
+	margin: 0;
+}
+
+.form b.indent{
+	display: inline-block;
+	font-weight: bold;
+	padding-top: 2px;
+	vertical-align: top;
+	width: 70px;
+}
+
+.form label {
+	display: inline-block;
+	font-weight: bold;
+	padding-top: 2px;
+	vertical-align: top;
+	width: 15em;
+}
+
+.form .indent label {
+	padding-left: 10px;
+	width: 14em !important;
+}
+
+form.tight label {
+	width: 8em !important;
+}
+
+.form .right {
+	min-height: 0;
+	width: auto;
+}
+
+.form .left {
+	float: left !important;
+	min-width: 300px !important;
+}
+
+.form p {
+	padding: 2px;
+	margin: 0px;
+}
+
+.form div {
+	padding: 0.2em;
+}
+
+.form p label {
+	display: inline-block;
+	font-weight: bold;
+	padding-top: 2px;
+	vertical-align: top;
+	width: 15em;
+}
+
+.form p table{
+	display: inline-block;
+}
+
+.form p span.tablefooter{
+	display: block;
+	margin-left: 15em;
+}
+
+.form #actions {
+	padding-top: 10px;
+}
+
+.req {
+	color: #ff0000;
+	font-weight: bold;
+}
+
+.group {
+	display: block;
+}
+
+div.buttons {
+	padding: 10px 3px;
+}
+
+#actions.buttons {
+	padding: 10px 3px;
+}
+/* End forms */
+
+/* Buttons */
+a.btn {
+	background: url(../images/btn_grey.png) no-repeat right top;
+	color: #000;
+	display: inline-block;
+	font-weight: bold;
+	height: 30px;
+	line-height: 30px;
+	text-decoration: none;
+}
+
+a.btn:hover {
+	background-position: 100% -30px;
+}
+
+a.btn:active {
+	background-position: 100% -60px;
+}
+
+a.btn span {
+	background: url(../images/btn_grey.png) no-repeat left top;
+	display: inline-block;
+	height: 30px;
+	line-height: 30px;
+	margin-right: 10px;
+	padding-left: 10px;
+	text-align: center;
+	min-width: 80px;
+}
+
+a.btn:hover span {
+	background-position: 0 -30px;
+}
+
+a.btn:active span {
+	background-position: 0 -60px;
+}
+
+a.red {
+	background: url(../images/btn_red.png) no-repeat right top;
+	color: #fff;
+}
+
+a.red span {
+	background: url(../images/btn_red.png) no-repeat left top;
+}
+
+a.yellow {
+	background: url(../images/btn_yellow.png) no-repeat right top;
+}
+
+a.yellow span {
+	background: url(../images/btn_yellow.png) no-repeat left top;
+}
+
+a.green {
+	background: url(../images/btn_green.png) no-repeat right top;
+}
+
+a.green span {
+	background: url(../images/btn_green.png) no-repeat left top;
+}
+/* End buttons */
+
+/* Tables */
+table.grid {
+	border-spacing: 0px;
+}
+
+table.grid th {
+	padding: 5px 3px;
+}
+
+table.grid td {
+	padding: 5px 3px;
+}
+
+tr.header {
+	background-color: #4467AA;
+	color: white;
+}
+
+table.grid tr.odd {
+	background-color: #eeeeee;
+}
+
+table.grid tr.even {
+	background-color: #aac8eb;
+}
+
+table.grid tr.selectable {
+	cursor: pointer;
+}
+
+table tr.selected,table tr.selected td.sorting_1 {
+	background-color: #b0bed9 !important;
+}
+
+table.grid tr.selectable:hover {
+	background-color: #ffcc66;
+}
+/* End tables */
+
+#container {
+	margin: 0 auto;
+	width: 1000px;
+}
+#logo {
+	display: inline-block;
+	padding-left: 5px;
+	float:left;
+}
+
+#appDateScreen {
+	display: inline-block;
+	text-align: right;
+	width: 96%;
+	color: white;
+	margin-top: 3px;
+}
+
+#toolbar{
+	width:750px;
+	float:right;
+}
+#userInfo {
+	background-color: #254061;
+	color: #fff;
+	display:inline-block;
+	height: 14px;
+	padding: 10px 15px 5px 10px;
+	margin: 26px 30px 0 0;
+	text-align: right;
+	width: 600px;
+}
+#userInfo a {
+	color: #fff;
+	text-decoration: none;
+}
+#userInfo a:hover {
+	text-decoration: underline;
+}
+#menu {
+	display: inline-block;
+	float: right;
+	margin-top: 15px;
+	margin-right: 10px;
+}
+#main {
+	clear:both;
+	background: #fff;
+	margin: 0px 0px;
+	padding: 20px;
+	margin-top:8px; /*IE FIX*/
+	/*height:520px;*/
+	min-height: 520px;
+	
+}
+
+#content {
+	background: #fff;
+	border-left: 1px solid #376092;
+	min-height: 520px;
+	margin-left: 210px;
+	padding: 10px 20px 20px 20px;
+	width: 750px;
+}
+
+#footer {
+	color: #fff;
+	padding-top: 5px;
+	text-align: center;
+}
+
+#news {
+	
+}
+
+#login {
+	border: 1px solid #555555;
+	float: right;
+	margin-right: 20px;
+	margin-top: 20px;
+	padding: 10px;
+	width: 300px;
+}
+
+#login div {
+	
+}
+
+.success {
+	background-color: #E0FFB8 !important;
+	border: 2px solid #94DA3A;
+	padding: 7px 10px;
+}
+
+div.error {
+	background-color: #FFFEB2 !important;
+	border: 2px solid #FFB320;
+	color: #f00;
+	margin: 5px;
+	padding: 7px 10px;
+}
+
+.error {
+	color: #f00;
+}
+
+.loading,.response {
+	display: none;
+}
+
+.calendar {
+	width: 85px;
+}
+
+.fieldError {
+	background-color: #FFEBEB !important;
+}
+
+.capitalize {
+	text-transform: uppercase;
+}
+
+.numeric {
+	text-align: right;
+}
+
+.percent {
+	text-align: right;
+}
+
+.float { 
+	text-align: right; 
+}
+
+.numericminus {
+	text-align: right;
+}
+
+.numericMaxLength {
+	text-align: right;
+}
+
+.rgNumeric {
+	text-align: right;
+}
+
+#breadcrumb {
+	border-bottom: 2px solid #254061;
+	color: #254061;
+	font-weight: bold;
+	font-style: italic;
+	margin-bottom: 10px;
+	padding-bottom: 5px;
+}
+
+.right label {
+	padding-left: 10px;
+}
+.filler {
+	display: inline-block;
+	width: 20px;
+}
+.spacer {
+	min-height: 7px;
+}
+
+td span.alignright {float:right; display:inline; text-align:right;}
+
+/*** override styles ***/
+.dataTables_filter label { width:200px;}
+
+#gridPick_paginate {
+	    height: 20px;
+    width: 52px;
+}
+
+#gridPick_previous{
+ float: left;
+    height: 20px;
+    width: 25px;
+}
+
+
+#gridPick_next{
+	margin-left:-1px;
+ float: right;
+    height: 20px;
+    width: 25px;
+}
+
+#gridPick2_paginate {
+	    height: 20px;
+    width: 52px;
+}
+
+#gridPick2_previous{
+ float: left;
+    height: 20px;
+    width: 25px;
+}
+
+
+#gridPick2_next{
+	margin-left:-1px;
+ float: right;
+    height: 20px;
+    width: 25px;
+}
+
+/*** style special for IE  ***/
+.tier-box-IE{
+	 height: expression( this.scrollHeight > 99 ? "100px" : "auto" ); /* sets max-height for IE */
+}
+
+/*addition for autocomplete*/
+.ui-button { margin-left: -1px; }
+.ui-button-icon-only .ui-button-text { padding: 0.35em; } 
+.ui-autocomplete-input { margin: 0; padding: 0.48em 0 0.47em 0.45em; }
+.accordion form input { margin: 0; padding: 0.48em 0 0.47em 0.45em; }
+
+.remove_param{
+	width: 16px;
+	cursor: pointer;
+}
+
+#spacer { display: inline-block; min-width: 230px; }
+#shortcut { border: 0; height: 10px; margin-top: 2px; padding-left:3px; vertical-align: middle; }
+input[disabled][type='text'], textarea[disabled]{ color:Gray; background-color:WhiteSmoke;}
+
+.readonlylogo{
+	width: 300px;
+}
+
+.screenMask {
+    cursor: pointer;
+	opacity: .75; /* Standards Compliant Browsers */
+	filter: alpha(opacity=75); /* IE 7 and Earlier */
+	
+	/* Next 2 lines IE8 */
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=75)";
+	filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=75);
+}
+
+.smalldisabledtext{
+	width:60px;
+	text-align:center;
+}
+
+.mainEntry{
+}
+
+.leftEntry{
+	width: 70%;
+	float: left;
+}
+
+.rightEntry{
+	float: left;
+	height: 100px;
+	margin-top: 100px;
+	overflow: auto;
+}
+
+.divclear{
+	clear:both;
+}
+
+.innerdesc {
+  background-color: #C0C0C0;
+  border: 1px solid black;
+  height: 70px;
+  width: 250px;
+}
+
+.filterForDownload{
+	display: inline-block;
+	width: 15em;
+}

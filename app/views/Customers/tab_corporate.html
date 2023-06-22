@@ -1,0 +1,293 @@
+<script type="text/javascript">
+	$(function() {
+		
+		
+	});
+	
+	
+</script>
+	
+<div class="corporate_only">
+
+		<p>
+			#{textBox id:'bicCode', name:'customer.bicCode', label:'BIC Code', value:customer?.bicCode, readOnly:readOnly, width:'150px', class:'corporate capitalize', maxLength:20 /}
+			<span class="error">#{error 'BIC Code in tab Corporate is' /}</span>
+		</p>
+		<p>			
+			#{textBox id:'taxId', name:'customer.taxId.lookupCode', label:'Tax ID', value:customer?.taxId?.lookupCode, required:true, readOnly:readOnly, width:'80px', class:'capitalize corporate' /}
+			#{hidden id:'taxIdKey', name:'customer.taxId.lookupId', value:customer?.taxId?.lookupId, class:'corporate' /}
+			#{button id:'taxIdHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'taxIdDesc', name:'customer.taxId.lookupDescription', value:customer?.taxId?.lookupDescription, readOnly:true, width:'216px', class:'corporate' /}
+			#{hidden id:'supplementDocReq', name:'customer.supplementDocReq', value:customer?.supplementDocReq , class:'corporate'/}
+			<span class="error">#{error 'Tax ID in tab Institutional is' /}</span>
+		</p>
+		<p>
+			#{textBox id:'originCountry', name:'customer.originCountry.lookupCode', label:'Legal Domicile', value:customer?.originCountry?.lookupCode, class:'capitalize corporate', readOnly:readOnly, required:true, width:'80px' /}
+			#{hidden id:'originCountryId', name:'customer.originCountry.lookupId', value:customer?.originCountry?.lookupId, class:'corporate' /}
+			#{button id:'originCountryHelp', value:'?', class:'small', readOnly:readOnly /}	
+			#{textBox id:'originCountryDesc', name:'customer.originCountry.lookupDescription', value:customer?.originCountry?.lookupDescription, readOnly:true, class:'corporate', width:'216px' /}			
+			<span class="error">#{error 'Legal Domicile in tab Institutional is' /}</span>
+		</p>
+		<p style="display: none;">
+			#{textBox id:'placeCompEstb', name:'customer.birthPlace.lookupCode', label:'Place of Comp. Estb. (State)', value:customer?.birthPlace?.lookupCode, readOnly:readOnly, width:'80px', required:true, class:'corporate capitalize', maxLength:100 /}
+			#{hidden id:'placeCompEstbId', name:'customer.birthPlace.lookupId', value:customer?.birthPlace?.lookupId , class:'corporate'/}
+			#{button id:'placeCompEstbHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'placeCompEstbDesc', name:'customer.birthPlace.lookupDescription', value:customer?.birthPlace?.lookupDescription, readOnly:true, width:'216px', class:'corporate' /}
+			<span class="error">#{error 'Place of Comp. Estb. (State) in tab Institutional is' /}</span>
+		</p>
+		<p style="display: none;">
+			<label style="margin-left: 97px">(Area)<span class="req"> *</span></label>
+			<span style="margin-left: -97px">#{textBox id:'placeCompEstbArea', name:'customer.birthArea.lookupCode', value:customer?.birthArea?.lookupCode, required:true, readOnly:readOnly, width:'80px', maxLength:100, class:'corporate capitalize' /}
+			#{hidden id:'placeCompEstbAreaId', name:'customer.birthArea.lookupId', value:customer?.birthArea?.lookupId , class:'corporate'/}
+			#{button id:'placeCompEstbAreaHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'placeCompEstbAreaDesc', name:'customer.birthArea.lookupDescription', value:customer?.birthArea?.lookupDescription, readOnly:true, width:'216px', class:'corporate' /}
+			<span class="error">#{error 'Place of Comp. Estb. (Area) in tab Institutional is' /}</span>
+			</span>
+			
+		</p>
+		<p atr="mandatoryDirect">
+			#{textBox id:'birthPlaceOtherDummy', name:'customer.birthPlaceOtherDummy', label:'Place of Comp Estb. ', value:customer?.birthPlaceOtherDummy, readOnly:readOnly, required:true, width:'320px', maxLength:100, class:'corporate capitalize' /}
+			<span class="error">#{error 'Place of Comp. Estb. (State) in tab Institutional is' /}</span>
+		</p>
+		<p>
+			#{textBox id:'dateCompEstb', name:'customer.birthDate', label:'Date of Company Estb.', value:customer?.birthDate?.format(appProp.dateFormat), readOnly:readOnly, required:true, class:'calendar corporate', maxLength:10 /} (${appProp.displayDateFormat})
+			<span id="dateCompEstbError" class="error">#{error 'Date of Company Estb. in tab Institutional is' /}</span>
+		</p>
+<br />
+		<fieldSet>
+			<legend><b>Supplementary Documents</b></legend>
+	
+				<p id="liArticleOfAssociation">
+					#{textBox id:'articleOfAssociation', name:'customer.articleOfAssociation', label:'Article of Associate', value:customer?.articleOfAssociation, readOnly:readOnly, class:'corporate capitalize', width:'121px', maxLength:50, required:true /}
+					<span class="error">#{error 'Article of Associate in tab Institutional is' /}</span>
+				</p>
+				<p id="liSiupNo">
+					#{textBox id:'siupNo', name:'customer.siupNo', label:'Business Reg Cert No', value:customer?.siupNo, readOnly:readOnly, class:'corporate capitalize', width:'300px', maxLength:50, required:true /}
+					<span class="error">#{error 'Business Reg Cert No in tab Institutional is' /}</span>
+				</p>
+				<p>
+					#{textBox id:'expDateBusinesRegCert', name:'customer.siupExDate', label:'Exp. Date of Business Reg Cert No.', value:customer?.siupExDate?.format(appProp.dateFormat), readOnly:readOnly, required:true, class:'calendar corporate', maxLength:10 /} (${appProp.displayDateFormat})
+					<span id="expDateBusinesRegCertError" class="error">#{error 'Exp. Date of Business Reg Cert No. in tab Institutional is' /}</span>
+				</p>
+				<p id="skdNoLi" class="corporate_only">
+					#{textBox id:'skdNo', name:'customer.skdNo', value:customer?.skdNo, label:'SKD Number',readOnly:readOnly, width:'300px', maxLength:50, class:'corporate capitalize', required:false  /}
+					<span class="error">#{error 'SKD Number is' /}</span>
+					
+				</p>
+				<p id="skdDateLi" class="corporate_only">
+					#{textBox id:'skdDate', name:'customer.skdDate', label:'SKD Expired Date',value:customer?.skdDate?.format(appProp.dateFormat), readOnly:readOnly, class:'calendar corporate', maxLength:10, required:true  /}(${appProp.displayDateFormat})
+					<span id="skdDateError" class="error">#{error 'SKD Expired Date in tab Institutional is' /}</span>
+				</p>
+			
+			<table width="100%">
+			<tr>
+				<th width="50px"></th>
+				<th>
+					Document Type
+				</th>
+				<th>
+					Document No
+				</th>
+				<th>
+					Expiry Date
+				</th>
+			</tr>
+			<tr>
+				<td align="center" id="tdDocType">
+					<label>Document 1<span class="req"> *</span></label>
+				</td>
+				<td align="center">
+					#{dropDownList id:'documentType1', name:'customer.identificationType1.lookupId', value:customer?.identificationType1?.lookupId, options:supplementDoc, readOnly:readOnly, class:'corporate' /}
+					<span class="error">#{error 'Document 1 Type in tab Institutional is' /}</span>
+				</td>
+				<td align="center">
+					#{textBox id:'document1No', name:'customer.identification1No', value:customer?.identification1No, required:true, readOnly:readOnly, class:'corporate capitalize', width:'218px', maxLength:50 /}	
+				</td>
+				<td align="center">
+					#{textBox id:'document1Expiry', name:'customer.identification1Expiry', value:customer?.identification1Expiry?.format(appProp.dateFormat), required:true, readOnly:readOnly, class:'calendar corporate expiryDate invalidDateFormat', maxLength:10 /}
+				</td>
+				
+			</tr>
+			<tr>
+				<td></td>
+				<td align="center">
+					<span id="documentType1Error" class="error"></span>
+				</td>
+				<td align="center">
+					<span class="error">#{error 'Document 1 No in tab Institutional is' /}</span>
+				</td>
+				<td align="center">
+					<span class="error">#{error 'Document 1 Expiry Date in tab Institutional is' /}</span>
+					<span id="document1ExpiryError" class="error"></span>
+				</td>
+				
+			</tr>
+			<tr>
+				<td align="center">
+					<label>Document 2</label>
+				</td>
+				<td align="center">
+					#{dropDownList id:'documentType2', name:'customer.identificationType2.lookupId',value:customer?.identificationType2?.lookupId, options:supplementDoc, readOnly:readOnly, class:'corporate' /}
+				</td>
+				<td align="center">
+					#{textBox id:'document2No', name:'customer.identification2No', value:customer?.identification2No, required:true, readOnly:readOnly, class:'corporate capitalize', width:'218px', maxLength:50 /}
+				</td>
+				<td align="center">
+					#{textBox id:'document2Expiry', name:'customer.identification2Expiry', value:customer?.identification2Expiry?.format(appProp.dateFormat), readOnly:readOnly, class:'calendar corporate expiryDate invalidDateFormat', maxLength:10/}
+				</td>
+				
+			</tr>
+			<tr>
+				<td></td>
+				<td align="center">
+					<span id="documentType2Error" class="error"></span>
+				</td>
+				<td align="center">
+					<span class="error">#{error 'Document 2 Number in tab Institutional is' /}</span>
+				</td>
+				<td align="center">
+					<span class="error">#{error 'Document 2 Expiry Date in tab Institutional is' /}</span>
+					<span id="document2ExpiryError" class="error"></span>
+				</td>
+				
+			</tr>
+			<tr>
+				<td align="center">
+					<label>Document 3</label>
+				</td>
+				<td align="center">
+					#{dropDownList id:'documentType3', name:'customer.identificationType3.lookupId',value:customer?.identificationType3?.lookupId, options:supplementDoc, readOnly:readOnly, class:'corporate' /}
+				</td>
+				<td align="center">
+					#{textBox id:'document3No', name:'customer.identification3No', value:customer?.identification3No, required:true, readOnly:readOnly, class:'corporate capitalize', width:'218px', maxLength:50 /}
+				</td>
+				<td align="center">
+					#{textBox id:'document3Expiry', name:'customer.identification3Expiry', value:customer?.identification3Expiry?.format(appProp.dateFormat), readOnly:readOnly, class:'calendar corporate expiryDate invalidDateFormat', maxLength:10/}
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td align="center">
+					<span id="documentType3Error" class="error"></span>
+				</td>
+				<td align="center">
+					<span class="error">#{error 'Document 3 Number in tab Institutional is' /}</span>
+				</td>
+				<td align="center">
+					<span class="error">#{error 'Document 3 Expiry Date in tab Institutional is' /}</span>
+					<span id="document3ExpiryError" class="error"></span>
+				</td>
+				
+			</tr>
+			<tr>
+				<td align="center">
+					<label>Document 4</label>
+				</td>
+				<td align="center">
+					#{dropDownList id:'documentType4', name:'customer.identificationType4.lookupId', value:customer?.identificationType4?.lookupId, options:supplementDoc, readOnly:readOnly, class:'corporate' /}
+				</td>
+				<td align="center">
+					#{textBox id:'document4No', name:'customer.identification4No', value:customer?.identification4No, required:true, readOnly:readOnly, class:'corporate capitalize', width:'218px', maxLength:50 /}
+				</td>
+				<td align="center">
+					#{textBox id:'document4Expiry', name:'customer.identification4Expiry', value:customer?.identification4Expiry?.format(appProp.dateFormat), readOnly:readOnly, class:'calendar corporate expiryDate invalidDateFormat', maxLength:10/}
+				</td>
+				
+			</tr>
+			<tr>
+				<td></td>
+				<td align="center">
+					<span id="documentType4Error" class="error"></span>
+				</td>
+				<td align="center">
+					<span class="error">#{error 'Document 4 Number in tab Institutional is' /}</span>
+				</td>
+				<td align="center">
+					<span class="error">#{error 'Document 4 Expiry Date in tab Institutional is' /}</span>
+					<span id="document4ExpiryError" class="error"></span>
+				</td>
+				
+			</tr>
+		</table>
+		</fieldSet>
+<br />
+		
+		<p>
+			#{dropDownList id:'typeOfBusiness', name:'customer.typeOfBusiness.lookupId', label:'Type Of Business', value:customer?.typeOfBusiness?.lookupId, options:typeOfBusiness, readOnly:readOnly, required:true, width:'300px', class:'corporate'/}
+			<span class="error">#{error 'Type Of Business in tab Institutional is' /}</span>
+		</p>
+		<p id="otherTypeOfBusinessMandatory">
+			<label style="margin-left: 75px">(Others)<span class="req"> *</span></label>
+			<span style="margin-left: -75px">
+			#{textBox id:'typeOfBusinessOther', name:'customer.typeOfBusinessOthers', value:customer?.typeOfBusinessOthers, readOnly:readOnly, width:'300px', maxLength:100, class:'corporate capitalize specialField' /}
+			<span class="error">#{error 'Type Of Business (Others) in tab Institutional is' /}</span>
+			</span>
+		</p>
+		<p id="insuranceCode">
+			#{textBox id:'insuranceId', name:'customer.insuranceCode.lookupCode', label:'Sandi Asuransi', value:customer?.insuranceCode?.lookupCode, required:true, readOnly:readOnly, width:'80px', class:'capitalize corporate' /}
+			#{hidden id:'insuranceKey', name:'customer.insuranceCode.lookupId', value:customer?.insuranceCode?.lookupId, class:'corporate' /}
+			#{button id:'insuranceHelp', value:'?', class:'small', readOnly:readOnly /}
+			#{textBox id:'insuranceDesc', name:'customer.insuranceCode.lookupDescription', value:customer?.insuranceCode?.lookupDescription, readOnly:true, width:'216px', class:'corporate' /}
+			<span class="error">#{error 'Sandi Asuransi in tab Institutional is' /}</span>
+		</p>
+		<p atr="mandatoryDirect">
+			#{dropDownList id:'companyCharacteristic', name:'customer.companyCharacteristic.lookupId', label:'Comp. Characteristic', value:customer?.companyCharacteristic?.lookupId, options:companyCharacteristic, class:'corporate', readOnly:readOnly, required:true /}
+			<span class="error">#{error 'Comp. Characteristic in tab Institutional is' /}</span>
+		</p>
+		<p id="otherCompCharMandatory">
+			<label style="margin-left: 75px">(Others)<span class="req"> *</span></label>
+			<span style="margin-left: -75px">
+			#{textBox id:'companyCharacteristicOther', name:'customer.companyCharacteristicOthers', value:customer?.companyCharacteristicOthers, readOnly:readOnly, width:'300px', maxLength:100, class:'corporate capitalize specialField' /}
+			<span class="error">#{error 'Comp. Characteristic (Others) in tab Institutional is' /}</span>
+			</span>
+		</p>
+	<br />
+<fieldset>
+	<legend><b>Financial Information for last 3 Years</b></legend>
+	<br />
+	<p class="indent" >
+		#{textBox id:'asOfYear', label:'As of (year)',  name:'customer.asOfYear', value:customer?.asOfYear, readOnly:readOnly, required:true, class:'numberOnly corporate', maxLength:4, width:'50px' /}
+		<span class="error">#{error 'As of (year) in tab Institutional is' /}</span>
+	</p>
+	<table>
+		<tr>
+			<td>
+				<h2>ASSETS</h2>
+				<p class="indent">
+					<label>Latest Year<span class="spanLatestYear"></span><span class="req asset1Mandatory"> *</span></label>
+					#{dropDownList id:'assetYear1', name:'customer.assetYear1.lookupId', value:customer?.assetYear1?.lookupId, options:incomeCorp, readOnly:readOnly, class:'corporate' /}
+					<span class="error">#{error 'Asset Last Year in tab Institutional is' /}</span>
+				</p>
+				<p class="indent">
+					<label>Last 2 Year<span class="spanLast2Year"></span></label>
+					#{dropDownList id:'assetYear2', name:'customer.assetYear2.lookupId', value:customer?.assetYear2?.lookupId, required:false, options:incomeCorp, readOnly:readOnly, class:'corporate' /}
+					<span class="error">#{error 'Asset Second Year in tab Institutional is' /}</span>
+				</p>
+				<p class="indent">
+					<label>Last 3 Year<span class="spanLast3Year"></span></label>
+					#{dropDownList id:'assetYear3', name:'customer.assetYear3.lookupId', value:customer?.assetYear3?.lookupId, required:false, options:incomeCorp, readOnly:readOnly, class:'corporate' /}
+					<span class="error">#{error 'Asset Third Year in tab Institutional is' /}</span>
+				</p>
+			</td>
+			<td>
+				<h2 style="margin-left: 100px">OPERATING PROFIT</h2>
+				<p class="indent" style="margin-left: 100px">
+					<label>Latest Year<span class="spanLatestYear"></span><span class="req asset1Mandatory"> *</span></label>
+					#{dropDownList id:'profitYear1', name:'customer.profitYear1.lookupId', value:customer?.profitYear1?.lookupId, required:false, options:profitCorp, readOnly:readOnly, class:'corporate' /}
+					<span class="error">#{error 'Operating Profit Last Year in tab Institutional is' /}</span>
+				</p>
+				<p class="indent" style="margin-left: 100px">
+					<label>Last 2 Year<span class="spanLast2Year"></span></label>	
+					#{dropDownList id:'profitYear2', name:'customer.profitYear2.lookupId', value:customer?.profitYear2?.lookupId, required:false, options:profitCorp, readOnly:readOnly, class:'corporate' /}
+					<span class="error">#{error 'Operating Profit Second Year in tab Institutional is' /}</span>
+				</p>
+				<p class="indent" style="margin-left: 100px">
+					<label>Last 3 Year<span class="spanLast3Year"></span></label>
+					#{dropDownList id:'profitYear3', name:'customer.profitYear3.lookupId', value:customer?.profitYear3?.lookupId, required:false, options:profitCorp, readOnly:readOnly, class:'corporate' /}
+					<span class="error">#{error 'Operating Profit Third Year in tab Institutional is' /}</span>
+				</p>
+			</td>
+		</tr>
+	</table>
+</fieldset>
+</div>

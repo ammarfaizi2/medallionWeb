@@ -1,0 +1,100 @@
+#{set readonly:(model.displayMode==2 || model.displayMode==1) /}
+#{if flash.error}
+    <p class="ui-state-error">
+        ${flash.error}
+    </p>
+#{/if}
+#{script 'lookups.js' /}
+<script type="text/javascript">
+	var help = function(key, placeholder) {
+		var element = "<div id='help'><div class='loading'><img src='@@{'/public/images/loading2.gif'}' style='margin: 10px' /></div><div class='content'></div></div>"
+		$('body').append(element)
+		$('#help').dialog({
+			height: 300,
+			width:400,
+			resizable:false,
+			stack:true
+		})
+		$('#help .loading').show()
+		$('#help .content').hide()
+	}
+	
+	$(function() {
+		$('#save').click(function() {
+			save(${approval?.maintenanceLogKey}, '${model.displayMode}')
+			return false
+		})
+		$('#back').click(function() {
+			${(model.displayMode == 2) ? "save('" + approval?.maintenanceLogKey + "', 'back')" : "close()" }
+			return false
+		})
+		$('#form .buttons button').button()
+	})	
+
+</script>
+<style>
+.pane { height: 320px }
+</style>
+#{hidden id:'maintenanceLogKey', name:'model.maintenance.maintenanceLogKey', value:model?.maintenance?.maintenanceLogKey /}
+
+<h2>Pending Approval: ${model?.maintenance?.maintenanceLogKey} - ${model?.maintenance?.entityName}</h2>
+<div id="tabs">
+			
+<form class="form" method="POST">
+#{set readOnly:false /}
+#{if (model.displayMode == 3)}
+	#{set readOnly:true /}
+#{/if}
+#{elseif (model.displayMode == 4)}
+	#{set readOnly:true /}
+#{/elseif}
+
+	<table>
+		<tr>
+			<td style="width:100px">Entity Key</td>
+			<td>${model.maintenance.entityKey}</td>
+		</tr>
+		<tr>
+			<td>Entity Name</td>
+			<td>${model.maintenance.entityName}</td>
+		</tr>
+		<tr>
+			<td>Operator</td>
+			<td>${model.maintenance.recordCreatedBy}</td>
+		</tr>
+		<tr>
+			<td>Record Date</td>
+			<td>${model.maintenance.recordCreatedDate}</td>
+		</tr>
+		
+	</table>
+	<br/> 
+	<table>
+	<thead>
+		<td style="width:125px">Field</td>
+		<td style="width:200px">Old Data</td>
+		<td style="width:300px">New Data</td>
+	</thead>
+	<tr>
+		<td>Customer Type</td>
+		<td>${oldData?.customerType}</td>
+		<td>${newData?.customerType}</td>
+	</tr>
+	<tr>
+		<td>Customer No</td>
+		<td>${oldData?.customerNo}</td>
+		<td>${newData?.customerNo}</td>
+	</tr>
+	<tr>
+		<td>Full Name</td>
+		<td>${oldData?.customerName}</td>
+		<td>${newData?.customerName}</td>
+	</tr>
+	</table>		
+</form>
+</div>
+	<div class="buttons">
+		<button id="reject" onclick="ditolak('${model.maintenance.maintenanceLogKey}')">Reject</button>
+		<button id="approve" onclick="approve('${model.maintenance.maintenanceLogKey}')">Approve</button>
+		<button id="close" onclick="close()">Close</button>
+	</div>

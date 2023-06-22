@@ -1,0 +1,40 @@
+#{extends 'templates/list1.html' /}
+#{set pageTitle:'Report Maintenance' /}
+
+<script type="text/javascript">
+
+	function doEdit(data) {
+		if ((data[2] == "New") || (data[2] == "Updated")) {
+			view(data[0]);
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+</script>
+
+<table class="display">
+	<thead>
+		<tr>
+			<th>key</th>
+			<th>Report Name</th>
+			<th>Status</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:reports, as:'report'}
+		<tr>
+			<td>
+				${report?.reportKey}
+			</td>
+			<td>
+				${report?.reportName}
+			</td>
+			<td>
+				${report?.recordStatus?.decodeStatus()}
+			</td>			
+		</tr>
+	#{/list}
+	</tbody>
+</table>
